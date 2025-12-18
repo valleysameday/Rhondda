@@ -54,6 +54,7 @@ function loadPosts(category = 'all') {
 
 div.innerHTML = `
   <button class="report-btn" title="Report this post">⚑</button>
+  ${post.image ? `<img src="${post.image}" alt="${post.title}" class="post-img">` : ''}
   <h3>${post.title}</h3>
   <p>${post.content}</p>
   <small>Category: ${post.category}</small>
