@@ -1,21 +1,73 @@
 <svg width="600" height="250" viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Rhondda Noticeboard logo">
-  <circle cx="80" cy="80" r="40" fill="#FF7EB3" opacity="0.6" />
-  <circle cx="520" cy="150" r="30" fill="#7AFFAF" opacity="0.6" />
-  <circle cx="450" cy="60" r="20" fill="#7EE8FF" opacity="0.6" />
+  <!-- Rainbow gradient for NOTICEBOARD -->
+  <defs>
+    <linearGradient id="rainbowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF5252">
+        <animate attributeName="stop-color" values="#FF5252;#FFD93D;#6BCB77;#4D96FF;#9B72AA;#FF5252" dur="6s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="100%" stop-color="#9B72AA"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Animated circles (balloons) -->
+  <circle cx="80" cy="80" r="40" fill="#FF7EB3" opacity="0.6">
+    <animateTransform attributeName="transform" type="translate" values="0,0;0,-12;0,0" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="520" cy="150" r="30" fill="#7AFFAF" opacity="0.6">
+    <animateTransform attributeName="transform" type="translate" values="0,0;0,-10;0,0" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="450" cy="60" r="20" fill="#7EE8FF" opacity="0.6">
+    <animateTransform attributeName="transform" type="translate" values="0,0;0,-8;0,0" dur="2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Rhondda letters cycling colors -->
   <g font-family="Arial Rounded MT Bold, sans-serif" font-weight="900" font-size="85" letter-spacing="-2">
-    <text x="50" y="140" fill="#FF5252">R</text>
-    <text x="110" y="140" fill="#FF7E5F">h</text>
-    <text x="160" y="140" fill="#FEB47B">o</text>
-    <text x="215" y="140" fill="#FFD93D">n</text>
-    <text x="270" y="140" fill="#6BCB77">d</text>
-    <text x="325" y="140" fill="#4D96FF">d</text>
-    <text x="380" y="140" fill="#9B72AA">a</text>
+    <text x="50" y="140">R
+      <animate attributeName="fill" values="#FF5252;#FFD93D;#6BCB77;#4D96FF;#9B72AA;#FF5252" dur="6s" repeatCount="indefinite"/>
+    </text>
+    <text x="110" y="140">h
+      <animate attributeName="fill" values="#FF7E5F;#FEB47B;#FFD93D;#6BCB77;#4D96FF;#9B72AA;#FF7E5F" dur="6s" repeatCount="indefinite"/>
+    </text>
+    <text x="160" y="140">o
+      <animate attributeName="fill" values="#FEB47B;#FFD93D;#6BCB77;#4D96FF;#9B72AA;#FF5252;#FEB47B" dur="6s" repeatCount="indefinite"/>
+    </text>
+    <text x="215" y="140">n
+      <animate attributeName="fill" values="#FFD93D;#6BCB77;#4D96FF;#9B72AA;#FF5252;#FF7E5F;#FFD93D" dur="6s" repeatCount="indefinite"/>
+    </text>
+    <text x="270" y="140">d
+      <animate attributeName="fill" values="#6BCB77;#4D96FF;#9B72AA;#FF5252;#FF7E5F;#FEB47B;#6BCB77" dur="6s" repeatCount="indefinite"/>
+    </text>
+    <text x="325" y="140">d
+      <animate attributeName="fill" values="#4D96FF;#9B72AA;#FF5252;#FF7E5F;#FEB47B;#FFD93D;#4D96FF" dur="6s" repeatCount="indefinite"/>
+    </text>
+    <text x="380" y="140">a
+      <animate attributeName="fill" values="#9B72AA;#FF5252;#FF7E5F;#FEB47B;#FFD93D;#6BCB77;#9B72AA" dur="6s" repeatCount="indefinite"/>
+    </text>
   </g>
-  <text x="235" y="195" font-family="Arial Rounded MT Bold, sans-serif" font-weight="900" font-size="35" fill="#444" letter-spacing="1">
+
+  <!-- NOTICEBOARD with rainbow gradient -->
+  <text x="235" y="195" font-family="Arial Rounded MT Bold, sans-serif" font-weight="900" font-size="35" fill="url(#rainbowGradient)" letter-spacing="1">
     NOTICEBOARD
   </text>
+
+  <!-- Sparkle star -->
   <path d="M470 110 L475 125 L490 130 L475 135 L470 150 L465 135 L450 130 L465 125 Z" fill="#FFD700">
     <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
   </path>
-  <path d="M435 115 Q450 90 460 110" stroke="#9B72AA" stroke-width="8" fill="none" stroke-linecap="round" />
+
+  <!-- Confetti triangles -->
+  <polygon points="100,40 110,60 90,60" fill="#FFD93D">
+    <animate attributeName="opacity" values="1;0;1" dur="3s" repeatCount="indefinite"/>
+  </polygon>
+  <polygon points="500,200 510,220 490,220" fill="#4D96FF">
+    <animate attributeName="opacity" values="1;0;1" dur="2.5s" repeatCount="indefinite"/>
+  </polygon>
+  <polygon points="300,30 310,50 290,50" fill="#FF7EB3">
+    <animate attributeName="opacity" values="1;0;1" dur="2s" repeatCount="indefinite"/>
+  </polygon>
+
+  <!-- Wavy underline -->
+  <path d="M200 210 Q250 230 300 210 T400 210" stroke="#FF7E5F" stroke-width="4" fill="none">
+    <animate attributeName="d" values="M200 210 Q250 230 300 210 T400 210; M200 210 Q250 190 300 210 T400 210; M200 210 Q250 230 300 210 T400 210" dur="4s" repeatCount="indefinite"/>
+  </path>
 </svg>
