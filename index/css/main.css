@@ -257,3 +257,19 @@ footer {
 .report-btn:hover {
   opacity: 0.9;
 }
+/* Image area for listings (Gumtree-style) */
+.post-image {
+  width: 100%;
+  height: 150px;          /* fixed height = tidy cards */
+  background: #eee;
+  overflow: hidden;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.post-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;      /* THIS is the magic */
+  display: block;
+}
