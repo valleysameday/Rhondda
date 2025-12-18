@@ -236,3 +236,24 @@ footer {
 .weather-emoji {
   font-size: 1.4rem;
 }
+.post-card {
+  position: relative;
+}
+
+/* Tiny report flag */
+.report-btn {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.35;
+  padding: 0;
+  line-height: 1;
+}
+
+.report-btn:hover {
+  opacity: 0.9;
+}
