@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rhondda Noticeboard</title>
+
+  <!-- Main Styles -->
+  <link rel="stylesheet" href="/index/main.css" />
+
+  <!-- SEO / Trust -->
+  <meta name="description" content="Local offers, events and services across Rhondda. A community noticeboard for residents and businesses." />
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <img src="images/Site-Logo.svg" alt="Rhondda Noticeboard logo" class="logo" />
+    <h1>Rhondda Noticeboard</h1>
+  </div>
+
+  <!-- Soft call-to-action -->
+  <div class="header-actions">
+    <a href="/account/login.html" class="header-link">Business Login</a>
+    <a href="/account/register.html" class="header-link primary">Post an Offer</a>
+  </div>
+</header>
+
+<main>
+<!-- Login Modal -->
+<div id="loginModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Business Login</h2>
+    <input type="email" placeholder="Email">
+    <input type="password" placeholder="Password">
+    <button id="loginBtn">Login</button>
+  </div>
+</div>
+
+<!-- Post Offer Modal -->
+<div id="postModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Post an Offer</h2>
+    <input type="text" placeholder="Title">
+    <textarea placeholder="Description"></textarea>
+    <select>
+      <option>Offers</option>
+      <option>Events</option>
+      <option>Services</option>
+    </select>
+    <button id="postBtn">Submit</button>
+  </div>
+</div>
+  <!-- Categories -->
+  <section id="categories">
+    <button data-category="all" class="category-btn active">All</button>
+    <button data-category="offers" class="category-btn">Offers</button>
+    <button data-category="events" class="category-btn">Events</button>
+    <button data-category="services" class="category-btn">Services</button>
+  </section>
+
+  <!-- Posts Grid -->
+  <section id="postsContainer" class="posts-grid">
+    <!-- Cards injected by JS -->
+  </section>
+
+</main>
+
+<footer>
+  <p>&copy; 2025 Rhondda Noticeboard</p>
+  <p class="footer-links">
+    <a href="/about.html">About</a> ·
+    <a href="/terms.html">Terms</a> ·
+    <a href="/contact.html">Contact</a>
+  </p>
+</footer>
+
+<!-- Scripts -->
+<script type="module" src="/index/main.js"></script>
+
+</body>
+</html>
