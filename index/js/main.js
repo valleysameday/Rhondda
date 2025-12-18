@@ -3,6 +3,7 @@ const categoryBtns = document.querySelectorAll('.category-btn');
 const loginModal = document.getElementById('loginModal');
 const postModal = document.getElementById('postModal');
 
+/* -------------------- MODALS -------------------- */
 document.querySelector('.header-link[href$="login.html"]').onclick = e => {
   e.preventDefault();
   loginModal.style.display = 'flex';
@@ -14,22 +15,28 @@ document.querySelector('.header-link.primary').onclick = e => {
 };
 
 document.querySelectorAll('.close').forEach(span => {
-  span.onclick = () => { span.parentElement.parentElement.style.display = 'none'; }
+  span.onclick = () => {
+    span.parentElement.parentElement.style.display = 'none';
+  };
 });
+
+/* -------------------- MOCK POSTS -------------------- */
 const mockPosts = [
-  { title: 'Cafe Discount', content: 'Get 10% off at Joe’s Cafe', category: 'offers' },
-  { title: 'Charity Run', content: 'Join the charity 5k in Pontypridd', category: 'events' },
-  { title: 'Plumber Available', content: 'Quick plumbing service this week', category: 'services' },
-  { title: 'Supermarket Sale', content: 'Weekly specials on groceries', category: 'offers' },
-  { title: 'Dog Found', content: 'Lost Beagle spotted in Pontypridd', category: 'community' }
+  { id: '1', title: 'Cafe Discount', content: 'Get 10% off at Joe’s Cafe', category: 'offers', type: 'business' },
+  { id: '2', title: 'Charity Run', content: 'Join the charity 5k in Pontypridd', category: 'events' },
+  { id: '3', title: 'Plumber Available', content: 'Quick plumbing service this week', category: 'services', type: 'business' },
+  { id: '4', title: 'Supermarket Sale', content: 'Weekly specials on groceries', category: 'offers', type: 'ad' },
+  { id: '5', title: 'Dog Found', content: 'Lost Beagle spotted in Pontypridd', category: 'community' }
 ];
 
+/* -------------------- LOAD POSTS -------------------- */
 function loadPosts(category = 'all') {
   postsContainer.innerHTML = '';
 
-  const filtered = category === 'all'
-    ? mockPosts
-    : mockPosts.filter(p => p.category === category);
+  const filtered =
+    category === 'all'
+      ? mockPosts
+      : mockPosts.filter(p => p.category === category);
 
   if (!filtered.length) {
     postsContainer.innerHTML = '<p>No posts yet!</p>';
@@ -38,20 +45,34 @@ function loadPosts(category = 'all') {
 
   filtered.forEach(post => {
     const div = document.createElement('div');
-    div.className = 'post-card';
+    div.className = `post-card ${post.type || ''}`;
 
-    // Randomly make 1 in 4 posts full-width
-    if (Math.random() < 0.25) div.classList.add('full-width');
+    // Randomly make 1 in 4 posts full width
+    if (Math.random() < 0.25) {
+      div.classList.add('business');
+    }
 
     div.innerHTML = `
       <h3>${post.title}</h3>
       <p>${post.content}</p>
-      <small>Category: ${post.category}</small>
+
+      <div class="post-footer">
+        <small>${post.category}</small>
+
+        <button
+          class="report-btn"
+          data-post-id="${post.id}"
+        >
+          🚩 Report
+        </button>
+      </div>
     `;
+
     postsContainer.appendChild(div);
   });
 }
 
+/* -------------------- CATEGORY FILTER -------------------- */
 categoryBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     categoryBtns.forEach(b => b.classList.remove('active'));
@@ -59,6 +80,29 @@ categoryBtns.forEach(btn => {
     loadPosts(btn.dataset.category);
   });
 });
+
+/* -------------------- REPORT HANDLER (GLOBAL) -------------------- */
+document.addEventListener('click', e => {
+  if (!e.target.classList.contains('report-btn')) return;
+
+  const postId = e.target.dataset.postId;
+
+  const reason = prompt(
+    "Why are you reporting this post?\n\n• Scam\n• Offensive\n• Spam\n• Misleading\n• Other"
+  );
+
+  if (!reason) return;
+
+  console.log('Post reported:', {
+    postId,
+    reason,
+    time: new Date().toISOString()
+  });
+
+  alert("Thanks — this post has been flagged for review.");
+});
+
+/* -------------------- WEATHER -------------------- */
 async function loadWeather() {
   try {
     const res = await fetch(
@@ -69,11 +113,9 @@ async function loadWeather() {
     const code = data.current_weather.weathercode;
     const temp = Math.round(data.current_weather.temperature);
 
-    // Get sunrise/sunset for today
     const sunrise = new Date(data.daily.sunrise[0]);
     const sunset = new Date(data.daily.sunset[0]);
     const now = new Date(data.current_weather.time);
-
     const isDay = now >= sunrise && now <= sunset;
 
     let message = isDay
@@ -83,38 +125,27 @@ async function loadWeather() {
 
     if ([0].includes(code)) {
       message = isDay
-        ? `Clear skies over the valley — perfect for a stroll or a cuppa outside`
-        : `Clear night — stars out over the Rhondda, lush for a quiet walk`;
+        ? "Clear skies over the valley — lush day for it"
+        : "Clear night — quiet and calm";
       emoji = isDay ? "☀️" : "✨";
-    } else if ([1,2,3].includes(code)) {
+    } else if ([1, 2, 3].includes(code)) {
       message = isDay
-        ? `Bit of cloud about — still lush for popping down the shops or seeing mates`
-        : `Cloudy night — good time for a film indoors`;
+        ? "Bit of cloud about — still decent"
+        : "Cloudy night — film and a brew";
       emoji = "⛅";
-    } else if ([51,61,63,65].includes(code)) {
+    } else if ([51, 61, 63, 65].includes(code)) {
       message = isDay
-        ? `Rain’s on — grab your brolly and maybe support a local café while you’re out`
-        : `Rainy night — kettle on, blanket out, support local online`;
+        ? "Rain’s on — brolly time"
+        : "Rainy night — kettle on";
       emoji = "🌧️";
-    } else if ([71,73,75].includes(code)) {
-      message = isDay
-        ? `Snow in the valley — wrap up warm if you’re out`
-        : `Cold night — best to keep cosy and shop local online`;
+    } else if ([71, 73, 75].includes(code)) {
+      message = "Snow about — wrap up warm";
       emoji = "❄️";
     }
 
     document.querySelector(".weather-emoji").textContent = emoji;
     document.querySelector(".weather-text").textContent =
       `${message} · ${temp}°C`;
-
-    // Optional: change background theme
-    const widget = document.querySelector(".weather-widget");
-    if (widget) {
-      widget.style.background = isDay
-        ? "linear-gradient(to top, #87CEEB, #ffffff)" // daytime sky
-        : "linear-gradient(to top, #001848, #444)"   // night sky
-      widget.style.color = isDay ? "#222" : "#eee";
-    }
 
   } catch {
     document.querySelector(".weather-text").textContent =
@@ -123,5 +154,6 @@ async function loadWeather() {
 }
 
 loadWeather();
-// Load all posts on page load
+
+/* -------------------- INIT -------------------- */
 loadPosts();
