@@ -52,21 +52,12 @@ function loadPosts(category = 'all') {
       div.classList.add('business');
     }
 
-    div.innerHTML = `
-      <h3>${post.title}</h3>
-      <p>${post.content}</p>
-
-      <div class="post-footer">
-        <small>${post.category}</small>
-
-        <button
-          class="report-btn"
-          data-post-id="${post.id}"
-        >
-          🚩 Report
-        </button>
-      </div>
-    `;
+div.innerHTML = `
+  <button class="report-btn" title="Report this post">⚑</button>
+  <h3>${post.title}</h3>
+  <p>${post.content}</p>
+  <small>Category: ${post.category}</small>
+`;
 
     postsContainer.appendChild(div);
   });
