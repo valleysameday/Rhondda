@@ -69,20 +69,20 @@ async function loadWeather() {
     const code = data.current_weather.weathercode;
     const temp = Math.round(data.current_weather.temperature);
 
-    let message = "A typical day in Rhondda.";
+    let message = "Another day in the Rhondda — tidy!";
     let emoji = "🌤️";
 
     if ([0].includes(code)) {
-      message = `Clear skies today — ideal for local events`;
+      message = `Clear skies over the valley — perfect for a stroll or a cuppa outside`;
       emoji = "☀️";
     } else if ([1,2,3].includes(code)) {
-      message = `A bit cloudy today — still good for popping out`;
+      message = `Bit of cloud about — still lush for popping down the shops or seeing mates`;
       emoji = "⛅";
     } else if ([51,61,63,65].includes(code)) {
-      message = `Rainy today — check local offers before heading out`;
+      message = `Rain’s on — grab your brolly and maybe support a local café while you’re out`;
       emoji = "🌧️";
     } else if ([71,73,75].includes(code)) {
-      message = `Cold today — support local businesses from home`;
+      message = `Snow or chill in the air — best to keep cosy and shop local online`;
       emoji = "❄️";
     }
 
@@ -92,7 +92,7 @@ async function loadWeather() {
 
   } catch {
     document.querySelector(".weather-text").textContent =
-      "Local updates available today";
+      "Local updates available — keep an eye out, butt!";
   }
 }
 
