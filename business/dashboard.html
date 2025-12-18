@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rhondda Noticeboard - Business Dashboard</title>
+<link rel="stylesheet" href="/customerAccont/css/dashboard.css">
+</head>
+<body>
+
+<header>
+  <h1>Rhondda Noticeboard - Dashboard</h1>
+</header>
+
+<main>
+  <section class="post-creation">
+  <h2>Create a Post</h2>
+
+  <input type="text" id="postTitle" placeholder="Post Title">
+  <textarea id="postContent" placeholder="Post Content"></textarea>
+
+  <select id="postCategory">
+    <option value="offers">Offers</option>
+    <option value="events">Events</option>
+    <option value="services">Services</option>
+  </select>
+
+  <input type="file" id="postImage" accept="image/*">
+
+  <button id="createPostBtn">Add Post</button>
+  </section>
+
+  <section class="post-list">
+    <h2>Your Posts</h2>
+    <div id="dashboardPosts">
+      Loading posts...
+    </div>
+  </section>
+</main>
+
+<footer>
+  © 2025 Rhondda Noticeboard
+</footer>
+
+<script src="/customerAccont/js/dashboard.js"></script>
+</body>
+</html>
