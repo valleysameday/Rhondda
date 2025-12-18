@@ -59,6 +59,43 @@ categoryBtns.forEach(btn => {
     loadPosts(btn.dataset.category);
   });
 });
+async function loadWeather() {
+  try {
+    const res = await fetch(
+      "https://api.open-meteo.com/v1/forecast?latitude=51.65&longitude=-3.45&current_weather=true"
+    );
+    const data = await res.json();
 
+    const code = data.current_weather.weathercode;
+    const temp = Math.round(data.current_weather.temperature);
+
+    let message = "A typical day in Rhondda.";
+    let emoji = "🌤️";
+
+    if ([0].includes(code)) {
+      message = `Clear skies today — ideal for local events`;
+      emoji = "☀️";
+    } else if ([1,2,3].includes(code)) {
+      message = `A bit cloudy today — still good for popping out`;
+      emoji = "⛅";
+    } else if ([51,61,63,65].includes(code)) {
+      message = `Rainy today — check local offers before heading out`;
+      emoji = "🌧️";
+    } else if ([71,73,75].includes(code)) {
+      message = `Cold today — support local businesses from home`;
+      emoji = "❄️";
+    }
+
+    document.querySelector(".weather-emoji").textContent = emoji;
+    document.querySelector(".weather-text").textContent =
+      `${message} · ${temp}°C`;
+
+  } catch {
+    document.querySelector(".weather-text").textContent =
+      "Local updates available today";
+  }
+}
+
+loadWeather();
 // Load all posts on page load
 loadPosts();
