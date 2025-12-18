@@ -28,13 +28,30 @@
 </header>
 
 <main>
-<!-- Login Modal -->
 <div id="loginModal" class="modal">
   <div class="modal-content">
-    <span class="close">&times;</span>
+    <span class="close" aria-label="Close login">&times;</span>
+
     <h2>Business Login</h2>
-    <input type="email" placeholder="Email">
-    <input type="password" placeholder="Password">
+
+    <input
+      type="email"
+      id="loginEmail"
+      name="email"
+      placeholder="Email"
+      autocomplete="email"
+      required
+    >
+
+    <input
+      type="password"
+      id="loginPassword"
+      name="password"
+      placeholder="Password"
+      autocomplete="current-password"
+      required
+    >
+
     <button id="loginBtn">Login</button>
   </div>
 </div>
@@ -42,15 +59,37 @@
 <!-- Post Offer Modal -->
 <div id="postModal" class="modal">
   <div class="modal-content">
-    <span class="close">&times;</span>
+    <span class="close" aria-label="Close post">&times;</span>
+
     <h2>Post an Offer</h2>
-    <input type="text" placeholder="Title">
-    <textarea placeholder="Description"></textarea>
-    <select>
-      <option>Offers</option>
-      <option>Events</option>
-      <option>Services</option>
+
+    <input
+      type="text"
+      id="postTitle"
+      name="title"
+      placeholder="Title"
+      required
+    >
+
+    <textarea
+      id="postDescription"
+      name="description"
+      placeholder="Description"
+      rows="4"
+      required
+    ></textarea>
+
+    <select
+      id="postCategory"
+      name="category"
+      required
+    >
+      <option value="">Select category</option>
+      <option value="offers">Offers</option>
+      <option value="events">Events</option>
+      <option value="services">Services</option>
     </select>
+
     <button id="postBtn">Submit</button>
   </div>
 </div>
