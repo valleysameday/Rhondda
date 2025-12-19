@@ -1,23 +1,45 @@
 const postsContainer = document.getElementById('postsContainer');
 const categoryBtns = document.querySelectorAll('.category-btn');
+
 const loginModal = document.getElementById('loginModal');
 const postModal = document.getElementById('postModal');
 
+// Top action bar buttons
+const loginBtnTop = document.getElementById('loginBtn');
+const postAdBtn = document.getElementById('postAdBtn');
+const joinBtn = document.getElementById('joinBtn');
+
 /* -------------------- MODALS -------------------- */
-document.querySelector('.header-link[href$="login.html"]').onclick = e => {
-  e.preventDefault();
-  loginModal.style.display = 'flex';
-};
 
-document.querySelector('.header-link.primary').onclick = e => {
-  e.preventDefault();
-  postModal.style.display = 'flex';
-};
+// Open login modal
+if (loginBtnTop && loginModal) {
+  loginBtnTop.addEventListener('click', e => {
+    e.preventDefault();
+    loginModal.style.display = 'flex';
+  });
+}
 
-document.querySelectorAll('.close').forEach(span => {
-  span.onclick = () => {
-    span.parentElement.parentElement.style.display = 'none';
-  };
+// Open post modal
+if (postAdBtn && postModal) {
+  postAdBtn.addEventListener('click', e => {
+    e.preventDefault();
+    postModal.style.display = 'flex';
+  });
+}
+
+// Close modals
+document.querySelectorAll('.close').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const modal = btn.closest('.modal');
+    if (modal) modal.style.display = 'none';
+  });
+});
+
+// Click outside modal to close
+document.querySelectorAll('.modal').forEach(modal => {
+  modal.addEventListener('click', e => {
+    if (e.target === modal) modal.style.display = 'none';
+  });
 });
 
 /* -------------------- MOCK POSTS -------------------- */
@@ -44,23 +66,22 @@ function loadPosts(category = 'all') {
   }
 
   filtered.forEach(post => {
-    const div = document.createElement('div');
-    div.className = `post-card ${post.type || ''}`;
+    const card = document.createElement('div');
+    card.className = `post-card ${post.type || ''}`;
 
-    // Randomly make 1 in 4 posts full width
-    if (Math.random() < 0.25) {
-      div.classList.add('business');
+    // Example featured logic (later replace with paid flag)
+    if (post.type === 'business') {
+      card.classList.add('business');
     }
 
-div.innerHTML = `
-  <button class="report-btn" title="Report this post">⚑</button>
-  ${post.image ? `<img src="${post.image}" alt="${post.title}" class="post-img">` : ''}
-  <h3>${post.title}</h3>
-  <p>${post.content}</p>
-  <small>Category: ${post.category}</small>
-`;
+    card.innerHTML = `
+      <button class="report-btn" title="Report this post" data-post-id="${post.id}">⚑</button>
+      <h3>${post.title}</h3>
+      <p>${post.content}</p>
+      <small>Category: ${post.category}</small>
+    `;
 
-    postsContainer.appendChild(div);
+    postsContainer.appendChild(card);
   });
 }
 
@@ -73,7 +94,7 @@ categoryBtns.forEach(btn => {
   });
 });
 
-/* -------------------- REPORT HANDLER (GLOBAL) -------------------- */
+/* -------------------- REPORT HANDLER -------------------- */
 document.addEventListener('click', e => {
   if (!e.target.classList.contains('report-btn')) return;
 
@@ -110,35 +131,19 @@ async function loadWeather() {
     const now = new Date(data.current_weather.time);
     const isDay = now >= sunrise && now <= sunset;
 
+    let emoji = isDay ? "🌞" : "🌙";
     let message = isDay
       ? "Another tidy day in the Rhondda."
       : "Evening in the valley — cosy vibes.";
-    let emoji = isDay ? "🌞" : "🌙";
 
-    if ([0].includes(code)) {
-      message = isDay
-        ? "Clear skies over the valley — lush day for it"
-        : "Clear night — quiet and calm";
-      emoji = isDay ? "☀️" : "✨";
-    } else if ([1, 2, 3].includes(code)) {
-      message = isDay
-        ? "Bit of cloud about — still decent"
-        : "Cloudy night — film and a brew";
-      emoji = "⛅";
-    } else if ([51, 61, 63, 65].includes(code)) {
-      message = isDay
-        ? "Rain’s on — brolly time"
-        : "Rainy night — kettle on";
+    if ([51, 61, 63, 65].includes(code)) {
       emoji = "🌧️";
-    } else if ([71, 73, 75].includes(code)) {
-      message = "Snow about — wrap up warm";
-      emoji = "❄️";
+      message = "Rain’s on — brolly time";
     }
 
     document.querySelector(".weather-emoji").textContent = emoji;
     document.querySelector(".weather-text").textContent =
       `${message} · ${temp}°C`;
-
   } catch {
     document.querySelector(".weather-text").textContent =
       "Local updates available — keep an eye out, butt!";
