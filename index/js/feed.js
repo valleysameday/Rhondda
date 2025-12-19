@@ -30,16 +30,17 @@ function loadPosts(category = 'all') {
     const card = document.createElement('div');
     card.className = `post-card ${post.type || ''}`;
 
-    // Example featured logic (later replace with paid flag)
-    if (post.type === 'business') {
-      card.classList.add('business');
-    }
+    // Add image placeholder
+    const imgSrc = post.image || '/images/post-placeholder.jpg';
 
     card.innerHTML = `
-      <button class="report-btn" title="Report this post" data-post-id="${post.id}">⚑</button>
+      <div class="post-image">
+        <img src="${imgSrc}" alt="${post.title}" />
+      </div>
       <h3>${post.title}</h3>
-      <p>${post.content}</p>
-      <small>Category: ${post.category}</small>
+      <p class="post-desc">${post.content}</p>
+      <small class="post-category">Category: ${post.category}</small>
+      <button class="report-btn" title="Report this post" data-post-id="${post.id}">⚑</button>
     `;
 
     postsContainer.appendChild(card);
