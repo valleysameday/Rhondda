@@ -227,7 +227,7 @@ footer {
   gap: 30px;
 
   padding: 14px 0;
-  background: #ffffff;
+  background: #FF7EB3;
   border-top: 1px solid #eee;
 }
 
@@ -236,7 +236,7 @@ footer {
   flex-direction: column;
   align-items: center;
   text-decoration: none;
-  color: #444;
+  color: #eee;
   font-size: 13px;
   font-weight: 500;
   transition: color 0.2s, transform 0.2s;
