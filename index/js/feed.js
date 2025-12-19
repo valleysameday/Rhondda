@@ -1,13 +1,7 @@
 const postsContainer = document.getElementById('postsContainer');
 const categoryBtns = document.querySelectorAll('.category-btn');
 
-const loginModal = document.getElementById('loginModal');
-const postModal = document.getElementById('postModal');
 
-// Top action bar buttons
-const loginBtnTop = document.getElementById('loginBtn');
-const postAdBtn = document.getElementById('postAdBtn');
-const joinBtn = document.getElementById('joinBtn');
 
 /* -------------------- MOCK POSTS -------------------- */
 const mockPosts = [
