@@ -9,39 +9,6 @@ const loginBtnTop = document.getElementById('loginBtn');
 const postAdBtn = document.getElementById('postAdBtn');
 const joinBtn = document.getElementById('joinBtn');
 
-/* -------------------- MODALS -------------------- */
-
-// Open login modal
-if (loginBtnTop && loginModal) {
-  loginBtnTop.addEventListener('click', e => {
-    e.preventDefault();
-    loginModal.style.display = 'flex';
-  });
-}
-
-// Open post modal
-if (postAdBtn && postModal) {
-  postAdBtn.addEventListener('click', e => {
-    e.preventDefault();
-    postModal.style.display = 'flex';
-  });
-}
-
-// Close modals
-document.querySelectorAll('.close').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const modal = btn.closest('.modal');
-    if (modal) modal.style.display = 'none';
-  });
-});
-
-// Click outside modal to close
-document.querySelectorAll('.modal').forEach(modal => {
-  modal.addEventListener('click', e => {
-    if (e.target === modal) modal.style.display = 'none';
-  });
-});
-
 /* -------------------- MOCK POSTS -------------------- */
 const mockPosts = [
   { id: '1', title: 'Cafe Discount', content: 'Get 10% off at Joe’s Cafe', category: 'offers', type: 'business' },
