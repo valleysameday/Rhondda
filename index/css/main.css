@@ -1,4 +1,4 @@
-/* -------------------- RESET & BASE -------------------- */
+RESET & BASE -------------------- */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -272,4 +272,25 @@ footer {
   height: 100%;
   object-fit: cover;      /* THIS is the magic */
   display: block;
+}
+.action-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #ffffff;
+  padding: 12px 0;
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  border-bottom: 1px solid #eee;
+}
+.action-link:hover {
+  color: #FF7E5F;
+  transform: translateY(-2px);
+}
+@media (max-width: 480px) {
+  .action-bar {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
 }
