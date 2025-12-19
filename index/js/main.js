@@ -4,72 +4,45 @@ const categoryBtns = document.querySelectorAll('.category-btn');
 const loginModal = document.getElementById('loginModal');
 const postModal = document.getElementById('postModal');
 
-// Top action buttons
+// Top action bar buttons
 const loginBtnTop = document.getElementById('loginBtn');
 const postAdBtn = document.getElementById('postAdBtn');
 const joinBtn = document.getElementById('joinBtn');
 
-/* ======================================================
-   MODAL HELPERS
-====================================================== */
-function openModal(modal) {
-  if (!modal) return;
-  modal.style.display = 'flex';
-  document.body.classList.add('modal-open');
-}
+/* -------------------- MODALS -------------------- */
 
-function closeModal(modal) {
-  if (!modal) return;
-  modal.style.display = 'none';
-  document.body.classList.remove('modal-open');
-}
-
-/* ======================================================
-   MODAL EVENTS
-====================================================== */
+// Open login modal
 if (loginBtnTop && loginModal) {
   loginBtnTop.addEventListener('click', e => {
     e.preventDefault();
-    openModal(loginModal);
+    loginModal.style.display = 'flex';
   });
 }
 
+// Open post modal
 if (postAdBtn && postModal) {
   postAdBtn.addEventListener('click', e => {
     e.preventDefault();
-    openModal(postModal);
+    postModal.style.display = 'flex';
   });
 }
 
-// Close buttons (X)
+// Close modals
 document.querySelectorAll('.close').forEach(btn => {
   btn.addEventListener('click', () => {
     const modal = btn.closest('.modal');
-    closeModal(modal);
+    if (modal) modal.style.display = 'none';
   });
 });
 
-// Click outside modal
+// Click outside modal to close
 document.querySelectorAll('.modal').forEach(modal => {
   modal.addEventListener('click', e => {
-    if (e.target === modal) closeModal(modal);
+    if (e.target === modal) modal.style.display = 'none';
   });
 });
 
-// ESC key closes modal
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    document.querySelectorAll('.modal').forEach(modal => {
-      if (modal.style.display === 'flex') {
-        closeModal(modal);
-      }
-    });
-  }
-});
-
-/* ======================================================
-   MOCK POSTS (replace with backend later)
-====================================================== */
+/* -------------------- MOCK POSTS -------------------- */
 const mockPosts = [
   { id: '1', title: 'Cafe Discount', content: 'Get 10% off at Joe’s Cafe', category: 'offers', type: 'business' },
   { id: '2', title: 'Charity Run', content: 'Join the charity 5k in Pontypridd', category: 'events' },
@@ -78,12 +51,8 @@ const mockPosts = [
   { id: '5', title: 'Dog Found', content: 'Lost Beagle spotted in Pontypridd', category: 'community' }
 ];
 
-/* ======================================================
-   LOAD POSTS
-====================================================== */
+/* -------------------- LOAD POSTS -------------------- */
 function loadPosts(category = 'all') {
-  if (!postsContainer) return;
-
   postsContainer.innerHTML = '';
 
   const filtered =
@@ -100,12 +69,13 @@ function loadPosts(category = 'all') {
     const card = document.createElement('div');
     card.className = `post-card ${post.type || ''}`;
 
+    // Example featured logic (later replace with paid flag)
     if (post.type === 'business') {
       card.classList.add('business');
     }
 
     card.innerHTML = `
-      <button class="report-btn" data-post-id="${post.id}" title="Report this post">⚑</button>
+      <button class="report-btn" title="Report this post" data-post-id="${post.id}">⚑</button>
       <h3>${post.title}</h3>
       <p>${post.content}</p>
       <small>Category: ${post.category}</small>
@@ -115,9 +85,7 @@ function loadPosts(category = 'all') {
   });
 }
 
-/* ======================================================
-   CATEGORY FILTER
-====================================================== */
+/* -------------------- CATEGORY FILTER -------------------- */
 categoryBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     categoryBtns.forEach(b => b.classList.remove('active'));
@@ -126,9 +94,7 @@ categoryBtns.forEach(btn => {
   });
 });
 
-/* ======================================================
-   REPORT HANDLER
-====================================================== */
+/* -------------------- REPORT HANDLER -------------------- */
 document.addEventListener('click', e => {
   if (!e.target.classList.contains('report-btn')) return;
 
@@ -149,9 +115,7 @@ document.addEventListener('click', e => {
   alert("Thanks — this post has been flagged for review.");
 });
 
-/* ======================================================
-   WEATHER WIDGET
-====================================================== */
+/* -------------------- WEATHER -------------------- */
 async function loadWeather() {
   try {
     const res = await fetch(
@@ -159,11 +123,18 @@ async function loadWeather() {
     );
     const data = await res.json();
 
-    const temp = Math.round(data.current_weather.temperature);
     const code = data.current_weather.weathercode;
+    const temp = Math.round(data.current_weather.temperature);
 
-    let emoji = "🌤️";
-    let message = "Another tidy day in the Rhondda.";
+    const sunrise = new Date(data.daily.sunrise[0]);
+    const sunset = new Date(data.daily.sunset[0]);
+    const now = new Date(data.current_weather.time);
+    const isDay = now >= sunrise && now <= sunset;
+
+    let emoji = isDay ? "🌞" : "🌙";
+    let message = isDay
+      ? "Another tidy day in the Rhondda."
+      : "Evening in the valley — cosy vibes.";
 
     if ([51, 61, 63, 65].includes(code)) {
       emoji = "🌧️";
@@ -173,15 +144,13 @@ async function loadWeather() {
     document.querySelector(".weather-emoji").textContent = emoji;
     document.querySelector(".weather-text").textContent =
       `${message} · ${temp}°C`;
-
   } catch {
-    const text = document.querySelector(".weather-text");
-    if (text) text.textContent = "Local updates available — keep an eye out, butt!";
+    document.querySelector(".weather-text").textContent =
+      "Local updates available — keep an eye out, butt!";
   }
 }
 
-/* ======================================================
-   INIT
-====================================================== */
 loadWeather();
+
+/* -------------------- INIT -------------------- */
 loadPosts();
