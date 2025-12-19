@@ -1,4 +1,19 @@
+/* Lock background when modal open */
+body.modal-open {
+  overflow: hidden;
+}
 
+/* Dim background content when modal is open */
+body.modal-open main {
+  filter: blur(2px);
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Modal should always be on top */
+.modal {
+  z-index: 9999;
+}
 * {
   box-sizing: border-box;
   margin: 0;
