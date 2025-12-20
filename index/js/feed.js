@@ -1,4 +1,3 @@
-<script>
 const postsContainer = document.getElementById('postsContainer');
 const categoryBtns = document.querySelectorAll('.category-btn');
 
@@ -186,4 +185,3 @@ loadWeather();
 
 /* -------------------- INIT -------------------- */
 loadPosts();
-</script>
