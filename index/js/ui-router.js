@@ -103,35 +103,44 @@ const postCategory = document.getElementById('postCategory');
 const postSubcategory = document.getElementById('postSubcategory');
 const postSubcategoryWrapper = document.querySelector('.subcategory-wrapper');
 
-if (postSubcategoryWrapper) {
-  postSubcategoryWrapper.style.display = 'none'; // ✅ hide on load
-}
+const postPrice = document.getElementById('postPrice');
+const priceWrapper = document.querySelector('.price-wrapper');
 
-if (postCategory && postSubcategory && postSubcategoryWrapper) {
+// ✅ Hide on load
+postSubcategoryWrapper && (postSubcategoryWrapper.style.display = 'none');
+priceWrapper && (priceWrapper.style.display = 'none');
+
+if (postCategory) {
   postCategory.addEventListener('change', () => {
-    const subs = subcategoryMap[postCategory.value];
+    const category = postCategory.value;
+    const subs = subcategoryMap[category];
 
-    // ❌ No category OR no subcategories → hide dropdown
+    /* ---------- SUBCATEGORY LOGIC ---------- */
     if (!subs || subs.length === 0) {
       postSubcategory.innerHTML = '';
       postSubcategoryWrapper.style.display = 'none';
-      return;
+    } else {
+      postSubcategoryWrapper.style.display = 'block';
+      postSubcategory.innerHTML = '<option value="">Select subcategory</option>';
+
+      subs.forEach(sub => {
+        const opt = document.createElement('option');
+        opt.value = sub;
+        opt.textContent = sub;
+        postSubcategory.appendChild(opt);
+      });
     }
 
-    // ✅ Has subcategories → show + populate
-    postSubcategoryWrapper.style.display = 'block';
-    postSubcategory.innerHTML = '<option value="">Select subcategory</option>';
-
-    subs.forEach(sub => {
-      const opt = document.createElement('option');
-      opt.value = sub;
-      opt.textContent = sub;
-      postSubcategory.appendChild(opt);
-    });
+    /* ---------- PRICE LOGIC ---------- */
+    // ❌ Freebies never have a price
+    if (!category || category === 'free') {
+      priceWrapper.style.display = 'none';
+      postPrice.value = '';
+    } else {
+      priceWrapper.style.display = 'block';
+    }
   });
 }
-
-  document.getElementById('postPrice')?.value = '';
 
   /* -------------------- IMAGE PREVIEW -------------------- */
 if (postImage && imagePreview) {
