@@ -34,14 +34,18 @@ function loadPosts(category = 'all') {
     const imgSrc = post.image || '/images/post-placeholder.jpg';
 
     card.innerHTML = `
-      <div class="post-image">
-        <img src="${imgSrc}" alt="${post.title}" />
-      </div>
-      <h3>${post.title}</h3>
-      <p class="post-desc">${post.content}</p>
-      <small class="post-category">Category: ${post.category}</small>
-      <button class="report-btn" title="Report this post" data-post-id="${post.id}">⚑</button>
-    `;
+  <div class="post-image">
+    <img src="${imgSrc}" alt="${post.title}" />
+  </div>
+
+  <div class="post-body">
+    <h3>${post.title}</h3>
+    <p class="post-desc">${post.content}</p>
+    <small class="post-category">Category: ${post.category}</small>
+  </div>
+
+  <button class="report-btn" title="Report this post" data-post-id="${post.id}">⚑</button>
+`;
 
     postsContainer.appendChild(card);
   });
