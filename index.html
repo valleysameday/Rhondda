@@ -5,138 +5,145 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rhondda Noticeboard</title>
 
+  <meta name="description"
+        content="Local offers, events and services across Rhondda. A community noticeboard for residents and businesses." />
+
   <link rel="stylesheet" href="/index/css/main.css" />
-  <meta name="description" content="Local offers, events and services across Rhondda. A community noticeboard for residents and businesses." />
 </head>
 
 <body>
 
+<!-- ================= HEADER ================= -->
 <header>
   <div class="header-inner">
-    <img src="/images/logo.svg" alt="Logo for Rhondda community site" class="logo" />
+    <img src="/images/logo.svg"
+         alt="Rhondda Noticeboard logo"
+         class="logo" />
   </div>
 </header>
 
+<!-- ================= MAIN ================= -->
 <main>
 
-  <!-- Weather Snippet -->
+  <!-- Weather -->
   <section id="weatherSnippet" class="weather-snippet">
-    <span class="weather-emoji">⏳</span>
-    <span class="weather-text">Loading today's weather…</span>
+    <span class="weather-emoji">⏳.......</span>
+    <span class="weather-text">Loading today’s weather…</span>
   </section>
 
-<section id="categories">
-  <button data-category="all" class="category-btn active">All</button>
-  <button data-category="forsale" class="category-btn">For Sale</button>
-  <button data-category="jobs" class="category-btn">Jobs & Services</button>
-  <button data-category="property" class="category-btn">Property</button>
-  <button data-category="community" class="category-btn">Community</button>
-  <button data-category="events" class="category-btn">Events</button>
-  <button data-category="free" class="category-btn">Freebies</button>
-</section>
+  <!-- Categories -->
+  <section id="categories">
+    <button data-category="all" class="category-btn active">All</button>
+    <button data-category="forsale" class="category-btn">For Sale</button>
+    <button data-category="jobs" class="category-btn">Jobs & Services</button>
+    <button data-category="property" class="category-btn">Property</button>
+    <button data-category="community" class="category-btn">Community</button>
+    <button data-category="events" class="category-btn">Events</button>
+    <button data-category="free" class="category-btn">Freebies</button>
+  </section>
 
   <!-- Subcategories -->
-  <section id="subcategories" class="subcategories" style="display:none;"></section>
+  <section id="subcategories" class="subcategories" hidden></section>
 
-  <!-- Posts Grid -->
+  <!-- Posts -->
   <section id="postsContainer" class="posts-grid"></section>
 
 </main>
 
-<!-- LOGIN MODAL -->
+<!-- ================= LOGIN MODAL ================= -->
 <div id="loginModal" class="modal">
-  <div class="modal-content">
-    <span class="close" aria-label="Close login">&times;</span>
-    <h2>Business Login</h2>
+  <div class="modal-box">
+    <button class="close" aria-label="Close">&times;</button>
+    <h2>Log in</h2>
 
-    <input type="email" id="loginEmail" placeholder="Email" autocomplete="email" required>
-    <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" required>
+    <input type="email" id="loginEmail" placeholder="Email" autocomplete="email">
+    <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password">
 
-    <!-- UNIQUE ID -->
-    <button id="loginSubmitBtn">Login</button>
+    <button id="loginSubmit">Log in</button>
+
+    <p class="modal-switch">
+      No account?
+      <span onclick="openScreen('signup')">Create one</span>
+    </p>
+
+    <p class="modal-link" onclick="resetPassword()">Forgot password?</p>
   </div>
 </div>
 
-<!-- POST MODAL -->
+<!-- ================= SIGNUP MODAL ================= -->
+<div id="signupModal" class="modal">
+  <div class="modal-box">
+    <button class="close" aria-label="Close">&times;</button>
+    <h2>Create account</h2>
+
+    <input type="email" id="signupEmail" placeholder="Email" autocomplete="email">
+    <input type="password" id="signupPassword" placeholder="Password" autocomplete="new-password">
+
+    <button id="signupSubmit">Create account</button>
+
+    <p class="modal-switch">
+      Already have an account?
+      <span onclick="openScreen('login')">Log in</span>
+    </p>
+  </div>
+</div>
+
+<!-- ================= POST MODAL ================= -->
 <div id="postModal" class="modal">
-  <div class="modal-content">
-    <span class="close" aria-label="Close post">&times;</span>
-    <h2>Post an Offer</h2>
+  <div class="modal-box">
+    <button class="close" aria-label="Close">&times;</button>
+    <h2>Post an Ad</h2>
 
     <input type="text" id="postTitle" placeholder="Title" required>
-    <textarea id="postDescription" placeholder="Description" rows="4" required></textarea>
+    <textarea id="postDescription" rows="4" placeholder="Description" required></textarea>
 
-    <!-- Category -->
-    <select id="postCategory" name="category" required>
+    <select id="postCategory" required>
       <option value="">Select category</option>
       <option value="offers">Offers</option>
       <option value="events">Events</option>
       <option value="services">Services</option>
     </select>
 
-    <!-- Image upload -->
     <label class="hint-label">Add a photo (recommended)</label>
     <input type="file" id="postImage" accept="image/*">
     <div id="imagePreview" class="image-preview"></div>
     <small class="hint-text">Ads with photos get more views</small>
 
-    <!-- Subcategory -->
     <select id="postSubcategory">
       <option value="">Select subcategory</option>
     </select>
 
-    <!-- UNIQUE ID -->
     <button id="postSubmitBtn">Submit</button>
   </div>
 </div>
 
-<!-- JOIN MODAL -->
-<div id="joinModal" class="modal">
-  <div class="modal-content">
-    <span class="close" aria-label="Close join">&times;</span>
-    <h2>Join Us</h2>
-  </div>
-</div>
-
-<!-- FIXED ACTION BAR -->
+<!-- ================= ACTION BAR ================= -->
 <div class="action-bar">
 
-  <!-- UNIQUE ID -->
   <a href="#" id="postAdBtn" class="action-link post-free">
     <div class="icon-wrap">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-        <line x1="12" y1="8" x2="12" y2="16"></line>
-        <line x1="8" y1="12" x2="16" y2="12"></line>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <line x1="12" y1="8" x2="12" y2="16" />
+        <line x1="8" y1="12" x2="16" y2="12" />
       </svg>
       <span class="free-ribbon">FREE</span>
     </div>
     <span>Post an Ad</span>
   </a>
 
-  <!-- UNIQUE ID -->
   <a href="#" id="loginOpenBtn" class="action-link">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-      <polyline points="10 17 15 12 10 7"></polyline>
-      <line x1="15" y1="12" x2="3" y2="12"></line>
-    </svg>
-    <span class="label-main">Login</span>
+    <span>Login</span>
   </a>
 
-  <!-- UNIQUE ID -->
   <a href="#" id="joinOpenBtn" class="action-link">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-      <circle cx="8.5" cy="7" r="4"></circle>
-      <line x1="20" y1="8" x2="20" y2="14"></line>
-      <line x1="23" y1="11" x2="17" y2="11"></line>
-    </svg>
-    <span class="label-main">Join Us</span>
+    <span>Join</span>
   </a>
 
 </div>
 
+<!-- ================= FOOTER ================= -->
 <footer>
   <p>&copy; 2025 Rhondda Noticeboard</p>
   <p class="footer-links">
@@ -145,6 +152,13 @@
     <a href="/contact.html">Contact</a>
   </p>
 </footer>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script src="/js/firebase-init.js"></script>
+<script src="/js/auth.js"></script>
 
 <script src="/index/js/feed.js" defer></script>
 <script src="/index/js/ui-router.js" defer></script>
