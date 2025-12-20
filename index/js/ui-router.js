@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const routes = {
     login: document.getElementById('loginModal'),
     post: document.getElementById('postModal'),
-    join: document.getElementById('signupModal')
+    signup: document.getElementById('signupModal')
   };
 
   function openScreen(name) {
@@ -157,7 +157,7 @@ document.getElementById('openLoginModal')?.addEventListener('click', e => {
 
 document.getElementById('opensignupModal')?.addEventListener('click', e => {
   e.preventDefault();
-  openScreen('join');
+  openScreen('signup');
 });
 
 /* -------------------- CLOSE MODALS -------------------- */
