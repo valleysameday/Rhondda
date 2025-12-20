@@ -1,395 +1,483 @@
-/* =====================================================
-   1. RESET / GLOBAL BASICS
-   ===================================================== */
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+<style>
+  
+  
+  /* =====================================================
+   GLOBAL RESET
+===================================================== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-  font-family: Arial, sans-serif;
-  background: #f9fafb;
-  color: #111;
-  line-height: 1.5;
-  padding-bottom: 80px; /* space for fixed action bar */
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: #f2f4f5;
+    color: #111;
+    line-height: 1.5;
+    padding-bottom: 80px;
 }
 
+a { text-decoration: none; }
 
 /* =====================================================
-   2. MODAL / POPUP SYSTEM (Login, Post Ad, Join)
-   ===================================================== */
-
-/* Lock background when modal open */
-body.modal-open {
-  overflow: hidden;
-}
-
-/* Blur + dim main content */
-body.modal-open main {
-  filter: blur(3px);
-  opacity: 0.35;
-  pointer-events: none;
-}
-
-/* Modal backdrop */
-.modal {
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,0,0.45);
-  backdrop-filter: blur(4px);
-  z-index: 9999;
-}
-
-/* Modal box */
-.modal-content {
-  background: #ffffff;
-  width: 100%;
-  max-width: 420px;
-  padding: 22px;
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
-  position: relative;
-  animation: popIn 0.25s ease;
-}
-
-/* Close (X) */
-.modal .close {
-  position: absolute;
-  top: 14px;
-  right: 16px;
-  font-size: 22px;
-  cursor: pointer;
-  opacity: 0.6;
-}
-
-.modal .close:hover {
-  opacity: 1;
-}
-
-/* Inputs inside modals */
-.modal-content input,
-.modal-content textarea,
-.modal-content select {
-  width: 100%;
-  margin-bottom: 12px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  font-size: 15px;
-}
-
-/* Helpful hints */
-.hint-text {
-  display: block;
-  font-size: 0.8rem;
-  color: #666;
-  margin-bottom: 12px;
-}
-
-/* Modal animation */
-@keyframes popIn {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-
-/* =====================================================
-   3. HEADER / LOGO
-   ===================================================== */
-
+   HEADER
+===================================================== */
 header {
-  background: #FF7EB3;
-  color: white;
-  text-align: center;
-  padding: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    background: #FF7EB3;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 header img.logo {
-  height: 55px;
-  vertical-align: middle;
+    height: 45px;
 }
 
-
 /* =====================================================
-   4. WEATHER SNIPPET
-   ===================================================== */
-
+   WEATHER SNIPPET
+===================================================== */
 .weather-snippet {
-  background: #fff4e6;
-  border: 1px solid #ffd8b5;
-  border-radius: 10px;
-  padding: 10px 14px;
-  margin: 15px auto;
-  max-width: 900px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.95rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    background: #f0f7ff;
+    border: 1px solid #d1e5ff;
+    color: #2d3748;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 30px;
+    margin: 20px 0;
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .weather-emoji {
-  font-size: 1.4rem;
+    font-size: 2.5rem;
 }
 
+.weather-info {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+@media (min-width: 1024px) {
+    .weather-snippet { padding: 30px 40px; }
+    .weather-info { font-size: 1.4rem; }
+}
 
 /* =====================================================
-   5. CATEGORY + SUBCATEGORY BUTTONS
-   ===================================================== */
-
+   CATEGORIES
+===================================================== */
 #categories {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin: 20px 0;
-  gap: 10px;
+    display: flex;
+    justify-content: flex-start;
+    gap: 8px;
+    margin: 20px 0;
+    padding: 0 16px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
 }
+#categories::-webkit-scrollbar { display: none; }
 
 .category-btn {
-  padding: 10px 22px;
-  border: 2px solid #FF7EB3;
-  background: white;
-  color: #FF7EB3;
-  cursor: pointer;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 0.25s ease;
+    padding: 10px 20px;
+    background: #fff;
+    color: #444;
+    border: 1px solid #d1d5db;
+    border-radius: 25px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.2s;
+    flex-shrink: 0;
 }
-
-.category-btn:hover,
+.category-btn:hover { background: #f9fafb; }
 .category-btn.active {
-  background: #FF7EB3;
-  color: white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    background: #FF7EB3;
+    color: #fff;
+    border-color: #FF7EB3;
+    box-shadow: 0 2px 8px rgba(255,126,179,0.3);
 }
 
-/* Subcategories (appears under categories) */
+/* =====================================================
+   SUBCATEGORIES (Horizontal scroll + nice styling)
+===================================================== */
 .subcategories {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+    padding: 10px 16px;
+    margin-bottom: 20px;
+
+    overflow-x: auto;        /* ✅ horizontal scroll */
+    white-space: nowrap;     /* ✅ keep in one line */
+    scrollbar-width: none;   /* ✅ hide scrollbar (Firefox) */
+}
+.subcategories::-webkit-scrollbar {
+    display: none;           /* ✅ hide scrollbar (Chrome/Safari) */
 }
 
 .subcategory-btn {
-  padding: 6px 14px;
-  font-size: 0.85rem;
-  border-radius: 20px;
-  border: 1px solid #ccc;
-  background: #fff;
-  cursor: pointer;
+    padding: 10px 18px;      /* ✅ bigger, nicer pill buttons */
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #444;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 25px;
+    cursor: pointer;
+    flex-shrink: 0;          /* ✅ prevents squashing */
+    transition: all 0.2s ease;
 }
 
 .subcategory-btn:hover {
-  background: #eee;
+    background: #f9fafb;
+    border-color: #9ca3af;
 }
 
+.subcategory-btn.active {
+    background: #FF7EB3;
+    color: #fff;
+    border-color: #FF7EB3;
+    box-shadow: 0 2px 8px rgba(255, 126, 179, 0.3);
+}
 
 /* =====================================================
-   6. POSTS GRID + CARDS
-   ===================================================== */
-
+   POSTS GRID — CLEAN & BALANCED
+===================================================== */
 .posts-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  max-width: 1000px;
-  margin: 0 auto 50px;
-  padding: 0 16px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    max-width: 1400px;
+    margin: 0 auto 50px;
+    padding: 12px;
 }
 
-/* Card base */
+/* =====================================================
+   BASE CARD
+===================================================== */
 .post-card {
-  position: relative;
-  background: white;
-  border-radius: 18px;
-  padding: 18px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    transition: transform .18s ease, box-shadow .18s ease;
+    height: 320px; /* slightly taller for breathing room */
 }
 
 .post-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.12);
+}
+.post-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2d333f;
+    margin: 4px 0 6px;
+}
+/* =====================================================
+   IMAGES — FULL WIDTH & IMPACTFUL
+===================================================== */
+.post-image {
+    width: 100%;
+    height: 170px;
+    background: #f1f1f1;
+    position: relative;
 }
 
-/* Business highlight */
-.post-card.business {
-  grid-column: span 2;
-  background: #FFE8D6;
-  border: 2px solid #FF7E5F;
+.post-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-/* Normal ads */
-.post-card.ad {
-  border: 1px solid #ddd;
+/* subtle gradient improves text readability if needed */
+.post-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(0,0,0,0) 55%,
+      rgba(0,0,0,0.25)
+    );
+}
+
+/* =====================================================
+   BODY CONTENT
+===================================================== */
+.post-body {
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
 }
 
 /* Title */
 .post-card h3 {
-  font-size: 1.2rem;
-  margin-bottom: 6px;
-  color: #FF5252;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Description */
 .post-card p {
-  margin-bottom: 6px;
-  color: #333;
+    font-size: .9rem;
+    color: #374151;
+    line-height: 1.35;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-/* Category text */
+/* Meta */
 .post-card small {
-  color: #666;
-  font-size: 0.8rem;
+    font-size: .78rem;
+    color: #6b7280;
 }
-
 
 /* =====================================================
-   7. POST IMAGE (Oval style)
-   ===================================================== */
-
-.post-image {
-  width: 100%;
-  height: 150px;
-  overflow: hidden;
-  border-radius: 999px;
-  margin-bottom: 10px;
-  background: #eee;
+   BUSINESS / FEATURED CARDS — PREMIUM STANDOUT
+===================================================== */
+.post-card.business {
+    grid-column: span 2;
+    height: 360px;
+    border-radius: 16px;
+    border: 2px solid #ff4f8b;
+    background: linear-gradient(180deg, #fff7fb, #ffffff);
+    position: relative;
+    overflow: hidden;
 }
 
-.post-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* Business image */
+.post-card.business .post-image {
+    height: 200px;
+    width: 100%;
+    position: relative;
 }
 
+/* ✅ PREMIUM FEATURED RIBBON — bigger, brighter, glowing */
+.post-card.business::before {
+    content: "FEATURED BUSINESS";
+    position: absolute;
+    top: 30px;          /* ✅ fully visible */
+    left: -30px;        /* ✅ perfect diagonal placement */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* ✅ Premium gradient */
+    background: linear-gradient(135deg, #ff2f7d, #ff7eb3, #ffb3d6);
+
+    /* ✅ Glow effect */
+    box-shadow: 0 4px 12px rgba(255, 80, 140, 0.45);
+
+    /* ✅ Text styling */
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+
+    /* ✅ Bigger ribbon */
+    width: 160px;
+    height: 38px;
+
+    /* ✅ Clean diagonal */
+    transform: rotate(-45deg);
+    z-index: 5;
+
+    /* ✅ Smooth rendering */
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Business body */
+.post-card.business .post-body {
+    padding: 18px 20px;
+}
+
+/* Business title */
+.post-card.business h3 {
+    font-size: 1.35rem;
+    color: #ff2f7d;
+}
+
+/* Business description */
+.post-card.business p {
+    font-size: .95rem;
+    -webkit-line-clamp: 3;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
 
 /* =====================================================
-   8. REPORT BUTTON
-   ===================================================== */
+   DESKTOP LAYOUT
+===================================================== */
+@media (min-width: 1024px) {
+    .posts-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
 
-.report-btn {
-  position: absolute;
-  bottom: 6px;
-  right: 6px;
-  background: none;
-  border: none;
-  font-size: 12px;
-  cursor: pointer;
-  opacity: 0.35;
+    .post-card {
+        height: 340px;
+    }
+
+    .post-card.business {
+        height: 420px;
+    }
+
+    .post-card.business .post-image {
+        height: 260px;
+    }
 }
-
-.report-btn:hover {
-  opacity: 0.9;
-}
-
 
 /* =====================================================
-   9. FIXED ACTION BAR (BOTTOM)
-   ===================================================== */
-
+   FIXED ACTION BAR
+===================================================== */
 .action-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
-
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-
-  padding: 14px 0;
-  background: #FF7EB3;
-  border-top: 1px solid #eee;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 14px 0;
+    background: #FF7EB3;
+    border-top: 1px solid #eee;
 }
 
 .action-link {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-  color: #eee;
-  font-size: 13px;
-  font-weight: 500;
-  transition: color 0.2s, transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #eee;
+    font-size: 13px;
+    font-weight: 500;
+    transition: 0.2s;
 }
-
 .action-link:hover {
-  color: #FF7E5F;
-  transform: translateY(-2px);
+    color: #FF7E5F;
+    transform: translateY(-2px);
 }
 
-/* Icon wrapper for ribbon */
-.icon-wrap {
-  position: relative;
-  display: inline-block;
-}
+.icon-wrap { position: relative; }
 
-/* FREE ribbon */
 .free-ribbon {
-  position: absolute;
-  top: -6px;
-  right: -20px;
-  background: #FF7E5F;
-  color: #fff;
-  font-size: 9px;
-  font-weight: 600;
-  padding: 2px 4px;
-  border-radius: 4px;
-  transform: rotate(18deg);
-  letter-spacing: 0.4px;
-  pointer-events: none;
+    position: absolute;
+    top: -6px;
+    right: -20px;
+    background: #FF7E5F;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transform: rotate(18deg);
 }
 
-
 /* =====================================================
-   10. FOOTER
-   ===================================================== */
-
+   FOOTER
+===================================================== */
 footer {
-  text-align: center;
-  padding: 25px;
-  background: #f1f1f1;
-  font-size: 0.9rem;
-  color: #444;
-  border-top: 1px solid #ddd;
+    text-align: center;
+    padding: 40px 20px;
+    background: #f1f1f1;
+    color: #666;
+    font-size: 0.9rem;
+    border-top: 1px solid #ddd;
+    margin-top: 30px;
 }
 
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.footer-links a {
+    color: #FF7EB3;
+    font-weight: 500;
+}
 
 /* =====================================================
-   11. MOBILE RESPONSIVE
-   ===================================================== */
-
-@media (max-width: 480px) {
-  .posts-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
-    padding: 0 10px;
-  }
-
-  .category-btn {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-  }
-
-  .action-bar {
-    gap: 15px;
-  }
+   MODAL SYSTEM (FINAL FIXED VERSION)
+===================================================== */
+body.modal-open {
+    overflow: hidden;
 }
+
+body.modal-open main {
+    filter: blur(3px);
+    opacity: .35;
+    pointer-events: none;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: #fff;
+    width: 90%;
+    max-width: 420px;
+    padding: 22px;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+    position: relative;
+    animation: popIn 0.25s ease;
+}
+
+.modal .close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    font-size: 22px;
+    cursor: pointer;
+    opacity: .6;
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 15px;
+}
+
+@keyframes popIn {
+    from { transform: scale(.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+  
+  
+</style>
