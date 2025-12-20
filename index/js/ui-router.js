@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const routes = {
     login: document.getElementById('loginModal'),
     post: document.getElementById('postModal'),
-    join: document.getElementById('joinModal') // add when ready
+    join: document.getElementById('joinModal') // future
   };
 
   function openScreen(name) {
@@ -21,20 +21,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* -------------------- SUBCATEGORIES -------------------- */
+  /* -------------------- CATEGORY + SUBCATEGORY DATA -------------------- */
   const subcategoryMap = {
-    market: ['Electronics', 'Furniture', 'Appliances', 'Clothing', 'Miscellaneous'],
+    market: ['Electronics', 'Furniture', 'Appliances', 'Clothing', 'Misc'],
     offers: ['Washer', 'Tumble Dryer', 'Fridge', 'Microwave'],
     events: ['Charity', 'Music', 'Sport', 'Meetup'],
     services: ['Plumber', 'Cleaner', 'Electrician', 'Gardener']
   };
 
+  /* -------------------- FEED SUBCATEGORIES -------------------- */
   const categories = document.querySelectorAll('#categories .category-btn');
   const subcategoriesContainer = document.getElementById('subcategories');
 
   function showSubcategories(category) {
     subcategoriesContainer.innerHTML = '';
     const subs = subcategoryMap[category];
+
     if (!subs) {
       subcategoriesContainer.style.display = 'none';
       return;
@@ -44,10 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const btn = document.createElement('button');
       btn.className = 'subcategory-btn';
       btn.textContent = sub;
-      btn.addEventListener('click', () => {
-        // Here you can filter posts by category + subcategory
-        console.log(`Filter posts by ${category} > ${sub}`);
-      });
+      btn.onclick = () => {
+        console.log(`Filter feed: ${category} > ${sub}`);
+      };
       subcategoriesContainer.appendChild(btn);
     });
 
@@ -61,6 +62,42 @@ document.addEventListener('DOMContentLoaded', () => {
       showSubcategories(btn.dataset.category);
     });
   });
+
+  /* -------------------- POST AN AD UX -------------------- */
+  const postCategory = document.getElementById('postCategory');
+  const postSubcategory = document.getElementById('postSubcategory');
+  const postImage = document.getElementById('postImage');
+  const imagePreview = document.getElementById('imagePreview');
+
+  if (postCategory && postSubcategory) {
+    postCategory.addEventListener('change', () => {
+      const subs = subcategoryMap[postCategory.value] || [];
+      postSubcategory.innerHTML = '<option value="">Select subcategory</option>';
+
+      subs.forEach(sub => {
+        const opt = document.createElement('option');
+        opt.value = sub;
+        opt.textContent = sub;
+        postSubcategory.appendChild(opt);
+      });
+    });
+  }
+
+  /* -------------------- IMAGE PREVIEW -------------------- */
+  if (postImage && imagePreview) {
+    postImage.addEventListener('change', () => {
+      const file = postImage.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = e => {
+        imagePreview.innerHTML = `
+          <img src="${e.target.result}" alt="Preview">
+        `;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
 
   /* -------------------- BUTTON HOOKS -------------------- */
   document.getElementById('loginBtn')?.addEventListener('click', e => {
@@ -89,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /* -------------------- EXPOSE FOR FUTURE -------------------- */
+  /* -------------------- EXPOSE -------------------- */
   window.openScreen = openScreen;
   window.closeScreens = closeAll;
 });
