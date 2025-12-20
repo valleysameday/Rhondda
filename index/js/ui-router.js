@@ -1,9 +1,11 @@
+<script>
 document.addEventListener('DOMContentLoaded', () => {
+
   /* -------------------- ROUTES / MODALS -------------------- */
   const routes = {
     login: document.getElementById('loginModal'),
     post: document.getElementById('postModal'),
-    join: document.getElementById('joinModal') // future
+    join: document.getElementById('joinModal')
   };
 
   function openScreen(name) {
@@ -21,14 +23,50 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* -------------------- CATEGORY + SUBCATEGORY DATA -------------------- */
-  const subcategoryMap = {
-    market: ['Electronics', 'Furniture', 'Appliances', 'Clothing', 'Misc'],
-    offers: ['Washer', 'Tumble Dryer', 'Fridge', 'Microwave'],
-    events: ['Charity', 'Music', 'Sport', 'Meetup'],
-    services: ['Plumber', 'Cleaner', 'Electrician', 'Gardener']
-  };
+/* -------------------- CATEGORY + SUBCATEGORY DATA -------------------- */
+const subcategoryMap = {
+  forsale: [
+    'Appliances',
+    'Furniture',
+    'Electronics',
+    'Baby & Kids',
+    'Garden',
+    'Tools',
+    'Mobility',
+    'Misc'
+  ],
 
+  jobs: [
+    'Plumber',
+    'Electrician',
+    'Cleaner',
+    'Gardener',
+    'Handyman',
+    'Beauty & Hair',
+    'Mechanic',
+    'Tutor'
+  ],
+
+  property: [
+    'To Rent',
+    'To Buy',
+    'Rooms',
+    'Commercial'
+  ],
+
+  events: [
+    'Music',
+    'Charity',
+    'Sport',
+    'Classes',
+    'Markets'
+  ],
+
+  /* ✅ These categories have NO subcategories */
+  all: null,
+  community: null,
+  free: null
+};
   /* -------------------- FEED SUBCATEGORIES -------------------- */
   const categories = document.querySelectorAll('#categories .category-btn');
   const subcategoriesContainer = document.getElementById('subcategories');
@@ -46,9 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const btn = document.createElement('button');
       btn.className = 'subcategory-btn';
       btn.textContent = sub;
-      btn.onclick = () => {
-        console.log(`Filter feed: ${category} > ${sub}`);
-      };
+      btn.onclick = () => console.log(`Filter feed: ${category} > ${sub}`);
       subcategoriesContainer.appendChild(btn);
     });
 
@@ -63,70 +99,81 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /* -------------------- POST AN AD UX -------------------- */
-  const postCategory = document.getElementById('postCategory');
-  const postSubcategory = document.getElementById('postSubcategory');
-  const postImage = document.getElementById('postImage');
-  const imagePreview = document.getElementById('imagePreview');
+/* -------------------- POST AN AD UX -------------------- */
+const postCategory = document.getElementById('postCategory');
+const postSubcategory = document.getElementById('postSubcategory');
+const postSubcategoryWrapper = postSubcategory?.parentElement; // ✅ wrapper to hide/show
+const postImage = document.getElementById('postImage');
+const imagePreview = document.getElementById('imagePreview');
 
-  if (postCategory && postSubcategory) {
-    postCategory.addEventListener('change', () => {
-      const subs = subcategoryMap[postCategory.value] || [];
-      postSubcategory.innerHTML = '<option value="">Select subcategory</option>';
+if (postCategory && postSubcategory) {
+  postCategory.addEventListener('change', () => {
+    const subs = subcategoryMap[postCategory.value];
 
-      subs.forEach(sub => {
-        const opt = document.createElement('option');
-        opt.value = sub;
-        opt.textContent = sub;
-        postSubcategory.appendChild(opt);
-      });
-    });
-  }
+    // ✅ If no subcategories → hide the dropdown
+    if (!subs || subs.length === 0) {
+      postSubcategory.innerHTML = '';
+      if (postSubcategoryWrapper) postSubcategoryWrapper.style.display = 'none';
+      return;
+    }
 
-  /* -------------------- IMAGE PREVIEW -------------------- */
-  if (postImage && imagePreview) {
-    postImage.addEventListener('change', () => {
-      const file = postImage.files[0];
-      if (!file) return;
+    // ✅ If subcategories exist → show dropdown
+    if (postSubcategoryWrapper) postSubcategoryWrapper.style.display = 'block';
 
-      const reader = new FileReader();
-      reader.onload = e => {
-        imagePreview.innerHTML = `
-          <img src="${e.target.result}" alt="Preview">
-        `;
-      };
-      reader.readAsDataURL(file);
-    });
-  }
+    postSubcategory.innerHTML = '<option value="">Select subcategory</option>';
 
-  /* -------------------- BUTTON HOOKS -------------------- */
-  document.getElementById('loginBtn')?.addEventListener('click', e => {
-    e.preventDefault();
-    openScreen('login');
-  });
-
-  document.getElementById('postAdBtn')?.addEventListener('click', e => {
-    e.preventDefault();
-    openScreen('post');
-  });
-
-  document.getElementById('joinBtn')?.addEventListener('click', e => {
-    e.preventDefault();
-    openScreen('join');
-  });
-
-  /* -------------------- CLOSE MODALS -------------------- */
-  document.querySelectorAll('.close').forEach(btn => {
-    btn.addEventListener('click', closeAll);
-  });
-
-  document.querySelectorAll('.modal').forEach(modal => {
-    modal.addEventListener('click', e => {
-      if (e.target === modal) closeAll();
+    subs.forEach(sub => {
+      const opt = document.createElement('option');
+      opt.value = sub;
+      opt.textContent = sub;
+      postSubcategory.appendChild(opt);
     });
   });
+}
 
-  /* -------------------- EXPOSE -------------------- */
-  window.openScreen = openScreen;
-  window.closeScreens = closeAll;
+/* -------------------- IMAGE PREVIEW -------------------- */
+if (postImage && imagePreview) {
+  postImage.addEventListener('change', () => {
+    const file = postImage.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/* -------------------- ACTION BAR BUTTONS (MATCH HTML) -------------------- */
+document.getElementById('loginOpenBtn')?.addEventListener('click', e => {
+  e.preventDefault();
+  openScreen('login');
 });
+
+document.getElementById('postAdBtn')?.addEventListener('click', e => {
+  e.preventDefault();
+  openScreen('post');
+});
+
+document.getElementById('joinOpenBtn')?.addEventListener('click', e => {
+  e.preventDefault();
+  openScreen('join');
+});
+
+/* -------------------- CLOSE MODALS -------------------- */
+document.querySelectorAll('.close').forEach(btn => {
+  btn.addEventListener('click', closeAll);
+});
+
+document.querySelectorAll('.modal').forEach(modal => {
+  modal.addEventListener('click', e => {
+    if (e.target === modal) closeAll();
+  });
+});
+
+/* -------------------- EXPOSE -------------------- */
+window.openScreen = openScreen;
+window.closeScreens = closeAll;
+});
+</script>
