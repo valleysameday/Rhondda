@@ -131,7 +131,9 @@ if (postCategory && postSubcategory && postSubcategoryWrapper) {
   });
 }
 
-/* -------------------- IMAGE PREVIEW -------------------- */
+  document.getElementById('postPrice')?.value = '';
+
+  /* -------------------- IMAGE PREVIEW -------------------- */
 if (postImage && imagePreview) {
   postImage.addEventListener('change', () => {
     const file = postImage.files[0];
