@@ -111,25 +111,54 @@
     <button class="close" aria-label="Close">&times;</button>
     <h2>Post an Ad</h2>
 
+    <!-- Title -->
     <input type="text" id="postTitle" placeholder="Title" required>
+
+    <!-- Description -->
     <textarea id="postDescription" rows="4" placeholder="Description" required></textarea>
 
+    <!-- Category -->
     <select id="postCategory" required>
       <option value="">Select category</option>
-      <option value="offers">Offers</option>
+      <option value="forsale">For Sale</option>
+      <option value="jobs">Jobs & Services</option>
+      <option value="property">Property</option>
       <option value="events">Events</option>
-      <option value="services">Services</option>
+      <option value="community">Community</option>
+      <option value="free">Free</option>
     </select>
 
+    <!-- Subcategory (hidden if none) -->
+    <div class="subcategory-wrapper">
+      <select id="postSubcategory">
+        <option value="">Select subcategory</option>
+      </select>
+    </div>
+
+    <!-- Image upload -->
     <label class="hint-label">Add a photo (recommended)</label>
     <input type="file" id="postImage" accept="image/*">
     <div id="imagePreview" class="image-preview"></div>
     <small class="hint-text">Ads with photos get more views</small>
 
-    <select id="postSubcategory">
-      <option value="">Select subcategory</option>
-    </select>
+    <!-- Business account checkbox -->
+    <label class="checkbox-label">
+      <input type="checkbox" id="isBusinessAccount">
+      This is a business account
+    </label>
 
+    <!-- Business benefits card (hidden by default) -->
+    <div id="businessBenefits" class="business-benefits">
+      <h4>Business Account Benefits</h4>
+      <ul>
+        <li>Post featured ads</li>
+        <li>Get premium visibility</li>
+        <li>Access business analytics</li>
+        <li>Priority support</li>
+      </ul>
+    </div>
+
+    <!-- Submit button -->
     <button id="postSubmitBtn">Submit</button>
   </div>
 </div>
