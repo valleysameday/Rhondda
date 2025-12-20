@@ -1,232 +1,164 @@
-/* =====================================================
-   MODAL SYSTEM – PREMIER NEUMORPHIC EDITION
-===================================================== */
-
-:root {
-    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --accent-color: #764ba2;
-    --text-main: #2d3436;
-    --text-muted: #636e72;
-    --bg-card: rgba(255, 255, 255, 0.95);
-    --radius: 16px;
-    --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
+/* ================= MODAL BASE ================= */
 body.modal-open {
     overflow: hidden;
 }
 
 body.modal-open main {
-    filter: blur(8px) grayscale(20%);
-    transform: scale(0.98);
+    filter: blur(3px);
+    opacity: .35;
     pointer-events: none;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Modal overlay */
 .modal {
     position: fixed;
     inset: 0;
     display: none;
     align-items: center;
     justify-content: center;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(8px);
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(4px);
     z-index: 9999;
-    padding: 20px;
 }
 
 .modal.active {
     display: flex;
 }
 
-/* Modal container */
 .modal-content {
-    background: var(--bg-card);
-    width: 100%;
-    max-width: 420px;
-    padding: 40px;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    position: relative;
-    animation: modalSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background: #fff;
+    width: 90%;
+    max-width: 440px;
+    padding: 36px 28px;
+    border-radius: 24px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.3);
     display: flex;
     flex-direction: column;
+    gap: 20px;
+    animation: popIn 0.3s ease;
 }
 
-/* Close button - stylized */
+/* Close Button */
 .modal .close {
     position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f1f2f6;
-    border-radius: 50%;
-    font-size: 18px;
+    top: 14px;
+    right: 16px;
+    font-size: 22px;
     cursor: pointer;
+    opacity: .6;
     transition: all 0.2s ease;
-    color: var(--text-muted);
 }
-
 .modal .close:hover {
-    background: #dfe4ea;
-    color: #ff4757;
-    transform: rotate(90deg);
+    opacity: 1;
+    transform: scale(1.1);
 }
 
-/* Form Headings */
-.modal-content h2 {
-    margin-bottom: 8px;
-    font-size: 24px;
-    color: var(--text-main);
-    font-weight: 700;
-}
-
-.modal-content p {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin-bottom: 24px;
-}
-
-/* Form Grouping */
+/* ================= MODERN FORM ================= */
 .modal-form {
     display: flex;
     flex-direction: column;
-    gap: 18px;
-}
-
-/* Input Styling */
-.modal-form .input-group {
+    gap: 16px;
     position: relative;
 }
 
+/* Floating Label Inputs */
 .modal-form input,
+.modal-form textarea,
 .modal-form select {
     width: 100%;
-    padding: 14px 16px;
-    border-radius: 12px;
-    border: 2px solid #f1f2f6;
-    background: #f8f9fa;
-    font-size: 15px;
+    padding: 18px 16px 18px 16px;
+    border-radius: 16px;
+    border: 1px solid #ddd;
+    font-size: 16px;
     font-weight: 500;
-    transition: all 0.3s ease;
-    outline: none;
-    box-sizing: border-box;
+    background: #f9f9f9;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+    transition: all 0.25s ease;
+    position: relative;
 }
 
-.modal-form input:focus {
+.modal-form input:focus,
+.modal-form textarea:focus,
+.modal-form select:focus {
+    border-color: #FF7EB3;
+    box-shadow: 0 0 10px rgba(255,126,179,0.35);
     background: #fff;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 4px rgba(118, 75, 162, 0.1);
+    outline: none;
 }
 
-/* Placeholder color */
+/* Optional Floating Labels */
 .modal-form input::placeholder {
-    color: #a4b0be;
+    color: #bbb;
+    font-weight: 400;
 }
 
-/* Submit Button */
+/* ================= BUTTONS ================= */
 .modal-form button {
-    margin-top: 10px;
-    padding: 16px;
-    border-radius: 12px;
+    padding: 16px 0;
+    border-radius: 24px;
     border: none;
-    background: var(--primary-gradient);
+    background: linear-gradient(135deg, #FF7EB3, #FF758C);
     color: #fff;
     font-weight: 600;
     font-size: 16px;
-    letter-spacing: 0.5px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
+    transition: all 0.25s ease;
+    box-shadow: 0 6px 18px rgba(255,126,179,0.3);
 }
 
 .modal-form button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4);
-    filter: brightness(1.1);
+    opacity: 0.95;
+    box-shadow: 0 10px 25px rgba(255,126,179,0.35);
 }
 
-.modal-form button:active {
-    transform: translateY(0);
-}
-
-/* Footer Switch links */
+/* ================= MODAL SWITCH ================= */
 .modal-switch {
-    margin-top: 24px;
+    margin-top: 16px;
     font-size: 14px;
     text-align: center;
-    color: var(--text-muted);
 }
 
-.modal-switch span, 
-.modal-switch a {
-    color: var(--accent-color);
-    text-decoration: none;
-    font-weight: 700;
-    margin-left: 5px;
+.modal-switch span {
+    color: #FF7EB3;
+    font-weight: 600;
     cursor: pointer;
+    transition: color 0.2s;
 }
 
 .modal-switch span:hover {
-    text-decoration: underline;
+    color: #FF4A7D;
 }
 
-/* Checkbox Style */
+/* ================= CHECKBOX ================= */
 .checkbox-label {
     display: flex;
     align-items: center;
-    font-size: 14px;
-    color: var(--text-muted);
-    cursor: pointer;
-    user-select: none;
+    font-size: 0.95rem;
+    gap: 10px;
+    margin-bottom: 12px;
 }
 
-.checkbox-label input {
-    width: 18px;
-    height: 18px;
-    margin-right: 10px;
-    accent-color: var(--accent-color);
+/* ================= IMAGE PREVIEW ================= */
+.image-preview img {
+    width: 100%;
+    max-height: 220px;
+    object-fit: cover;
+    border-radius: 16px;
+    margin-top: 8px;
 }
 
-/* Animations */
-@keyframes modalSlideUp {
-    from { 
-        opacity: 0; 
-        transform: translateY(30px) scale(0.95); 
-    }
-    to { 
-        opacity: 1; 
-        transform: translateY(0) scale(1); 
-    }
+/* ================= POP-IN ANIMATION ================= */
+@keyframes popIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
-/* Accessibility: Reduce motion if requested */
-@media (prefers-reduced-motion: reduce) {
-    .modal-content {
-        animation: none;
-    }
-    body.modal-open main {
-        transition: none;
-    }
-}
-
-/* Mobile optimizations */
+/* ================= RESPONSIVE ================= */
 @media (max-width: 480px) {
     .modal-content {
-        padding: 30px 20px;
-        max-width: 100%;
-        border-radius: 24px 24px 0 0;
-        position: absolute;
-        bottom: 0;
+        padding: 28px 20px;
     }
-    
-    @keyframes modalSlideUp {
-        from { transform: translateY(100%); }
-        to { transform: translateY(0); }
+    .modal-form button {
+        font-size: 15px;
     }
 }
