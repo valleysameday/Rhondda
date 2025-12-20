@@ -5,74 +5,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const openPostBtn = document.getElementById('openPostModal');
   const postSubmitBtn = document.getElementById('postSubmitBtn');
-  const loginSubmitBtn = document.getElementById('loginSubmit');
-  const signupSubmitBtn = document.getElementById('signupSubmit');
-
-  // Track attempted post if user is not logged in
+  
+  // Track attempted post
   let postAttemptedData = null;
 
   // ----------------- OPEN POST MODAL -----------------
   openPostBtn?.addEventListener('click', e => {
     e.preventDefault();
-    window.openScreen('post'); // Always open form first
+
+    const isLoggedIn = !!localStorage.getItem('user');
+
+    // Already logged in → open post modal
+    if (isLoggedIn) {
+      window.openScreen('post');
+      return;
+    }
+
+    // Not logged in → open post modal anyway so they can fill form
+    window.openScreen('post');
   });
 
   // ----------------- POST SUBMISSION -----------------
   postSubmitBtn?.addEventListener('click', e => {
     e.preventDefault();
 
-    // Collect post data
-    postAttemptedData = {
-      title: document.getElementById('postTitle').value.trim(),
-      description: document.getElementById('postDescription').value.trim(),
-      category: document.getElementById('postCategory').value,
-      subcategory: document.getElementById('postSubcategory').value,
-      image: document.getElementById('postImage').files[0]
-    };
+    // Collect inputs
+    const title = document.getElementById('postTitle').value.trim();
+    const description = document.getElementById('postDescription').value.trim();
+    const category = document.getElementById('postCategory').value;
+    const subcategory = document.getElementById('postSubcategory').value;
+    const image = document.getElementById('postImage').files[0];
 
+    // -------------------- VALIDATION --------------------
+    if (!title) return alert("Please enter a title.");
+    if (!description) return alert("Please enter a description.");
+    if (!category) return alert("Please select a category.");
+
+    // -------------------- CHECK LOGIN --------------------
     const isLoggedIn = !!localStorage.getItem('user');
-
     if (!isLoggedIn) {
-      // Open login modal
+      // Save form data temporarily
+      postAttemptedData = { title, description, category, subcategory, image };
       window.openScreen('login');
       return;
     }
 
-    // Already logged in → submit immediately
-    submitPost(postAttemptedData);
-    postAttemptedData = null;
-  });
-
-  // ----------------- LOGIN / SIGNUP SUCCESS -----------------
-  const afterAuth = () => {
-    window.closeScreens();
-
-    if (postAttemptedData) {
-      // Submit saved post automatically
-      submitPost(postAttemptedData);
-      postAttemptedData = null;
-    }
-  };
-
-  loginSubmitBtn?.addEventListener('click', e => {
-    e.preventDefault();
-    // TODO: Replace with real login logic
-    localStorage.setItem('user', 'true'); // Mock login
-    afterAuth();
-  });
-
-  signupSubmitBtn?.addEventListener('click', e => {
-    e.preventDefault();
-    // TODO: Replace with real signup logic
-    localStorage.setItem('user', 'true'); // Mock signup
-    afterAuth();
-  });
-
-  // ----------------- SUBMIT POST FUNCTION -----------------
-  function submitPost(data) {
-    console.log('Submitting post:', data);
-
-    // Mock submission — replace with actual API call
+    // -------------------- SUBMIT POST --------------------
+    console.log({ title, description, category, subcategory, image });
     alert('Your ad has been posted!');
 
     // Clear form
@@ -82,5 +61,57 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('postSubcategory').innerHTML = '<option value="">Select subcategory</option>';
     document.getElementById('imagePreview').innerHTML = '';
     document.getElementById('postImage').value = '';
-  }
+
+    window.closeScreens();
+  });
+
+  // ----------------- LOGIN / SIGNUP -----------------
+  const loginSubmitBtn = document.getElementById('loginSubmit');
+  const signupSubmitBtn = document.getElementById('signupSubmit');
+
+  const afterAuth = () => {
+    window.closeScreens();
+
+    // Reopen post modal if user tried to post
+    if (postAttemptedData) {
+      window.openScreen('post');
+
+      // Restore previous inputs
+      document.getElementById('postTitle').value = postAttemptedData.title || '';
+      document.getElementById('postDescription').value = postAttemptedData.description || '';
+      document.getElementById('postCategory').value = postAttemptedData.category || '';
+      
+      // Trigger subcategory population
+      const event = new Event('change');
+      document.getElementById('postCategory').dispatchEvent(event);
+
+      document.getElementById('postSubcategory').value = postAttemptedData.subcategory || '';
+
+      // Restore image preview if file exists
+      if (postAttemptedData.image) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          document.getElementById('imagePreview').innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+        };
+        reader.readAsDataURL(postAttemptedData.image);
+      }
+
+      // Clear tracking
+      postAttemptedData = null;
+    }
+  };
+
+  loginSubmitBtn?.addEventListener('click', e => {
+    e.preventDefault();
+    // Perform login logic
+    localStorage.setItem('user', 'true');
+    afterAuth();
+  });
+
+  signupSubmitBtn?.addEventListener('click', e => {
+    e.preventDefault();
+    // Perform signup logic
+    localStorage.setItem('user', 'true');
+    afterAuth();
+  });
 });
