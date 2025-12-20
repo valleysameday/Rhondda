@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const routes = {
     login: document.getElementById('loginModal'),
     post: document.getElementById('postModal'),
-    join: document.getElementById('joinModal')
+    join: document.getElementById('signupModal')
   };
 
   function openScreen(name) {
