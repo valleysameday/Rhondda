@@ -155,7 +155,7 @@ document.getElementById('openLoginModal')?.addEventListener('click', e => {
   openScreen('login');
 });
 
-document.getElementById('openSignupModal')?.addEventListener('click', e => {
+document.getElementById('opensignupModal')?.addEventListener('click', e => {
   e.preventDefault();
   openScreen('signup');
 });
