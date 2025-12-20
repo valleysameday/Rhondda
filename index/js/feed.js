@@ -1,25 +1,84 @@
+<script>
 const postsContainer = document.getElementById('postsContainer');
 const categoryBtns = document.querySelectorAll('.category-btn');
 
-
-
 /* -------------------- MOCK POSTS -------------------- */
 const mockPosts = [
-  { id: '1', title: 'Cafe Discount', content: 'Get 10% off at Joe’s Cafe', category: 'offers', type: 'business' },
-  { id: '2', title: 'Charity Run', content: 'Join the charity 5k in Pontypridd', category: 'events' },
-  { id: '3', title: 'Plumber Available', content: 'Quick plumbing service this week', category: 'services', type: 'business' },
-  { id: '4', title: 'Supermarket Sale', content: 'Weekly specials on groceries', category: 'offers', type: 'ad' },
-  { id: '5', title: 'Dog Found', content: 'Lost Beagle spotted in Pontypridd', category: 'community' }
+  /* ✅ Jobs & Services (business paying customers) */
+  { 
+    id: '1',
+    title: 'Local Plumber Available',
+    content: 'Fast call-outs across Rhondda. Fully insured.',
+    category: 'jobs',
+    type: 'business'
+  },
+
+  { 
+    id: '2',
+    title: 'Mobile Hairdresser',
+    content: 'Cuts, colours & styling. Evening appointments available.',
+    category: 'jobs',
+    type: 'business'
+  },
+
+  /* ✅ For Sale */
+  { 
+    id: '3',
+    title: 'Fridge Freezer',
+    content: 'Good condition, fully working.',
+    category: 'forsale',
+    price: 50
+  },
+
+  { 
+    id: '4',
+    title: 'Sofa Set',
+    content: '3-seater + armchair. Smoke-free home.',
+    category: 'forsale',
+    price: 120
+  },
+
+  /* ✅ Property */
+  { 
+    id: '5',
+    title: '2 Bed House To Rent',
+    content: 'Treorchy. Close to schools and shops.',
+    category: 'property',
+    type: 'business'
+  },
+
+  /* ✅ Community */
+  { 
+    id: '6',
+    title: 'Lost Dog',
+    content: 'Small brown terrier seen near Bute Street.',
+    category: 'community'
+  },
+
+  /* ✅ Events */
+  { 
+    id: '7',
+    title: 'Charity Quiz Night',
+    content: 'Raising funds for Rhondda Foodbank.',
+    category: 'events'
+  },
+
+  /* ✅ Freebies */
+  { 
+    id: '8',
+    title: 'Free Wardrobe',
+    content: 'Collection only from Tonypandy.',
+    category: 'free'
+  }
 ];
 
 /* -------------------- LOAD POSTS -------------------- */
 function loadPosts(category = 'all') {
   postsContainer.innerHTML = '';
 
-  const filtered =
-    category === 'all'
-      ? mockPosts
-      : mockPosts.filter(p => p.category === category);
+  const filtered = category === 'all'
+    ? mockPosts
+    : mockPosts.filter(p => p.category === category);
 
   if (!filtered.length) {
     postsContainer.innerHTML = '<p>No posts yet!</p>';
@@ -30,22 +89,29 @@ function loadPosts(category = 'all') {
     const card = document.createElement('div');
     card.className = `post-card ${post.type || ''}`;
 
-    // Add image placeholder
     const imgSrc = post.image || '/images/post-placeholder.jpg';
 
+    const overlayText = post.type === 'business'
+      ? `<div class="business-overlay">${post.title}</div>`
+      : '';
+
     card.innerHTML = `
-  <div class="post-image">
-    <img src="${imgSrc}" alt="${post.title}" />
-  </div>
+      <div class="post-image">
+        <img src="${imgSrc}" alt="${post.title}">
+        ${overlayText}
+      </div>
 
-  <div class="post-body">
-    <h3>${post.title}</h3>
-    <p class="post-desc">${post.content}</p>
-    <small class="post-category">Category: ${post.category}</small>
-  </div>
+      <div class="post-body">
+        <h3>${post.title}</h3>
 
-  <button class="report-btn" title="Report this post" data-post-id="${post.id}">⚑</button>
-`;
+        ${post.price ? `<div class="post-price">£${post.price}</div>` : ''}
+
+        <p class="post-desc">${post.content}</p>
+        <small class="post-category">Category: ${post.category}</small>
+      </div>
+
+      <button class="report-btn" title="Report this post" data-post-id="${post.id}">⚑</button>
+    `;
 
     postsContainer.appendChild(card);
   });
@@ -120,3 +186,4 @@ loadWeather();
 
 /* -------------------- INIT -------------------- */
 loadPosts();
+</script>
