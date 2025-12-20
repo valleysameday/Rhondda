@@ -5,14 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rhondda Noticeboard</title>
 
-  <!-- Main Styles -->
   <link rel="stylesheet" href="/index/css/main.css" />
-
-  <!-- SEO / Trust -->
   <meta name="description" content="Local offers, events and services across Rhondda. A community noticeboard for residents and businesses." />
 </head>
 
 <body>
+
 <header>
   <div class="header-inner">
     <img src="/images/logo.svg" alt="Logo for Rhondda community site" class="logo" />
@@ -20,79 +18,90 @@
 </header>
 
 <main>
+
   <!-- Weather Snippet -->
   <section id="weatherSnippet" class="weather-snippet">
     <span class="weather-emoji">⏳</span>
     <span class="weather-text">Loading today's weather…</span>
   </section>
 
-<!-- Categories (below weather) -->
 <section id="categories">
   <button data-category="all" class="category-btn active">All</button>
-  <button data-category="market" class="category-btn">Market</button>
-  <button data-category="offers" class="category-btn">Offers</button>
+  <button data-category="forsale" class="category-btn">For Sale</button>
+  <button data-category="jobs" class="category-btn">Jobs & Services</button>
+  <button data-category="property" class="category-btn">Property</button>
+  <button data-category="community" class="category-btn">Community</button>
   <button data-category="events" class="category-btn">Events</button>
-  <button data-category="services" class="category-btn">Business & Services</button>
+  <button data-category="free" class="category-btn">Freebies</button>
 </section>
 
-<!-- Dynamic Subcategories -->
-<section id="subcategories" class="subcategories" style="display:none;">
-  <!-- Subcategory buttons will be injected here -->
-</section>
+  <!-- Subcategories -->
+  <section id="subcategories" class="subcategories" style="display:none;"></section>
 
   <!-- Posts Grid -->
-  <section id="postsContainer" class="posts-grid">
-    <!-- Cards injected by JS -->
-  </section>
+  <section id="postsContainer" class="posts-grid"></section>
+
 </main>
 
-<!-- MODALS (outside main so blur works correctly) -->
+<!-- LOGIN MODAL -->
 <div id="loginModal" class="modal">
   <div class="modal-content">
     <span class="close" aria-label="Close login">&times;</span>
     <h2>Business Login</h2>
-    <input type="email" id="loginEmail" name="email" placeholder="Email" autocomplete="email" required>
-    <input type="password" id="loginPassword" name="password" placeholder="Password" autocomplete="current-password" required>
-    <button id="loginBtn">Login</button>
+
+    <input type="email" id="loginEmail" placeholder="Email" autocomplete="email" required>
+    <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" required>
+
+    <!-- UNIQUE ID -->
+    <button id="loginSubmitBtn">Login</button>
   </div>
 </div>
 
+<!-- POST MODAL -->
 <div id="postModal" class="modal">
   <div class="modal-content">
     <span class="close" aria-label="Close post">&times;</span>
     <h2>Post an Offer</h2>
-    <input type="text" id="postTitle" name="title" placeholder="Title" required>
-    <textarea id="postDescription" name="description" placeholder="Description" rows="4" required></textarea>
-    <select id="postCategory" name="category" required>
-   <!-- Image upload -->
-<label class="hint-label">Add a photo (recommended)</label>
-<input type="file" id="postImage" accept="image/*">
-<div id="imagePreview" class="image-preview"></div>
-<small class="hint-text">Ads with photos get more views</small>
 
-<!-- Subcategory -->
-<select id="postSubcategory">
-  <option value="">Select subcategory</option>
-</select>
+    <input type="text" id="postTitle" placeholder="Title" required>
+    <textarea id="postDescription" placeholder="Description" rows="4" required></textarea>
+
+    <!-- Category -->
+    <select id="postCategory" name="category" required>
       <option value="">Select category</option>
       <option value="offers">Offers</option>
       <option value="events">Events</option>
       <option value="services">Services</option>
     </select>
-    <button id="postBtn">Submit</button>
+
+    <!-- Image upload -->
+    <label class="hint-label">Add a photo (recommended)</label>
+    <input type="file" id="postImage" accept="image/*">
+    <div id="imagePreview" class="image-preview"></div>
+    <small class="hint-text">Ads with photos get more views</small>
+
+    <!-- Subcategory -->
+    <select id="postSubcategory">
+      <option value="">Select subcategory</option>
+    </select>
+
+    <!-- UNIQUE ID -->
+    <button id="postSubmitBtn">Submit</button>
   </div>
 </div>
 
+<!-- JOIN MODAL -->
 <div id="joinModal" class="modal">
   <div class="modal-content">
     <span class="close" aria-label="Close join">&times;</span>
     <h2>Join Us</h2>
-    <!-- Join form inputs go here -->
   </div>
 </div>
 
-<!-- Fixed Action Bar -->
+<!-- FIXED ACTION BAR -->
 <div class="action-bar">
+
+  <!-- UNIQUE ID -->
   <a href="#" id="postAdBtn" class="action-link post-free">
     <div class="icon-wrap">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -105,7 +114,8 @@
     <span>Post an Ad</span>
   </a>
 
-  <a href="#" id="loginBtn" class="action-link">
+  <!-- UNIQUE ID -->
+  <a href="#" id="loginOpenBtn" class="action-link">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
       <polyline points="10 17 15 12 10 7"></polyline>
@@ -114,7 +124,8 @@
     <span class="label-main">Login</span>
   </a>
 
-  <a href="#" id="joinBtn" class="action-link">
+  <!-- UNIQUE ID -->
+  <a href="#" id="joinOpenBtn" class="action-link">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
       <circle cx="8.5" cy="7" r="4"></circle>
@@ -123,6 +134,7 @@
     </svg>
     <span class="label-main">Join Us</span>
   </a>
+
 </div>
 
 <footer>
@@ -136,5 +148,6 @@
 
 <script src="/index/js/feed.js" defer></script>
 <script src="/index/js/ui-router.js" defer></script>
+
 </body>
 </html>
