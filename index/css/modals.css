@@ -56,7 +56,45 @@ body.modal-open main {
     border: 1px solid #ddd;
     font-size: 15px;
 }
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
+.modal-form input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.modal-form button {
+  margin-top: 6px;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: #FF7EB3;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modal-form button:hover {
+  opacity: 0.9;
+}
+
+.modal-switch {
+  margin-top: 14px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.modal-switch a {
+  color: #FF7EB3;
+  cursor: pointer;
+  font-weight: 600;
+}
 @keyframes popIn {
     from { transform: scale(.95); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
