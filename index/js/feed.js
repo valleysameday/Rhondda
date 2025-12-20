@@ -1,6 +1,17 @@
 const postsContainer = document.getElementById('postsContainer');
 const categoryBtns = document.querySelectorAll('.category-btn');
+const businessCheckbox = document.getElementById('isBusinessAccount');
+const businessBenefits = document.getElementById('businessBenefits');
 
+if (businessCheckbox && businessBenefits) {
+  businessCheckbox.addEventListener('change', () => {
+    if (businessCheckbox.checked) {
+      businessBenefits.style.display = 'block';
+    } else {
+      businessBenefits.style.display = 'none';
+    }
+  });
+}
 /* -------------------- MOCK POSTS -------------------- */
 const mockPosts = [
   /* ✅ Jobs & Services (business paying customers) */
