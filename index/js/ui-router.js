@@ -157,7 +157,7 @@ document.getElementById('openLoginModal')?.addEventListener('click', e => {
 
 document.getElementById('opensignupModal')?.addEventListener('click', e => {
   e.preventDefault();
-  openScreen('signup');
+  openScreen('join');
 });
 
 /* -------------------- CLOSE MODALS -------------------- */
