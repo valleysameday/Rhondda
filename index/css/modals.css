@@ -108,3 +108,31 @@ body.modal-open main {
     from { transform: scale(0.95); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
 }
+.business-benefits {
+    display: none;                 /* hidden by default */
+    background: #fff0f5;           /* soft pink background */
+    border: 1px solid #ff7eb3;     /* accent border */
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-top: 12px;
+    box-shadow: 0 6px 18px rgba(255,126,179,0.25);
+    font-size: 0.9rem;
+    color: #333;
+    animation: fadeSlide 0.3s ease forwards;
+}
+
+.business-benefits h4 {
+    font-size: 1rem;
+    margin-bottom: 6px;
+    color: #ff4f8b;
+}
+
+.business-benefits ul {
+    list-style: disc;
+    margin-left: 18px;
+}
+
+@keyframes fadeSlide {
+    0% { opacity: 0; transform: translateY(-8px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
