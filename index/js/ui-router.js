@@ -1,4 +1,3 @@
-<script>
 document.addEventListener('DOMContentLoaded', () => {
 
   /* -------------------- ROUTES / MODALS -------------------- */
@@ -176,4 +175,3 @@ document.querySelectorAll('.modal').forEach(modal => {
 window.openScreen = openScreen;
 window.closeScreens = closeAll;
 });
-</script>
