@@ -101,24 +101,25 @@ const subcategoryMap = {
 /* -------------------- POST AN AD UX -------------------- */
 const postCategory = document.getElementById('postCategory');
 const postSubcategory = document.getElementById('postSubcategory');
-const postSubcategoryWrapper = postSubcategory?.parentElement; // ✅ wrapper to hide/show
-const postImage = document.getElementById('postImage');
-const imagePreview = document.getElementById('imagePreview');
+const postSubcategoryWrapper = document.querySelector('.subcategory-wrapper');
 
-if (postCategory && postSubcategory) {
+if (postSubcategoryWrapper) {
+  postSubcategoryWrapper.style.display = 'none'; // ✅ hide on load
+}
+
+if (postCategory && postSubcategory && postSubcategoryWrapper) {
   postCategory.addEventListener('change', () => {
     const subs = subcategoryMap[postCategory.value];
 
-    // ✅ If no subcategories → hide the dropdown
+    // ❌ No category OR no subcategories → hide dropdown
     if (!subs || subs.length === 0) {
       postSubcategory.innerHTML = '';
-      if (postSubcategoryWrapper) postSubcategoryWrapper.style.display = 'none';
+      postSubcategoryWrapper.style.display = 'none';
       return;
     }
 
-    // ✅ If subcategories exist → show dropdown
-    if (postSubcategoryWrapper) postSubcategoryWrapper.style.display = 'block';
-
+    // ✅ Has subcategories → show + populate
+    postSubcategoryWrapper.style.display = 'block';
     postSubcategory.innerHTML = '<option value="">Select subcategory</option>';
 
     subs.forEach(sub => {
