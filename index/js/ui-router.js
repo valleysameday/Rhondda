@@ -145,19 +145,19 @@ if (postImage && imagePreview) {
 }
 
 /* -------------------- ACTION BAR BUTTONS (MATCH HTML) -------------------- */
-document.getElementById('loginOpenBtn')?.addEventListener('click', e => {
-  e.preventDefault();
-  openScreen('login');
-});
-
-document.getElementById('postAdBtn')?.addEventListener('click', e => {
+document.getElementById('openPostModal')?.addEventListener('click', e => {
   e.preventDefault();
   openScreen('post');
 });
 
-document.getElementById('joinOpenBtn')?.addEventListener('click', e => {
+document.getElementById('openLoginModal')?.addEventListener('click', e => {
   e.preventDefault();
-  openScreen('join');
+  openScreen('login');
+});
+
+document.getElementById('openSignupModal')?.addEventListener('click', e => {
+  e.preventDefault();
+  openScreen('signup');
 });
 
 /* -------------------- CLOSE MODALS -------------------- */
