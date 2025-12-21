@@ -26,7 +26,29 @@ getFirebase().then(fb => {
       loadView("home");
       return;
     }
+import { deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { ref, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
+async function deletePostAndImages(post) {
+  try {
+    const allImages = [];
+
+    if (post.imageUrl) allImages.push(post.imageUrl);
+    if (Array.isArray(post.imageUrls)) allImages.push(...post.imageUrls);
+
+    for (const url of allImages) {
+      const path = url.split("/o/")[1].split("?")[0];
+      const storageRef = ref(storage, decodeURIComponent(path));
+      await deleteObject(storageRef);
+    }
+
+    await deleteDoc(doc(db, "posts", post.id));
+
+    console.log("✅ Deleted post + images:", post.id);
+  } catch (err) {
+    console.error("❌ Failed to delete post:", err);
+  }
+}
     /* ---------------- ELEMENTS ---------------- */
     const headerName = document.getElementById("bizHeaderName");
     const headerTagline = document.getElementById("bizHeaderTagline");
