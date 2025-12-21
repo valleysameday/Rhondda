@@ -1,4 +1,4 @@
-import { auth, db, storage } from '/firebase/init.js';
+import { auth, db, storage } from '/index/js/firebase/init.js';
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
