@@ -15,7 +15,7 @@ import {
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-import { ref, deleteObject } 
+import { ref, deleteObject, uploadBytes, getDownloadURL } 
 from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
 let auth, db, storage;
@@ -83,7 +83,7 @@ getFirebase().then(fb => {
     const userRef = doc(db, "users", user.uid);
     const snap = await getDoc(userRef);
 
-    let name = "", phone = "", area = "", bio = "";
+    let name = "", phone = "", area = "", bio = "", avatarUrl = "";
 
     if (snap.exists()) {
       const u = snap.data();
@@ -91,8 +91,10 @@ getFirebase().then(fb => {
       phone = u.phone || "";
       area = u.area || "";
       bio = u.bio || "";
+      avatarUrl = u.avatarUrl || "";
     }
 
+    /* ✅ Update header + profile view */
     document.getElementById("headerName").textContent = name || "Your account";
     document.getElementById("headerAreaBadge").textContent = area || "Add your area";
     document.getElementById("headerTagline").textContent =
@@ -107,6 +109,93 @@ getFirebase().then(fb => {
     document.getElementById("profilePhoneInput").value = phone;
     document.getElementById("profileAreaInput").value = area;
     document.getElementById("profileBioInput").value = bio;
+
+    /* ---------------------------------------------------
+       ✅ AVATAR DISPLAY + UPLOAD
+    --------------------------------------------------- */
+    const avatarInput = document.getElementById("avatarUploadInput");
+    const avatarCircle = document.getElementById("dashboardAvatar");
+    const avatarClickArea = document.getElementById("avatarClickArea");
+
+    if (avatarUrl) {
+      avatarCircle.style.backgroundImage = `url('${avatarUrl}')`;
+    }
+
+    avatarClickArea.addEventListener("click", () => {
+      avatarInput.click();
+    });
+
+    avatarInput.addEventListener("change", async () => {
+      const file = avatarInput.files[0];
+      if (!file) return;
+
+      const storageRef = ref(storage, `avatars/${user.uid}.jpg`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+
+      await updateDoc(userRef, { avatarUrl: url });
+
+      avatarCircle.style.backgroundImage = `url('${url}')`;
+    });
+
+    /* ---------------------------------------------------
+       ✅ AREA AUTOCOMPLETE
+    --------------------------------------------------- */
+    const AREAS = [
+      "Porth","Trealaw","Tonypandy","Penygraig","Llwynypia","Ystrad","Gelli",
+      "Ton Pentre","Pentre","Treorchy","Treherbert","Ferndale","Tylorstown",
+      "Maerdy","Cymmer","Wattstown","Blaenllechau","Blaencwm","Blaenrhondda",
+      "Clydach Vale","Edmondstown","Llwyncelyn","Penrhys","Pontygwaith",
+      "Williamstown","Ynyshir","Aberdare","Aberaman","Abercynon","Cwmbach",
+      "Hirwaun","Llwydcoed","Mountain Ash","Penrhiwceiber","Pen-y-waun",
+      "Rhigos","Cefnpennar","Cwaman","Godreaman","Miskin (Mountain Ash)",
+      "New Cardiff","Penderyn","Tyntetown","Ynysboeth","Pontypridd","Beddau",
+      "Church Village","Cilfynydd","Glyn-coch","Hawthorn","Llantrisant",
+      "Llantwit Fardre","Rhydfelen","Taff's Well","Talbot Green","Tonteg",
+      "Treforest","Trehafod","Ynysybwl","Coed-y-cwm","Graig","Hopkinstown",
+      "Nantgarw","Trallwng","Upper Boat","Brynna","Llanharan","Llanharry",
+      "Pontyclun","Tonyrefail","Tyn-y-nant","Gilfach Goch","Groesfaen",
+      "Miskin (Llantrisant)","Mwyndy","Thomastown"
+    ];
+
+    const areaInput = document.getElementById("profileAreaInput");
+    const suggestionBox = document.getElementById("areaSuggestions");
+
+    areaInput.addEventListener("input", () => {
+      const value = areaInput.value.toLowerCase();
+      suggestionBox.innerHTML = "";
+
+      if (!value) {
+        suggestionBox.style.display = "none";
+        return;
+      }
+
+      const matches = AREAS.filter(a => a.toLowerCase().startsWith(value));
+
+      if (!matches.length) {
+        suggestionBox.style.display = "none";
+        return;
+      }
+
+      suggestionBox.style.display = "block";
+
+      matches.forEach(areaName => {
+        const div = document.createElement("div");
+        div.className = "suggestion-item";
+        div.textContent = areaName;
+        div.addEventListener("click", () => {
+          areaInput.value = areaName;
+          suggestionBox.style.display = "none";
+        });
+        suggestionBox.appendChild(div);
+      });
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!suggestionBox.contains(e.target) && e.target !== areaInput) {
+        suggestionBox.style.display = "none";
+      }
+    });
 
     /* ---------------- LOAD POSTS ---------------- */
     const q = query(collection(db, "posts"), where("userId", "==", user.uid));
