@@ -140,3 +140,26 @@ body.modal-open main {
 .price-wrapper {
   display: none;
 }
+.feedback-text {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: #444;
+  min-height: 18px;
+  transition: opacity .2s ease;
+}
+.feedback-error {
+  color: #d33;
+}
+.feedback-success {
+  color: #2a8f2a;
+}
+.shake {
+  animation: shake .3s;
+}
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
+}
