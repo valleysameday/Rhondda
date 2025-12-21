@@ -91,7 +91,7 @@ async function loadPost() {
         <div class="seller-box">
           <h3>Seller</h3>
           ${seller ? `
-            <p>${seller.email}</p>
+            <p>${seller.name || "Local Seller"}</p>
             ${seller.isBusiness ? `<span class="biz-tag">Business Account</span>` : ""}
           ` : `<p>Private seller</p>`}
           <div class="seller-actions">
