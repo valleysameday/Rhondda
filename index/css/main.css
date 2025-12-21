@@ -550,3 +550,64 @@ footer {
     flex: 1;
   }
 }
+.seller-profile-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding-bottom: 60px;
+}
+
+.seller-banner {
+  height: 140px;
+  background: linear-gradient(135deg, #ff7eb3, #ff758c);
+  border-radius: 0 0 20px 20px;
+}
+
+.seller-avatar-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: -40px;
+}
+
+.seller-avatar {
+  width: 90px;
+  height: 90px;
+  background: #fff;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.seller-header {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.seller-reliability {
+  color: var(--brand-dark);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.seller-stats {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 14px 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.seller-bio {
+  background: #fff;
+  padding: 14px;
+  border-radius: 12px;
+  margin: 10px;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+.seller-ads-title {
+  margin: 20px 12px 10px;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
