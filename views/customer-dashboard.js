@@ -10,6 +10,8 @@ import {
   where, 
   getDocs,
   doc,
+  getDoc,
+  updateDoc,
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -19,29 +21,52 @@ getFirebase().then(fb => {
   auth = fb.auth;
   db = fb.db;
 
-  let authResolved = false;
-
   onAuthStateChanged(auth, async user => {
-    authResolved = true;
-
     if (!user) {
-      loadView("home");   // ✅ SPA navigation
+      loadView("home");
       return;
     }
 
-    // ✅ Load user's posts
+    /* ---------------- LOAD PROFILE ---------------- */
+    const userRef = doc(db, "users", user.uid);
+    const snap = await getDoc(userRef);
+
+    if (snap.exists()) {
+      const u = snap.data();
+      document.getElementById("profileName").value = u.name || "";
+      document.getElementById("profilePhone").value = u.phone || "";
+      document.getElementById("profileBio").value = u.bio || "";
+    }
+
+    /* ---------------- SAVE PROFILE ---------------- */
+    document.getElementById("saveProfileBtn").addEventListener("click", async () => {
+      const name = document.getElementById("profileName").value.trim();
+      const phone = document.getElementById("profilePhone").value.trim();
+      const bio = document.getElementById("profileBio").value.trim();
+      const feedback = document.getElementById("profileFeedback");
+
+      feedback.textContent = "Saving...";
+
+      await updateDoc(userRef, { name, phone, bio });
+
+      feedback.textContent = "✅ Profile updated!";
+      feedback.classList.add("feedback-success");
+
+      setTimeout(() => feedback.textContent = "", 1500);
+    });
+
+    /* ---------------- LOAD USER POSTS ---------------- */
     const q = query(collection(db, "posts"), where("userId", "==", user.uid));
-    const snap = await getDocs(q);
+    const postsSnap = await getDocs(q);
 
     const container = document.getElementById("userPosts");
     container.innerHTML = "";
 
-    if (snap.empty) {
+    if (postsSnap.empty) {
       container.innerHTML = `<p class="empty-msg">You haven’t posted anything yet.</p>`;
-      return;
     }
 
-    snap.forEach(docSnap => {
+    postsSnap.forEach(docSnap => {
       const p = docSnap.data();
       const id = docSnap.id;
 
@@ -61,32 +86,36 @@ getFirebase().then(fb => {
       `;
     });
 
-    // DELETE HANDLER
+    /* ---------------- DELETE POST ---------------- */
     document.querySelectorAll(".dash-delete").forEach(btn => {
       btn.addEventListener("click", async () => {
         if (!confirm("Delete this ad?")) return;
         await deleteDoc(doc(db, "posts", btn.dataset.id));
-        loadView("customer-dashboard");   // ✅ SPA reload
+        loadView("customer-dashboard");
       });
     });
-  });
 
-  // ✅ Safety timeout
-  setTimeout(() => {
-    if (!authResolved && !auth.currentUser) {
-      navigateToHome();
-    }
-  }, 500);
+    /* ---------------- EDIT POST ---------------- */
+    document.querySelectorAll(".dash-edit").forEach(btn => {
+      btn.addEventListener("click", () => {
+        openScreen("editPost");
+        window.editPostId = btn.dataset.id;
+      });
+    });
 
-  /* ---------------- LOGOUT WITH OVERLAY ---------------- */
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    const overlay = document.getElementById("logoutOverlay");
-    overlay.style.display = "flex";
+    /* ---------------- NEW POST ---------------- */
+    document.getElementById("newPostBtn").addEventListener("click", () => {
+      openScreen("post");
+    });
 
-    signOut(auth).then(() => {
-      setTimeout(() => {
-        navigateToHome();   // ✅ SPA navigation
-      }, 3000);
+    /* ---------------- LOGOUT ---------------- */
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      const overlay = document.getElementById("logoutOverlay");
+      overlay.style.display = "flex";
+
+      signOut(auth).then(() => {
+        setTimeout(() => navigateToHome(), 2000);
+      });
     });
   });
 });
