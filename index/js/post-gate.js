@@ -3,7 +3,8 @@ import { getFirebase } from '/index/js/firebase/init.js';
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
-  onAuthStateChanged 
+  onAuthStateChanged,
+  sendPasswordResetEmail
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 import { collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import { ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js';
@@ -143,6 +144,19 @@ getFirebase().then(fb => {
         alert(err.message);
       }
     });
+
+    // ----------------- RESET PASSWORD -----------------
+    window.resetPassword = async function () {
+      const email = prompt("Enter your email to reset your password:");
+      if (!email) return;
+
+      try {
+        await sendPasswordResetEmail(auth, email);
+        alert("Password reset email sent!");
+      } catch (err) {
+        alert(err.message);
+      }
+    };
 
     // ----------------- AUTH STATE -----------------
     onAuthStateChanged(auth, user => {
