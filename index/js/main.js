@@ -1,6 +1,5 @@
 import { getFirebase } from '/index/js/firebase/init.js';
 import { initUIRouter } from '/index/js/ui-router.js';
-import { initFeed } from '/index/js/feed.js';
 import '/index/js/post-gate.js';
 
 let auth, db, storage;
@@ -16,7 +15,10 @@ export async function loadView(view) {
   // Load JS for that view
   import(`/views/${view}.js`).catch(err => console.error("View JS error:", err));
 }
+
+// ✅ Make loadView available globally
 window.loadView = loadView;
+
 /* ---------------- INITIALISE APP ---------------- */
 getFirebase().then(fb => {
   auth = fb.auth;
@@ -26,9 +28,9 @@ getFirebase().then(fb => {
   console.log("✅ Firebase ready in main.js");
 
   const start = () => {
-  initUIRouter();
-  loadView("home");   // ✅ Load homepage view instead
-};
+    initUIRouter();      // ✅ global modals + action bar
+    loadView("home");    // ✅ load homepage view
+  };
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", start);
@@ -38,6 +40,8 @@ getFirebase().then(fb => {
 });
 
 /* ---------------- GLOBAL NAVIGATION HOOKS ---------------- */
+
+// ✅ Load correct dashboard based on account type
 window.navigateToDashboard = function () {
   if (!window.currentUser) {
     openScreen("login");
@@ -49,4 +53,15 @@ window.navigateToDashboard = function () {
   } else {
     loadView("customer-dashboard");
   }
+};
+
+// ✅ Proper SPA home navigation (used after logout)
+window.navigateToHome = function () {
+  loadView("home").then(() => {
+    // Re‑initialise homepage logic
+    import("/views/home.js").then(() => {
+      initUIRouter();        // ✅ rebind modals + action bar
+      window.closeScreens?.();
+    });
+  });
 };
