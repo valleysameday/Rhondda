@@ -98,11 +98,8 @@ getFirebase().then(fb => {
         const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
 
         if (userDoc.exists()) {
-          if (userDoc.data().isBusiness) {
-            window.location.href = "/business/dashboard.html";
-          } else {
-            window.location.href = "/customer/dashboard.html";
-          }
+          window.firebaseUserDoc = userDoc.data();
+          navigateToDashboard();   // ✅ SPA navigation
         }
 
       } catch (err) {
@@ -127,11 +124,8 @@ getFirebase().then(fb => {
           createdAt: serverTimestamp()
         });
 
-        if (isBusiness) {
-          window.location.href = "/business/dashboard.html";
-        } else {
-          window.location.href = "/customer/dashboard.html";
-        }
+        window.firebaseUserDoc = { email, isBusiness };
+        navigateToDashboard();   // ✅ SPA navigation
 
       } catch (err) {
         alert(err.message);
@@ -169,7 +163,7 @@ getFirebase().then(fb => {
     });
   }
 
-  // ✅ FIX: Ensure startPostGate ALWAYS runs
+  // ✅ Ensure startPostGate ALWAYS runs
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", startPostGate);
   } else {
