@@ -1,3 +1,4 @@
+// ui-router.js
 export function initUIRouter() {
 
   const routes = {
@@ -5,7 +6,7 @@ export function initUIRouter() {
     post: document.getElementById('postModal'),
     signup: document.getElementById('signupModal'),
     forgot: document.getElementById('forgotPasswordModal'),
-    resetConfirm: document.getElementById('resetConfirmModal') // ✅ NEW
+    resetConfirm: document.getElementById('resetConfirmModal')
   };
 
   function openScreen(name) {
@@ -103,6 +104,32 @@ export function initUIRouter() {
   document.getElementById('opensignupModal')?.addEventListener('click', e => {
     e.preventDefault();
     openScreen('signup');
+  });
+
+  /* -------------------- MY ACCOUNT BUTTON -------------------- */
+  document.getElementById('openAccountModal')?.addEventListener('click', async e => {
+    e.preventDefault();
+
+    // ✅ If auth not ready → force login modal
+    if (!window.firebaseAuthReady) {
+      openScreen('login');
+      return;
+    }
+
+    const user = window.currentUser;
+
+    if (!user) {
+      openScreen('login');
+      return;
+    }
+
+    const profile = window.firebaseUserDoc;
+
+    if (profile?.isBusiness) {
+      window.location.href = "/business/dashboard.html";
+    } else {
+      window.location.href = "/customer/dashboard.html";
+    }
   });
 
   /* -------------------- CLOSE MODALS -------------------- */
