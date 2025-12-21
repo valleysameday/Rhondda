@@ -48,52 +48,56 @@ getFirebase().then(fb => {
     let postAttemptedData = null;
 
     /* ---------------- POST SUBMISSION ---------------- */
-    postSubmitBtn?.addEventListener('click', async e => {
-      e.preventDefault();
+postSubmitBtn?.addEventListener('click', async e => {
+  e.preventDefault();
 
-      const title = document.getElementById('postTitle').value.trim();
-      const description = document.getElementById('postDescription').value.trim();
-      const category = document.getElementById('postCategory').value;
-      const subcategory = document.getElementById('postSubcategory').value;
-      const image = document.getElementById('postImage').files[0];
+  const title = document.getElementById('postTitle').value.trim();
+  const description = document.getElementById('postDescription').value.trim();
+  const category = document.getElementById('postCategory').value;
+  const subcategory = document.getElementById('postSubcategory').value;
+  const priceInput = document.getElementById('postPrice').value.trim();
+  const price = priceInput === "" ? null : Number(priceInput);
+  const image = document.getElementById('postImage').files[0];
 
-      if (!title || !description || !category) {
-        postFeedback.textContent = "❌ Please fill all required fields.";
-        postFeedback.classList.add("feedback-error", "shake");
-        setTimeout(() => postFeedback.classList.remove("shake"), 300);
-        return;
-      }
+  if (!title || !description || !category) {
+    postFeedback.textContent = "❌ Please fill all required fields.";
+    postFeedback.classList.add("feedback-error", "shake");
+    setTimeout(() => postFeedback.classList.remove("shake"), 300);
+    return;
+  }
 
-      if (!auth.currentUser) {
-        postAttemptedData = { title, description, category, subcategory, image };
-        openScreen('login');
-        return;
-      }
+  if (!auth.currentUser) {
+    postAttemptedData = { title, description, category, subcategory, price, image };
+    openScreen('login');
+    return;
+  }
 
-      postFeedback.textContent = "Uploading your ad…";
+  postFeedback.textContent = "Uploading your ad…";
 
-      let imageUrl = null;
-      if (image) {
-        const storageRef = ref(storage, `posts/${Date.now()}_${image.name}`);
-        await uploadBytes(storageRef, image);
-        imageUrl = await getDownloadURL(storageRef);
-      }
+  let imageUrl = null;
+  if (image) {
+    const storageRef = ref(storage, `posts/${Date.now()}_${image.name}`);
+    await uploadBytes(storageRef, image);
+    imageUrl = await getDownloadURL(storageRef);
+  }
 
-      await addDoc(collection(db, 'posts'), {
-        title,
-        description,
-        category,
-        subcategory,
-        imageUrl,
-        createdAt: serverTimestamp(),
-        userId: auth.currentUser.uid
-      });
+  await addDoc(collection(db, 'posts'), {
+    title,
+    description,
+    category,
+    subcategory,
+    price,               // ✅ PRICE SAVED
+    imageUrl,
+    createdAt: serverTimestamp(),
+    userId: auth.currentUser.uid,
+    businessId: window.firebaseUserDoc?.isBusiness ? auth.currentUser.uid : null
+  });
 
-      postFeedback.textContent = "✅ Your ad is live!";
-      postFeedback.classList.add("feedback-success");
+  postFeedback.textContent = "✅ Your ad is live!";
+  postFeedback.classList.add("feedback-success");
 
-      setTimeout(() => window.closeScreens(), 800);
-    });
+  setTimeout(() => window.closeScreens(), 800);
+});
 
     /* ---------------- LOGIN ---------------- */
     loginSubmitBtn?.addEventListener('click', async e => {
