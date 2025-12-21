@@ -26,7 +26,7 @@ export function initUIRouter() {
   window.openScreen = openScreen;
   window.closeScreens = closeAll;
 
-  /* -------------------- CATEGORY + SUBCATEGORY -------------------- */
+  /* -------------------- CATEGORY + SUBCATEGORY (HOMEPAGE) -------------------- */
   const subcategoryMap = {
     forsale: ['Appliances','Furniture','Electronics','Baby & Kids','Garden','Tools','Mobility','Misc'],
     jobs: ['Plumber','Electrician','Cleaner','Gardener','Handyman','Beauty & Hair','Mechanic','Tutor'],
@@ -122,7 +122,6 @@ export function initUIRouter() {
       return;
     }
 
-    // ✅ SPA navigation instead of full-page redirect
     navigateToDashboard();
   });
 
@@ -136,4 +135,46 @@ export function initUIRouter() {
       if (e.target === modal) closeAll();
     });
   });
+
+  /* ---------------------------------------------------------
+     ✅ POST MODAL CATEGORY + SUBCATEGORY + PRICE LOGIC
+     --------------------------------------------------------- */
+  const postCategory = document.getElementById("postCategory");
+  const postSubcategory = document.getElementById("postSubcategory");
+  const priceWrapper = document.querySelector(".price-wrapper");
+
+  if (postCategory) {
+    postCategory.addEventListener("change", e => {
+      const category = e.target.value;
+
+      // ✅ Load subcategories into modal dropdown
+      const subs = subcategoryMap[category];
+      postSubcategory.innerHTML = "<option value=''>Select subcategory</option>";
+
+      if (subs) {
+        subs.forEach(sub => {
+          const opt = document.createElement("option");
+          opt.value = sub.toLowerCase().replace(/\s+/g, "-");
+          opt.textContent = sub;
+          postSubcategory.appendChild(opt);
+        });
+        postSubcategory.parentElement.style.display = "block";
+      } else {
+        postSubcategory.parentElement.style.display = "none";
+      }
+
+      // ✅ Show price only for For Sale + Property
+      if (category === "forsale" || category === "property") {
+        priceWrapper.style.display = "block";
+      } else {
+        priceWrapper.style.display = "none";
+      }
+
+      // ✅ Auto-set FREE category price to 0
+      if (category === "free") {
+        document.getElementById("postPrice").value = 0;
+      }
+    });
+  }
+
 }
