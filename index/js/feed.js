@@ -48,7 +48,7 @@ export function initFeed() {
         loadView("view-post");
       });
 
-      const imgSrc = post.imageUrl || "https://via.placeholder.com/600x400?text=No+Image";
+      https://placehold.co/600x400?text=No+Image
       const isBusiness = post.businessId ? true : false;
 
       card.innerHTML = `
