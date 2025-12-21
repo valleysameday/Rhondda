@@ -146,3 +146,4 @@ export function initFeed() {
     }
   }
 }
+window.initFeed = initFeed;
