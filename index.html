@@ -9,7 +9,7 @@
         content="Local offers, events and services across Rhondda. A community noticeboard for residents and businesses." />
 
   <link rel="stylesheet" href="/index/css/main.css">
-<link rel="stylesheet" href="/index/css/modals.css">
+  <link rel="stylesheet" href="/index/css/modals.css">
 </head>
 
 <body>
@@ -67,7 +67,24 @@
       <span onclick="openScreen('signup')">Create one</span>
     </p>
 
-    <p class="modal-link" onclick="resetPassword()">Forgot password?</p>
+    <p id="forgotPasswordLink" class="modal-link">Forgot password?</p>
+  </div>
+</div>
+
+<!-- ================= FORGOT PASSWORD MODAL ================= -->
+<div id="forgotPasswordModal" class="modal">
+  <div class="modal-content">
+    <button class="close" aria-label="Close">&times;</button>
+    <h2>Reset Password</h2>
+
+    <input type="email" id="forgotEmail" placeholder="Enter your email" autocomplete="email">
+
+    <button id="forgotSubmit">Send Reset Email</button>
+
+    <p class="modal-switch">
+      Remembered your password?
+      <span onclick="openScreen('login')">Back to login</span>
+    </p>
   </div>
 </div>
 
@@ -81,20 +98,20 @@
     <input type="password" id="signupPassword" placeholder="Password" autocomplete="new-password">
 
     <label class="checkbox-label">
-  <input type="checkbox" id="isBusinessAccount">
-  This is a business account
-</label>
+      <input type="checkbox" id="isBusinessAccount">
+      This is a business account
+    </label>
 
-<!-- Business benefits popup -->
-<div id="businessBenefits" class="business-benefits">
-  <h4>Business Account Benefits</h4>
-  <ul>
-    <li>Post featured ads</li>
-    <li>Get premium visibility</li>
-    <li>Access business analytics</li>
-    <li>Priority support</li>
-  </ul>
-</div>
+    <!-- Business benefits popup -->
+    <div id="businessBenefits" class="business-benefits">
+      <h4>Business Account Benefits</h4>
+      <ul>
+        <li>Post featured ads</li>
+        <li>Get premium visibility</li>
+        <li>Access business analytics</li>
+        <li>Priority support</li>
+      </ul>
+    </div>
 
     <button id="signupSubmit">Create account</button>
 
@@ -151,7 +168,8 @@
     <button id="postSubmitBtn">Submit</button>
   </div>
 </div>
-<!-- Fixed Action Bar -->
+
+<!-- ================= FIXED ACTION BAR ================= -->
 <div class="action-bar">
 
   <!-- POST AD -->
@@ -195,6 +213,7 @@
   </a>
 
 </div>
+
 <!-- ================= FOOTER ================= -->
 <footer>
   <p>&copy; 2025 Rhondda Noticeboard</p>
@@ -204,6 +223,7 @@
     <a href="/contact.html">Contact</a>
   </p>
 </footer>
+
 <!-- Only one script -->
 <script type="module" src="/index/js/main.js"></script>
 </body>
