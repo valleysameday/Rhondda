@@ -1,10 +1,11 @@
 export function initUIRouter() {
-  /* -------------------- ROUTES / MODALS -------------------- */
+
   const routes = {
     login: document.getElementById('loginModal'),
     post: document.getElementById('postModal'),
     signup: document.getElementById('signupModal'),
-    forgot: document.getElementById('forgotPasswordModal') // ✅ NEW MODAL
+    forgot: document.getElementById('forgotPasswordModal'),
+    resetConfirm: document.getElementById('resetConfirmModal') // ✅ NEW
   };
 
   function openScreen(name) {
@@ -24,7 +25,7 @@ export function initUIRouter() {
   window.openScreen = openScreen;
   window.closeScreens = closeAll;
 
-  /* -------------------- CATEGORY + SUBCATEGORY DATA -------------------- */
+  /* -------------------- CATEGORY + SUBCATEGORY -------------------- */
   const subcategoryMap = {
     forsale: ['Appliances','Furniture','Electronics','Baby & Kids','Garden','Tools','Mobility','Misc'],
     jobs: ['Plumber','Electrician','Cleaner','Gardener','Handyman','Beauty & Hair','Mechanic','Tutor'],
@@ -64,59 +65,27 @@ export function initUIRouter() {
     });
   });
 
-  /* -------------------- POST AN AD UX -------------------- */
-  const postCategory = document.getElementById('postCategory');
-  const postSubcategory = document.getElementById('postSubcategory');
-  const postSubcategoryWrapper = document.querySelector('.subcategory-wrapper');
-  const postPrice = document.getElementById('postPrice');
-  const priceWrapper = document.querySelector('.price-wrapper');
-
-  if (postSubcategoryWrapper) postSubcategoryWrapper.style.display = 'none';
-  if (priceWrapper) priceWrapper.style.display = 'none';
-
-  if (postCategory) {
-    postCategory.addEventListener('change', () => {
-      const category = postCategory.value;
-      const subs = subcategoryMap[category];
-
-      // Subcategory logic
-      if (!subs || subs.length === 0) {
-        postSubcategory.innerHTML = '';
-        postSubcategoryWrapper.style.display = 'none';
-      } else {
-        postSubcategoryWrapper.style.display = 'block';
-        postSubcategory.innerHTML = '<option value="">Select subcategory</option>';
-        subs.forEach(sub => {
-          const opt = document.createElement('option');
-          opt.value = sub;
-          opt.textContent = sub;
-          postSubcategory.appendChild(opt);
-        });
-      }
-
-      // Price logic
-      if (!category || category === 'free') {
-        priceWrapper.style.display = 'none';
-        postPrice.value = '';
-      } else {
-        priceWrapper.style.display = 'block';
-      }
+  /* -------------------- FORGOT PASSWORD LINK -------------------- */
+  const forgotLink = document.getElementById('forgotPasswordLink');
+  if (forgotLink) {
+    forgotLink.addEventListener('click', e => {
+      e.preventDefault();
+      openScreen('forgot');
     });
   }
 
-  /* -------------------- IMAGE PREVIEW -------------------- */
-  const postImage = document.getElementById('postImage');
-  const imagePreview = document.getElementById('imagePreview');
+  /* -------------------- FORGOT PASSWORD SUBMIT -------------------- */
+  const forgotSubmit = document.getElementById('forgotSubmit');
+  const forgotEmail = document.getElementById('forgotEmail');
 
-  if (postImage && imagePreview) {
-    postImage.addEventListener('change', () => {
-      const file = postImage.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-      };
-      reader.readAsDataURL(file);
+  if (forgotSubmit && forgotEmail) {
+    forgotSubmit.addEventListener('click', () => {
+      const email = forgotEmail.value.trim();
+      if (!email) {
+        alert("Please enter your email");
+        return;
+      }
+      window.resetPassword(email);
     });
   }
 
@@ -135,29 +104,6 @@ export function initUIRouter() {
     e.preventDefault();
     openScreen('signup');
   });
-
-  /* -------------------- FORGOT PASSWORD LINK -------------------- */
-  const forgotLink = document.getElementById('forgotPasswordLink');
-  if (forgotLink) {
-    forgotLink.addEventListener('click', e => {
-      e.preventDefault();
-      openScreen('forgot');
-    });
-  }
-
-  /* -------------------- FORGOT PASSWORD SUBMIT -------------------- */
-  const forgotSubmit = document.getElementById('forgotSubmit');
-  const forgotEmail = document.getElementById('forgotEmail');
-
-  if (forgotSubmit && forgotEmail) {
-    forgotSubmit.addEventListener('click', () => {
-      if (!forgotEmail.value.trim()) {
-        alert("Please enter your email");
-        return;
-      }
-      window.resetPassword(forgotEmail.value.trim());
-    });
-  }
 
   /* -------------------- CLOSE MODALS -------------------- */
   document.querySelectorAll('.close').forEach(btn => {
