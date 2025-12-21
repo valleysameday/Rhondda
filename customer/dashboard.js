@@ -29,7 +29,7 @@ getFirebase().then(fb => {
       return;
     }
 
-    // ✅ User is logged in — load their posts
+    // ✅ Load user's posts
     const q = query(collection(db, "posts"), where("userId", "==", user.uid));
     const snap = await getDocs(q);
 
@@ -71,14 +71,22 @@ getFirebase().then(fb => {
     });
   });
 
-  // ✅ Safety timeout — prevents instant redirect before Firebase loads
+  // ✅ Safety timeout — prevents redirect before Firebase loads
   setTimeout(() => {
     if (!authResolved && !auth.currentUser) {
       window.location.href = "/";
     }
   }, 500);
 
+  /* ---------------- LOGOUT WITH OVERLAY ---------------- */
   document.getElementById("logoutBtn").addEventListener("click", () => {
-    signOut(auth).then(() => window.location.href = "/");
+    const overlay = document.getElementById("logoutOverlay");
+    overlay.style.display = "flex";
+
+    signOut(auth).then(() => {
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1500);
+    });
   });
 });
