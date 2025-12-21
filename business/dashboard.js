@@ -94,7 +94,15 @@ getFirebase().then(fb => {
     }
   }, 500);
 
+  /* ---------------- LOGOUT WITH OVERLAY ---------------- */
   document.getElementById("logoutBtn").addEventListener("click", () => {
-    signOut(auth).then(() => window.location.href = "/");
+    const overlay = document.getElementById("logoutOverlay");
+    overlay.style.display = "flex";
+
+    signOut(auth).then(() => {
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1500);
+    });
   });
 });
