@@ -1,124 +1,97 @@
 /* 
-   Modern 2025/2026 Community Noticeboard Stylesheet 
-   Design Philosophy: Hyper-local, Tactile, and Accessible
+   2025/2026 HYPER-LOCAL NOTICEBOARD MASTER STYLESHEET
+   Layout: Forced 2-Column Grid (Mobile & Desktop)
+   Feature: Full-Width Pay-to-Play Business Slots
 */
 
 :root {
-    /* Refined 2025 Palette */
+    /* Modern 2025 Color Profile */
     --brand-primary: #FF7EB3;
     --brand-secondary: #FF7E5F;
-    --brand-dark: #2D333F;
-    --bg-main: #F8FAFC;
+    --brand-dark: #1E293B;
+    --bg-main: #F2F4F5;
     --surface: #FFFFFF;
+    --surface-glass: rgba(255, 255, 255, 0.9);
     --border-soft: #E2E8F0;
-    --text-main: #1E293B;
+    --text-main: #111111;
     --text-muted: #64748B;
-    --status-free: #10B981;
-    --glass-bg: rgba(255, 255, 255, 0.8);
+    --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
+/* 1. CORE RESET & STICKY FOOTER LOGIC */
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    -webkit-font-smoothing: antialiased;
+}
+
+html, body {
+    height: 100%;
 }
 
 body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     background: var(--bg-main);
     color: var(--text-main);
-    line-height: 1.6;
-    padding-bottom: 100px; /* Space for the floating action bar */
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh; /* Dynamic viewport for 2025 mobile browsers */
+    -webkit-font-smoothing: antialiased;
 }
 
-a { text-decoration: none; color: inherit; }
-
-/* --- 2025 Header: Glassmorphism Effect --- */
+/* 2. HEADER & SEARCH AREA */
 header {
-    background: var(--brand-primary);
-    background: linear-gradient(135deg, #FF7EB3 0%, #FF758C 100%);
+    background: linear-gradient(135deg, #FF7EB3, #FF758C);
     color: #fff;
     text-align: center;
-    padding: 16px;
-    position: sticky;
-    top: 0;
-    z-index: 1100;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
-header img.logo {
-    height: 40px;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-}
-
-/* --- Search: Center Stage --- */
-.search-wrapper {
-    max-width: 800px;
-    margin: -25px auto 20px;
-    padding: 0 16px;
+    padding: 15px 10px 45px;
     position: relative;
-    z-index: 1200;
+    z-index: 10;
+}
+
+header img.logo { 
+    height: 42px; 
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); 
+}
+
+.search-wrapper {
+    max-width: 600px;
+    margin: -25px auto 10px;
+    padding: 0 12px;
+    position: relative;
+    z-index: 20;
 }
 
 .search-bar {
     width: 100%;
-    padding: 18px 25px;
-    border-radius: 16px;
+    padding: 1rem 1.2rem;
+    border-radius: 14px;
     border: none;
-    font-size: 1.05rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
+    font-size: 1rem;
     background: var(--surface);
+    box-shadow: var(--shadow-md);
 }
 
-.search-bar:focus {
-    outline: none;
-    box-shadow: 0 10px 30px rgba(255, 126, 179, 0.2);
-    transform: translateY(-2px);
-}
-
-/* --- Weather: Smart Widget Style --- */
-.weather-snippet {
-    background: var(--glass-bg);
-    border: 1px solid var(--border-soft);
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 15px 25px;
-    margin: 20px auto;
-    width: calc(100% - 32px);
-    max-width: 1400px;
-    border-radius: 20px;
-    backdrop-filter: blur(5px);
-}
-
-.weather-emoji { font-size: 2rem; }
-.weather-info { font-weight: 600; color: var(--brand-dark); }
-
-/* --- Categories: Tactile Chips --- */
+/* 3. CATEGORY SCROLLERS */
 #categories, .subcategories {
     display: flex;
-    gap: 12px;
-    margin: 10px 0;
-    padding: 10px 16px;
+    gap: 8px;
+    padding: 12px;
     overflow-x: auto;
     scrollbar-width: none;
 }
+#categories::-webkit-scrollbar { display: none; }
 
 .category-btn, .subcategory-btn {
-    padding: 12px 24px;
+    padding: 8px 18px;
     background: var(--surface);
     border: 1px solid var(--border-soft);
-    border-radius: 14px;
+    border-radius: 20px;
     font-weight: 600;
+    font-size: 0.85rem;
     white-space: nowrap;
     cursor: pointer;
-    transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-.category-btn:hover { background: #f1f5f9; }
 
 .category-btn.active {
     background: var(--brand-dark);
@@ -126,144 +99,157 @@ header img.logo {
     border-color: var(--brand-dark);
 }
 
-/* --- The Bento Grid --- */
+/* 4. THE FORCED 2-COLUMN BENTO GRID */
 .posts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-    gap: 16px;
-    max-width: 1400px;
+    /* Forces 2 columns on ALL screen sizes */
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 12px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 16px;
+    padding: 12px;
+    flex: 1; /* Pushes footer down */
 }
 
+/* Standard Post Card */
 .post-card {
     background: var(--surface);
-    border-radius: 20px;
-    border: 1px solid var(--border-soft);
+    border-radius: 16px;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid var(--border-soft);
+    transition: transform 0.2s ease;
     height: auto;
-    min-height: 340px;
 }
 
-.post-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+.post-image { 
+    width: 100%; 
+    height: 140px; 
+    position: relative; 
+    background: #eee; 
 }
 
-.post-image {
-    width: 100%;
-    height: 180px;
-    border-radius: 20px 20px 0 0;
-    overflow: hidden;
+.post-image img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
 }
 
-.post-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
+.post-body { 
+    padding: 12px; 
 }
 
-.post-card:hover .post-image img { transform: scale(1.05); }
-
-.post-body { padding: 16px; }
-
-.post-price {
-    font-size: 1.2rem;
-    font-weight: 800;
-    color: var(--brand-primary);
-    margin-bottom: 4px;
+.post-price { 
+    font-size: 1.1rem; 
+    font-weight: 800; 
+    color: var(--brand-dark); 
 }
 
-.post-card h3 {
-    font-size: 1rem;
-    font-weight: 700;
-    margin-bottom: 8px;
+.post-card h3 { 
+    font-size: 0.9rem; 
+    margin: 4px 0; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
 }
 
-/* --- Featured/Business Cards: Premium Look --- */
+/* 5. FULL-WIDTH BUSINESS CARDS */
 .post-card.business {
-    grid-column: span 2;
-    background: linear-gradient(145deg, #ffffff, #fff5f8);
-    border: 2px solid #FFD1E3;
+    grid-column: span 2; /* Spans across both columns */
+    border: 2px solid var(--brand-primary);
+    background: linear-gradient(180deg, #fffcfd, #ffffff);
+}
+
+.post-card.business .post-image {
+    height: 200px; /* Taller image for paying businesses */
 }
 
 .post-card.business::before {
-    content: "PROMOTED";
-    top: 15px;
-    left: 15px;
-    transform: none;
-    border-radius: 8px;
-    height: 24px;
-    width: auto;
-    padding: 0 10px;
+    content: "FEATURED BUSINESS";
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: var(--brand-primary);
+    color: #fff;
+    padding: 4px 10px;
     font-size: 0.65rem;
+    font-weight: 800;
+    border-radius: 6px;
+    z-index: 5;
 }
 
-/* --- Floating Action Bar (Mobile First) --- */
+/* 6. FLOATING ACTION BAR (BOTTOM NAV) */
 .action-bar {
-    background: rgba(30, 41, 59, 0.95); /* Dark Sleek Look */
-    backdrop-filter: blur(15px);
-    padding: 12px 20px;
-    border-radius: 30px;
-    width: 90%;
-    max-width: 500px;
+    position: fixed;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    border: 1px solid rgba(255,255,255,0.1);
+    width: 90%;
+    max-width: 450px;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-around;
+    padding: 12px;
+    background: rgba(30, 41, 59, 0.97);
+    backdrop-filter: blur(15px);
+    border-radius: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
 .action-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     color: #94A3B8;
-    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
 }
 
-.action-link:hover, .action-link.active {
+.action-link.active { 
+    color: var(--brand-primary); 
+}
+
+/* 7. FOOTER & SAFE ZONE */
+footer {
+    margin-top: auto;
+    background: #fff;
+    border-top: 1px solid var(--border-soft);
+    padding: 40px 20px 120px; /* 120px bottom padding protects against Action Bar overlap */
+    text-align: center;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.footer-links a {
     color: var(--brand-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
 }
 
-.free-ribbon {
-    background: var(--status-free);
-    text-transform: uppercase;
-}
-
-/* --- Desktop Enhancements --- */
+/* 8. DESKTOP ENHANCEMENTS */
 @media (min-width: 1024px) {
     .posts-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 24px;
+        gap: 20px;
+        padding: 20px;
     }
-    
-    .post-card.business {
-        grid-column: span 2;
-        grid-row: span 1;
+
+    .post-image {
+        height: 180px;
     }
-}
 
-/* --- Modern 2025 "Live" Indicator --- */
-.live-indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.7rem;
-    font-weight: 800;
-    color: #ef4444;
-}
+    .post-card.business .post-image {
+        height: 300px;
+    }
 
-.live-indicator::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    background: #ef4444;
-    border-radius: 50%;
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(1.2); }
-    100% { opacity: 1; transform: scale(1); }
+    .post-card h3 {
+        font-size: 1.05rem;
+    }
 }
