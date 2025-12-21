@@ -1,4 +1,5 @@
 <link rel="stylesheet" href="/index/css/dashboard.css">
+
 <header class="dash-header">
   <h1>Your Account</h1>
   <button id="logoutBtn" class="logout-btn">Log out</button>
@@ -10,21 +11,32 @@
   <div class="profile-box">
     <h2>Your Profile</h2>
 
+    <!-- NAME -->
     <div class="profile-row">
       <label>Name</label>
       <input id="profileName" type="text" placeholder="Your name">
     </div>
 
+    <!-- PHONE (PRIVATE) -->
     <div class="profile-row">
-      <label>Phone</label>
+      <label>Phone (private)</label>
       <input id="profilePhone" type="text" placeholder="Your phone number">
     </div>
 
+    <!-- AREA WITH AUTOCOMPLETE -->
+    <div class="profile-row" style="position: relative;">
+      <label>Area</label>
+      <input id="profileArea" type="text" placeholder="Your area">
+      <div id="areaSuggestions" class="suggestions-box"></div>
+    </div>
+
+    <!-- BIO -->
     <div class="profile-row">
       <label>Bio</label>
       <textarea id="profileBio" placeholder="Tell us a bit about yourself"></textarea>
     </div>
 
+    <!-- SAVE BUTTON -->
     <button id="saveProfileBtn" class="dash-save-btn">Save Profile</button>
     <p id="profileFeedback" class="feedback-text"></p>
   </div>
@@ -32,16 +44,8 @@
   <!-- POST BUTTON -->
   <button id="newPostBtn" class="dash-new-post">+ Post an Ad</button>
 
-  <!-- USER POSTS -->
+  <!-- USER ADS -->
   <h2>Your Ads</h2>
   <div id="userPosts" class="dash-posts-grid"></div>
 
 </section>
-
-<!-- LOGOUT OVERLAY -->
-<div id="logoutOverlay" class="logout-overlay">
-  <div>
-    <p>Logging you out...</p>
-    <small>Please wait</small>
-  </div>
-</div>
