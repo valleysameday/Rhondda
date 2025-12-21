@@ -26,7 +26,7 @@ getFirebase().then(fb => {
     authResolved = true;
 
     if (!user) {
-      loadView("home");   // ✅ SPA navigation
+      navigateToHome();   // ✅ SPA navigation
       return;
     }
 
