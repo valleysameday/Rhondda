@@ -1,3 +1,12 @@
+import { auth, db, storage } from '/firebase/init.js';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  onAuthStateChanged 
+} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+import { ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js';
+
 document.addEventListener('DOMContentLoaded', () => {
   const postModal = document.getElementById('postModal');
   const loginModal = document.getElementById('loginModal');
@@ -5,53 +14,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const openPostBtn = document.getElementById('openPostModal');
   const postSubmitBtn = document.getElementById('postSubmitBtn');
-  
-  // Track attempted post
+
   let postAttemptedData = null;
 
   // ----------------- OPEN POST MODAL -----------------
   openPostBtn?.addEventListener('click', e => {
     e.preventDefault();
-
-    const isLoggedIn = !!localStorage.getItem('user');
-
-    // Already logged in → open post modal
-    if (isLoggedIn) {
+    if (auth.currentUser) {
       window.openScreen('post');
-      return;
+    } else {
+      window.openScreen('post'); // still allow filling form
     }
-
-    // Not logged in → open post modal anyway so they can fill form
-    window.openScreen('post');
   });
 
   // ----------------- POST SUBMISSION -----------------
-  postSubmitBtn?.addEventListener('click', e => {
+  postSubmitBtn?.addEventListener('click', async e => {
     e.preventDefault();
 
-    // Collect inputs
     const title = document.getElementById('postTitle').value.trim();
     const description = document.getElementById('postDescription').value.trim();
     const category = document.getElementById('postCategory').value;
     const subcategory = document.getElementById('postSubcategory').value;
     const image = document.getElementById('postImage').files[0];
 
-    // -------------------- VALIDATION --------------------
-    if (!title) return alert("Please enter a title.");
-    if (!description) return alert("Please enter a description.");
-    if (!category) return alert("Please select a category.");
+    if (!title || !description || !category) return alert('Please fill all required fields.');
 
-    // -------------------- CHECK LOGIN --------------------
-    const isLoggedIn = !!localStorage.getItem('user');
-    if (!isLoggedIn) {
-      // Save form data temporarily
+    if (!auth.currentUser) {
       postAttemptedData = { title, description, category, subcategory, image };
       window.openScreen('login');
       return;
     }
 
-    // -------------------- SUBMIT POST --------------------
-    console.log({ title, description, category, subcategory, image });
+    let imageUrl = null;
+    if (image) {
+      const storageRef = ref(storage, `posts/${Date.now()}_${image.name}`);
+      await uploadBytes(storageRef, image);
+      imageUrl = await getDownloadURL(storageRef);
+    }
+
+    await addDoc(collection(db, 'posts'), {
+      title,
+      description,
+      category,
+      subcategory,
+      imageUrl,
+      createdAt: serverTimestamp(),
+      userId: auth.currentUser.uid
+    });
+
     alert('Your ad has been posted!');
 
     // Clear form
@@ -72,22 +82,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const afterAuth = () => {
     window.closeScreens();
 
-    // Reopen post modal if user tried to post
     if (postAttemptedData) {
       window.openScreen('post');
 
-      // Restore previous inputs
       document.getElementById('postTitle').value = postAttemptedData.title || '';
       document.getElementById('postDescription').value = postAttemptedData.description || '';
       document.getElementById('postCategory').value = postAttemptedData.category || '';
-      
-      // Trigger subcategory population
+
       const event = new Event('change');
       document.getElementById('postCategory').dispatchEvent(event);
 
       document.getElementById('postSubcategory').value = postAttemptedData.subcategory || '';
 
-      // Restore image preview if file exists
       if (postAttemptedData.image) {
         const reader = new FileReader();
         reader.onload = e => {
@@ -96,22 +102,42 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsDataURL(postAttemptedData.image);
       }
 
-      // Clear tracking
       postAttemptedData = null;
     }
   };
 
-  loginSubmitBtn?.addEventListener('click', e => {
+  loginSubmitBtn?.addEventListener('click', async e => {
     e.preventDefault();
-    // Perform login logic
-    localStorage.setItem('user', 'true');
-    afterAuth();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      afterAuth();
+    } catch (err) {
+      alert(err.message);
+    }
   });
 
-  signupSubmitBtn?.addEventListener('click', e => {
+  signupSubmitBtn?.addEventListener('click', async e => {
     e.preventDefault();
-    // Perform signup logic
-    localStorage.setItem('user', 'true');
-    afterAuth();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      afterAuth();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
+  // ----------------- AUTH STATE -----------------
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      console.log('User logged in:', user.email);
+    } else {
+      console.log('No user logged in');
+    }
   });
 });
