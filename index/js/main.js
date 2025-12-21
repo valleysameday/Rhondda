@@ -16,7 +16,7 @@ export async function loadView(view) {
   // Load JS for that view
   import(`/views/${view}.js`).catch(err => console.error("View JS error:", err));
 }
-
+window.loadView = loadView;
 /* ---------------- INITIALISE APP ---------------- */
 getFirebase().then(fb => {
   auth = fb.auth;
