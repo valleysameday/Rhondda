@@ -12,8 +12,9 @@ export async function loadView(view) {
   const html = await fetch(`/views/${view}.html`).then(r => r.text());
   app.innerHTML = html;
 
-  // Load JS for that view
-  import(`/views/${view}.js`).catch(err => console.error("View JS error:", err));
+  // ✅ Force re-run of view JS every time
+  import(`/views/${view}.js?cache=${Date.now()}`)
+    .catch(err => console.error("View JS error:", err));
 }
 
 // ✅ Make loadView available globally
@@ -58,8 +59,8 @@ window.navigateToDashboard = function () {
 // ✅ Proper SPA home navigation (used after logout)
 window.navigateToHome = function () {
   loadView("home").then(() => {
-    // Re‑initialise homepage logic
-    import("/views/home.js").then(() => {
+    // ✅ Re-run homepage logic
+    import(`/views/home.js?cache=${Date.now()}`).then(() => {
       initUIRouter();        // ✅ rebind modals + action bar
       window.closeScreens?.();
     });
