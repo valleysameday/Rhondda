@@ -36,6 +36,11 @@ async function loadPost() {
 
   const img = post.imageUrl || "/images/post-placeholder.jpg";
 
+  const priceText =
+    post.price === 0 ? "FREE" :
+    post.price ? `£${post.price}` :
+    "";
+
   container.innerHTML = `
     <div class="view-post-image">
       <img src="${img}" alt="${post.title}">
@@ -44,6 +49,8 @@ async function loadPost() {
 
     <div class="view-post-body">
       <h1>${post.title}</h1>
+
+      ${priceText ? `<h2 class="post-price">${priceText}</h2>` : ""}
 
       <p class="view-post-desc">${post.description}</p>
 
@@ -65,13 +72,11 @@ async function loadPost() {
   `;
 }
 
-/* ---------------- ACTIONS ---------------- */
-
 window.openEditPost = function (id) {
   window.editPostId = id;
   openScreen("editPost");
 };
 
-window.contactSeller = function (userId) {
+window.contactSeller = function () {
   alert("Contact seller feature coming soon!");
 };
