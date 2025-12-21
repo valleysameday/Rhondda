@@ -15,20 +15,14 @@ import {
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-let auth, db;
+import { ref, deleteObject } 
+from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-getFirebase().then(fb => {
-  auth = fb.auth;
-  db = fb.db;
+let auth, db, storage;
 
-  onAuthStateChanged(auth, async user => {
-    if (!user) {
-      loadView("home");
-      return;
-    }
-import { deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { ref, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
-
+/* ---------------------------------------------------
+   ✅ DELETE POST + IMAGES
+--------------------------------------------------- */
 async function deletePostAndImages(post) {
   try {
     const allImages = [];
@@ -43,240 +37,104 @@ async function deletePostAndImages(post) {
     }
 
     await deleteDoc(doc(db, "posts", post.id));
-
     console.log("✅ Deleted post + images:", post.id);
+
   } catch (err) {
     console.error("❌ Failed to delete post:", err);
   }
 }
-    /* ---------------- ELEMENT REFERENCES ---------------- */
-    const headerNameEl = document.getElementById("headerName");
-    const headerAreaBadgeEl = document.getElementById("headerAreaBadge");
-    const headerTaglineEl = document.getElementById("headerTagline");
 
-    const viewNameEl = document.getElementById("viewName");
-    const viewPhoneEl = document.getElementById("viewPhone");
-    const viewAreaEl = document.getElementById("viewArea");
-    const viewBioEl = document.getElementById("viewBio");
+/* ---------------------------------------------------
+   ✅ AUTO DELETE POSTS OLDER THAN 14 DAYS
+--------------------------------------------------- */
+async function autoDeleteExpiredPosts(userId) {
+  const now = Date.now();
+  const fourteenDays = 14 * 24 * 60 * 60 * 1000;
 
-    const nameInput = document.getElementById("profileNameInput");
-    const phoneInput = document.getElementById("profilePhoneInput");
-    const areaInput = document.getElementById("profileAreaInput");
-    const bioInput = document.getElementById("profileBioInput");
+  const q = query(collection(db, "posts"), where("userId", "==", userId));
+  const snap = await getDocs(q);
 
-    const profileViewMode = document.getElementById("profileViewMode");
-    const profileEditMode = document.getElementById("profileEditMode");
-    const toggleEditBtn = document.getElementById("toggleEditProfile");
-    const cancelEditBtn = document.getElementById("cancelEditProfileBtn");
-    const feedback = document.getElementById("profileFeedback");
+  snap.forEach(async docSnap => {
+    const post = { id: docSnap.id, ...docSnap.data() };
+    if (!post.createdAt) return;
 
-    const statAdsCount = document.getElementById("statAdsCount");
-    const statTotalViews = document.getElementById("statTotalViews");
-    const statUnlocks = document.getElementById("statUnlocks");
+    const age = now - post.createdAt.toMillis();
+    if (age > fourteenDays) {
+      await deletePostAndImages(post);
+    }
+  });
+}
+
+/* ---------------------------------------------------
+   ✅ MAIN DASHBOARD LOGIC
+--------------------------------------------------- */
+getFirebase().then(fb => {
+  auth = fb.auth;
+  db = fb.db;
+  storage = fb.storage;
+
+  onAuthStateChanged(auth, async user => {
+    if (!user) {
+      loadView("home");
+      return;
+    }
 
     /* ---------------- LOAD PROFILE ---------------- */
     const userRef = doc(db, "users", user.uid);
     const snap = await getDoc(userRef);
 
-    let name = "";
-    let phone = "";
-    let area = "";
-    let bio = "";
+    let name = "", phone = "", area = "", bio = "";
 
     if (snap.exists()) {
       const u = snap.data();
       name = u.name || "";
       phone = u.phone || "";
-      bio = u.bio || "";
       area = u.area || "";
+      bio = u.bio || "";
     }
 
-    // Header
-    headerNameEl.textContent = name || "Your account";
-    headerAreaBadgeEl.textContent = area || "Add your area";
-    headerTaglineEl.textContent = name
-      ? "Your Rhondda profile is looking tidy"
-      : "Let’s set up your Rhondda profile";
+    document.getElementById("headerName").textContent = name || "Your account";
+    document.getElementById("headerAreaBadge").textContent = area || "Add your area";
+    document.getElementById("headerTagline").textContent =
+      name ? "Your Rhondda profile is looking tidy" : "Let’s set up your Rhondda profile";
 
-    // View mode
-    viewNameEl.textContent = name || "Add your name";
-    viewPhoneEl.textContent = phone || "Add your phone";
-    viewAreaEl.textContent = area || "Add your area";
-    viewBioEl.textContent = bio || "Tell locals a bit about yourself and what you’re selling.";
+    document.getElementById("viewName").textContent = name || "Add your name";
+    document.getElementById("viewPhone").textContent = phone || "Add your phone";
+    document.getElementById("viewArea").textContent = area || "Add your area";
+    document.getElementById("viewBio").textContent = bio || "Tell locals a bit about yourself.";
 
-    // Edit mode
-    nameInput.value = name;
-    phoneInput.value = phone;
-    areaInput.value = area;
-    bioInput.value = bio;
+    document.getElementById("profileNameInput").value = name;
+    document.getElementById("profilePhoneInput").value = phone;
+    document.getElementById("profileAreaInput").value = area;
+    document.getElementById("profileBioInput").value = bio;
 
-    /* ---------------- EDIT MODE TOGGLE ---------------- */
-    const enterEditMode = () => {
-      profileViewMode.style.display = "none";
-      profileEditMode.style.display = "block";
-      toggleEditBtn.textContent = "Done editing";
-      feedback.textContent = "";
-    };
-
-    const exitEditMode = () => {
-      profileViewMode.style.display = "block";
-      profileEditMode.style.display = "none";
-      toggleEditBtn.textContent = "Edit profile";
-    };
-
-    toggleEditBtn.addEventListener("click", () => {
-      if (profileEditMode.style.display === "block") {
-        exitEditMode();
-      } else {
-        enterEditMode();
-      }
-    });
-
-    cancelEditBtn.addEventListener("click", () => {
-      // Reset inputs to last saved state
-      nameInput.value = name;
-      phoneInput.value = phone;
-      areaInput.value = area;
-      bioInput.value = bio;
-      exitEditMode();
-    });
-
-    /* ---------------- AREA AUTOCOMPLETE (Rhondda Cynon Taf) ---------------- */
-    const AREAS = [
-      "Porth", "Trealaw", "Tonypandy", "Penygraig", "Llwynypia",
-      "Ystrad", "Gelli", "Ton Pentre", "Pentre", "Treorchy",
-      "Treherbert", "Ferndale", "Tylorstown", "Maerdy",
-      "Cymmer", "Wattstown", "Blaenllechau", "Blaencwm", "Blaenrhondda",
-      "Clydach Vale", "Edmondstown", "Llwyncelyn", "Penrhys", "Pontygwaith",
-      "Williamstown", "Ynyshir",
-      "Aberdare", "Aberaman", "Abercynon", "Cwmbach", "Hirwaun",
-      "Llwydcoed", "Mountain Ash", "Penrhiwceiber", "Pen-y-waun",
-      "Rhigos", "Cefnpennar", "Cwaman", "Godreaman",
-      "Miskin (Mountain Ash)", "New Cardiff", "Penderyn", "Tyntetown",
-      "Ynysboeth",
-      "Pontypridd", "Beddau", "Church Village", "Cilfynydd", "Glyn-coch",
-      "Hawthorn", "Llantrisant", "Llantwit Fardre", "Rhydfelen",
-      "Taff's Well", "Talbot Green", "Tonteg", "Treforest", "Trehafod",
-      "Ynysybwl", "Coed-y-cwm", "Graig", "Hopkinstown", "Nantgarw",
-      "Trallwng", "Upper Boat",
-      "Brynna", "Llanharan", "Llanharry", "Pontyclun", "Tonyrefail",
-      "Tyn-y-nant", "Gilfach Goch", "Groesfaen", "Miskin (Llantrisant)",
-      "Mwyndy", "Thomastown"
-    ];
-
-    const suggestionBox = document.getElementById("areaSuggestions");
-
-    areaInput.addEventListener("input", () => {
-      const value = areaInput.value.toLowerCase();
-      suggestionBox.innerHTML = "";
-
-      if (!value) {
-        suggestionBox.style.display = "none";
-        return;
-      }
-
-      const matches = AREAS.filter(a => a.toLowerCase().startsWith(value));
-
-      if (!matches.length) {
-        suggestionBox.style.display = "none";
-        return;
-      }
-
-      suggestionBox.style.display = "block";
-
-      matches.forEach(areaName => {
-        const div = document.createElement("div");
-        div.className = "suggestion-item";
-        div.textContent = areaName;
-        div.addEventListener("click", () => {
-          areaInput.value = areaName;
-          suggestionBox.style.display = "none";
-        });
-        suggestionBox.appendChild(div);
-      });
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!suggestionBox.contains(e.target) && e.target !== areaInput) {
-        suggestionBox.style.display = "none";
-      }
-    });
-
-    /* ---------------- SAVE PROFILE ---------------- */
-    document.getElementById("saveProfileBtn").addEventListener("click", async () => {
-      const newName = nameInput.value.trim();
-      const newPhone = phoneInput.value.trim();
-      const newBio = bioInput.value.trim();
-      const newArea = areaInput.value.trim();
-
-      feedback.textContent = "Saving...";
-
-      await updateDoc(userRef, { name: newName, phone: newPhone, bio: newBio, area: newArea });
-
-      // Update local state
-      name = newName;
-      phone = newPhone;
-      bio = newBio;
-      area = newArea;
-
-      // Update header
-      headerNameEl.textContent = name || "Your account";
-      headerAreaBadgeEl.textContent = area || "Add your area";
-      headerTaglineEl.textContent = name
-        ? "Your Rhondda profile is looking tidy"
-        : "Let’s set up your Rhondda profile";
-
-      // Update view mode
-      viewNameEl.textContent = name || "Add your name";
-      viewPhoneEl.textContent = phone || "Add your phone";
-      viewAreaEl.textContent = area || "Add your area";
-      viewBioEl.textContent = bio || "Tell locals a bit about yourself and what you’re selling.";
-
-      feedback.textContent = "✅ Profile updated!";
-      feedback.classList.add("feedback-success");
-
-      setTimeout(() => {
-        feedback.textContent = "";
-        feedback.classList.remove("feedback-success");
-      }, 1500);
-
-      exitEditMode();
-    });
-
-    /* ---------------- LOAD USER POSTS + STATS ---------------- */
+    /* ---------------- LOAD POSTS ---------------- */
     const q = query(collection(db, "posts"), where("userId", "==", user.uid));
     const postsSnap = await getDocs(q);
 
     const container = document.getElementById("userPosts");
     container.innerHTML = "";
 
-    let adsCount = 0;
-    let totalViews = 0;
-    let totalUnlocks = 0;
+    let adsCount = 0, totalViews = 0, totalUnlocks = 0;
 
     if (postsSnap.empty) {
-      container.innerHTML = `<p class="empty-msg">You haven’t posted anything yet. Your first ad will show up here.</p>`;
+      container.innerHTML = `<p class="empty-msg">You haven’t posted anything yet.</p>`;
     }
 
     postsSnap.forEach(docSnap => {
       const p = docSnap.data();
       const id = docSnap.id;
 
-      adsCount += 1;
-      if (typeof p.views === "number") totalViews += p.views;
-      if (typeof p.unlocks === "number") totalUnlocks += p.unlocks;
+      adsCount++;
+      if (p.views) totalViews += p.views;
+      if (p.unlocks) totalUnlocks += p.unlocks;
 
       container.innerHTML += `
         <div class="dash-card">
           <img src="${p.imageUrl || '/images/post-placeholder.jpg'}" class="dash-img">
           <div class="dash-info">
-            <h3>${p.title || "Untitled ad"}</h3>
-            <p>${p.description || ""}</p>
-            <small>
-              ${p.category || "General"}
-              ${p.subcategory ? " • " + p.subcategory : ""}
-              ${p.area ? " • " + p.area : (area ? " • " + area : "")}
-            </small>
+            <h3>${p.title}</h3>
+            <p>${p.description}</p>
           </div>
           <div class="dash-actions">
             <button class="dash-btn dash-edit" data-id="${id}">Edit</button>
@@ -286,21 +144,28 @@ async function deletePostAndImages(post) {
       `;
     });
 
-    // Stats
-    statAdsCount.textContent = adsCount;
-    statTotalViews.textContent = totalViews;
-    statUnlocks.textContent = totalUnlocks;
+    document.getElementById("statAdsCount").textContent = adsCount;
+    document.getElementById("statTotalViews").textContent = totalViews;
+    document.getElementById("statUnlocks").textContent = totalUnlocks;
 
-    /* ---------------- DELETE POST ---------------- */
+    /* ---------------- DELETE BUTTONS ---------------- */
     document.querySelectorAll(".dash-delete").forEach(btn => {
       btn.addEventListener("click", async () => {
         if (!confirm("Delete this ad?")) return;
-        await deleteDoc(doc(db, "posts", btn.dataset.id));
+
+        const postId = btn.dataset.id;
+        const postSnap = await getDoc(doc(db, "posts", postId));
+        const post = { id: postId, ...postSnap.data() };
+
+        await deletePostAndImages(post);
         loadView("customer-dashboard");
       });
     });
 
-    /* ---------------- EDIT POST ---------------- */
+    /* ---------------- AUTO DELETE OLD POSTS ---------------- */
+    autoDeleteExpiredPosts(user.uid);
+
+    /* ---------------- EDIT + NEW + LOGOUT ---------------- */
     document.querySelectorAll(".dash-edit").forEach(btn => {
       btn.addEventListener("click", () => {
         openScreen("editPost");
@@ -308,19 +173,13 @@ async function deletePostAndImages(post) {
       });
     });
 
-    /* ---------------- NEW POST ---------------- */
     document.getElementById("newPostBtn").addEventListener("click", () => {
       openScreen("post");
     });
 
-    /* ---------------- LOGOUT ---------------- */
     document.getElementById("logoutBtn").addEventListener("click", () => {
-      const overlay = document.getElementById("logoutOverlay");
-      overlay.style.display = "flex";
-
-      signOut(auth).then(() => {
-        setTimeout(() => navigateToHome(), 2000);
-      });
+      document.getElementById("logoutOverlay").style.display = "flex";
+      signOut(auth).then(() => setTimeout(() => navigateToHome(), 2000));
     });
   });
 });
