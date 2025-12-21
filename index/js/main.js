@@ -26,9 +26,9 @@ getFirebase().then(fb => {
   console.log("✅ Firebase ready in main.js");
 
   const start = () => {
-    initUIRouter();   // modals, categories, action bar
-    initFeed();       // homepage feed
-  };
+  initUIRouter();
+  loadView("home");   // ✅ Load homepage view instead
+};
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", start);
