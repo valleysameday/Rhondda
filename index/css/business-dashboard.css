@@ -434,3 +434,34 @@ body {
 .biz-logout-card p {
   margin: 0 0 0.2rem;
   }
+.biz-avatar-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.biz-avatar-wrapper {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  border: 3px solid #ff7b00;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.biz-avatar-circle {
+  width: 100%;
+  height: 100%;
+  background-color: #ddd;
+  background-size: cover;
+  background-position: center;
+}
+
+.biz-avatar-edit-hint {
+  font-size: 12px;
+  color: #777;
+  margin-top: 6px;
+}
