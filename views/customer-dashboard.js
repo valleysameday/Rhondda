@@ -27,57 +27,121 @@ getFirebase().then(fb => {
       return;
     }
 
+    /* ---------------- ELEMENT REFERENCES ---------------- */
+    const headerNameEl = document.getElementById("headerName");
+    const headerAreaBadgeEl = document.getElementById("headerAreaBadge");
+    const headerTaglineEl = document.getElementById("headerTagline");
+
+    const viewNameEl = document.getElementById("viewName");
+    const viewPhoneEl = document.getElementById("viewPhone");
+    const viewAreaEl = document.getElementById("viewArea");
+    const viewBioEl = document.getElementById("viewBio");
+
+    const nameInput = document.getElementById("profileNameInput");
+    const phoneInput = document.getElementById("profilePhoneInput");
+    const areaInput = document.getElementById("profileAreaInput");
+    const bioInput = document.getElementById("profileBioInput");
+
+    const profileViewMode = document.getElementById("profileViewMode");
+    const profileEditMode = document.getElementById("profileEditMode");
+    const toggleEditBtn = document.getElementById("toggleEditProfile");
+    const cancelEditBtn = document.getElementById("cancelEditProfileBtn");
+    const feedback = document.getElementById("profileFeedback");
+
+    const statAdsCount = document.getElementById("statAdsCount");
+    const statTotalViews = document.getElementById("statTotalViews");
+    const statUnlocks = document.getElementById("statUnlocks");
+
     /* ---------------- LOAD PROFILE ---------------- */
     const userRef = doc(db, "users", user.uid);
     const snap = await getDoc(userRef);
 
+    let name = "";
+    let phone = "";
+    let area = "";
+    let bio = "";
+
     if (snap.exists()) {
       const u = snap.data();
-
-      // Display text
-      document.getElementById("profileNameDisplay").textContent = u.name || "Your name";
-      document.getElementById("profilePhoneDisplay").textContent = u.phone || "Your phone number";
-      document.getElementById("profileBioDisplay").textContent = u.bio || "Tell us a bit about yourself";
-      document.getElementById("profileAreaDisplay").textContent = u.area || "Your area";
-
-      // Hidden inputs
-      document.getElementById("profileNameInput").value = u.name || "";
-      document.getElementById("profilePhoneInput").value = u.phone || "";
-      document.getElementById("profileBioInput").value = u.bio || "";
-      document.getElementById("profileAreaInput").value = u.area || "";
+      name = u.name || "";
+      phone = u.phone || "";
+      bio = u.bio || "";
+      area = u.area || "";
     }
 
+    // Header
+    headerNameEl.textContent = name || "Your account";
+    headerAreaBadgeEl.textContent = area || "Add your area";
+    headerTaglineEl.textContent = name
+      ? "Your Rhondda profile is looking tidy"
+      : "Let’s set up your Rhondda profile";
+
+    // View mode
+    viewNameEl.textContent = name || "Add your name";
+    viewPhoneEl.textContent = phone || "Add your phone";
+    viewAreaEl.textContent = area || "Add your area";
+    viewBioEl.textContent = bio || "Tell locals a bit about yourself and what you’re selling.";
+
+    // Edit mode
+    nameInput.value = name;
+    phoneInput.value = phone;
+    areaInput.value = area;
+    bioInput.value = bio;
+
+    /* ---------------- EDIT MODE TOGGLE ---------------- */
+    const enterEditMode = () => {
+      profileViewMode.style.display = "none";
+      profileEditMode.style.display = "block";
+      toggleEditBtn.textContent = "Done editing";
+      feedback.textContent = "";
+    };
+
+    const exitEditMode = () => {
+      profileViewMode.style.display = "block";
+      profileEditMode.style.display = "none";
+      toggleEditBtn.textContent = "Edit profile";
+    };
+
+    toggleEditBtn.addEventListener("click", () => {
+      if (profileEditMode.style.display === "block") {
+        exitEditMode();
+      } else {
+        enterEditMode();
+      }
+    });
+
+    cancelEditBtn.addEventListener("click", () => {
+      // Reset inputs to last saved state
+      nameInput.value = name;
+      phoneInput.value = phone;
+      areaInput.value = area;
+      bioInput.value = bio;
+      exitEditMode();
+    });
+
     /* ---------------- AREA AUTOCOMPLETE (Rhondda Cynon Taf) ---------------- */
-const AREAS = [
-  // Rhondda Fawr & Rhondda Fach
-  "Porth", "Trealaw", "Tonypandy", "Penygraig", "Llwynypia",
-  "Ystrad", "Gelli", "Ton Pentre", "Pentre", "Treorchy",
-  "Treherbert", "Ferndale", "Tylorstown", "Maerdy",
-  "Cymmer", "Wattstown", "Blaenllechau", "Blaencwm", "Blaenrhondda",
-  "Clydach Vale", "Edmondstown", "Llwyncelyn", "Penrhys", "Pontygwaith",
-  "Williamstown", "Ynyshir",
+    const AREAS = [
+      "Porth", "Trealaw", "Tonypandy", "Penygraig", "Llwynypia",
+      "Ystrad", "Gelli", "Ton Pentre", "Pentre", "Treorchy",
+      "Treherbert", "Ferndale", "Tylorstown", "Maerdy",
+      "Cymmer", "Wattstown", "Blaenllechau", "Blaencwm", "Blaenrhondda",
+      "Clydach Vale", "Edmondstown", "Llwyncelyn", "Penrhys", "Pontygwaith",
+      "Williamstown", "Ynyshir",
+      "Aberdare", "Aberaman", "Abercynon", "Cwmbach", "Hirwaun",
+      "Llwydcoed", "Mountain Ash", "Penrhiwceiber", "Pen-y-waun",
+      "Rhigos", "Cefnpennar", "Cwaman", "Godreaman",
+      "Miskin (Mountain Ash)", "New Cardiff", "Penderyn", "Tyntetown",
+      "Ynysboeth",
+      "Pontypridd", "Beddau", "Church Village", "Cilfynydd", "Glyn-coch",
+      "Hawthorn", "Llantrisant", "Llantwit Fardre", "Rhydfelen",
+      "Taff's Well", "Talbot Green", "Tonteg", "Treforest", "Trehafod",
+      "Ynysybwl", "Coed-y-cwm", "Graig", "Hopkinstown", "Nantgarw",
+      "Trallwng", "Upper Boat",
+      "Brynna", "Llanharan", "Llanharry", "Pontyclun", "Tonyrefail",
+      "Tyn-y-nant", "Gilfach Goch", "Groesfaen", "Miskin (Llantrisant)",
+      "Mwyndy", "Thomastown"
+    ];
 
-  // Cynon Valley
-  "Aberdare", "Aberaman", "Abercynon", "Cwmbach", "Hirwaun",
-  "Llwydcoed", "Mountain Ash", "Penrhiwceiber", "Pen-y-waun",
-  "Rhigos", "Cefnpennar", "Cwaman", "Godreaman", "Llwyncelyn",
-  "Miskin (Mountain Ash)", "New Cardiff", "Penderyn", "Tyntetown",
-  "Ynysboeth",
-
-  // Pontypridd & Taff Ely
-  "Pontypridd", "Beddau", "Church Village", "Cilfynydd", "Glyn-coch",
-  "Hawthorn", "Llantrisant", "Llantwit Fardre", "Rhydfelen",
-  "Taff's Well", "Talbot Green", "Tonteg", "Treforest", "Trehafod",
-  "Ynysybwl", "Coed-y-cwm", "Graig", "Hopkinstown", "Nantgarw",
-  "Trallwng", "Upper Boat",
-
-  // Llantrisant & South RCT
-  "Brynna", "Llanharan", "Llanharry", "Pontyclun", "Tonyrefail",
-  "Tyn-y-nant", "Gilfach Goch", "Groesfaen", "Miskin (Llantrisant)",
-  "Mwyndy", "Thomastown"
-];
-
-    const areaInput = document.getElementById("profileAreaInput");
     const suggestionBox = document.getElementById("areaSuggestions");
 
     areaInput.addEventListener("input", () => {
@@ -98,67 +162,98 @@ const AREAS = [
 
       suggestionBox.style.display = "block";
 
-      matches.forEach(area => {
+      matches.forEach(areaName => {
         const div = document.createElement("div");
         div.className = "suggestion-item";
-        div.textContent = area;
+        div.textContent = areaName;
         div.addEventListener("click", () => {
-          areaInput.value = area;
+          areaInput.value = areaName;
           suggestionBox.style.display = "none";
         });
         suggestionBox.appendChild(div);
       });
     });
 
+    document.addEventListener("click", (e) => {
+      if (!suggestionBox.contains(e.target) && e.target !== areaInput) {
+        suggestionBox.style.display = "none";
+      }
+    });
+
     /* ---------------- SAVE PROFILE ---------------- */
     document.getElementById("saveProfileBtn").addEventListener("click", async () => {
-      const name = document.getElementById("profileNameInput").value.trim();
-      const phone = document.getElementById("profilePhoneInput").value.trim();
-      const bio = document.getElementById("profileBioInput").value.trim();
-      const area = document.getElementById("profileAreaInput").value.trim();
-      const feedback = document.getElementById("profileFeedback");
+      const newName = nameInput.value.trim();
+      const newPhone = phoneInput.value.trim();
+      const newBio = bioInput.value.trim();
+      const newArea = areaInput.value.trim();
 
       feedback.textContent = "Saving...";
 
-      await updateDoc(userRef, { name, phone, bio, area });
+      await updateDoc(userRef, { name: newName, phone: newPhone, bio: newBio, area: newArea });
 
-      // Update display text after save
-      document.getElementById("profileNameDisplay").textContent = name || "Your name";
-      document.getElementById("profilePhoneDisplay").textContent = phone || "Your phone number";
-      document.getElementById("profileBioDisplay").textContent = bio || "Tell us a bit about yourself";
-      document.getElementById("profileAreaDisplay").textContent = area || "Your area";
+      // Update local state
+      name = newName;
+      phone = newPhone;
+      bio = newBio;
+      area = newArea;
+
+      // Update header
+      headerNameEl.textContent = name || "Your account";
+      headerAreaBadgeEl.textContent = area || "Add your area";
+      headerTaglineEl.textContent = name
+        ? "Your Rhondda profile is looking tidy"
+        : "Let’s set up your Rhondda profile";
+
+      // Update view mode
+      viewNameEl.textContent = name || "Add your name";
+      viewPhoneEl.textContent = phone || "Add your phone";
+      viewAreaEl.textContent = area || "Add your area";
+      viewBioEl.textContent = bio || "Tell locals a bit about yourself and what you’re selling.";
 
       feedback.textContent = "✅ Profile updated!";
       feedback.classList.add("feedback-success");
 
-      setTimeout(() => feedback.textContent = "", 1500);
+      setTimeout(() => {
+        feedback.textContent = "";
+        feedback.classList.remove("feedback-success");
+      }, 1500);
+
+      exitEditMode();
     });
 
-    /* ---------------- LOAD USER POSTS ---------------- */
+    /* ---------------- LOAD USER POSTS + STATS ---------------- */
     const q = query(collection(db, "posts"), where("userId", "==", user.uid));
     const postsSnap = await getDocs(q);
 
     const container = document.getElementById("userPosts");
     container.innerHTML = "";
 
+    let adsCount = 0;
+    let totalViews = 0;
+    let totalUnlocks = 0;
+
     if (postsSnap.empty) {
-      container.innerHTML = `<p class="empty-msg">You haven’t posted anything yet.</p>`;
+      container.innerHTML = `<p class="empty-msg">You haven’t posted anything yet. Your first ad will show up here.</p>`;
     }
 
     postsSnap.forEach(docSnap => {
       const p = docSnap.data();
       const id = docSnap.id;
 
+      adsCount += 1;
+      if (typeof p.views === "number") totalViews += p.views;
+      if (typeof p.unlocks === "number") totalUnlocks += p.unlocks;
+
       container.innerHTML += `
         <div class="dash-card">
           <img src="${p.imageUrl || '/images/post-placeholder.jpg'}" class="dash-img">
           <div class="dash-info">
-            <h3>${p.title}</h3>
-            <p>${p.description}</p>
+            <h3>${p.title || "Untitled ad"}</h3>
+            <p>${p.description || ""}</p>
             <small>
-              ${p.category} 
-              ${p.subcategory ? "• " + p.subcategory : ""} 
-              ${p.area ? "• " + p.area : ""}
+              ${p.category || "General"}
+              ${p.subcategory ? " • " + p.subcategory : ""}
+              ${p.area ? " • " + p.area : (area ? " • " + area : "")}
             </small>
           </div>
           <div class="dash-actions">
@@ -168,6 +263,11 @@ const AREAS = [
         </div>
       `;
     });
+
+    // Stats
+    statAdsCount.textContent = adsCount;
+    statTotalViews.textContent = totalViews;
+    statUnlocks.textContent = totalUnlocks;
 
     /* ---------------- DELETE POST ---------------- */
     document.querySelectorAll(".dash-delete").forEach(btn => {
