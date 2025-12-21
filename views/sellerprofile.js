@@ -1,16 +1,29 @@
 import { getFirebase } from "/index/js/firebase/init.js";
-import { doc, getDoc, collection, query, where, orderBy, getDocs } 
-from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  orderBy,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 import { computeBadges, renderBadges } from "/index/js/badges.js";
 
 let db;
 
+/* ---------------------------------------------------
+   ✅ INITIALISE PAGE
+--------------------------------------------------- */
 getFirebase().then(fb => {
   db = fb.db;
   loadSellerProfile();
 });
 
+/* ---------------------------------------------------
+   ✅ LOAD SELLER PROFILE
+--------------------------------------------------- */
 async function loadSellerProfile() {
   const sellerId = window.selectedSellerId;
   if (!sellerId) return;
@@ -26,12 +39,14 @@ async function loadSellerProfile() {
   const seller = sellerSnap.data();
 
   /* ---------------- SELLER NAME ---------------- */
-  document.getElementById("sellerName").textContent = seller.displayName || seller.email;
+  document.getElementById("sellerName").textContent =
+    seller.displayName || seller.businessName || seller.email;
 
   /* ---------------- RELIABILITY ---------------- */
   const stats = await computeSellerStats(sellerId);
   const reliability = computeReliability(stats);
-  document.getElementById("sellerReliability").textContent = `Reliability: ${reliability}%`;
+  document.getElementById("sellerReliability").textContent =
+    `Reliability: ${reliability}%`;
 
   /* ---------------- BADGES ---------------- */
   const badges = computeBadges(seller, stats);
@@ -57,7 +72,9 @@ async function loadSellerProfile() {
   loadSellerAds(sellerId);
 }
 
-/* ---------------- LOAD SELLER ADS ---------------- */
+/* ---------------------------------------------------
+   ✅ LOAD SELLER'S OTHER ADS
+--------------------------------------------------- */
 async function loadSellerAds(sellerId) {
   const container = document.getElementById("sellerAdsContainer");
 
@@ -82,11 +99,16 @@ async function loadSellerAds(sellerId) {
       loadView("view-post");
     };
 
-    const img = post.imageUrl || (post.imageUrls && post.imageUrls[0]);
+    // ✅ Safe image fallback
+    const img =
+      post.imageUrl ||
+      (Array.isArray(post.imageUrls) && post.imageUrls[0]) ||
+      "https://placehold.co/400x300?text=No+Image";
 
     card.innerHTML = `
       <div class="post-image">
-        <img src="${img}" alt="${post.title}">
+        <img src="${img}" alt="${post.title || "Ad image"}"
+             onerror="this.src='https://placehold.co/400x300?text=Image+Error'">
       </div>
       <div class="post-body">
         <h3>${post.title}</h3>
@@ -98,7 +120,9 @@ async function loadSellerAds(sellerId) {
   });
 }
 
-/* ---------------- STATS + RELIABILITY ---------------- */
+/* ---------------------------------------------------
+   ✅ SELLER STATS (TEMP LOGIC UNTIL FEATURES ADDED)
+--------------------------------------------------- */
 async function computeSellerStats(sellerId) {
   const postsSnap = await getDocs(
     query(collection(db, "posts"), where("userId", "==", sellerId))
@@ -120,6 +144,9 @@ async function computeSellerStats(sellerId) {
   };
 }
 
+/* ---------------------------------------------------
+   ✅ RELIABILITY SCORE
+--------------------------------------------------- */
 function computeReliability(stats) {
   let score = 50;
 
