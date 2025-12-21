@@ -562,15 +562,6 @@ footer {
   border-radius: 0 0 20px 20px;
 }
 
-.seller-avatar {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background-size: cover;
-  background-position: center;
-  background-color: #eee;
-}
-
 .seller-header {
   text-align: center;
   margin-top: 10px;
@@ -639,8 +630,8 @@ footer {
    BADGE ICON (SVG)
 ------------------------------ */
 .badge-pill svg {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
   fill: #444;
 }
