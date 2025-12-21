@@ -188,3 +188,27 @@ body {
 .feedback-error {
   color: #d33;
 }
+/* ============================
+   AREA AUTOCOMPLETE
+============================ */
+.suggestions-box {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-top: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+  display: none;
+  position: absolute;
+  width: calc(100% - 2rem);
+  z-index: 10;
+}
+
+.suggestion-item {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.suggestion-item:hover {
+  background: #f3f3f3;
+}
