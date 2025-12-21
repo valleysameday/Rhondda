@@ -33,10 +33,18 @@ getFirebase().then(fb => {
 
     if (snap.exists()) {
       const u = snap.data();
-      document.getElementById("profileName").value = u.name || "";
-      document.getElementById("profilePhone").value = u.phone || "";
-      document.getElementById("profileBio").value = u.bio || "";
-      document.getElementById("profileArea").value = u.area || "";
+
+      // Display text
+      document.getElementById("profileNameDisplay").textContent = u.name || "Your name";
+      document.getElementById("profilePhoneDisplay").textContent = u.phone || "Your phone number";
+      document.getElementById("profileBioDisplay").textContent = u.bio || "Tell us a bit about yourself";
+      document.getElementById("profileAreaDisplay").textContent = u.area || "Your area";
+
+      // Hidden inputs
+      document.getElementById("profileNameInput").value = u.name || "";
+      document.getElementById("profilePhoneInput").value = u.phone || "";
+      document.getElementById("profileBioInput").value = u.bio || "";
+      document.getElementById("profileAreaInput").value = u.area || "";
     }
 
     /* ---------------- AREA AUTOCOMPLETE (Rhondda Cynon Taf) ---------------- */
@@ -69,8 +77,7 @@ const AREAS = [
   "Mwyndy", "Thomastown"
 ];
 
-
-    const areaInput = document.getElementById("profileArea");
+    const areaInput = document.getElementById("profileAreaInput");
     const suggestionBox = document.getElementById("areaSuggestions");
 
     areaInput.addEventListener("input", () => {
@@ -105,15 +112,21 @@ const AREAS = [
 
     /* ---------------- SAVE PROFILE ---------------- */
     document.getElementById("saveProfileBtn").addEventListener("click", async () => {
-      const name = document.getElementById("profileName").value.trim();
-      const phone = document.getElementById("profilePhone").value.trim();
-      const bio = document.getElementById("profileBio").value.trim();
-      const area = document.getElementById("profileArea").value.trim();
+      const name = document.getElementById("profileNameInput").value.trim();
+      const phone = document.getElementById("profilePhoneInput").value.trim();
+      const bio = document.getElementById("profileBioInput").value.trim();
+      const area = document.getElementById("profileAreaInput").value.trim();
       const feedback = document.getElementById("profileFeedback");
 
       feedback.textContent = "Saving...";
 
       await updateDoc(userRef, { name, phone, bio, area });
+
+      // Update display text after save
+      document.getElementById("profileNameDisplay").textContent = name || "Your name";
+      document.getElementById("profilePhoneDisplay").textContent = phone || "Your phone number";
+      document.getElementById("profileBioDisplay").textContent = bio || "Tell us a bit about yourself";
+      document.getElementById("profileAreaDisplay").textContent = area || "Your area";
 
       feedback.textContent = "✅ Profile updated!";
       feedback.classList.add("feedback-success");
