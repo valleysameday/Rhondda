@@ -19,9 +19,17 @@ getFirebase().then(fb => {
   auth = fb.auth;
   db = fb.db;
 
-  onAuthStateChanged(auth, async user => {
-    if (!user) return window.location.href = "/";
+  let authResolved = false;
 
+  onAuthStateChanged(auth, async user => {
+    authResolved = true;
+
+    if (!user) {
+      window.location.href = "/";
+      return;
+    }
+
+    // ✅ User is logged in — load their posts
     const q = query(collection(db, "posts"), where("userId", "==", user.uid));
     const snap = await getDocs(q);
 
@@ -62,6 +70,13 @@ getFirebase().then(fb => {
       });
     });
   });
+
+  // ✅ Safety timeout — prevents instant redirect before Firebase loads
+  setTimeout(() => {
+    if (!authResolved && !auth.currentUser) {
+      window.location.href = "/";
+    }
+  }, 500);
 
   document.getElementById("logoutBtn").addEventListener("click", () => {
     signOut(auth).then(() => window.location.href = "/");
