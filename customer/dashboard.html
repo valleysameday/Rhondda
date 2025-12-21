@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Dashboard • Rhondda Noticeboard</title>
+  <link rel="stylesheet" href="/index/css/dashboard.css">
+</head>
+
+<body>
+
+<header class="dash-header">
+  <h1>Your Ads</h1>
+  <button id="logoutBtn" class="logout-btn">Log out</button>
+</header>
+
+<section class="dash-section">
+  <p class="dash-intro">Here are all the ads you’ve posted on Rhondda Noticeboard.</p>
+  <div id="userPosts" class="dash-posts-grid"></div>
+</section>
+
+<script type="module" src="/customer/dashboard.js"></script>
+<script type="module">
+  import { getFirebase } from '/index/js/firebase/init.js';
+
+  getFirebase().then(({ auth }) => {
+    if (!auth.currentUser) {
+      window.location.replace("/index.html");
+    }
+  });
+</script>
+</body>
+</html>
