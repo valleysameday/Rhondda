@@ -115,15 +115,12 @@
 </div>
 
 <!-- ================= POST MODAL ================= -->
-<div id="postModal" class="modal">
-  <div class="modal-content">
-    <button class="close" aria-label="Close">&times;</button>
-    <h2>Post an Ad</h2>
+<div id="postWizard">
 
-    <input type="text" id="postTitle" placeholder="Title" required>
-    <textarea id="postDescription" rows="4" placeholder="Description" required></textarea>
-
-    <select id="postCategory" required>
+  <!-- STEP 1 -->
+  <div class="wizard-step" data-step="1">
+    <h2>What are you posting?</h2>
+    <select id="wizardCategory">
       <option value="">Select category</option>
       <option value="forsale">For Sale</option>
       <option value="jobs">Jobs & Services</option>
@@ -132,24 +129,60 @@
       <option value="community">Community</option>
       <option value="free">Free</option>
     </select>
+    <button class="wizard-next">Next</button>
+  </div>
 
-    <div class="subcategory-wrapper">
-      <select id="postSubcategory">
-        <option value="">Select subcategory</option>
-      </select>
-    </div>
+  <!-- STEP 2 -->
+  <div class="wizard-step" data-step="2">
+    <h2>Select a subcategory</h2>
+    <select id="wizardSubcategory"></select>
+    <button class="wizard-prev">Back</button>
+    <button class="wizard-next">Next</button>
+  </div>
 
-    <div class="price-wrapper">
-      <label for="postPrice">Price (£)</label>
-      <input type="number" id="postPrice" placeholder="0" min="0" step="0.01">
-    </div>
+  <!-- STEP 3 -->
+  <div class="wizard-step" data-step="3">
+    <h2>Give your ad a title</h2>
+    <input id="wizardTitle" type="text" placeholder="e.g. Sofa for sale">
+    <button class="wizard-prev">Back</button>
+    <button class="wizard-next">Next</button>
+  </div>
 
-    <label class="hint-label">Add a photo (recommended)</label>
-    <input type="file" id="postImage" accept="image/*">
-    <div id="imagePreview" class="image-preview"></div>
-    <small class="hint-text">Ads with photos get more views</small>
+  <!-- STEP 4 -->
+  <div class="wizard-step" data-step="4">
+    <h2>Description</h2>
+    <textarea id="wizardDescription" placeholder="Describe your item or service"></textarea>
+    <button class="wizard-prev">Back</button>
+    <button class="wizard-next">Next</button>
+  </div>
 
-    <button id="postSubmitBtn">Submit</button>
+  <!-- STEP 5 -->
+  <div class="wizard-step" data-step="5">
+    <h2>Price</h2>
+    <input id="wizardPrice" type="number" placeholder="0">
+    <button class="wizard-prev">Back</button>
+    <button class="wizard-next">Next</button>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="wizard-step" data-step="6">
+    <h2>Add a photo</h2>
+    <button id="wizardChooseImage">Choose Photo</button>
+    <input type="file" id="postImage" accept="image/*" style="display:none;">
+    <div id="wizardPreview"></div>
+    <button class="wizard-prev">Back</button>
+    <button class="wizard-next">Next</button>
+  </div>
+
+  <!-- STEP 7 -->
+  <div class="wizard-step" data-step="7">
+    <h2>Review your ad</h2>
+    <div id="wizardReview"></div>
+    <button class="wizard-prev">Back</button>
+    <button id="wizardSubmit">Submit Ad</button>
+  </div>
+
+</div>
 
     <!-- POST FEEDBACK -->
     <p id="postFeedback" class="feedback-text"></p>
