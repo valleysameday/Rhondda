@@ -41,6 +41,10 @@ getFirebase().then(fb => {
     const forgotSubmit = document.getElementById('forgotSubmit');
     const forgotEmail = document.getElementById('forgotEmail');
 
+    const loginFeedback = document.getElementById("loginFeedback");
+    const signupFeedback = document.getElementById("signupFeedback");
+    const postFeedback = document.getElementById("postFeedback");
+
     let postAttemptedData = null;
 
     /* ---------------- POST SUBMISSION ---------------- */
@@ -54,7 +58,9 @@ getFirebase().then(fb => {
       const image = document.getElementById('postImage').files[0];
 
       if (!title || !description || !category) {
-        alert('Please fill all required fields.');
+        postFeedback.textContent = "❌ Please fill all required fields.";
+        postFeedback.classList.add("feedback-error", "shake");
+        setTimeout(() => postFeedback.classList.remove("shake"), 300);
         return;
       }
 
@@ -63,6 +69,8 @@ getFirebase().then(fb => {
         openScreen('login');
         return;
       }
+
+      postFeedback.textContent = "Uploading your ad…";
 
       let imageUrl = null;
       if (image) {
@@ -81,8 +89,10 @@ getFirebase().then(fb => {
         userId: auth.currentUser.uid
       });
 
-      alert('Your ad has been posted!');
-      window.closeScreens();
+      postFeedback.textContent = "✅ Your ad is live!";
+      postFeedback.classList.add("feedback-success");
+
+      setTimeout(() => window.closeScreens(), 800);
     });
 
     /* ---------------- LOGIN ---------------- */
@@ -92,6 +102,8 @@ getFirebase().then(fb => {
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
 
+      loginFeedback.textContent = "Checking details…";
+
       try {
         await signInWithEmailAndPassword(auth, email, password);
 
@@ -99,11 +111,20 @@ getFirebase().then(fb => {
 
         if (userDoc.exists()) {
           window.firebaseUserDoc = userDoc.data();
-          navigateToDashboard();   // ✅ SPA navigation
+
+          loginFeedback.textContent = "✅ Correct — loading your dashboard…";
+          loginFeedback.classList.add("feedback-success");
+
+          setTimeout(() => {
+            window.closeScreens();
+            navigateToDashboard();
+          }, 600);
         }
 
       } catch (err) {
-        alert(err.message);
+        loginFeedback.textContent = "❌ Incorrect email or password.";
+        loginFeedback.classList.add("feedback-error", "shake");
+        setTimeout(() => loginFeedback.classList.remove("shake"), 300);
       }
     });
 
@@ -115,6 +136,8 @@ getFirebase().then(fb => {
       const password = document.getElementById('signupPassword').value;
       const isBusiness = document.getElementById('isBusinessAccount').checked;
 
+      signupFeedback.textContent = "Creating your account…";
+
       try {
         await createUserWithEmailAndPassword(auth, email, password);
 
@@ -125,10 +148,19 @@ getFirebase().then(fb => {
         });
 
         window.firebaseUserDoc = { email, isBusiness };
-        navigateToDashboard();   // ✅ SPA navigation
+
+        signupFeedback.textContent = "✅ Account created — loading dashboard…";
+        signupFeedback.classList.add("feedback-success");
+
+        setTimeout(() => {
+          window.closeScreens();
+          navigateToDashboard();
+        }, 600);
 
       } catch (err) {
-        alert(err.message);
+        signupFeedback.textContent = "❌ " + err.message;
+        signupFeedback.classList.add("feedback-error", "shake");
+        setTimeout(() => signupFeedback.classList.remove("shake"), 300);
       }
     });
 
@@ -144,7 +176,11 @@ getFirebase().then(fb => {
 
     forgotSubmit?.addEventListener('click', () => {
       const email = forgotEmail.value.trim();
-      if (!email) return alert("Please enter your email");
+      if (!email) {
+        loginFeedback.textContent = "❌ Please enter your email.";
+        loginFeedback.classList.add("feedback-error");
+        return;
+      }
       window.resetPassword(email);
     });
 
