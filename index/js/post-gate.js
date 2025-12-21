@@ -26,7 +26,7 @@ import {
 let auth, db, storage;
 
 /* ---------------------------------------------------
-   ✅ IMAGE COMPRESSION (RUNS IN BROWSER)
+   ✅ IMAGE COMPRESSION
 --------------------------------------------------- */
 function compressImage(file, maxWidth = 1200, quality = 0.7) {
   return new Promise(resolve => {
@@ -58,45 +58,69 @@ getFirebase().then(fb => {
   db = fb.db;
   storage = fb.storage;
 
-  console.log("✅ Firebase loaded");
-
   function startPostGate() {
 
     /* ---------------------------------------------------
-       ✅ WIZARD CONTROLLER
+       ✅ STEP CONTROLLER
     --------------------------------------------------- */
     let currentStep = 1;
 
     function showStep(step) {
-      document.querySelectorAll(".wizard-step").forEach(s => {
+      document.querySelectorAll(".post-step").forEach(s => {
         s.style.display = s.dataset.step == step ? "block" : "none";
       });
       currentStep = step;
     }
 
     // Next buttons
-    document.querySelectorAll(".wizard-next").forEach(btn => {
+    document.querySelectorAll(".post-next").forEach(btn => {
       btn.addEventListener("click", () => {
         showStep(currentStep + 1);
       });
     });
 
     // Back buttons
-    document.querySelectorAll(".wizard-prev").forEach(btn => {
+    document.querySelectorAll(".post-prev").forEach(btn => {
       btn.addEventListener("click", () => {
         showStep(currentStep - 1);
       });
     });
 
-    // Start wizard
     showStep(1);
+
+    /* ---------------------------------------------------
+       ✅ SUBCATEGORY LOADING
+    --------------------------------------------------- */
+    const subcategories = {
+      forsale: ["Furniture", "Electronics", "Clothes", "Toys", "Other"],
+      jobs: ["Trades", "Cleaning", "Care Work", "Driving", "Other"],
+      property: ["To Rent", "To Buy", "Rooms", "Commercial"],
+      events: ["Music", "Sports", "Community", "Classes"],
+      community: ["Lost & Found", "Local Info", "Announcements"],
+      free: ["Giveaway", "Scrap", "Leftovers"]
+    };
+
+    document.getElementById("postCategory")?.addEventListener("change", e => {
+      const cat = e.target.value;
+      const subSelect = document.getElementById("postSubcategory");
+
+      subSelect.innerHTML = "";
+      if (!cat || !subcategories[cat]) return;
+
+      subcategories[cat].forEach(sub => {
+        const opt = document.createElement("option");
+        opt.value = sub.toLowerCase();
+        opt.textContent = sub;
+        subSelect.appendChild(opt);
+      });
+    });
 
     /* ---------------------------------------------------
        ✅ IMAGE PICKER
     --------------------------------------------------- */
+    const chooseImageBtn = document.getElementById("chooseImageBtn");
     const postImageInput = document.getElementById("postImage");
-    const chooseImageBtn = document.getElementById("wizardChooseImage");
-    const previewBox = document.getElementById("wizardPreview");
+    const previewBox = document.getElementById("imagePreview");
 
     chooseImageBtn?.addEventListener("click", () => {
       postImageInput.click();
@@ -114,20 +138,22 @@ getFirebase().then(fb => {
     });
 
     /* ---------------------------------------------------
-       ✅ SUBMIT AD (FINAL STEP)
+       ✅ SUBMIT AD
     --------------------------------------------------- */
-    document.getElementById("wizardSubmit")?.addEventListener("click", async () => {
+    document.getElementById("postSubmitBtn")?.addEventListener("click", async () => {
 
-      const title = document.getElementById('wizardTitle').value.trim();
-      const description = document.getElementById('wizardDescription').value.trim();
-      const category = document.getElementById('wizardCategory').value;
-      const subcategory = document.getElementById('wizardSubcategory').value;
-      const priceInput = document.getElementById('wizardPrice').value.trim();
+      const title = document.getElementById("postTitle").value.trim();
+      const description = document.getElementById("postDescription").value.trim();
+      const category = document.getElementById("postCategory").value;
+      const subcategory = document.getElementById("postSubcategory").value;
+      const area = document.getElementById("postArea").value.trim();
+
+      const priceInput = document.getElementById("postPrice").value.trim();
       const price = priceInput === "" ? null : Number(priceInput);
 
       const postFeedback = document.getElementById("postFeedback");
 
-      if (!title || !description || !category) {
+      if (!title || !description || !category || !subcategory) {
         postFeedback.textContent = "❌ Please complete all required fields.";
         postFeedback.classList.add("feedback-error");
         return;
@@ -160,11 +186,12 @@ getFirebase().then(fb => {
 
       const imageUrl = imageUrls[0] || null;
 
-      await addDoc(collection(db, 'posts'), {
+      await addDoc(collection(db, "posts"), {
         title,
         description,
         category,
         subcategory,
+        area,
         price,
         imageUrl,
         imageUrls,
@@ -276,7 +303,6 @@ getFirebase().then(fb => {
     });
   }
 
-  // ✅ Ensure startPostGate ALWAYS runs
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", startPostGate);
   } else {
