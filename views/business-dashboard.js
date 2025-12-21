@@ -15,7 +15,7 @@ import {
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-import { ref, deleteObject } 
+import { ref, deleteObject, uploadBytes, getDownloadURL } 
 from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
 let auth, db, storage;
@@ -83,7 +83,7 @@ getFirebase().then(fb => {
     const userRef = doc(db, "businesses", user.uid);
     const snap = await getDoc(userRef);
 
-    let name = "", phone = "", area = "", website = "", bio = "";
+    let name = "", phone = "", area = "", website = "", bio = "", avatarUrl = "";
 
     if (snap.exists()) {
       const b = snap.data();
@@ -92,8 +92,10 @@ getFirebase().then(fb => {
       area = b.area || "";
       website = b.website || "";
       bio = b.bio || "";
+      avatarUrl = b.avatarUrl || "";
     }
 
+    /* ✅ Update header + view mode */
     document.getElementById("bizHeaderName").textContent = name || "Your Business";
     document.getElementById("bizHeaderTagline").textContent =
       name ? "Manage your ads, brand, and customers" : "Let’s set up your business profile";
@@ -111,31 +113,51 @@ getFirebase().then(fb => {
     document.getElementById("bizBioInput").value = bio;
 
     /* ---------------------------------------------------
-       ✅ AREA AUTOCOMPLETE (Rhondda Cynon Taf)
+       ✅ AVATAR DISPLAY + UPLOAD
+    --------------------------------------------------- */
+    const avatarInput = document.getElementById("bizAvatarUploadInput");
+    const avatarCircle = document.getElementById("bizDashboardAvatar");
+    const avatarClickArea = document.getElementById("bizAvatarClickArea");
+
+    if (avatarUrl) {
+      avatarCircle.style.backgroundImage = `url('${avatarUrl}')`;
+    }
+
+    avatarClickArea.addEventListener("click", () => {
+      avatarInput.click();
+    });
+
+    avatarInput.addEventListener("change", async () => {
+      const file = avatarInput.files[0];
+      if (!file) return;
+
+      const storageRef = ref(storage, `avatars/${user.uid}.jpg`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+
+      await updateDoc(userRef, { avatarUrl: url });
+
+      avatarCircle.style.backgroundImage = `url('${url}')`;
+    });
+
+    /* ---------------------------------------------------
+       ✅ AREA AUTOCOMPLETE
     --------------------------------------------------- */
     const AREAS = [
-      "Porth","Trealaw","Tonypandy","Penygraig","Llwynypia",
-      "Ystrad","Gelli","Ton Pentre","Pentre","Treorchy",
-      "Treherbert","Ferndale","Tylorstown","Maerdy",
-      "Cymmer","Wattstown","Blaenllechau","Blaencwm","Blaenrhondda",
+      "Porth","Trealaw","Tonypandy","Penygraig","Llwynypia","Ystrad","Gelli",
+      "Ton Pentre","Pentre","Treorchy","Treherbert","Ferndale","Tylorstown",
+      "Maerdy","Cymmer","Wattstown","Blaenllechau","Blaencwm","Blaenrhondda",
       "Clydach Vale","Edmondstown","Llwyncelyn","Penrhys","Pontygwaith",
-      "Williamstown","Ynyshir",
-
-      "Aberdare","Aberaman","Abercynon","Cwmbach","Hirwaun",
-      "Llwydcoed","Mountain Ash","Penrhiwceiber","Pen-y-waun",
-      "Rhigos","Cefnpennar","Cwaman","Godreaman","Llwyncelyn",
-      "Miskin (Mountain Ash)","New Cardiff","Penderyn","Tyntetown",
-      "Ynysboeth",
-
-      "Pontypridd","Beddau","Church Village","Cilfynydd","Glyn-coch",
-      "Hawthorn","Llantrisant","Llantwit Fardre","Rhydfelen",
-      "Taff's Well","Talbot Green","Tonteg","Treforest","Trehafod",
-      "Ynysybwl","Coed-y-cwm","Graig","Hopkinstown","Nantgarw",
-      "Trallwng","Upper Boat",
-
-      "Brynna","Llanharan","Llanharry","Pontyclun","Tonyrefail",
-      "Tyn-y-nant","Gilfach Goch","Groesfaen","Miskin (Llantrisant)",
-      "Mwyndy","Thomastown"
+      "Williamstown","Ynyshir","Aberdare","Aberaman","Abercynon","Cwmbach",
+      "Hirwaun","Llwydcoed","Mountain Ash","Penrhiwceiber","Pen-y-waun",
+      "Rhigos","Cefnpennar","Cwaman","Godreaman","Miskin (Mountain Ash)",
+      "New Cardiff","Penderyn","Tyntetown","Ynysboeth","Pontypridd","Beddau",
+      "Church Village","Cilfynydd","Glyn-coch","Hawthorn","Llantrisant",
+      "Llantwit Fardre","Rhydfelen","Taff's Well","Talbot Green","Tonteg",
+      "Treforest","Trehafod","Ynysybwl","Coed-y-cwm","Graig","Hopkinstown",
+      "Nantgarw","Trallwng","Upper Boat","Brynna","Llanharan","Llanharry",
+      "Pontyclun","Tonyrefail","Tyn-y-nant","Gilfach Goch","Groesfaen",
+      "Miskin (Llantrisant)","Mwyndy","Thomastown"
     ];
 
     const areaInput = document.getElementById("bizAreaInput");
@@ -179,13 +201,13 @@ getFirebase().then(fb => {
 
     /* ---------------- SAVE BUSINESS PROFILE ---------------- */
     document.getElementById("bizSaveProfileBtn").addEventListener("click", async () => {
-      const newName = nameInput.value.trim();
-      const newPhone = phoneInput.value.trim();
-      const newArea = areaInput.value.trim();
-      const newWebsite = websiteInput.value.trim();
-      const newBio = bioInput.value.trim();
+      const newName = bizNameInput.value.trim();
+      const newPhone = bizPhoneInput.value.trim();
+      const newArea = bizAreaInput.value.trim();
+      const newWebsite = bizWebsiteInput.value.trim();
+      const newBio = bizBioInput.value.trim();
 
-      feedback.textContent = "Saving...";
+      bizFeedback.textContent = "Saving...";
 
       await updateDoc(userRef, {
         name: newName,
@@ -195,31 +217,25 @@ getFirebase().then(fb => {
         bio: newBio
       });
 
-      name = newName;
-      phone = newPhone;
-      area = newArea;
-      website = newWebsite;
-      bio = newBio;
+      document.getElementById("bizViewName").textContent = newName || "Add your business name";
+      document.getElementById("bizViewPhone").textContent = newPhone || "Add your phone";
+      document.getElementById("bizViewArea").textContent = newArea || "Add your area";
+      document.getElementById("bizViewWebsite").textContent = newWebsite || "Add your website";
+      document.getElementById("bizViewBio").textContent = newBio || "Tell customers what you offer";
 
-      document.getElementById("bizViewName").textContent = name || "Add your business name";
-      document.getElementById("bizViewPhone").textContent = phone || "Add your phone";
-      document.getElementById("bizViewArea").textContent = area || "Add your area";
-      document.getElementById("bizViewWebsite").textContent = website || "Add your website";
-      document.getElementById("bizViewBio").textContent = bio || "Tell customers what you offer";
-
-      feedback.textContent = "✅ Business profile updated!";
-      feedback.classList.add("biz-feedback-success");
+      bizFeedback.textContent = "✅ Business profile updated!";
+      bizFeedback.classList.add("biz-feedback-success");
 
       setTimeout(() => {
-        feedback.textContent = "";
-        feedback.classList.remove("biz-feedback-success");
+        bizFeedback.textContent = "";
+        bizFeedback.classList.remove("biz-feedback-success");
       }, 1500);
 
-      exitEdit();
+      exitBizEdit();
     });
 
     /* ---------------- LOAD BUSINESS ADS ---------------- */
-    const postsSnap = await getDocs(q);
+    const postsSnap = await getDocs(query(collection(db, "posts"), where("businessId", "==", user.uid)));
     const container = document.getElementById("bizPosts");
     container.innerHTML = "";
 
