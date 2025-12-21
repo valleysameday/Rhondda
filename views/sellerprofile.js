@@ -40,7 +40,7 @@ async function loadSellerProfile() {
 
   /* ---------------- SELLER NAME ---------------- */
   document.getElementById("sellerName").textContent =
-    seller.displayName || seller.businessName || seller.email;
+  seller.displayName || seller.businessName || "Local Seller";
 
   /* ---------------- RELIABILITY ---------------- */
   const stats = await computeSellerStats(sellerId);
