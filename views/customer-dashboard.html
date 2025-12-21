@@ -12,32 +12,40 @@
     <h2>Your Profile</h2>
 
     <!-- NAME -->
-    <div class="profile-row">
-      <label>Name</label>
-      <input id="profileName" type="text" placeholder="Your name">
+    <div class="profile-field">
+      <strong>Name:</strong>
+      <span id="profileNameDisplay" class="editable-text">Your name</span>
+      <input id="profileNameInput" type="text" class="editable-input" style="display:none;">
+      <button class="edit-icon" data-edit="profileName">✏️</button>
     </div>
 
     <!-- PHONE (PRIVATE) -->
-    <div class="profile-row">
-      <label>Phone (private)</label>
-      <input id="profilePhone" type="text" placeholder="Your phone number">
+    <div class="profile-field">
+      <strong>Phone (private):</strong>
+      <span id="profilePhoneDisplay" class="editable-text">Your phone number</span>
+      <input id="profilePhoneInput" type="text" class="editable-input" style="display:none;">
+      <button class="edit-icon" data-edit="profilePhone">✏️</button>
     </div>
 
-    <!-- AREA WITH AUTOCOMPLETE -->
-    <div class="profile-row" style="position: relative;">
-      <label>Area</label>
-      <input id="profileArea" type="text" placeholder="Your area">
+    <!-- AREA -->
+    <div class="profile-field" style="position: relative;">
+      <strong>Area:</strong>
+      <span id="profileAreaDisplay" class="editable-text">Your area</span>
+      <input id="profileAreaInput" type="text" class="editable-input" style="display:none;">
       <div id="areaSuggestions" class="suggestions-box"></div>
+      <button class="edit-icon" data-edit="profileArea">✏️</button>
     </div>
 
     <!-- BIO -->
-    <div class="profile-row">
-      <label>Bio</label>
-      <textarea id="profileBio" placeholder="Tell us a bit about yourself"></textarea>
+    <div class="profile-field">
+      <strong>Bio:</strong>
+      <span id="profileBioDisplay" class="editable-text">Tell us a bit about yourself</span>
+      <textarea id="profileBioInput" class="editable-input" style="display:none;"></textarea>
+      <button class="edit-icon" data-edit="profileBio">✏️</button>
     </div>
 
     <!-- SAVE BUTTON -->
-    <button id="saveProfileBtn" class="dash-save-btn">Save Profile</button>
+    <button id="saveProfileBtn" class="dash-save-btn">Save Changes</button>
     <p id="profileFeedback" class="feedback-text"></p>
   </div>
 
@@ -49,3 +57,4 @@
   <div id="userPosts" class="dash-posts-grid"></div>
 
 </section>
+
