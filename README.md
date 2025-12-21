@@ -31,8 +31,7 @@ It’s designed to be simple, engaging, and mobile‑friendly — with ads shown
 
 ### Installation
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/rhondda-noticeboard.git
+
 
 # Navigate into the project
 cd rhondda-noticeboard
