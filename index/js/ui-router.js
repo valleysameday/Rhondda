@@ -6,7 +6,8 @@ export function initUIRouter() {
     post: document.getElementById('postModal'),
     signup: document.getElementById('signupModal'),
     forgot: document.getElementById('forgotPasswordModal'),
-    resetConfirm: document.getElementById('resetConfirmModal')
+    resetConfirm: document.getElementById('resetConfirmModal'),
+sellerprofile: document.getElementById('sellerProfilePage')
   };
 
   function openScreen(name) {
