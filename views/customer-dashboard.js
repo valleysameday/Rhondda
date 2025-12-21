@@ -25,7 +25,7 @@ getFirebase().then(fb => {
     authResolved = true;
 
     if (!user) {
-      window.location.href = "/";
+      loadView("home");   // ✅ SPA navigation
       return;
     }
 
@@ -66,15 +66,15 @@ getFirebase().then(fb => {
       btn.addEventListener("click", async () => {
         if (!confirm("Delete this ad?")) return;
         await deleteDoc(doc(db, "posts", btn.dataset.id));
-        location.reload();
+        loadView("customer-dashboard");   // ✅ SPA reload
       });
     });
   });
 
-  // ✅ Safety timeout — prevents redirect before Firebase loads
+  // ✅ Safety timeout
   setTimeout(() => {
     if (!authResolved && !auth.currentUser) {
-      window.location.href = "/";
+      loadView("home");
     }
   }, 500);
 
@@ -85,8 +85,8 @@ getFirebase().then(fb => {
 
     signOut(auth).then(() => {
       setTimeout(() => {
-        window.location.href = "/";
-      }, 5000);
+        loadView("home");   // ✅ SPA navigation
+      }, 3000);
     });
   });
 });
