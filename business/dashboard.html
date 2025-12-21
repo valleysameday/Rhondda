@@ -25,15 +25,6 @@
   </div>
 </section>
 
-<script type="module" src="/business/dashboard.js"></script>
-<script type="module">
-  import { getFirebase } from '/index/js/firebase/init.js';
 
-  getFirebase().then(({ auth }) => {
-    if (!auth.currentUser) {
-      window.location.replace("/index.html");
-    }
-  });
-</script>
 </body>
 </html>
