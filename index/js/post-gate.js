@@ -1,16 +1,31 @@
 // post-gate.js
 import { getFirebase } from '/index/js/firebase/init.js';
+
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   onAuthStateChanged,
   sendPasswordResetEmail
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-import { collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-import { ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js';
+
+import { 
+  collection, 
+  addDoc, 
+  serverTimestamp,
+  doc,
+  setDoc,
+  getDoc
+} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+import { 
+  ref, 
+  uploadBytes, 
+  getDownloadURL 
+} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js';
 
 let auth, db, storage;
 
+// ✅ Load Firebase FIRST
 getFirebase().then(fb => {
   auth = fb.auth;
   db = fb.db;
@@ -20,13 +35,20 @@ getFirebase().then(fb => {
 
   document.addEventListener('DOMContentLoaded', () => {
 
+    /* ----------------------------------------------------
+       ELEMENTS
+    ---------------------------------------------------- */
     const postSubmitBtn = document.getElementById('postSubmitBtn');
     const loginSubmitBtn = document.getElementById('loginSubmit');
     const signupSubmitBtn = document.getElementById('signupSubmit');
+    const forgotSubmit = document.getElementById('forgotSubmit');
+    const forgotEmail = document.getElementById('forgotEmail');
 
     let postAttemptedData = null;
 
-    // ----------------- POST SUBMISSION -----------------
+    /* ----------------------------------------------------
+       POST SUBMISSION
+    ---------------------------------------------------- */
     postSubmitBtn?.addEventListener('click', async e => {
       e.preventDefault();
 
@@ -68,35 +90,69 @@ getFirebase().then(fb => {
       window.closeScreens();
     });
 
-    // ----------------- LOGIN -----------------
+    /* ----------------------------------------------------
+       LOGIN
+    ---------------------------------------------------- */
     loginSubmitBtn?.addEventListener('click', async e => {
       e.preventDefault();
+
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
 
       try {
         await signInWithEmailAndPassword(auth, email, password);
-        window.closeScreens();
+
+        // ✅ Fetch user type
+        const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
+
+        if (userDoc.exists()) {
+          if (userDoc.data().isBusiness) {
+            window.location.href = "/business/dashboard.html";
+          } else {
+            window.location.href = "/customer/dashboard.html";
+          }
+        }
+
       } catch (err) {
         alert(err.message);
       }
     });
 
-    // ----------------- SIGNUP -----------------
+    /* ----------------------------------------------------
+       SIGNUP
+    ---------------------------------------------------- */
     signupSubmitBtn?.addEventListener('click', async e => {
       e.preventDefault();
+
       const email = document.getElementById('signupEmail').value.trim();
       const password = document.getElementById('signupPassword').value;
+      const isBusiness = document.getElementById('isBusinessAccount').checked;
 
       try {
         await createUserWithEmailAndPassword(auth, email, password);
-        window.closeScreens();
+
+        // ✅ Save user profile
+        await setDoc(doc(db, "users", auth.currentUser.uid), {
+          email,
+          isBusiness,
+          createdAt: serverTimestamp()
+        });
+
+        // ✅ Redirect to correct dashboard
+        if (isBusiness) {
+          window.location.href = "/business/dashboard.html";
+        } else {
+          window.location.href = "/customer/dashboard.html";
+        }
+
       } catch (err) {
         alert(err.message);
       }
     });
 
-    // ----------------- RESET PASSWORD -----------------
+    /* ----------------------------------------------------
+       RESET PASSWORD
+    ---------------------------------------------------- */
     window.resetPassword = async function (email) {
       try {
         await sendPasswordResetEmail(auth, email);
@@ -106,7 +162,15 @@ getFirebase().then(fb => {
       }
     };
 
-    // ----------------- AUTH STATE -----------------
+    forgotSubmit?.addEventListener('click', () => {
+      const email = forgotEmail.value.trim();
+      if (!email) return alert("Please enter your email");
+      window.resetPassword(email);
+    });
+
+    /* ----------------------------------------------------
+       AUTH STATE
+    ---------------------------------------------------- */
     onAuthStateChanged(auth, user => {
       if (user) console.log('User logged in:', user.email);
       else console.log('No user logged in');
