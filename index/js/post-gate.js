@@ -48,56 +48,64 @@ getFirebase().then(fb => {
     let postAttemptedData = null;
 
     /* ---------------- POST SUBMISSION ---------------- */
-postSubmitBtn?.addEventListener('click', async e => {
-  e.preventDefault();
+    postSubmitBtn?.addEventListener('click', async e => {
+      e.preventDefault();
 
-  const title = document.getElementById('postTitle').value.trim();
-  const description = document.getElementById('postDescription').value.trim();
-  const category = document.getElementById('postCategory').value;
-  const subcategory = document.getElementById('postSubcategory').value;
-  const priceInput = document.getElementById('postPrice').value.trim();
-  const price = priceInput === "" ? null : Number(priceInput);
-  const image = document.getElementById('postImage').files[0];
+      const title = document.getElementById('postTitle').value.trim();
+      const description = document.getElementById('postDescription').value.trim();
+      const category = document.getElementById('postCategory').value;
+      const subcategory = document.getElementById('postSubcategory').value;
+      const priceInput = document.getElementById('postPrice').value.trim();
+      const price = priceInput === "" ? null : Number(priceInput);
 
-  if (!title || !description || !category) {
-    postFeedback.textContent = "❌ Please fill all required fields.";
-    postFeedback.classList.add("feedback-error", "shake");
-    setTimeout(() => postFeedback.classList.remove("shake"), 300);
-    return;
-  }
+      const files = Array.from(document.getElementById('postImage').files || []);
+      
+      if (!title || !description || !category) {
+        postFeedback.textContent = "❌ Please fill all required fields.";
+        postFeedback.classList.add("feedback-error", "shake");
+        setTimeout(() => postFeedback.classList.remove("shake"), 300);
+        return;
+      }
 
-  if (!auth.currentUser) {
-    postAttemptedData = { title, description, category, subcategory, price, image };
-    openScreen('login');
-    return;
-  }
+      if (!auth.currentUser) {
+        postAttemptedData = { title, description, category, subcategory, price };
+        // we don’t keep files here (can’t re‑use safely)
+        openScreen('login');
+        return;
+      }
 
-  postFeedback.textContent = "Uploading your ad…";
+      postFeedback.textContent = "Uploading your ad…";
 
-  let imageUrl = null;
-  if (image) {
-    const storageRef = ref(storage, `posts/${Date.now()}_${image.name}`);
-    await uploadBytes(storageRef, image);
-    imageUrl = await getDownloadURL(storageRef);
-  }
+      // ✅ Upload all images (if any)
+      const imageUrls = [];
+      for (const file of files) {
+        const storageRef = ref(storage, `posts/${Date.now()}_${file.name}`);
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        imageUrls.push(url);
+      }
 
-  await addDoc(collection(db, 'posts'), {
-    title,
-    description,
-    category,
-    subcategory,
-    price,               // ✅ PRICE SAVED
-    imageUrl,
-    createdAt: serverTimestamp(),
-    userId: auth.currentUser.uid,
-    businessId: window.firebaseUserDoc?.isBusiness ? auth.currentUser.uid : null
-  });
+      // ✅ Thumbnail for home feed = first image or null
+      const imageUrl = imageUrls[0] || null;
 
-  postFeedback.textContent = "✅ Your ad is live!";
-  postFeedback.classList.add("feedback-success");
+      await addDoc(collection(db, 'posts'), {
+        title,
+        description,
+        category,
+        subcategory,
+        price,
+        imageUrl,      // ✅ used on home feed
+        imageUrls,     // ✅ full gallery on view‑post
+        createdAt: serverTimestamp(),
+        userId: auth.currentUser.uid,
+        businessId: window.firebaseUserDoc?.isBusiness ? auth.currentUser.uid : null
+      });
 
-  setTimeout(() => window.closeScreens(), 800);
-});
+      postFeedback.textContent = "✅ Your ad is live!";
+      postFeedback.classList.add("feedback-success");
+
+      setTimeout(() => window.closeScreens(), 800);
+    });
 
     /* ---------------- LOGIN ---------------- */
     loginSubmitBtn?.addEventListener('click', async e => {
