@@ -102,7 +102,7 @@ getFirebase().then(fb => {
     signOut(auth).then(() => {
       setTimeout(() => {
         window.location.href = "/";
-      }, 1500);
+      }, 3500);
     });
   });
 });
