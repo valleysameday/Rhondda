@@ -63,6 +63,9 @@ getFirebase().then(fb => {
     const postSubmitBtn = document.getElementById('postSubmitBtn');
     const loginSubmitBtn = document.getElementById('loginSubmit');
     const signupSubmitBtn = document.getElementById('signupSubmit');
+    document.getElementById("chooseImageBtn").addEventListener("click", () => {
+  document.getElementById("postImage").click();
+});
     const forgotSubmit = document.getElementById('forgotSubmit');
     const forgotEmail = document.getElementById('forgotEmail');
 
