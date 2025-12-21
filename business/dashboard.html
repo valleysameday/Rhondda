@@ -1,47 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rhondda Noticeboard - Business Dashboard</title>
-<link rel="stylesheet" href="/business/css/dashboard.css">
+  <meta charset="UTF-8">
+  <title>Business Dashboard • Rhondda Noticeboard</title>
+  <link rel="stylesheet" href="/index/css/dashboard.css">
 </head>
+
 <body>
 
-<header>
-  <h1>Rhondda Noticeboard - Dashboard</h1>
+<header class="dash-header business">
+  <h1>Your Business Ads</h1>
+  <button id="logoutBtn" class="logout-btn">Log out</button>
 </header>
 
-<main>
-  <section class="post-creation">
-  <h2>Create a Post</h2>
+<section class="dash-section">
+  <p class="dash-intro">Manage your business ads and track performance.</p>
+  <div id="businessPosts" class="dash-posts-grid"></div>
+</section>
 
-  <input type="text" id="postTitle" placeholder="Post Title">
-  <textarea id="postContent" placeholder="Post Content"></textarea>
+<section class="dash-section analytics">
+  <h2>Business Insights</h2>
+  <div class="analytics-box">
+    <p>Views, clicks, and featured boosts coming soon.</p>
+  </div>
+</section>
 
-  <select id="postCategory">
-    <option value="offers">Offers</option>
-    <option value="events">Events</option>
-    <option value="services">Services</option>
-  </select>
+<script type="module" src="/business/dashboard.js"></script>
+<script type="module">
+  import { getFirebase } from '/index/js/firebase/init.js';
 
-  <input type="file" id="postImage" accept="image/*">
-
-  <button id="createPostBtn">Add Post</button>
-  </section>
-
-  <section class="post-list">
-    <h2>Your Posts</h2>
-    <div id="dashboardPosts">
-      Loading posts...
-    </div>
-  </section>
-</main>
-
-<footer>
-  © 2025 Rhondda Noticeboard
-</footer>
-
-<script src="/business/css/js/dashboard.js"></script>
+  getFirebase().then(({ auth }) => {
+    if (!auth.currentUser) {
+      window.location.replace("/index.html");
+    }
+  });
+</script>
 </body>
 </html>
