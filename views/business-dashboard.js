@@ -90,7 +90,7 @@ getFirebase().then(fb => {
   // ✅ Safety timeout
   setTimeout(() => {
     if (!authResolved && !auth.currentUser) {
-      loadView("home");
+      navigateToHome();
     }
   }, 500);
 
