@@ -98,8 +98,8 @@ async function loadPost() {
             <button class="primary-btn" onclick="contactSeller('${post.userId}')">
               Contact seller
             </button>
-            <button class="secondary-btn" onclick="viewSellerPosts('${post.userId}')">
-              View seller’s other ads
+            <button class="secondary-btn" onclick="openSellerProfile('${post.userId}')">
+              View all Adds & Profile 
             </button>
           </div>
         </div>
