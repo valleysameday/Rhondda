@@ -562,19 +562,13 @@ footer {
   border-radius: 0 0 20px 20px;
 }
 
-.seller-avatar-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-top: -40px;
-}
-
 .seller-avatar {
-  width: 90px;
-  height: 90px;
-  background: #fff;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  border: 4px solid #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  background-size: cover;
+  background-position: center;
+  background-color: #eee;
 }
 
 .seller-header {
