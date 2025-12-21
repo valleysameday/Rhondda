@@ -1,0 +1,436 @@
+/* ============================
+   BASE
+============================ */
+body {
+  font-family: system-ui, sans-serif;
+  background: #f4f6f8;
+  margin: 0;
+  padding: 0;
+  color: #222;
+}
+
+.biz-section-title {
+  margin: 1rem 0 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111;
+}
+
+/* ============================
+   HEADER (COAL & ELECTRIC BLUE)
+============================ */
+.biz-header {
+  background: linear-gradient(135deg, #0a0a0a, #003366, #007bff);
+  color: #fff;
+  padding: 1.2rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.biz-header-left h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.biz-tagline {
+  margin: 0.2rem 0 0;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.biz-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+}
+
+.biz-type-badge {
+  background: rgba(255,255,255,0.15);
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+/* ============================
+   LOGOUT BUTTON
+============================ */
+.biz-logout-btn {
+  background: rgba(0,0,0,0.25);
+  border: none;
+  padding: 0.45rem 0.9rem;
+  color: white;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.biz-logout-btn:hover {
+  background: rgba(0,0,0,0.4);
+  transform: translateY(-1px);
+}
+
+/* ============================
+   MAIN SECTION
+============================ */
+.biz-section {
+  padding: 1rem;
+  max-width: 850px;
+  margin: 0 auto 2.5rem;
+}
+
+/* ============================
+   STATS BOX
+============================ */
+.biz-stats-box {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  margin-top: -1.2rem;
+  margin-bottom: 1.3rem;
+  position: relative;
+  z-index: 1;
+}
+
+.biz-stats-box h2 {
+  margin: 0 0 0.7rem;
+  font-size: 1.05rem;
+}
+
+.biz-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.biz-stat-pill {
+  background: linear-gradient(135deg, #eef3ff, #dce9ff);
+  border-radius: 999px;
+  padding: 0.6rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid rgba(0,123,255,0.25);
+}
+
+.biz-stat-number {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #007bff;
+}
+
+.biz-stat-label {
+  font-size: 0.75rem;
+  color: #555;
+}
+
+/* ============================
+   BUSINESS PROFILE BOX
+============================ */
+.biz-profile-box {
+  background: #fff;
+  padding: 1.1rem;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  margin-bottom: 1.5rem;
+}
+
+.biz-profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+}
+
+.biz-profile-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+/* Edit profile button */
+.biz-edit-profile-btn {
+  background: #e8f0ff;
+  color: #003366;
+  border-radius: 999px;
+  border: 1px solid #c9dbff;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.biz-edit-profile-btn:hover {
+  background: #dce7ff;
+}
+
+/* VIEW MODE */
+.biz-profile-view {
+  border-top: 1px solid #f1f1f1;
+  padding-top: 0.8rem;
+}
+
+.biz-profile-line {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.6rem;
+}
+
+.biz-profile-label {
+  font-size: 0.8rem;
+  color: #777;
+  margin-bottom: 0.1rem;
+}
+
+.biz-profile-value {
+  font-size: 0.95rem;
+  color: #222;
+  background: #f7f9fc;
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+}
+
+.biz-profile-line-bio .biz-profile-value {
+  min-height: 40px;
+}
+
+/* EDIT MODE */
+.biz-profile-edit {
+  border-top: 1px solid #f1f1f1;
+  padding-top: 0.8rem;
+}
+
+.biz-profile-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.8rem;
+}
+
+.biz-profile-row label {
+  font-size: 0.85rem;
+  margin-bottom: 0.2rem;
+  color: #555;
+}
+
+.biz-profile-row input,
+.biz-profile-row textarea {
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fafafa;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.biz-profile-row input:focus,
+.biz-profile-row textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+  outline: none;
+}
+
+.biz-profile-row textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* EDIT MODE ACTIONS */
+.biz-profile-edit-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+}
+
+.biz-save-btn {
+  background: #007bff;
+  color: #fff;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  flex: 1;
+}
+
+.biz-save-btn:hover {
+  opacity: 0.95;
+}
+
+.biz-cancel-edit-btn {
+  background: #f3f3f3;
+  color: #555;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* FEEDBACK TEXT */
+.biz-feedback-text {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  min-height: 18px;
+}
+
+.biz-feedback-success {
+  color: #2a8f2a;
+}
+
+/* ============================
+   AREA AUTOCOMPLETE
+============================ */
+.biz-suggestions-box {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  margin-top: 4px;
+  max-height: 160px;
+  overflow-y: auto;
+  display: none;
+  position: absolute;
+  width: 100%;
+  z-index: 10;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.biz-suggestion-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.biz-suggestion-item:hover {
+  background: #e8f0ff;
+}
+
+/* ============================
+   NEW POST BUTTON
+============================ */
+.biz-new-post {
+  background: #111;
+  color: #fff;
+  padding: 0.75rem 0.9rem;
+  border-radius: 999px;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  margin-bottom: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.biz-new-post-label {
+  font-weight: 600;
+}
+
+.biz-new-post-tag {
+  background: #007bff;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
+/* ============================
+   BUSINESS ADS GRID
+============================ */
+.biz-posts-grid {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.biz-card {
+  background: white;
+  border-radius: 12px;
+  padding: 0.7rem;
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.04);
+}
+
+.biz-img {
+  width: 86px;
+  height: 86px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.biz-info h3 {
+  margin: 0 0 0.25rem;
+  font-size: 0.98rem;
+}
+
+.biz-info p {
+  margin: 0 0 0.3rem;
+  font-size: 0.85rem;
+  color: #444;
+}
+
+.biz-info small {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.biz-actions {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.biz-btn {
+  padding: 0.3rem 0.6rem;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.biz-edit {
+  background: #ffc107;
+}
+
+.biz-delete {
+  background: #ff4d4d;
+  color: white;
+}
+
+/* EMPTY STATE */
+.biz-empty-msg {
+  color: #666;
+  padding: 1rem 0.3rem;
+  font-size: 0.9rem;
+}
+
+/* ============================
+   LOGOUT OVERLAY
+============================ */
+.biz-logout-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.biz-logout-card {
+  background: #fff;
+  padding: 1rem 1.3rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+.biz-logout-card p {
+  margin: 0 0 0.2rem;
+  }
