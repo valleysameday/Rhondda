@@ -145,7 +145,7 @@
     </div>
 
     <label class="hint-label">Add a photo (recommended)</label>
-    <input type="file" id="postImage" accept="image/*">
+    
     <div id="imagePreview" class="image-preview"></div>
     <small class="hint-text">Ads with photos get more views</small>
 
@@ -195,7 +195,8 @@
   </a>
 
 </div>
-
+<!-- Put this OUTSIDE the modal, anywhere in <body> -->
+<input type="file" id="postImage" accept="image/*" style="display:none;">
 <!-- ================= FOOTER ================= -->
 <footer>
   <p>&copy; 2025 Rhondda Noticeboard</p>
