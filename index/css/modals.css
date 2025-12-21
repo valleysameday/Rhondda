@@ -156,140 +156,78 @@ body.modal-open main {
 .shake {
   animation: shake .3s;
 }
-@keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  50% { transform: translateX(4px); }
-  75% { transform: translateX(-4px); }
-  100% { transform: translateX(0); }
-}
 
-
-/* ---------------------------------------------------
-   ✅ WIZARD CONTAINER
---------------------------------------------------- */
-#wizardModal,
-#postWizard {
-  width: 100%;
-  display: block;
-}
-
-/* ---------------------------------------------------
-   ✅ WIZARD STEPS
---------------------------------------------------- */
-.wizard-step {
+/* Step container */
+.post-step {
   display: none;
-  animation: fadeSlideIn 0.35s ease;
-  padding: 10px 0;
+  animation: fadeSlideIn 0.3s ease;
 }
 
 @keyframes fadeSlideIn {
-  from {
-    opacity: 0;
-    transform: translateX(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
-/* ---------------------------------------------------
-   ✅ TITLES
---------------------------------------------------- */
-.wizard-step h2 {
+/* Titles */
+.post-step h2 {
   font-size: 1.4rem;
   margin-bottom: 12px;
-  color: #222;
   font-weight: 600;
 }
 
-/* ---------------------------------------------------
-   ✅ INPUTS
---------------------------------------------------- */
-.wizard-step input,
-.wizard-step textarea,
-.wizard-step select {
+/* Inputs */
+.post-step input,
+.post-step textarea,
+.post-step select {
   width: 100%;
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #ddd;
   margin-bottom: 15px;
   font-size: 1rem;
-  background: #fff;
 }
 
-.wizard-step textarea {
-  min-height: 100px;
-  resize: vertical;
-}
-
-/* ---------------------------------------------------
-   ✅ BUTTONS
---------------------------------------------------- */
-.wizard-next,
-.wizard-prev,
-#wizardSubmit,
-#wizardChooseImage {
+/* Buttons */
+.post-next,
+.post-prev,
+#postSubmitBtn,
+#chooseImageBtn {
   width: 100%;
   padding: 12px;
   border-radius: 8px;
   border: none;
-  font-size: 1rem;
   margin-top: 10px;
+  font-size: 1rem;
   cursor: pointer;
   transition: 0.2s ease;
 }
 
-/* Next button */
-.wizard-next {
+.post-next {
   background: #ff7b00;
   color: #fff;
 }
+.post-next:hover { background: #e56f00; }
 
-.wizard-next:hover {
-  background: #e56f00;
-}
-
-/* Back button */
-.wizard-prev {
+.post-prev {
   background: #eee;
   color: #333;
 }
+.post-prev:hover { background: #ddd; }
 
-.wizard-prev:hover {
-  background: #ddd;
-}
-
-/* Submit button */
-#wizardSubmit {
+#postSubmitBtn {
   background: #28a745;
   color: #fff;
 }
+#postSubmitBtn:hover { background: #218838; }
 
-#wizardSubmit:hover {
-  background: #218838;
-}
-
-/* Choose Image button */
-#wizardChooseImage {
+#chooseImageBtn {
   background: #007bff;
   color: #fff;
 }
+#chooseImageBtn:hover { background: #0069d9; }
 
-#wizardChooseImage:hover {
-  background: #0069d9;
-}
-
-/* ---------------------------------------------------
-   ✅ IMAGE PREVIEW
---------------------------------------------------- */
-#wizardPreview {
-  margin-top: 10px;
-  text-align: center;
-}
-
-#wizardPreview img.preview-img {
+/* Image preview */
+#imagePreview img {
   width: 100%;
   max-height: 260px;
   object-fit: cover;
@@ -298,35 +236,3 @@ body.modal-open main {
   border: 2px solid #eee;
 }
 
-/* ---------------------------------------------------
-   ✅ REVIEW BOX
---------------------------------------------------- */
-#wizardReview {
-  background: #fafafa;
-  padding: 15px;
-  border-radius: 10px;
-  border: 1px solid #eee;
-  margin-bottom: 15px;
-}
-
-#wizardReview p {
-  margin: 6px 0;
-  font-size: 0.95rem;
-}
-
-/* ---------------------------------------------------
-   ✅ MOBILE FRIENDLY
---------------------------------------------------- */
-@media (max-width: 480px) {
-  .wizard-step h2 {
-    font-size: 1.2rem;
-  }
-
-  .wizard-next,
-  .wizard-prev,
-  #wizardSubmit,
-  #wizardChooseImage {
-    font-size: 0.95rem;
-    padding: 10px;
-  }
-}
