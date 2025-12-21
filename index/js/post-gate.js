@@ -33,11 +33,8 @@ getFirebase().then(fb => {
 
   console.log("✅ Firebase loaded");
 
-  document.addEventListener('DOMContentLoaded', () => {
+  function startPostGate() {
 
-    /* ----------------------------------------------------
-       ELEMENTS
-    ---------------------------------------------------- */
     const postSubmitBtn = document.getElementById('postSubmitBtn');
     const loginSubmitBtn = document.getElementById('loginSubmit');
     const signupSubmitBtn = document.getElementById('signupSubmit');
@@ -46,9 +43,7 @@ getFirebase().then(fb => {
 
     let postAttemptedData = null;
 
-    /* ----------------------------------------------------
-       POST SUBMISSION
-    ---------------------------------------------------- */
+    /* ---------------- POST SUBMISSION ---------------- */
     postSubmitBtn?.addEventListener('click', async e => {
       e.preventDefault();
 
@@ -90,9 +85,7 @@ getFirebase().then(fb => {
       window.closeScreens();
     });
 
-    /* ----------------------------------------------------
-       LOGIN
-    ---------------------------------------------------- */
+    /* ---------------- LOGIN ---------------- */
     loginSubmitBtn?.addEventListener('click', async e => {
       e.preventDefault();
 
@@ -102,7 +95,6 @@ getFirebase().then(fb => {
       try {
         await signInWithEmailAndPassword(auth, email, password);
 
-        // ✅ Fetch user type
         const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
 
         if (userDoc.exists()) {
@@ -118,9 +110,7 @@ getFirebase().then(fb => {
       }
     });
 
-    /* ----------------------------------------------------
-       SIGNUP
-    ---------------------------------------------------- */
+    /* ---------------- SIGNUP ---------------- */
     signupSubmitBtn?.addEventListener('click', async e => {
       e.preventDefault();
 
@@ -131,14 +121,12 @@ getFirebase().then(fb => {
       try {
         await createUserWithEmailAndPassword(auth, email, password);
 
-        // ✅ Save user profile
         await setDoc(doc(db, "users", auth.currentUser.uid), {
           email,
           isBusiness,
           createdAt: serverTimestamp()
         });
 
-        // ✅ Redirect to correct dashboard
         if (isBusiness) {
           window.location.href = "/business/dashboard.html";
         } else {
@@ -150,9 +138,7 @@ getFirebase().then(fb => {
       }
     });
 
-    /* ----------------------------------------------------
-       RESET PASSWORD
-    ---------------------------------------------------- */
+    /* ---------------- RESET PASSWORD ---------------- */
     window.resetPassword = async function (email) {
       try {
         await sendPasswordResetEmail(auth, email);
@@ -168,13 +154,18 @@ getFirebase().then(fb => {
       window.resetPassword(email);
     });
 
-    /* ----------------------------------------------------
-       AUTH STATE
-    ---------------------------------------------------- */
+    /* ---------------- AUTH STATE ---------------- */
     onAuthStateChanged(auth, user => {
       if (user) console.log('User logged in:', user.email);
       else console.log('No user logged in');
     });
+  }
 
-  });
+  // ✅ FIX: Ensure startPostGate ALWAYS runs
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startPostGate);
+  } else {
+    startPostGate();
+  }
+
 });
