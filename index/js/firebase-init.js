@@ -1,14 +1,35 @@
+// firebase/init.js
+
+// ✅ Firebase config from environment variables only
 const firebaseConfig = {
-  apiKey: import.meta.env.RN_FIREBASE_API_KEY || window.RN_FIREBASE_API_KEY,
-  authDomain: import.meta.env.RN_FIREBASE_AUTH_DOMAIN || window.RN_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.RN_FIREBASE_PROJECT_ID || window.RN_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.RN_FIREBASE_STORAGE_BUCKET || window.RN_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.RN_FIREBASE_MESSAGING_SENDER_ID || window.RN_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.RN_FIREBASE_APP_ID || window.RN_FIREBASE_APP_ID
+  apiKey: import.meta.env.RN_FIREBASE_API_KEY || null,
+  authDomain: import.meta.env.RN_FIREBASE_AUTH_DOMAIN || null,
+  projectId: import.meta.env.RN_FIREBASE_PROJECT_ID || null,
+  storageBucket: import.meta.env.RN_FIREBASE_STORAGE_BUCKET || null,
+  messagingSenderId: import.meta.env.RN_FIREBASE_MESSAGING_SENDER_ID || null,
+  appId: import.meta.env.RN_FIREBASE_APP_ID || null
 };
 
-firebase.initializeApp(firebaseConfig);
+// ⚠️ Make sure no values are hard-coded here
 
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
+// Initialize Firebase only if keys exist
+if (
+  firebaseConfig.apiKey &&
+  firebaseConfig.authDomain &&
+  firebaseConfig.projectId
+) {
+  firebase.initializeApp(firebaseConfig);
+
+  // Export services for your app
+  export const auth = firebase.auth();
+  export const db = firebase.firestore();
+  export const storage = firebase.storage();
+} else {
+  console.warn(
+    "Firebase keys missing! Make sure your environment variables are set."
+  );
+  // Provide dummy objects so your code doesn't break locally
+  export const auth = null;
+  export const db = null;
+  export const storage = null;
+}
