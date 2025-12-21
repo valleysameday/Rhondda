@@ -20,15 +20,24 @@ getFirebase().then(fb => {
   auth = fb.auth;
   db = fb.db;
 
+  let authResolved = false;
+
   onAuthStateChanged(auth, async user => {
-    if (!user) return window.location.href = "/";
+    authResolved = true;
+
+    if (!user) {
+      window.location.href = "/";
+      return;
+    }
 
     // ✅ Check business status
     const userDoc = await getDoc(doc(db, "users", user.uid));
     if (!userDoc.exists() || !userDoc.data().isBusiness) {
-      return window.location.href = "/customer/dashboard.html";
+      window.location.href = "/customer/dashboard.html";
+      return;
     }
 
+    // ✅ Load business posts
     const q = query(collection(db, "posts"), where("userId", "==", user.uid));
     const snap = await getDocs(q);
 
@@ -70,13 +79,20 @@ getFirebase().then(fb => {
       });
     });
 
-    // FEATURE HANDLER (placeholder)
+    // FEATURE HANDLER
     document.querySelectorAll(".dash-feature").forEach(btn => {
       btn.addEventListener("click", () => {
         alert("Featured ads coming soon!");
       });
     });
   });
+
+  // ✅ Safety timeout — prevents redirect before Firebase loads
+  setTimeout(() => {
+    if (!authResolved && !auth.currentUser) {
+      window.location.href = "/";
+    }
+  }, 500);
 
   document.getElementById("logoutBtn").addEventListener("click", () => {
     signOut(auth).then(() => window.location.href = "/");
