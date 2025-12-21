@@ -36,18 +36,84 @@ getFirebase().then(fb => {
       document.getElementById("profileName").value = u.name || "";
       document.getElementById("profilePhone").value = u.phone || "";
       document.getElementById("profileBio").value = u.bio || "";
+      document.getElementById("profileArea").value = u.area || "";
     }
+
+    /* ---------------- AREA AUTOCOMPLETE (Rhondda Cynon Taf) ---------------- */
+const AREAS = [
+  // Rhondda Fawr & Rhondda Fach
+  "Porth", "Trealaw", "Tonypandy", "Penygraig", "Llwynypia",
+  "Ystrad", "Gelli", "Ton Pentre", "Pentre", "Treorchy",
+  "Treherbert", "Ferndale", "Tylorstown", "Maerdy",
+  "Cymmer", "Wattstown", "Blaenllechau", "Blaencwm", "Blaenrhondda",
+  "Clydach Vale", "Edmondstown", "Llwyncelyn", "Penrhys", "Pontygwaith",
+  "Williamstown", "Ynyshir",
+
+  // Cynon Valley
+  "Aberdare", "Aberaman", "Abercynon", "Cwmbach", "Hirwaun",
+  "Llwydcoed", "Mountain Ash", "Penrhiwceiber", "Pen-y-waun",
+  "Rhigos", "Cefnpennar", "Cwaman", "Godreaman", "Llwyncelyn",
+  "Miskin (Mountain Ash)", "New Cardiff", "Penderyn", "Tyntetown",
+  "Ynysboeth",
+
+  // Pontypridd & Taff Ely
+  "Pontypridd", "Beddau", "Church Village", "Cilfynydd", "Glyn-coch",
+  "Hawthorn", "Llantrisant", "Llantwit Fardre", "Rhydfelen",
+  "Taff's Well", "Talbot Green", "Tonteg", "Treforest", "Trehafod",
+  "Ynysybwl", "Coed-y-cwm", "Graig", "Hopkinstown", "Nantgarw",
+  "Trallwng", "Upper Boat",
+
+  // Llantrisant & South RCT
+  "Brynna", "Llanharan", "Llanharry", "Pontyclun", "Tonyrefail",
+  "Tyn-y-nant", "Gilfach Goch", "Groesfaen", "Miskin (Llantrisant)",
+  "Mwyndy", "Thomastown"
+];
+
+
+    const areaInput = document.getElementById("profileArea");
+    const suggestionBox = document.getElementById("areaSuggestions");
+
+    areaInput.addEventListener("input", () => {
+      const value = areaInput.value.toLowerCase();
+      suggestionBox.innerHTML = "";
+
+      if (!value) {
+        suggestionBox.style.display = "none";
+        return;
+      }
+
+      const matches = AREAS.filter(a => a.toLowerCase().startsWith(value));
+
+      if (!matches.length) {
+        suggestionBox.style.display = "none";
+        return;
+      }
+
+      suggestionBox.style.display = "block";
+
+      matches.forEach(area => {
+        const div = document.createElement("div");
+        div.className = "suggestion-item";
+        div.textContent = area;
+        div.addEventListener("click", () => {
+          areaInput.value = area;
+          suggestionBox.style.display = "none";
+        });
+        suggestionBox.appendChild(div);
+      });
+    });
 
     /* ---------------- SAVE PROFILE ---------------- */
     document.getElementById("saveProfileBtn").addEventListener("click", async () => {
       const name = document.getElementById("profileName").value.trim();
       const phone = document.getElementById("profilePhone").value.trim();
       const bio = document.getElementById("profileBio").value.trim();
+      const area = document.getElementById("profileArea").value.trim();
       const feedback = document.getElementById("profileFeedback");
 
       feedback.textContent = "Saving...";
 
-      await updateDoc(userRef, { name, phone, bio });
+      await updateDoc(userRef, { name, phone, bio, area });
 
       feedback.textContent = "✅ Profile updated!";
       feedback.classList.add("feedback-success");
@@ -76,7 +142,11 @@ getFirebase().then(fb => {
           <div class="dash-info">
             <h3>${p.title}</h3>
             <p>${p.description}</p>
-            <small>${p.category} ${p.subcategory ? "• " + p.subcategory : ""}</small>
+            <small>
+              ${p.category} 
+              ${p.subcategory ? "• " + p.subcategory : ""} 
+              ${p.area ? "• " + p.area : ""}
+            </small>
           </div>
           <div class="dash-actions">
             <button class="dash-btn dash-edit" data-id="${id}">Edit</button>
