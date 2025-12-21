@@ -1,5 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
-
+export function initUIRouter() {
   /* -------------------- ROUTES / MODALS -------------------- */
   const routes = {
     login: document.getElementById('loginModal'),
@@ -10,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function openScreen(name) {
     closeAll();
     if (!routes[name]) return;
-
     document.body.classList.add('modal-open');
     routes[name].style.display = 'flex';
   }
@@ -22,63 +20,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-/* -------------------- CATEGORY + SUBCATEGORY DATA -------------------- */
-const subcategoryMap = {
-  forsale: [
-    'Appliances',
-    'Furniture',
-    'Electronics',
-    'Baby & Kids',
-    'Garden',
-    'Tools',
-    'Mobility',
-    'Misc'
-  ],
+  window.openScreen = openScreen;
+  window.closeScreens = closeAll;
 
-  jobs: [
-    'Plumber',
-    'Electrician',
-    'Cleaner',
-    'Gardener',
-    'Handyman',
-    'Beauty & Hair',
-    'Mechanic',
-    'Tutor'
-  ],
+  /* -------------------- CATEGORY + SUBCATEGORY DATA -------------------- */
+  const subcategoryMap = {
+    forsale: ['Appliances','Furniture','Electronics','Baby & Kids','Garden','Tools','Mobility','Misc'],
+    jobs: ['Plumber','Electrician','Cleaner','Gardener','Handyman','Beauty & Hair','Mechanic','Tutor'],
+    property: ['To Rent','To Buy','Rooms','Commercial'],
+    events: ['Music','Charity','Sport','Classes','Markets'],
+    all: null,
+    community: null,
+    free: null
+  };
 
-  property: [
-    'To Rent',
-    'To Buy',
-    'Rooms',
-    'Commercial'
-  ],
-
-  events: [
-    'Music',
-    'Charity',
-    'Sport',
-    'Classes',
-    'Markets'
-  ],
-
-  /* ✅ These categories have NO subcategories */
-  all: null,
-  community: null,
-  free: null
-};
-  /* -------------------- FEED SUBCATEGORIES -------------------- */
   const categories = document.querySelectorAll('#categories .category-btn');
   const subcategoriesContainer = document.getElementById('subcategories');
 
   function showSubcategories(category) {
+    if (!subcategoriesContainer) return;
     subcategoriesContainer.innerHTML = '';
     const subs = subcategoryMap[category];
-
     if (!subs) {
       subcategoriesContainer.style.display = 'none';
       return;
     }
-
     subs.forEach(sub => {
       const btn = document.createElement('button');
       btn.className = 'subcategory-btn';
@@ -86,7 +52,6 @@ const subcategoryMap = {
       btn.onclick = () => console.log(`Filter feed: ${category} > ${sub}`);
       subcategoriesContainer.appendChild(btn);
     });
-
     subcategoriesContainer.style.display = 'flex';
   }
 
@@ -98,92 +63,86 @@ const subcategoryMap = {
     });
   });
 
-/* -------------------- POST AN AD UX -------------------- */
-const postCategory = document.getElementById('postCategory');
-const postSubcategory = document.getElementById('postSubcategory');
-const postSubcategoryWrapper = document.querySelector('.subcategory-wrapper');
+  /* -------------------- POST AN AD UX -------------------- */
+  const postCategory = document.getElementById('postCategory');
+  const postSubcategory = document.getElementById('postSubcategory');
+  const postSubcategoryWrapper = document.querySelector('.subcategory-wrapper');
+  const postPrice = document.getElementById('postPrice');
+  const priceWrapper = document.querySelector('.price-wrapper');
 
-const postPrice = document.getElementById('postPrice');
-const priceWrapper = document.querySelector('.price-wrapper');
+  if (postSubcategoryWrapper) postSubcategoryWrapper.style.display = 'none';
+  if (priceWrapper) priceWrapper.style.display = 'none';
 
-// ✅ Hide on load
-postSubcategoryWrapper && (postSubcategoryWrapper.style.display = 'none');
-priceWrapper && (priceWrapper.style.display = 'none');
+  if (postCategory) {
+    postCategory.addEventListener('change', () => {
+      const category = postCategory.value;
+      const subs = subcategoryMap[category];
 
-if (postCategory) {
-  postCategory.addEventListener('change', () => {
-    const category = postCategory.value;
-    const subs = subcategoryMap[category];
+      // Subcategory logic
+      if (!subs || subs.length === 0) {
+        postSubcategory.innerHTML = '';
+        postSubcategoryWrapper.style.display = 'none';
+      } else {
+        postSubcategoryWrapper.style.display = 'block';
+        postSubcategory.innerHTML = '<option value="">Select subcategory</option>';
+        subs.forEach(sub => {
+          const opt = document.createElement('option');
+          opt.value = sub;
+          opt.textContent = sub;
+          postSubcategory.appendChild(opt);
+        });
+      }
 
-    /* ---------- SUBCATEGORY LOGIC ---------- */
-    if (!subs || subs.length === 0) {
-      postSubcategory.innerHTML = '';
-      postSubcategoryWrapper.style.display = 'none';
-    } else {
-      postSubcategoryWrapper.style.display = 'block';
-      postSubcategory.innerHTML = '<option value="">Select subcategory</option>';
-
-      subs.forEach(sub => {
-        const opt = document.createElement('option');
-        opt.value = sub;
-        opt.textContent = sub;
-        postSubcategory.appendChild(opt);
-      });
-    }
-
-    /* ---------- PRICE LOGIC ---------- */
-    // ❌ Freebies never have a price
-    if (!category || category === 'free') {
-      priceWrapper.style.display = 'none';
-      postPrice.value = '';
-    } else {
-      priceWrapper.style.display = 'block';
-    }
-  });
-}
+      // Price logic
+      if (!category || category === 'free') {
+        priceWrapper.style.display = 'none';
+        postPrice.value = '';
+      } else {
+        priceWrapper.style.display = 'block';
+      }
+    });
+  }
 
   /* -------------------- IMAGE PREVIEW -------------------- */
-if (postImage && imagePreview) {
-  postImage.addEventListener('change', () => {
-    const file = postImage.files[0];
-    if (!file) return;
+  const postImage = document.getElementById('postImage');
+  const imagePreview = document.getElementById('imagePreview');
 
-    const reader = new FileReader();
-    reader.onload = e => {
-      imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-    };
-    reader.readAsDataURL(file);
+  if (postImage && imagePreview) {
+    postImage.addEventListener('change', () => {
+      const file = postImage.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /* -------------------- ACTION BAR BUTTONS -------------------- */
+  document.getElementById('openPostModal')?.addEventListener('click', e => {
+    e.preventDefault();
+    openScreen('post');
+  });
+
+  document.getElementById('openLoginModal')?.addEventListener('click', e => {
+    e.preventDefault();
+    openScreen('login');
+  });
+
+  document.getElementById('opensignupModal')?.addEventListener('click', e => {
+    e.preventDefault();
+    openScreen('signup');
+  });
+
+  /* -------------------- CLOSE MODALS -------------------- */
+  document.querySelectorAll('.close').forEach(btn => {
+    btn.addEventListener('click', closeAll);
+  });
+
+  document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('click', e => {
+      if (e.target === modal) closeAll();
+    });
   });
 }
-
-/* -------------------- ACTION BAR BUTTONS (MATCH HTML) -------------------- */
-document.getElementById('openPostModal')?.addEventListener('click', e => {
-  e.preventDefault();
-  openScreen('post');
-});
-
-document.getElementById('openLoginModal')?.addEventListener('click', e => {
-  e.preventDefault();
-  openScreen('login');
-});
-
-document.getElementById('opensignupModal')?.addEventListener('click', e => {
-  e.preventDefault();
-  openScreen('signup');
-});
-
-/* -------------------- CLOSE MODALS -------------------- */
-document.querySelectorAll('.close').forEach(btn => {
-  btn.addEventListener('click', closeAll);
-});
-
-document.querySelectorAll('.modal').forEach(modal => {
-  modal.addEventListener('click', e => {
-    if (e.target === modal) closeAll();
-  });
-});
-
-/* -------------------- EXPOSE -------------------- */
-window.openScreen = openScreen;
-window.closeScreens = closeAll;
-});
