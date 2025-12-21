@@ -12,6 +12,17 @@ export async function loadView(view) {
   const html = await fetch(`/views/${view}.html`).then(r => r.text());
   app.innerHTML = html;
 
+  // ✅ Attach search listener ONLY on home view
+  if (view === "home") {
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput) {
+      searchInput.addEventListener("input", e => {
+        window.currentSearch = e.target.value;
+        initFeed(); // reload feed with search applied
+      });
+    }
+  }
+
   // ✅ Force re-run of view JS every time
   import(`/views/${view}.js?cache=${Date.now()}`)
     .catch(err => console.error("View JS error:", err));
