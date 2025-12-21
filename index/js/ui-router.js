@@ -106,11 +106,10 @@ export function initUIRouter() {
     openScreen('signup');
   });
 
-  /* -------------------- MY ACCOUNT BUTTON -------------------- */
+  /* -------------------- MY ACCOUNT BUTTON (SPA VERSION) -------------------- */
   document.getElementById('openAccountModal')?.addEventListener('click', async e => {
     e.preventDefault();
 
-    // ✅ If auth not ready → force login modal
     if (!window.firebaseAuthReady) {
       openScreen('login');
       return;
@@ -123,13 +122,8 @@ export function initUIRouter() {
       return;
     }
 
-    const profile = window.firebaseUserDoc;
-
-    if (profile?.isBusiness) {
-      window.location.href = "/business/dashboard.html";
-    } else {
-      window.location.href = "/customer/dashboard.html";
-    }
+    // ✅ SPA navigation instead of full-page redirect
+    navigateToDashboard();
   });
 
   /* -------------------- CLOSE MODALS -------------------- */
