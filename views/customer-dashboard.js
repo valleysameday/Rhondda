@@ -74,7 +74,7 @@ getFirebase().then(fb => {
   // ✅ Safety timeout
   setTimeout(() => {
     if (!authResolved && !auth.currentUser) {
-      loadView("home");
+      navigateToHome();
     }
   }, 500);
 
@@ -85,7 +85,7 @@ getFirebase().then(fb => {
 
     signOut(auth).then(() => {
       setTimeout(() => {
-        loadView("home");   // ✅ SPA navigation
+        navigateToHome();   // ✅ SPA navigation
       }, 3000);
     });
   });
