@@ -25,6 +25,31 @@ import {
 
 let auth, db, storage;
 
+/* ---------------------------------------------------
+   ✅ IMAGE COMPRESSION (RUNS IN BROWSER)
+--------------------------------------------------- */
+function compressImage(file, maxWidth = 1200, quality = 0.7) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = img.width > maxWidth ? maxWidth / img.width : 1;
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(
+        blob => resolve(blob || file), // fallback to original if something goes wrong
+        "image/jpeg",
+        quality
+      );
+    };
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 // ✅ Load Firebase FIRST
 getFirebase().then(fb => {
   auth = fb.auth;
@@ -76,13 +101,20 @@ getFirebase().then(fb => {
 
       postFeedback.textContent = "Uploading your ad…";
 
-      // ✅ Upload all images (if any)
+      // ✅ Upload all images (if any) with compression
       const imageUrls = [];
       for (const file of files) {
-        const storageRef = ref(storage, `posts/${Date.now()}_${file.name}`);
-        await uploadBytes(storageRef, file);
-        const url = await getDownloadURL(storageRef);
-        imageUrls.push(url);
+        try {
+          const compressedBlob = await compressImage(file, 1200, 0.7);
+          const slimFileName = file.name.replace(/\.(png|jpg|jpeg|webp|gif)$/i, "") + "_slim.jpg";
+          const storageRef = ref(storage, `posts/${Date.now()}_${slimFileName}`);
+
+          await uploadBytes(storageRef, compressedBlob);
+          const url = await getDownloadURL(storageRef);
+          imageUrls.push(url);
+        } catch (err) {
+          console.error("Image upload failed for file:", file.name, err);
+        }
       }
 
       // ✅ Thumbnail for home feed = first image or null
