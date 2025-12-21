@@ -73,7 +73,19 @@ export function initFeed() {
         post.price ? `£${post.price}` :
         "";
 
+      card.innerHTML = `
+        <div class="post-image">
+          <img src="${imgSrc}" alt="${post.title}">
+          ${isBusiness ? `<div class="business-overlay">Business</div>` : ""}
+          ${priceText ? `<div class="price-badge">${priceText}</div>` : ""}
+        </div>
 
+        <div class="post-body">
+          <h3>${post.title}</h3>
+          <p class="post-desc">${post.description}</p>
+          <small class="post-category">${post.category}</small>
+        </div>
+      `;
 
       postsContainer.appendChild(card);
     });
@@ -111,20 +123,7 @@ export function initFeed() {
       const now = new Date(data.current_weather.time);
       const isDay = now >= sunrise && now <= sunset;
 
-      let emoji = isDay ? "🌞" : "🌙"card.innerHTML = `
-  <div class="post-image">
-    <img src="${imgSrc}" alt="${post.title}">
-    ${isBusiness ? `<div class="business-overlay">Business</div>` : ""}
-    ${priceText ? `<div class="price-badge">${priceText}</div>` : ""}
-  </div>
-
-  <div class="post-body">
-    <h3>${post.title}</h3>
-    ${priceText ? `<p class="post-price">${priceText}</p>` : ""}
-    <p class="post-desc">${post.description}</p>
-    <small class="post-category">${post.category}</small>
-  </div>
-`;;
+      let emoji = isDay ? "🌞" : "🌙";
 
       if ([51, 61, 63, 65, 80, 81, 82].includes(code)) emoji = "🌧️";
       if ([71, 73, 75].includes(code)) emoji = "❄️";
