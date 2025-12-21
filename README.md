@@ -31,10 +31,3 @@ It’s designed to be simple, engaging, and mobile‑friendly — with ads shown
 
 ### Installation
 ```bash
-
-
-# Navigate into the project
-cd rhondda-noticeboard
-
-# Install dependencies
-npm install
