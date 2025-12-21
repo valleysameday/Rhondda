@@ -37,7 +37,11 @@ async function loadSellerProfile() {
   }
 
   const seller = sellerSnap.data();
-
+// ✅ Load avatar if exists
+if (seller.avatarUrl) {
+  document.getElementById("sellerAvatar").style.backgroundImage =
+    `url('${seller.avatarUrl}')`;
+}
   /* ---------------- SELLER NAME ---------------- */
   document.getElementById("sellerName").textContent =
   seller.displayName || seller.businessName || "Local Seller";
