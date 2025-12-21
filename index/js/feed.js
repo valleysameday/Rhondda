@@ -40,33 +40,34 @@ export function initFeed() {
     postsContainer.innerHTML = "";
 
     filtered.forEach(post => {
-    filtered.forEach(post => {
-  const card = document.createElement("div");
-  card.className = "post-card";
+      const card = document.createElement("div");
+      card.className = "post-card";
 
-  card.addEventListener("click", () => {
-    window.selectedPostId = post.id;
-    loadView("view-post");
-  });
+      card.addEventListener("click", () => {
+        window.selectedPostId = post.id;
+        loadView("view-post");
+      });
 
-  const imgSrc = post.imageUrl || "/images/post-placeholder.jpg";
-  const isBusiness = post.businessId ? true : false;
+      const imgSrc = post.imageUrl || "/images/post-placeholder.jpg";
+      const isBusiness = post.businessId ? true : false;
 
-  card.innerHTML = `
-    <div class="post-image">
-      <img src="${imgSrc}" alt="${post.title}">
-      ${isBusiness ? `<div class="business-overlay">Business</div>` : ""}
-    </div>
+      card.innerHTML = `
+        <div class="post-image">
+          <img src="${imgSrc}" alt="${post.title}">
+          ${isBusiness ? `<div class="business-overlay">Business</div>` : ""}
+        </div>
 
-    <div class="post-body">
-      <h3>${post.title}</h3>
-      <p class="post-desc">${post.description}</p>
-      <small class="post-category">${post.category}</small>
-    </div>
-  `;
+        <div class="post-body">
+          <h3>${post.title}</h3>
+          <p class="post-desc">${post.description}</p>
+          <small class="post-category">${post.category}</small>
+        </div>
+      `;
 
-  postsContainer.appendChild(card);
-});
+      postsContainer.appendChild(card);
+    });
+  }
+
   /* ---------------- CATEGORY FILTERS ---------------- */
   categoryBtns.forEach(btn => {
     btn.addEventListener("click", () => {
