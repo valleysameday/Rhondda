@@ -155,9 +155,17 @@ getFirebase().then(fb => {
     });
 
     /* ---------------- AUTH STATE ---------------- */
-    onAuthStateChanged(auth, user => {
-      if (user) console.log('User logged in:', user.email);
-      else console.log('No user logged in');
+    onAuthStateChanged(auth, async user => {
+      window.currentUser = user;
+
+      if (user) {
+        const snap = await getDoc(doc(db, "users", user.uid));
+        window.firebaseUserDoc = snap.exists() ? snap.data() : null;
+      } else {
+        window.firebaseUserDoc = null;
+      }
+
+      window.firebaseAuthReady = true;
     });
   }
 
