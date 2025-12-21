@@ -17,12 +17,9 @@ body.modal-open main {
     background: rgba(0,0,0,0.45);
     backdrop-filter: blur(4px);
     z-index: 9999;
-    opacity: 0;
-    transition: opacity 0.25s ease;
 }
 .modal.active {
     display: flex;
-    opacity: 1;
 }
 
 .modal-content {
@@ -37,11 +34,6 @@ body.modal-open main {
     display: flex;
     flex-direction: column;
     gap: 14px;
-    transform: translateY(10px);
-    transition: transform 0.25s ease;
-}
-.modal.active .modal-content {
-    transform: translateY(0);
 }
 
 .modal .close {
@@ -116,12 +108,10 @@ body.modal-open main {
     from { transform: scale(0.95); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
 }
-
-/* ================= BUSINESS BENEFITS BOX ================= */
 .business-benefits {
-    display: none;
-    background: #fff0f5;
-    border: 1px solid #ff7eb3;
+    display: none;                 /* hidden by default */
+    background: #fff0f5;           /* soft pink background */
+    border: 1px solid #ff7eb3;     /* accent border */
     border-radius: 12px;
     padding: 14px 16px;
     margin-top: 12px;
@@ -146,35 +136,26 @@ body.modal-open main {
     0% { opacity: 0; transform: translateY(-8px); }
     100% { opacity: 1; transform: translateY(0); }
 }
-
-/* ================= CONDITIONAL FIELDS ================= */
 .subcategory-wrapper,
 .price-wrapper {
   display: none;
 }
-
-/* ================= INLINE FEEDBACK ================= */
 .feedback-text {
-  margin-top: 4px;
+  margin-top: 8px;
   font-size: 0.9rem;
   color: #444;
   min-height: 18px;
-  transition: opacity .2s ease, color .2s ease;
+  transition: opacity .2s ease;
 }
-
 .feedback-error {
   color: #d33;
 }
-
 .feedback-success {
   color: #2a8f2a;
 }
-
-/* Shake animation for errors */
 .shake {
   animation: shake .3s;
 }
-
 @keyframes shake {
   0% { transform: translateX(0); }
   25% { transform: translateX(-4px); }
