@@ -6,11 +6,11 @@ It’s designed to be simple, engaging, and mobile‑friendly — with ads shown
 ---
 
 ## 🚀 Features
-- Two‑column grid layout (ads side‑by‑side, business posts full‑width).
-- Category filters (Offers, Events, Services, All).
-- Firebase integration for dynamic content.
-- Netlify deployment for fast hosting.
-- Responsive design for mobile and desktop.
+- Two‑column grid layout (ads side-by-side, business posts full-width)
+- Category filters (Offers, Events, Services, All)
+- Firebase integration for dynamic content
+- Netlify deployment for fast hosting
+- Responsive design for mobile and desktop
 
 ---
 
