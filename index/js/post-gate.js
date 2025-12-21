@@ -107,7 +107,7 @@ getFirebase().then(fb => {
         try {
           const compressedBlob = await compressImage(file, 1200, 0.7);
           const slimFileName = file.name.replace(/\.(png|jpg|jpeg|webp|gif)$/i, "") + "_slim.jpg";
-          const storageRef = ref(storage, `posts/${Date.now()}_${slimFileName}`);
+          const storageRef = ref(storage, `posts/${auth.currentUser.uid}/${Date.now()}_${slimFileName}`);
 
           await uploadBytes(storageRef, compressedBlob);
           const url = await getDownloadURL(storageRef);
