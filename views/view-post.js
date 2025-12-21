@@ -156,7 +156,6 @@ window.contactSeller = function (userId) {
 
 window.viewSellerPosts = function (userId) {
   window.sellerFilterId = userId;
-  loadView("seller-posts");
 };
 window.openSellerProfile = function (sellerId) {
   window.selectedSellerId = sellerId;
