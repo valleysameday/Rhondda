@@ -411,3 +411,15 @@ footer {
     color: #FF7EB3;
     font-weight: 500;
 }
+.search-wrapper {
+  padding: 0 1rem;
+  margin-bottom: 1rem;
+}
+
+.search-bar {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
