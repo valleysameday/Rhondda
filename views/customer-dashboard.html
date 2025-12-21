@@ -1,27 +1,46 @@
 <header class="dash-header">
-  <h1>Your Ads</h1>
+  <h1>Your Account</h1>
   <button id="logoutBtn" class="logout-btn">Log out</button>
 </header>
 
 <section class="dash-section">
-  <p class="dash-intro">Here are all the ads you’ve posted on Rhondda Noticeboard.</p>
+
+  <!-- PROFILE SECTION -->
+  <div class="profile-box">
+    <h2>Your Profile</h2>
+
+    <div class="profile-row">
+      <label>Name</label>
+      <input id="profileName" type="text" placeholder="Your name">
+    </div>
+
+    <div class="profile-row">
+      <label>Phone</label>
+      <input id="profilePhone" type="text" placeholder="Your phone number">
+    </div>
+
+    <div class="profile-row">
+      <label>Bio</label>
+      <textarea id="profileBio" placeholder="Tell us a bit about yourself"></textarea>
+    </div>
+
+    <button id="saveProfileBtn" class="dash-save-btn">Save Profile</button>
+    <p id="profileFeedback" class="feedback-text"></p>
+  </div>
+
+  <!-- POST BUTTON -->
+  <button id="newPostBtn" class="dash-new-post">+ Post an Ad</button>
+
+  <!-- USER POSTS -->
+  <h2>Your Ads</h2>
   <div id="userPosts" class="dash-posts-grid"></div>
+
 </section>
 
-<div id="logoutOverlay" style="
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  font-size: 1.4rem;
-  z-index: 9999;
-">
+<!-- LOGOUT OVERLAY -->
+<div id="logoutOverlay" class="logout-overlay">
   <div>
-    <p>Logging you out....</p>
+    <p>Logging you out...</p>
     <small>Please wait</small>
   </div>
 </div>
