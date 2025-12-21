@@ -3,7 +3,8 @@ export function initUIRouter() {
   const routes = {
     login: document.getElementById('loginModal'),
     post: document.getElementById('postModal'),
-    signup: document.getElementById('signupModal')
+    signup: document.getElementById('signupModal'),
+    forgot: document.getElementById('forgotPasswordModal') // ✅ NEW MODAL
   };
 
   function openScreen(name) {
@@ -134,6 +135,29 @@ export function initUIRouter() {
     e.preventDefault();
     openScreen('signup');
   });
+
+  /* -------------------- FORGOT PASSWORD LINK -------------------- */
+  const forgotLink = document.getElementById('forgotPasswordLink');
+  if (forgotLink) {
+    forgotLink.addEventListener('click', e => {
+      e.preventDefault();
+      openScreen('forgot');
+    });
+  }
+
+  /* -------------------- FORGOT PASSWORD SUBMIT -------------------- */
+  const forgotSubmit = document.getElementById('forgotSubmit');
+  const forgotEmail = document.getElementById('forgotEmail');
+
+  if (forgotSubmit && forgotEmail) {
+    forgotSubmit.addEventListener('click', () => {
+      if (!forgotEmail.value.trim()) {
+        alert("Please enter your email");
+        return;
+      }
+      window.resetPassword(forgotEmail.value.trim());
+    });
+  }
 
   /* -------------------- CLOSE MODALS -------------------- */
   document.querySelectorAll('.close').forEach(btn => {
