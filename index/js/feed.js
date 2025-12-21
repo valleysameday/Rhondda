@@ -15,10 +15,10 @@ export function initFeed() {
   getFirebase().then(fb => {
     db = fb.db;
     loadPosts("all");
-    loadWeather();   // ✅ WEATHER NOW RUNS
+    loadWeather();
   });
 
-  /* ---------------- LOAD POSTS FROM FIRESTORE ---------------- */
+  /* ---------------- LOAD POSTS ---------------- */
   async function loadPosts(category = "all") {
     postsContainer.innerHTML = "<p>Loading…</p>";
 
@@ -28,18 +28,35 @@ export function initFeed() {
     const posts = [];
     snap.forEach(doc => posts.push({ id: doc.id, ...doc.data() }));
 
+    /* CATEGORY FILTER */
     const filtered = category === "all"
       ? posts
       : posts.filter(p => p.category === category);
 
-    if (!filtered.length) {
-      postsContainer.innerHTML = "<p>No posts yet!</p>";
+    /* SEARCH FILTER */
+    const searchTerm = (window.currentSearch || "").toLowerCase();
+
+    const searched = filtered.filter(p => {
+      const priceText =
+        p.price === 0 ? "free" :
+        p.price ? `£${p.price}` : "";
+
+      return (
+        p.title.toLowerCase().includes(searchTerm) ||
+        p.description.toLowerCase().includes(searchTerm) ||
+        (p.area && p.area.toLowerCase().includes(searchTerm)) ||
+        priceText.includes(searchTerm)
+      );
+    });
+
+    if (!searched.length) {
+      postsContainer.innerHTML = "<p>No posts found.</p>";
       return;
     }
 
     postsContainer.innerHTML = "";
 
-    filtered.forEach(post => {
+    searched.forEach(post => {
       const card = document.createElement("div");
       card.className = "post-card";
 
@@ -51,10 +68,16 @@ export function initFeed() {
       const imgSrc = post.imageUrl || "https://placehold.co/600x400?text=No+Image";
       const isBusiness = post.businessId ? true : false;
 
+      const priceText =
+        post.price === 0 ? "FREE" :
+        post.price ? `£${post.price}` :
+        "";
+
       card.innerHTML = `
         <div class="post-image">
           <img src="${imgSrc}" alt="${post.title}">
           ${isBusiness ? `<div class="business-overlay">Business</div>` : ""}
+          ${priceText ? `<div class="price-badge">${priceText}</div>` : ""}
         </div>
 
         <div class="post-body">
@@ -68,7 +91,7 @@ export function initFeed() {
     });
   }
 
-  /* ---------------- CATEGORY FILTERS ---------------- */
+  /* ---------------- CATEGORY BUTTONS ---------------- */
   categoryBtns.forEach(btn => {
     btn.addEventListener("click", () => {
       categoryBtns.forEach(b => b.classList.remove("active"));
@@ -109,17 +132,11 @@ export function initFeed() {
 
       let message = "";
 
-      if (!isDay) {
-        message = "Evening in the valley — cosy vibes.";
-      } else if (temp <= 3) {
-        message = "Cold enough to freeze your nan’s washing.";
-      } else if (rainChance > 60) {
-        message = "Rain’s on — grab your brolly, butt.";
-      } else if (temp >= 20) {
-        message = "Warm one in the Rhondda — tidy!";
-      } else {
-        message = "Another tidy day in the Rhondda.";
-      }
+      if (!isDay) message = "Evening in the valley — cosy vibes.";
+      else if (temp <= 3) message = "Cold enough to freeze your nan’s washing.";
+      else if (rainChance > 60) message = "Rain’s on — grab your brolly, butt.";
+      else if (temp >= 20) message = "Warm one in the Rhondda — tidy!";
+      else message = "Another tidy day in the Rhondda.";
 
       emojiEl.textContent = emoji;
       textEl.textContent = `${message} · ${temp}°C (feels like ${feels}°C)`;
