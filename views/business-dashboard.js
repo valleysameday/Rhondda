@@ -1,16 +1,8 @@
 // business-dashboard.js
 import { getFirebase } from '/index/js/firebase/init.js';
-import { onAuthStateChanged, signOut }
-  from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-import {
-  collection, query, where, getDocs,
-  doc, getDoc, updateDoc, deleteDoc
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-import {
-  ref, deleteObject, uploadBytes, getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { collection, query, where, getDocs, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { ref, deleteObject, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
 let auth, db, storage;
 
@@ -74,13 +66,14 @@ async function loadBusinessProfile(uid) {
   $("bizWebsiteInput").value = d.website || "";
   $("bizBioInput").value = d.bio || "";
 
-  if (d.avatarUrl && $("bizDashboardAvatar")) {
-    $("bizDashboardAvatar").style.backgroundImage = `url('${d.avatarUrl}')`;
+  const avatar = $("bizDashboardAvatar");
+  if (avatar) {
+    avatar.style.backgroundImage = `url('${d.avatarUrl || "https://via.placeholder.com/100?text=Avatar"}')`;
   }
 }
 
 /* ---------------------------------------------------
-   🖼️ AVATAR UPLOAD (FIXED ID)
+   🖼️ AVATAR UPLOAD (WITH PLACEHOLDER)
 --------------------------------------------------- */
 function setupAvatarUpload(uid) {
   const input = $("avatarUploadInput");
@@ -95,12 +88,21 @@ function setupAvatarUpload(uid) {
     const file = input.files[0];
     if (!file) return;
 
-    const refPath = ref(storage, `avatars/${uid}.jpg`);
-    await uploadBytes(refPath, file);
-    const url = await getDownloadURL(refPath);
+    try {
+      const refPath = ref(storage, `avatars/${uid}.jpg`);
+      await uploadBytes(refPath, file);
+      const url = await getDownloadURL(refPath);
+      await updateDoc(doc(db, "businesses", uid), { avatarUrl: url });
+      avatar.style.backgroundImage = `url('${url}')`;
+    } catch (err) {
+      console.error("Avatar upload failed:", err);
+      avatar.style.backgroundImage = "url('https://via.placeholder.com/100?text=Avatar')";
+    }
+  };
 
-    await updateDoc(doc(db, "businesses", uid), { avatarUrl: url });
-    avatar.style.backgroundImage = `url('${url}')`;
+  // Fallback if broken
+  avatar.onerror = () => {
+    avatar.style.backgroundImage = "url('https://via.placeholder.com/100?text=Avatar')";
   };
 }
 
@@ -138,52 +140,80 @@ function setupProfileEditToggle(uid) {
 }
 
 /* ---------------------------------------------------
-   📦 LOAD BUSINESS ADS
+   📦 LOAD BUSINESS ADS (WITH PLACEHOLDERS)
 --------------------------------------------------- */
 async function loadBusinessPosts(uid) {
-  const snap = await getDocs(
-    query(collection(db, "posts"), where("businessId", "==", uid))
-  );
+  try {
+    const snap = await getDocs(
+      query(collection(db, "posts"), where("businessId", "==", uid))
+    );
 
-  const box = $("bizPosts");
-  box.innerHTML = "";
+    const box = $("bizPosts");
+    box.innerHTML = "";
 
-  let ads = 0, views = 0, leads = 0;
+    let adsCount = 0, totalViews = 0, totalLeads = 0;
 
-  if (snap.empty) {
-    box.innerHTML = `<p class="biz-empty-msg">No ads yet.</p>`;
+    if (snap.empty) {
+      box.innerHTML = `<p class="biz-empty-msg">No ads yet.</p>`;
+      $("bizStatAdsCount").textContent = adsCount;
+      $("bizStatTotalViews").textContent = totalViews;
+      $("bizStatLeads").textContent = totalLeads;
+      return;
+    }
+
+    snap.forEach(docSnap => {
+      const post = docSnap.data();
+      const id = docSnap.id;
+
+      adsCount++;
+      totalViews += post.views || 0;
+      totalLeads += post.leads || 0;
+
+      const imgSrc = post.imageUrl || "https://via.placeholder.com/300x200?text=No+Image";
+
+      const card = document.createElement("div");
+      card.className = "biz-card";
+
+      const img = document.createElement("img");
+      img.src = imgSrc;
+      img.alt = post.title || "Ad image";
+      img.className = "biz-card-img";
+      img.onerror = () => img.src = "https://via.placeholder.com/300x200?text=No+Image";
+
+      const info = document.createElement("div");
+      const h3 = document.createElement("h3");
+      h3.textContent = post.title || "Untitled Ad";
+      const p = document.createElement("p");
+      p.textContent = post.description || "";
+      info.appendChild(h3);
+      info.appendChild(p);
+
+      const delBtn = document.createElement("button");
+      delBtn.className = "biz-delete";
+      delBtn.dataset.id = id;
+      delBtn.textContent = "Delete";
+      delBtn.onclick = async () => {
+        if (!confirm("Delete this ad?")) return;
+        const snap = await getDoc(doc(db, "posts", id));
+        await deletePostAndImages({ id, ...snap.data() });
+        loadBusinessPosts(uid);
+      };
+
+      card.appendChild(img);
+      card.appendChild(info);
+      card.appendChild(delBtn);
+
+      box.appendChild(card);
+    });
+
+    $("bizStatAdsCount").textContent = adsCount;
+    $("bizStatTotalViews").textContent = totalViews;
+    $("bizStatLeads").textContent = totalLeads;
+
+  } catch (err) {
+    console.error("Failed to load business posts:", err);
+    $("bizPosts").innerHTML = `<p class="biz-empty-msg">Error loading ads. Please try again.</p>`;
   }
-
-  snap.forEach(d => {
-    const p = d.data();
-    ads++;
-    views += p.views || 0;
-    leads += p.leads || 0;
-
-    box.insertAdjacentHTML("beforeend", `
-      <div class="biz-card">
-        <img src="${p.imageUrl || ''}" onerror="this.style.display='none'">
-        <div>
-          <h3>${p.title}</h3>
-          <p>${p.description}</p>
-        </div>
-        <button class="biz-delete" data-id="${d.id}">Delete</button>
-      </div>
-    `);
-  });
-
-  $("bizStatAdsCount").textContent = ads;
-  $("bizStatTotalViews").textContent = views;
-  $("bizStatLeads").textContent = leads;
-
-  document.querySelectorAll(".biz-delete").forEach(btn => {
-    btn.onclick = async () => {
-      if (!confirm("Delete this ad?")) return;
-      const snap = await getDoc(doc(db, "posts", btn.dataset.id));
-      await deletePostAndImages({ id: btn.dataset.id, ...snap.data() });
-      loadBusinessPosts(uid);
-    };
-  });
 }
 
 /* ---------------------------------------------------
@@ -198,7 +228,7 @@ function setupLogout() {
 }
 
 /* ---------------------------------------------------
-   🚀 INIT
+   🚀 INIT DASHBOARD
 --------------------------------------------------- */
 getFirebase().then(fb => {
   auth = fb.auth;
