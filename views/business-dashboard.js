@@ -1,50 +1,33 @@
 // business-dashboard.js
 import { getFirebase } from '/index/js/firebase/init.js';
-import {
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { onAuthStateChanged, signOut }
+  from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 import {
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  getDoc,
-  updateDoc,
-  deleteDoc
+  collection, query, where, getDocs,
+  doc, getDoc, updateDoc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 import {
-  ref,
-  deleteObject,
-  uploadBytes,
-  getDownloadURL
+  ref, deleteObject, uploadBytes, getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
 let auth, db, storage;
-let currentUser = null;
 
 /* ---------------------------------------------------
-   🔒 SAFE DOM HELPERS (CRITICAL)
+   🔒 SAFE DOM HELPERS
 --------------------------------------------------- */
-function $(id) {
-  return document.getElementById(id);
-}
-
-function onClick(id, handler) {
-  const el = $(id);
-  if (el) el.addEventListener("click", handler);
-}
+const $ = id => document.getElementById(id);
+const show = el => el && (el.style.display = "block");
+const hide = el => el && (el.style.display = "none");
 
 /* ---------------------------------------------------
-   🧠 WAIT FOR DASHBOARD VIEW
+   🧠 WAIT FOR DASHBOARD VIEW (SPA SAFE)
 --------------------------------------------------- */
 function waitForDashboard() {
   return new Promise(resolve => {
     const check = () => {
-      if ($("bizDashboard")) resolve();
+      if ($("bizHeaderName")) resolve();
       else requestAnimationFrame(check);
     };
     check();
@@ -55,12 +38,12 @@ function waitForDashboard() {
    🗑️ DELETE POST + IMAGES
 --------------------------------------------------- */
 async function deletePostAndImages(post) {
-  const images = [
+  const urls = [
     ...(post.imageUrl ? [post.imageUrl] : []),
-    ...(Array.isArray(post.imageUrls) ? post.imageUrls : [])
+    ...(post.imageUrls || [])
   ];
 
-  for (const url of images) {
+  for (const url of urls) {
     try {
       const path = decodeURIComponent(url.split("/o/")[1].split("?")[0]);
       await deleteObject(ref(storage, path));
@@ -74,34 +57,33 @@ async function deletePostAndImages(post) {
    🏗️ LOAD BUSINESS PROFILE
 --------------------------------------------------- */
 async function loadBusinessProfile(uid) {
-  const refDoc = doc(db, "businesses", uid);
-  const snap = await getDoc(refDoc);
+  const snap = await getDoc(doc(db, "businesses", uid));
+  const d = snap.exists() ? snap.data() : {};
 
-  const data = snap.exists() ? snap.data() : {};
+  $("bizHeaderName").textContent = d.name || "Your Business";
 
-  $("bizHeaderName").textContent = data.name || "Your Business";
-  $("bizViewName").textContent = data.name || "Add business name";
-  $("bizViewPhone").textContent = data.phone || "Add phone";
-  $("bizViewArea").textContent = data.area || "Add area";
-  $("bizViewWebsite").textContent = data.website || "Add website";
-  $("bizViewBio").textContent = data.bio || "Describe your business";
+  $("bizViewName").textContent = d.name || "Add your business name";
+  $("bizViewPhone").textContent = d.phone || "Add your phone";
+  $("bizViewArea").textContent = d.area || "Add your area";
+  $("bizViewWebsite").textContent = d.website || "Add your website";
+  $("bizViewBio").textContent = d.bio || "Tell customers what you offer";
 
-  $("bizNameInput").value = data.name || "";
-  $("bizPhoneInput").value = data.phone || "";
-  $("bizAreaInput").value = data.area || "";
-  $("bizWebsiteInput").value = data.website || "";
-  $("bizBioInput").value = data.bio || "";
+  $("bizNameInput").value = d.name || "";
+  $("bizPhoneInput").value = d.phone || "";
+  $("bizAreaInput").value = d.area || "";
+  $("bizWebsiteInput").value = d.website || "";
+  $("bizBioInput").value = d.bio || "";
 
-  if (data.avatarUrl && $("bizDashboardAvatar")) {
-    $("bizDashboardAvatar").style.backgroundImage = `url('${data.avatarUrl}')`;
+  if (d.avatarUrl && $("bizDashboardAvatar")) {
+    $("bizDashboardAvatar").style.backgroundImage = `url('${d.avatarUrl}')`;
   }
 }
 
 /* ---------------------------------------------------
-   🖼️ AVATAR UPLOAD
+   🖼️ AVATAR UPLOAD (FIXED ID)
 --------------------------------------------------- */
 function setupAvatarUpload(uid) {
-  const input = $("bizAvatarUploadInput");
+  const input = $("avatarUploadInput");
   const clickArea = $("bizAvatarClickArea");
   const avatar = $("bizDashboardAvatar");
 
@@ -113,13 +95,46 @@ function setupAvatarUpload(uid) {
     const file = input.files[0];
     if (!file) return;
 
-    const avatarRef = ref(storage, `avatars/${uid}.jpg`);
-    await uploadBytes(avatarRef, file);
-    const url = await getDownloadURL(avatarRef);
+    const refPath = ref(storage, `avatars/${uid}.jpg`);
+    await uploadBytes(refPath, file);
+    const url = await getDownloadURL(refPath);
 
     await updateDoc(doc(db, "businesses", uid), { avatarUrl: url });
     avatar.style.backgroundImage = `url('${url}')`;
   };
+}
+
+/* ---------------------------------------------------
+   ✏️ EDIT / VIEW MODE TOGGLE
+--------------------------------------------------- */
+function setupProfileEditToggle(uid) {
+  const view = $("bizProfileViewMode");
+  const edit = $("bizProfileEditMode");
+
+  $("bizToggleEditProfile")?.addEventListener("click", () => {
+    hide(view);
+    show(edit);
+  });
+
+  $("bizCancelEditProfileBtn")?.addEventListener("click", () => {
+    show(view);
+    hide(edit);
+  });
+
+  $("bizSaveProfileBtn")?.addEventListener("click", async () => {
+    await updateDoc(doc(db, "businesses", uid), {
+      name: $("bizNameInput").value.trim(),
+      phone: $("bizPhoneInput").value.trim(),
+      area: $("bizAreaInput").value.trim(),
+      website: $("bizWebsiteInput").value.trim(),
+      bio: $("bizBioInput").value.trim()
+    });
+
+    $("bizProfileFeedback").textContent = "✅ Profile updated";
+    show(view);
+    hide(edit);
+    loadBusinessProfile(uid);
+  });
 }
 
 /* ---------------------------------------------------
@@ -130,38 +145,29 @@ async function loadBusinessPosts(uid) {
     query(collection(db, "posts"), where("businessId", "==", uid))
   );
 
-  const container = $("bizPosts");
-  if (!container) return;
-
-  container.innerHTML = "";
+  const box = $("bizPosts");
+  box.innerHTML = "";
 
   let ads = 0, views = 0, leads = 0;
 
   if (snap.empty) {
-    container.innerHTML = `<p class="biz-empty-msg">No ads yet.</p>`;
-    return;
+    box.innerHTML = `<p class="biz-empty-msg">No ads yet.</p>`;
   }
 
-  snap.forEach(docSnap => {
-    const p = docSnap.data();
-    const id = docSnap.id;
-
+  snap.forEach(d => {
+    const p = d.data();
     ads++;
     views += p.views || 0;
     leads += p.leads || 0;
 
-    container.insertAdjacentHTML("beforeend", `
+    box.insertAdjacentHTML("beforeend", `
       <div class="biz-card">
         <img src="${p.imageUrl || '/images/post-placeholder.jpg'}">
         <div>
           <h3>${p.title}</h3>
           <p>${p.description}</p>
-          <small>${p.category} • ${p.subcategory || ""}</small>
         </div>
-        <div>
-          <button class="biz-edit" data-id="${id}">Edit</button>
-          <button class="biz-delete" data-id="${id}">Delete</button>
-        </div>
+        <button class="biz-delete" data-id="${d.id}">Delete</button>
       </div>
     `);
   });
@@ -181,28 +187,13 @@ async function loadBusinessPosts(uid) {
 }
 
 /* ---------------------------------------------------
-   💾 SAVE PROFILE
+   🚪 LOGOUT
 --------------------------------------------------- */
-function setupSaveProfile(uid) {
-  onClick("bizSaveProfileBtn", async () => {
-    await updateDoc(doc(db, "businesses", uid), {
-      name: $("bizNameInput").value.trim(),
-      phone: $("bizPhoneInput").value.trim(),
-      area: $("bizAreaInput").value.trim(),
-      website: $("bizWebsiteInput").value.trim(),
-      bio: $("bizBioInput").value.trim()
-    });
-  });
-}
-
-/* ---------------------------------------------------
-   🚪 GLOBAL ACTIONS
---------------------------------------------------- */
-function setupGlobalActions() {
-  onClick("bizNewPostBtn", () => openScreen("post"));
-  onClick("bizLogoutBtn", async () => {
+function setupLogout() {
+  $("bizLogoutBtn")?.addEventListener("click", async () => {
+    show($("bizLogoutOverlay"));
     await signOut(auth);
-    navigateToHome();
+    setTimeout(() => navigateToHome(), 800);
   });
 }
 
@@ -217,14 +208,12 @@ getFirebase().then(fb => {
   onAuthStateChanged(auth, async user => {
     if (!user) return;
 
-    currentUser = user;
-
     await waitForDashboard();
 
-    await loadBusinessProfile(user.uid);
+    loadBusinessProfile(user.uid);
     setupAvatarUpload(user.uid);
-    setupSaveProfile(user.uid);
-    setupGlobalActions();
+    setupProfileEditToggle(user.uid);
+    setupLogout();
     loadBusinessPosts(user.uid);
   });
 });
