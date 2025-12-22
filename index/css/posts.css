@@ -1,0 +1,109 @@
+/* Layout */
+.view-post-layout {
+  display: flex;
+  gap: 20px;
+  padding: 15px;
+}
+
+.view-post-left {
+  flex: 1;
+}
+
+.view-post-right {
+  flex: 1;
+}
+
+/* Seller Header */
+.post-seller-header {
+  display: flex;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 15px;
+}
+
+.seller-header-avatar {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.seller-header-info p {
+  margin: 0;
+}
+
+.seller-badges .badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-right: 5px;
+}
+
+.badge.business {
+  background: #007bff;
+  color: white;
+}
+
+.badge.trusted {
+  background: #28a745;
+  color: white;
+}
+
+.view-listings-btn {
+  margin-top: 6px;
+  background: none;
+  border: none;
+  color: #007bff;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Gallery */
+.gallery-slide img {
+  width: 100%;
+  border-radius: 6px;
+}
+
+.gallery-thumbs {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.thumb-btn {
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.thumb-btn img {
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
+  object-fit: cover;
+  opacity: 0.7;
+}
+
+.thumb-btn.active img {
+  opacity: 1;
+  border: 2px solid #007bff;
+}
+
+/* Engagement Button */
+.engage-btn {
+  margin-top: 15px;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.engage-btn:hover {
+  background: #e6e6e6;
+}
