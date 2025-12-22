@@ -1,87 +1,172 @@
+/* ================= VIEW POST CONTAINER REFRESH ================= */
 .view-post-container {
-  padding: 1rem;
-  max-width: 800px;
+  padding: 1.5rem 1rem 100px; /* Extra bottom padding for the mobile action bar */
+  max-width: 900px;
   margin: 0 auto;
+  animation: fadeIn 0.4s ease-out;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Back Button - Minimalist & Modern */
 .back-btn {
-  background: none;
-  border: none;
-  font-size: 1rem;
-  margin-bottom: 1rem;
+  background: var(--surface-glass);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-soft);
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
   cursor: pointer;
-  color: #333;
+  color: var(--brand-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: 0.2s;
 }
 
+.back-btn:hover {
+  background: var(--surface);
+  transform: translateX(-4px);
+}
+
+/* The Main Card */
 .view-post-card {
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  background: var(--surface);
+  border-radius: 24px;
+  box-shadow: var(--shadow-md);
   overflow: hidden;
+  border: 1px solid var(--border-soft);
 }
 
 .view-post-image {
   position: relative;
+  background: #f1f5f9;
+  overflow: hidden;
 }
 
 .view-post-image img {
   width: 100%;
-  height: auto;
+  max-height: 450px;
+  object-fit: cover;
   display: block;
 }
 
+/* Business Badge - Rhondda Brand Colors */
 .business-badge {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  background: #007bff;
+  top: 15px;
+  left: 15px;
+  background: var(--brand-dark);
   color: white;
-  padding: 0.3rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 5;
 }
 
 .view-post-body {
-  padding: 1rem;
+  padding: 2rem 1.5rem;
 }
 
 .view-post-body h1 {
   margin: 0 0 0.5rem;
-  font-size: 1.4rem;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--brand-dark);
+  line-height: 1.2;
+}
+
+/* Price Highlight */
+.view-post-price {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--brand-primary);
+  margin-bottom: 1rem;
 }
 
 .view-post-desc {
-  margin: 0.5rem 0 1rem;
-  font-size: 1rem;
-  color: #444;
+  margin: 1.5rem 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #334155;
+  white-space: pre-wrap; /* Preserves line breaks from textarea */
+}
+
+/* Meta Info Grid */
+.view-post-meta {
+  background: #f8fafc;
+  padding: 1.2rem;
+  border-radius: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  border: 1px solid var(--border-soft);
 }
 
 .view-post-meta p {
-  margin: 0.2rem 0;
-  font-size: 0.9rem;
-  color: #555;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
+.view-post-meta strong {
+  color: var(--brand-dark);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* Action Buttons */
 .view-post-actions {
-  margin-top: 1.2rem;
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.edit-btn,
 .contact-btn {
   width: 100%;
-  padding: 0.8rem;
-  border-radius: 999px;
+  padding: 18px;
+  border-radius: 18px;
   border: none;
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
   cursor: pointer;
-  font-size: 1rem;
-  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(255, 126, 179, 0.3);
+  transition: transform 0.2s;
+}
+
+.contact-btn:active {
+  transform: scale(0.97);
 }
 
 .edit-btn {
-  background: #ffc107;
+  width: 100%;
+  padding: 14px;
+  border-radius: 16px;
+  background: #f1f5f9;
+  color: var(--brand-dark);
+  font-weight: 600;
+  border: 1px solid var(--border-soft);
+  cursor: pointer;
 }
 
-.contact-btn {
-  background: #007bff;
-  color: white;
+/* Desktop Polish */
+@media (min-width: 768px) {
+  .view-post-body { padding: 3rem; }
+  .view-post-body h1 { font-size: 2.4rem; }
+  .view-post-actions { flex-direction: row; }
+  .contact-btn { flex: 2; }
+  .edit-btn { flex: 1; }
 }
