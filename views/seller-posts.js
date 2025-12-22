@@ -8,6 +8,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let db;
+const PLACEHOLDER_POST = "/images/post-placeholder.jpg";
 
 getFirebase().then(fb => {
   db = fb.db;
@@ -48,30 +49,53 @@ async function loadSellerPosts() {
       loadView("view-post");
     });
 
-    const imgSrc = post.imageUrl 
-      || (post.imageUrls && post.imageUrls[0]) 
-      || "https://placehold.co/600x400?text=No+Image";
+    // ---------- Image ----------
+    const img = document.createElement("img");
+    img.src = post.imageUrl || (post.imageUrls && post.imageUrls[0]) || PLACEHOLDER_POST;
+    img.alt = post.title || "Post image";
+    img.loading = "lazy";
+    img.onerror = () => img.src = PLACEHOLDER_POST;
 
-    const isBusiness = !!post.businessId;
+    const postImageDiv = document.createElement("div");
+    postImageDiv.className = "post-image";
+    postImageDiv.appendChild(img);
 
-    const priceText =
-      post.price === 0 ? "FREE" :
-      post.price ? `£${post.price}` :
-      "";
+    if (post.businessId) {
+      const overlay = document.createElement("div");
+      overlay.className = "business-overlay";
+      overlay.textContent = "Business";
+      postImageDiv.appendChild(overlay);
+    }
 
-    card.innerHTML = `
-      <div class="post-image">
-        <img src="${imgSrc}" alt="${post.title}">
-        ${isBusiness ? `<div class="business-overlay">Business</div>` : ""}
-        ${priceText ? `<div class="price-badge">${priceText}</div>` : ""}
-      </div>
+    if (post.price !== undefined && post.price !== null) {
+      const priceBadge = document.createElement("div");
+      priceBadge.className = "price-badge";
+      priceBadge.textContent = post.price === 0 ? "FREE" : `£${post.price}`;
+      postImageDiv.appendChild(priceBadge);
+    }
 
-      <div class="post-body">
-        <h3>${post.title}</h3>
-        <p class="post-desc">${post.description}</p>
-        <small class="post-category">${post.category}</small>
-      </div>
-    `;
+    // ---------- Body ----------
+    const postBody = document.createElement("div");
+    postBody.className = "post-body";
+
+    const h3 = document.createElement("h3");
+    h3.textContent = post.title;
+
+    const desc = document.createElement("p");
+    desc.className = "post-desc";
+    desc.textContent = post.description;
+
+    const cat = document.createElement("small");
+    cat.className = "post-category";
+    cat.textContent = post.category;
+
+    postBody.appendChild(h3);
+    postBody.appendChild(desc);
+    postBody.appendChild(cat);
+
+    // ---------- Append to card ----------
+    card.appendChild(postImageDiv);
+    card.appendChild(postBody);
 
     container.appendChild(card);
   });
