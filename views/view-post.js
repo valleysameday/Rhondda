@@ -2,6 +2,8 @@ import { getFirebase } from "/index/js/firebase/init.js";
 import {
   doc,
   getDoc,
+  updateDoc,
+  increment,
   collection,
   query,
   where,
@@ -24,8 +26,8 @@ async function loadPost() {
     return;
   }
 
-  const ref = doc(db, "posts", window.selectedPostId);
-  const snap = await getDoc(ref);
+  const postRef = doc(db, "posts", window.selectedPostId);
+  const snap = await getDoc(postRef);
 
   if (!snap.exists()) {
     container.innerHTML = "<p>This post no longer exists.</p>";
@@ -34,25 +36,28 @@ async function loadPost() {
 
   const post = snap.data();
 
-  const isOwner = auth.currentUser && auth.currentUser.uid === post.userId;
-  const isBusiness = !!post.businessId;
+  // ⭐ Increase view count
+  updateDoc(postRef, {
+    views: increment(1)
+  });
 
+  const isOwner = auth.currentUser && auth.currentUser.uid === post.userId;
   const priceText =
     post.price === 0 ? "FREE" :
-    post.price ? `£${post.price}` :
-    "";
+    post.price ? `£${post.price}` : "";
 
-  const images = post.imageUrls && post.imageUrls.length
+  const images = post.imageUrls?.length
     ? post.imageUrls
     : (post.imageUrl ? [post.imageUrl] : []);
 
-  // load seller
+  // ⭐ Load seller
   let seller = null;
   if (post.userId) {
     const userSnap = await getDoc(doc(db, "users", post.userId));
     if (userSnap.exists()) seller = userSnap.data();
   }
 
+  // ⭐ Build HTML
   container.innerHTML = `
     <div class="view-post-layout">
 
@@ -64,6 +69,7 @@ async function loadPost() {
             </div>
           `).join("")}
         </div>
+
         ${images.length > 1 ? `
           <div class="gallery-thumbs">
             ${images.map((url, idx) => `
@@ -76,6 +82,27 @@ async function loadPost() {
       </div>
 
       <div class="view-post-right">
+
+        <!-- ⭐ SELLER HEADER -->
+        <div class="post-seller-header">
+          <img src="${seller?.photoURL || '/index/img/default-avatar.png'}"
+               class="seller-header-avatar">
+
+          <div class="seller-header-info">
+            <p class="posted-by">Posted by <strong>${seller?.name || "Local Seller"}</strong></p>
+            <p class="posted-on">Posted on Rhondda Noticeboard</p>
+
+            <div class="seller-badges">
+              ${seller?.isBusiness ? `<span class="badge business">Business</span>` : ""}
+              ${seller?.trusted ? `<span class="badge trusted">Trusted</span>` : ""}
+            </div>
+
+            <button class="view-listings-btn" onclick="openSellerProfile('${post.userId}')">
+              View all listings by ${seller?.name || "seller"}
+            </button>
+          </div>
+        </div>
+
         <h1>${post.title}</h1>
         ${priceText ? `<h2 class="post-price">${priceText}</h2>` : ""}
 
@@ -86,23 +113,13 @@ async function loadPost() {
           ${post.subcategory ? `<p><strong>Subcategory:</strong> ${post.subcategory}</p>` : ""}
           ${post.area ? `<p><strong>Area:</strong> ${post.area}</p>` : ""}
           <p><strong>Posted:</strong> ${post.createdAt?.toDate().toLocaleDateString() || "Unknown"}</p>
+          <p><strong>Views:</strong> ${post.views ? post.views + 1 : 1}</p>
         </div>
 
-        <div class="seller-box">
-          <h3>Seller</h3>
-          ${seller ? `
-            <p>${seller.name || "Local Seller"}</p>
-            ${seller.isBusiness ? `<span class="biz-tag">Business Account</span>` : ""}
-          ` : `<p>Private seller</p>`}
-          <div class="seller-actions">
-            <button class="primary-btn" onclick="contactSeller('${post.userId}')">
-              Contact seller
-            </button>
-            <button class="secondary-btn" onclick="openSellerProfile('${post.userId}')">
-              View all Adds & Profile 
-            </button>
-          </div>
-        </div>
+        <!-- ⭐ ENGAGEMENT BUTTON -->
+        <button class="engage-btn" onclick="engagePost('${window.selectedPostId}')">
+          👍 I'm interested (${post.engagement || 0})
+        </button>
 
         <div class="view-post-actions">
           ${isOwner ? `
@@ -114,15 +131,24 @@ async function loadPost() {
             Back to home
           </button>
         </div>
-      </div>
 
+      </div>
     </div>
   `;
 
   setupGallery();
 }
 
-// ✅ simple thumbnail-based gallery (swipe/scroll supported on mobile)
+// ⭐ Engagement counter
+window.engagePost = async function (postId) {
+  const postRef = doc(db, "posts", postId);
+  await updateDoc(postRef, {
+    engagement: increment(1)
+  });
+  alert("Thanks! The seller will see your interest.");
+};
+
+// ⭐ Simple gallery
 function setupGallery() {
   const slides = document.querySelectorAll(".gallery-slide");
   const thumbs = document.querySelectorAll(".thumb-btn");
@@ -134,29 +160,17 @@ function setupGallery() {
 
   thumbs.forEach(btn => {
     btn.addEventListener("click", () => {
-      const idx = Number(btn.dataset.index);
-      current = idx;
+      current = Number(btn.dataset.index);
       highlightSlide(current);
     });
   });
 
   function highlightSlide(index) {
-    slides.forEach((s, i) => {
-      s.style.display = i === index ? "block" : "none";
-    });
-    thumbs.forEach((t, i) => {
-      t.classList.toggle("active", i === index);
-    });
+    slides.forEach((s, i) => s.style.display = i === index ? "block" : "none");
+    thumbs.forEach((t, i) => t.classList.toggle("active", i === index));
   }
 }
 
-window.contactSeller = function (userId) {
-  alert("Contact seller feature coming soon!");
-};
-
-window.viewSellerPosts = function (userId) {
-  window.sellerFilterId = userId;
-};
 window.openSellerProfile = function (sellerId) {
   window.selectedSellerId = sellerId;
   loadView("sellerprofile");
