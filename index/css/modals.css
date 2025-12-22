@@ -178,3 +178,30 @@ body.modal-open main {
     75% { transform: translateX(5px); }
 }
 .shake { animation: shake 0.3s ease-in-out; }
+/* Reveal animation */
+.slide-reveal {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(-8px);
+  transition: all .25s ease;
+}
+.slide-reveal.active {
+  max-height: 120px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Disabled price */
+#priceWrapper.disabled {
+  opacity: .4;
+  pointer-events: none;
+}
+
+/* Image preview */
+.preview-img {
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.15);
+}
