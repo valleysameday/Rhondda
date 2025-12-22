@@ -5,6 +5,9 @@ import { ref, deleteObject, uploadBytes, getDownloadURL } from "https://www.gsta
 
 let auth, db, storage;
 
+const PLACEHOLDER_AVATAR = "/images/avatar-placeholder.jpg";
+const PLACEHOLDER_POST = "/images/post-placeholder.jpg";
+
 /* ---------------------------------------------------
    ✅ DELETE POST + IMAGES
 --------------------------------------------------- */
@@ -99,7 +102,7 @@ getFirebase().then(fb => {
     const avatarCircle = document.getElementById("dashboardAvatar");
     const avatarClickArea = document.getElementById("avatarClickArea");
 
-    avatarCircle.style.backgroundImage = `url('${avatarUrl || 'https://via.placeholder.com/100?text=Avatar'}')`;
+    avatarCircle.style.backgroundImage = `url('${avatarUrl || PLACEHOLDER_AVATAR}')`;
 
     avatarClickArea.addEventListener("click", () => avatarInput.click());
 
@@ -167,21 +170,48 @@ getFirebase().then(fb => {
       if (p.views) totalViews += p.views;
       if (p.unlocks) totalUnlocks += p.unlocks;
 
-      const imgUrl = p.imageUrl || "https://via.placeholder.com/300x200?text=No+Image";
+      const imgUrl = p.imageUrl || PLACEHOLDER_POST;
 
-      container.innerHTML += `
-        <div class="dash-card">
-          <img src="${imgUrl}" class="dash-img">
-          <div class="dash-info">
-            <h3>${p.title}</h3>
-            <p>${p.description}</p>
-          </div>
-          <div class="dash-actions">
-            <button class="dash-btn dash-edit" data-id="${id}">Edit</button>
-            <button class="dash-btn dash-delete" data-id="${id}">Delete</button>
-          </div>
-        </div>
-      `;
+      const card = document.createElement("div");
+      card.className = "dash-card";
+
+      const img = document.createElement("img");
+      img.src = imgUrl;
+      img.className = "dash-img";
+      img.loading = "lazy";
+      img.alt = p.title || "Ad image";
+      img.onerror = () => { img.src = PLACEHOLDER_POST; };
+
+      const info = document.createElement("div");
+      info.className = "dash-info";
+      const h3 = document.createElement("h3");
+      h3.textContent = p.title;
+      const pDesc = document.createElement("p");
+      pDesc.textContent = p.description;
+      info.appendChild(h3);
+      info.appendChild(pDesc);
+
+      const actions = document.createElement("div");
+      actions.className = "dash-actions";
+
+      const editBtn = document.createElement("button");
+      editBtn.className = "dash-btn dash-edit";
+      editBtn.dataset.id = id;
+      editBtn.textContent = "Edit";
+
+      const delBtn = document.createElement("button");
+      delBtn.className = "dash-btn dash-delete";
+      delBtn.dataset.id = id;
+      delBtn.textContent = "Delete";
+
+      actions.appendChild(editBtn);
+      actions.appendChild(delBtn);
+
+      card.appendChild(img);
+      card.appendChild(info);
+      card.appendChild(actions);
+
+      container.appendChild(card);
     });
 
     document.getElementById("statAdsCount").textContent = adsCount;
@@ -189,7 +219,7 @@ getFirebase().then(fb => {
     document.getElementById("statUnlocks").textContent = totalUnlocks;
 
     // ---------- Delete buttons ----------
-    document.querySelectorAll(".dash-delete").forEach(btn => {
+    container.querySelectorAll(".dash-delete").forEach(btn => {
       btn.addEventListener("click", async () => {
         if (!confirm("Delete this ad?")) return;
         const postId = btn.dataset.id;
@@ -200,11 +230,8 @@ getFirebase().then(fb => {
       });
     });
 
-    // ---------- Auto-delete old posts ----------
-    autoDeleteExpiredPosts(user.uid);
-
     // ---------- Edit / New / Logout ----------
-    document.querySelectorAll(".dash-edit").forEach(btn => {
+    container.querySelectorAll(".dash-edit").forEach(btn => {
       btn.addEventListener("click", () => {
         openScreen("editPost");
         window.editPostId = btn.dataset.id;
@@ -217,5 +244,8 @@ getFirebase().then(fb => {
       document.getElementById("logoutOverlay").style.display = "flex";
       signOut(auth).then(() => setTimeout(() => navigateToHome(), 2000));
     });
+
+    // ---------- Auto-delete old posts ----------
+    autoDeleteExpiredPosts(user.uid);
   });
 });
