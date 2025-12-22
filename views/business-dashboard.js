@@ -1,13 +1,14 @@
+// business-dashboard.js
 import { getFirebase } from '/index/js/firebase/init.js';
-import { 
-  onAuthStateChanged, 
-  signOut 
+import {
+  onAuthStateChanged,
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-import { 
-  collection, 
-  query, 
-  where, 
+import {
+  collection,
+  query,
+  where,
   getDocs,
   doc,
   getDoc,
@@ -15,58 +16,198 @@ import {
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-import { ref, deleteObject, uploadBytes, getDownloadURL } 
-from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+import {
+  ref,
+  deleteObject,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
 let auth, db, storage;
+let currentUser = null;
 
 /* ---------------------------------------------------
-   ✅ DELETE POST + IMAGES
+   🔒 SAFE DOM HELPERS (CRITICAL)
 --------------------------------------------------- */
-async function deletePostAndImages(post) {
-  try {
-    const allImages = [];
+function $(id) {
+  return document.getElementById(id);
+}
 
-    if (post.imageUrl) allImages.push(post.imageUrl);
-    if (Array.isArray(post.imageUrls)) allImages.push(...post.imageUrls);
-
-    for (const url of allImages) {
-      const path = url.split("/o/")[1].split("?")[0];
-      const storageRef = ref(storage, decodeURIComponent(path));
-      await deleteObject(storageRef);
-    }
-
-    await deleteDoc(doc(db, "posts", post.id));
-    console.log("✅ Deleted post + images:", post.id);
-
-  } catch (err) {
-    console.error("❌ Failed to delete post:", err);
-  }
+function onClick(id, handler) {
+  const el = $(id);
+  if (el) el.addEventListener("click", handler);
 }
 
 /* ---------------------------------------------------
-   ✅ AUTO DELETE POSTS OLDER THAN 14 DAYS
+   🧠 WAIT FOR DASHBOARD VIEW
 --------------------------------------------------- */
-async function autoDeleteExpiredPosts(userId) {
-  const now = Date.now();
-  const fourteenDays = 14 * 24 * 60 * 60 * 1000;
-
-  const q = query(collection(db, "posts"), where("businessId", "==", userId));
-  const snap = await getDocs(q);
-
-  snap.forEach(async docSnap => {
-    const post = { id: docSnap.id, ...docSnap.data() };
-    if (!post.createdAt) return;
-
-    const age = now - post.createdAt.toMillis();
-    if (age > fourteenDays) {
-      await deletePostAndImages(post);
-    }
+function waitForDashboard() {
+  return new Promise(resolve => {
+    const check = () => {
+      if ($("bizDashboard")) resolve();
+      else requestAnimationFrame(check);
+    };
+    check();
   });
 }
 
 /* ---------------------------------------------------
-   ✅ MAIN BUSINESS DASHBOARD LOGIC
+   🗑️ DELETE POST + IMAGES
+--------------------------------------------------- */
+async function deletePostAndImages(post) {
+  const images = [
+    ...(post.imageUrl ? [post.imageUrl] : []),
+    ...(Array.isArray(post.imageUrls) ? post.imageUrls : [])
+  ];
+
+  for (const url of images) {
+    try {
+      const path = decodeURIComponent(url.split("/o/")[1].split("?")[0]);
+      await deleteObject(ref(storage, path));
+    } catch {}
+  }
+
+  await deleteDoc(doc(db, "posts", post.id));
+}
+
+/* ---------------------------------------------------
+   🏗️ LOAD BUSINESS PROFILE
+--------------------------------------------------- */
+async function loadBusinessProfile(uid) {
+  const refDoc = doc(db, "businesses", uid);
+  const snap = await getDoc(refDoc);
+
+  const data = snap.exists() ? snap.data() : {};
+
+  $("bizHeaderName").textContent = data.name || "Your Business";
+  $("bizViewName").textContent = data.name || "Add business name";
+  $("bizViewPhone").textContent = data.phone || "Add phone";
+  $("bizViewArea").textContent = data.area || "Add area";
+  $("bizViewWebsite").textContent = data.website || "Add website";
+  $("bizViewBio").textContent = data.bio || "Describe your business";
+
+  $("bizNameInput").value = data.name || "";
+  $("bizPhoneInput").value = data.phone || "";
+  $("bizAreaInput").value = data.area || "";
+  $("bizWebsiteInput").value = data.website || "";
+  $("bizBioInput").value = data.bio || "";
+
+  if (data.avatarUrl && $("bizDashboardAvatar")) {
+    $("bizDashboardAvatar").style.backgroundImage = `url('${data.avatarUrl}')`;
+  }
+}
+
+/* ---------------------------------------------------
+   🖼️ AVATAR UPLOAD
+--------------------------------------------------- */
+function setupAvatarUpload(uid) {
+  const input = $("bizAvatarUploadInput");
+  const clickArea = $("bizAvatarClickArea");
+  const avatar = $("bizDashboardAvatar");
+
+  if (!input || !clickArea || !avatar) return;
+
+  clickArea.onclick = () => input.click();
+
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    const avatarRef = ref(storage, `avatars/${uid}.jpg`);
+    await uploadBytes(avatarRef, file);
+    const url = await getDownloadURL(avatarRef);
+
+    await updateDoc(doc(db, "businesses", uid), { avatarUrl: url });
+    avatar.style.backgroundImage = `url('${url}')`;
+  };
+}
+
+/* ---------------------------------------------------
+   📦 LOAD BUSINESS ADS
+--------------------------------------------------- */
+async function loadBusinessPosts(uid) {
+  const snap = await getDocs(
+    query(collection(db, "posts"), where("businessId", "==", uid))
+  );
+
+  const container = $("bizPosts");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  let ads = 0, views = 0, leads = 0;
+
+  if (snap.empty) {
+    container.innerHTML = `<p class="biz-empty-msg">No ads yet.</p>`;
+    return;
+  }
+
+  snap.forEach(docSnap => {
+    const p = docSnap.data();
+    const id = docSnap.id;
+
+    ads++;
+    views += p.views || 0;
+    leads += p.leads || 0;
+
+    container.insertAdjacentHTML("beforeend", `
+      <div class="biz-card">
+        <img src="${p.imageUrl || '/images/post-placeholder.jpg'}">
+        <div>
+          <h3>${p.title}</h3>
+          <p>${p.description}</p>
+          <small>${p.category} • ${p.subcategory || ""}</small>
+        </div>
+        <div>
+          <button class="biz-edit" data-id="${id}">Edit</button>
+          <button class="biz-delete" data-id="${id}">Delete</button>
+        </div>
+      </div>
+    `);
+  });
+
+  $("bizStatAdsCount").textContent = ads;
+  $("bizStatTotalViews").textContent = views;
+  $("bizStatLeads").textContent = leads;
+
+  document.querySelectorAll(".biz-delete").forEach(btn => {
+    btn.onclick = async () => {
+      if (!confirm("Delete this ad?")) return;
+      const snap = await getDoc(doc(db, "posts", btn.dataset.id));
+      await deletePostAndImages({ id: btn.dataset.id, ...snap.data() });
+      loadBusinessPosts(uid);
+    };
+  });
+}
+
+/* ---------------------------------------------------
+   💾 SAVE PROFILE
+--------------------------------------------------- */
+function setupSaveProfile(uid) {
+  onClick("bizSaveProfileBtn", async () => {
+    await updateDoc(doc(db, "businesses", uid), {
+      name: $("bizNameInput").value.trim(),
+      phone: $("bizPhoneInput").value.trim(),
+      area: $("bizAreaInput").value.trim(),
+      website: $("bizWebsiteInput").value.trim(),
+      bio: $("bizBioInput").value.trim()
+    });
+  });
+}
+
+/* ---------------------------------------------------
+   🚪 GLOBAL ACTIONS
+--------------------------------------------------- */
+function setupGlobalActions() {
+  onClick("bizNewPostBtn", () => openScreen("post"));
+  onClick("bizLogoutBtn", async () => {
+    await signOut(auth);
+    navigateToHome();
+  });
+}
+
+/* ---------------------------------------------------
+   🚀 INIT
 --------------------------------------------------- */
 getFirebase().then(fb => {
   auth = fb.auth;
@@ -74,241 +215,16 @@ getFirebase().then(fb => {
   storage = fb.storage;
 
   onAuthStateChanged(auth, async user => {
-    if (!user) {
-      loadView("home");
-      return;
-    }
+    if (!user) return;
 
-    /* ---------------- LOAD BUSINESS PROFILE ---------------- */
-    const userRef = doc(db, "businesses", user.uid);
-    const snap = await getDoc(userRef);
+    currentUser = user;
 
-    let name = "", phone = "", area = "", website = "", bio = "", avatarUrl = "";
+    await waitForDashboard();
 
-    if (snap.exists()) {
-      const b = snap.data();
-      name = b.name || "";
-      phone = b.phone || "";
-      area = b.area || "";
-      website = b.website || "";
-      bio = b.bio || "";
-      avatarUrl = b.avatarUrl || "";
-    }
-
-    /* ✅ Update header + view mode */
-    document.getElementById("bizHeaderName").textContent = name || "Your Business";
-    document.getElementById("bizHeaderTagline").textContent =
-      name ? "Manage your ads, brand, and customers" : "Let’s set up your business profile";
-
-    document.getElementById("bizViewName").textContent = name || "Add your business name";
-    document.getElementById("bizViewPhone").textContent = phone || "Add your phone";
-    document.getElementById("bizViewArea").textContent = area || "Add your area";
-    document.getElementById("bizViewWebsite").textContent = website || "Add your website";
-    document.getElementById("bizViewBio").textContent = bio || "Tell customers what you offer";
-
-    document.getElementById("bizNameInput").value = name;
-    document.getElementById("bizPhoneInput").value = phone;
-    document.getElementById("bizAreaInput").value = area;
-    document.getElementById("bizWebsiteInput").value = website;
-    document.getElementById("bizBioInput").value = bio;
-
-    /* ---------------------------------------------------
-       ✅ AVATAR DISPLAY + UPLOAD
-    --------------------------------------------------- */
-    const avatarInput = document.getElementById("bizAvatarUploadInput");
-    const avatarCircle = document.getElementById("bizDashboardAvatar");
-    const avatarClickArea = document.getElementById("bizAvatarClickArea");
-
-    if (avatarUrl) {
-      avatarCircle.style.backgroundImage = `url('${avatarUrl}')`;
-    }
-
-    avatarClickArea.addEventListener("click", () => {
-      avatarInput.click();
-    });
-
-    avatarInput.addEventListener("change", async () => {
-      const file = avatarInput.files[0];
-      if (!file) return;
-
-      const storageRef = ref(storage, `avatars/${user.uid}.jpg`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-
-      await updateDoc(userRef, { avatarUrl: url });
-
-      avatarCircle.style.backgroundImage = `url('${url}')`;
-    });
-
-    /* ---------------------------------------------------
-       ✅ AREA AUTOCOMPLETE
-    --------------------------------------------------- */
-    const AREAS = [
-      "Porth","Trealaw","Tonypandy","Penygraig","Llwynypia","Ystrad","Gelli",
-      "Ton Pentre","Pentre","Treorchy","Treherbert","Ferndale","Tylorstown",
-      "Maerdy","Cymmer","Wattstown","Blaenllechau","Blaencwm","Blaenrhondda",
-      "Clydach Vale","Edmondstown","Llwyncelyn","Penrhys","Pontygwaith",
-      "Williamstown","Ynyshir","Aberdare","Aberaman","Abercynon","Cwmbach",
-      "Hirwaun","Llwydcoed","Mountain Ash","Penrhiwceiber","Pen-y-waun",
-      "Rhigos","Cefnpennar","Cwaman","Godreaman","Miskin (Mountain Ash)",
-      "New Cardiff","Penderyn","Tyntetown","Ynysboeth","Pontypridd","Beddau",
-      "Church Village","Cilfynydd","Glyn-coch","Hawthorn","Llantrisant",
-      "Llantwit Fardre","Rhydfelen","Taff's Well","Talbot Green","Tonteg",
-      "Treforest","Trehafod","Ynysybwl","Coed-y-cwm","Graig","Hopkinstown",
-      "Nantgarw","Trallwng","Upper Boat","Brynna","Llanharan","Llanharry",
-      "Pontyclun","Tonyrefail","Tyn-y-nant","Gilfach Goch","Groesfaen",
-      "Miskin (Llantrisant)","Mwyndy","Thomastown"
-    ];
-
-    const areaInput = document.getElementById("bizAreaInput");
-    const suggestionBox = document.getElementById("bizAreaSuggestions");
-
-    areaInput.addEventListener("input", () => {
-      const value = areaInput.value.toLowerCase();
-      suggestionBox.innerHTML = "";
-
-      if (!value) {
-        suggestionBox.style.display = "none";
-        return;
-      }
-
-      const matches = AREAS.filter(a => a.toLowerCase().startsWith(value));
-
-      if (!matches.length) {
-        suggestionBox.style.display = "none";
-        return;
-      }
-
-      suggestionBox.style.display = "block";
-
-      matches.forEach(areaName => {
-        const div = document.createElement("div");
-        div.className = "biz-suggestion-item";
-        div.textContent = areaName;
-        div.addEventListener("click", () => {
-          areaInput.value = areaName;
-          suggestionBox.style.display = "none";
-        });
-        suggestionBox.appendChild(div);
-      });
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!suggestionBox.contains(e.target) && e.target !== areaInput) {
-        suggestionBox.style.display = "none";
-      }
-    });
-
-    /* ---------------- SAVE BUSINESS PROFILE ---------------- */
-    document.getElementById("bizSaveProfileBtn").addEventListener("click", async () => {
-      const newName = bizNameInput.value.trim();
-      const newPhone = bizPhoneInput.value.trim();
-      const newArea = bizAreaInput.value.trim();
-      const newWebsite = bizWebsiteInput.value.trim();
-      const newBio = bizBioInput.value.trim();
-
-      bizFeedback.textContent = "Saving...";
-
-      await updateDoc(userRef, {
-        name: newName,
-        phone: newPhone,
-        area: newArea,
-        website: newWebsite,
-        bio: newBio
-      });
-
-      document.getElementById("bizViewName").textContent = newName || "Add your business name";
-      document.getElementById("bizViewPhone").textContent = newPhone || "Add your phone";
-      document.getElementById("bizViewArea").textContent = newArea || "Add your area";
-      document.getElementById("bizViewWebsite").textContent = newWebsite || "Add your website";
-      document.getElementById("bizViewBio").textContent = newBio || "Tell customers what you offer";
-
-      bizFeedback.textContent = "✅ Business profile updated!";
-      bizFeedback.classList.add("biz-feedback-success");
-
-      setTimeout(() => {
-        bizFeedback.textContent = "";
-        bizFeedback.classList.remove("biz-feedback-success");
-      }, 1500);
-
-      exitBizEdit();
-    });
-
-    /* ---------------- LOAD BUSINESS ADS ---------------- */
-    const postsSnap = await getDocs(query(collection(db, "posts"), where("businessId", "==", user.uid)));
-    const container = document.getElementById("bizPosts");
-    container.innerHTML = "";
-
-    let adsCount = 0, totalViews = 0, totalLeads = 0;
-
-    if (postsSnap.empty) {
-      container.innerHTML = `<p class="biz-empty-msg">You haven’t posted any business ads yet.</p>`;
-    }
-
-    postsSnap.forEach(docSnap => {
-      const p = docSnap.data();
-      const id = docSnap.id;
-
-      adsCount++;
-      if (p.views) totalViews += p.views;
-      if (p.leads) totalLeads += p.leads;
-
-      container.innerHTML += `
-        <div class="biz-card">
-          <img src="${p.imageUrl || '/images/post-placeholder.jpg'}" class="biz-img">
-          <div class="biz-info">
-            <h3>${p.title}</h3>
-            <p>${p.description}</p>
-            <small>
-              ${p.category || "General"}
-              ${p.subcategory ? " • " + p.subcategory : ""}
-              ${p.area ? " • " + p.area : ""}
-            </small>
-          </div>
-          <div class="biz-actions">
-            <button class="biz-btn biz-edit" data-id="${id}">Edit</button>
-            <button class="biz-btn biz-delete" data-id="${id}">Delete</button>
-          </div>
-        </div>
-      `;
-    });
-
-    document.getElementById("bizStatAdsCount").textContent = adsCount;
-    document.getElementById("bizStatTotalViews").textContent = totalViews;
-    document.getElementById("bizStatLeads").textContent = totalLeads;
-
-    /* ---------------- DELETE BUTTONS ---------------- */
-    document.querySelectorAll(".biz-delete").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        if (!confirm("Delete this ad?")) return;
-
-        const postId = btn.dataset.id;
-        const postSnap = await getDoc(doc(db, "posts", postId));
-        const post = { id: postId, ...postSnap.data() };
-
-        await deletePostAndImages(post);
-        loadView("business-dashboard");
-      });
-    });
-
-    /* ---------------- AUTO DELETE OLD POSTS ---------------- */
-    autoDeleteExpiredPosts(user.uid);
-
-    /* ---------------- EDIT + NEW + LOGOUT ---------------- */
-    document.querySelectorAll(".biz-edit").forEach(btn => {
-      btn.addEventListener("click", () => {
-        openScreen("editPost");
-        window.editPostId = btn.dataset.id;
-      });
-    });
-
-    document.getElementById("bizNewPostBtn").addEventListener("click", () => {
-      openScreen("post");
-    });
-
-    document.getElementById("bizLogoutBtn").addEventListener("click", () => {
-      document.getElementById("bizLogoutOverlay").style.display = "flex";
-      signOut(auth).then(() => setTimeout(() => navigateToHome(), 2000));
-    });
+    await loadBusinessProfile(user.uid);
+    setupAvatarUpload(user.uid);
+    setupSaveProfile(user.uid);
+    setupGlobalActions();
+    loadBusinessPosts(user.uid);
   });
 });
