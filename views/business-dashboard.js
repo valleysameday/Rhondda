@@ -1,10 +1,12 @@
-// business-dashboard.js
 import { getFirebase } from '/index/js/firebase/init.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { collection, query, where, getDocs, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { ref, deleteObject, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
 let auth, db, storage;
+
+const PLACEHOLDER_AVATAR = "/images/avatar-placeholder.jpg";
+const PLACEHOLDER_POST = "/images/post-placeholder.jpg";
 
 /* ---------------------------------------------------
    🔒 SAFE DOM HELPERS
@@ -68,12 +70,12 @@ async function loadBusinessProfile(uid) {
 
   const avatar = $("bizDashboardAvatar");
   if (avatar) {
-    avatar.style.backgroundImage = `url('${d.avatarUrl || "https://via.placeholder.com/100?text=Avatar"}')`;
+    avatar.style.backgroundImage = `url('${d.avatarUrl || PLACEHOLDER_AVATAR}')`;
   }
 }
 
 /* ---------------------------------------------------
-   🖼️ AVATAR UPLOAD (WITH PLACEHOLDER)
+   🖼️ AVATAR UPLOAD (WITH PLACEHOLDER + LAZY LOAD)
 --------------------------------------------------- */
 function setupAvatarUpload(uid) {
   const input = $("avatarUploadInput");
@@ -96,13 +98,12 @@ function setupAvatarUpload(uid) {
       avatar.style.backgroundImage = `url('${url}')`;
     } catch (err) {
       console.error("Avatar upload failed:", err);
-      avatar.style.backgroundImage = "url('https://via.placeholder.com/100?text=Avatar')";
+      avatar.style.backgroundImage = `url('${PLACEHOLDER_AVATAR}')`;
     }
   };
 
-  // Fallback if broken
   avatar.onerror = () => {
-    avatar.style.backgroundImage = "url('https://via.placeholder.com/100?text=Avatar')";
+    avatar.style.backgroundImage = `url('${PLACEHOLDER_AVATAR}')`;
   };
 }
 
@@ -140,7 +141,7 @@ function setupProfileEditToggle(uid) {
 }
 
 /* ---------------------------------------------------
-   📦 LOAD BUSINESS ADS (WITH PLACEHOLDERS)
+   📦 LOAD BUSINESS ADS (WITH PLACEHOLDERS + LAZY LOAD)
 --------------------------------------------------- */
 async function loadBusinessPosts(uid) {
   try {
@@ -169,7 +170,7 @@ async function loadBusinessPosts(uid) {
       totalViews += post.views || 0;
       totalLeads += post.leads || 0;
 
-      const imgSrc = post.imageUrl || "https://via.placeholder.com/300x200?text=No+Image";
+      const imgSrc = post.imageUrl || PLACEHOLDER_POST;
 
       const card = document.createElement("div");
       card.className = "biz-card";
@@ -178,7 +179,8 @@ async function loadBusinessPosts(uid) {
       img.src = imgSrc;
       img.alt = post.title || "Ad image";
       img.className = "biz-card-img";
-      img.onerror = () => img.src = "https://via.placeholder.com/300x200?text=No+Image";
+      img.loading = "lazy";
+      img.onerror = () => { img.src = PLACEHOLDER_POST; };
 
       const info = document.createElement("div");
       const h3 = document.createElement("h3");
