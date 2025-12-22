@@ -84,15 +84,6 @@
     <button class="close" aria-label="Close">&times;</button>
     <h2>Create account</h2>
 
-    <!-- NAME / BUSINESS NAME -->
-    <input
-      type="text"
-      id="signupName"
-      placeholder="Your name"
-      autocomplete="name"
-      required
-    >
-
     <input type="email" id="signupEmail" placeholder="Email" autocomplete="email">
     <input type="password" id="signupPassword" placeholder="Password" autocomplete="new-password">
 
@@ -126,68 +117,62 @@
 <!-- ================= POST MODAL ================= -->
 <div id="postModal" class="modal">
   <div class="modal-content">
-
     <button class="close" aria-label="Close">&times;</button>
-    <h2>Post an Ad</h2>
 
-    <!-- CATEGORY -->
-    <label for="postCategory">Category</label>
-    <select id="postCategory" required>
-      <option value="">Choose category</option>
-      <option value="forsale">For Sale</option>
-      <option value="jobs">Jobs & Services</option>
-      <option value="property">Property</option>
-      <option value="events">Events</option>
-      <option value="community">Community</option>
-      <option value="free">Free</option>
-    </select>
+    <div id="postFlow">
 
-    <!-- SUBCATEGORY -->
-    <div id="subcategoryWrapper" class="slide-reveal">
-      <label for="postSubcategory">Subcategory</label>
-      <select id="postSubcategory" required></select>
+      <!-- STEP 1: CATEGORY -->
+      <div class="post-step" data-step="1">
+        <h2>Select a Category</h2>
+        <select id="postCategory">
+          <option value="">Choose category</option>
+          <option value="forsale">For Sale</option>
+          <option value="jobs">Jobs & Services</option>
+          <option value="property">Property</option>
+          <option value="events">Events</option>
+          <option value="community">Community</option>
+          <option value="free">Free</option>
+        </select>
+        <button class="post-next">Next</button>
+      </div>
+
+      <!-- STEP 2: SUBCATEGORY -->
+      <div class="post-step" data-step="2">
+        <h2>Select a Subcategory</h2>
+        <select id="postSubcategory"></select>
+        <button class="post-prev">Back</button>
+        <button class="post-next">Next</button>
+      </div>
+
+      <!-- STEP 3: AD DETAILS -->
+      <div class="post-step" data-step="3">
+        <h2>Ad Details</h2>
+
+        <input type="text" id="postTitle" placeholder="Title" required>
+
+        <textarea id="postDescription" rows="4" placeholder="Description" required></textarea>
+
+        <label>Price (optional)</label>
+        <input type="number" id="postPrice" placeholder="0" min="0" step="0.01">
+
+        <label>Your Area</label>
+        <input type="text" id="postArea" placeholder="e.g. Ferndale, Pentre, Tonypandy">
+
+        <label>Add Photos</label>
+        <button id="chooseImageBtn">Choose Photo</button>
+        <input type="file" id="postImage" accept="image/*" style="display:none;">
+        <div id="imagePreview"></div>
+
+        <button class="post-prev">Back</button>
+        <button id="postSubmitBtn">Submit Ad</button>
+      </div>
+
     </div>
-
-    <!-- DETAILS -->
-    <input type="text"
-           id="postTitle"
-           placeholder="Title"
-           maxlength="80"
-           required>
-
-    <textarea id="postDescription"
-              rows="4"
-              placeholder="Describe what you’re offering…"
-              maxlength="1000"
-              required></textarea>
-
-    <!-- PRICE -->
-    <div id="priceWrapper">
-      <label>Price (optional)</label>
-      <input type="number" id="postPrice" placeholder="0" min="0" step="0.01">
-    </div>
-
-    <!-- LOCATION -->
-    <label>Your Area</label>
-    <input type="text"
-           id="postArea"
-           placeholder="e.g. Ferndale, Pentre, Tonypandy">
-
-    <!-- IMAGE -->
-    <label>Add a Photo (recommended)</label>
-    <button id="chooseImageBtn" type="button">Choose Photo</button>
-    <input type="file"
-           id="postImage"
-           accept="image/*"
-           style="display:none;">
-    <div id="imagePreview"></div>
-
-    <button id="postSubmitBtn">Submit Ad</button>
 
     <p id="postFeedback" class="feedback-text"></p>
-
   </div>
 </div>
+
 <!-- ================= FIXED ACTION BAR ================= -->
 <div class="action-bar">
 
