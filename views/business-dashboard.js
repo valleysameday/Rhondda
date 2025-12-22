@@ -162,7 +162,7 @@ async function loadBusinessPosts(uid) {
 
     box.insertAdjacentHTML("beforeend", `
       <div class="biz-card">
-        <img src="${p.imageUrl || '/images/post-placeholder.jpg'}">
+        <img src="${p.imageUrl || ''}" onerror="this.style.display='none'">
         <div>
           <h3>${p.title}</h3>
           <p>${p.description}</p>
