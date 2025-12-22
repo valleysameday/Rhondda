@@ -1,10 +1,5 @@
 import { getFirebase } from "/index/js/firebase/init.js";
-import { 
-  collection, 
-  query, 
-  orderBy, 
-  getDocs 
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let db;
 
@@ -18,7 +13,6 @@ export function initFeed() {
     loadWeather();
   });
 
-  /* ---------------- LOAD POSTS ---------------- */
   async function loadPosts(category = "all") {
     postsContainer.innerHTML = "<p>Loading…</p>";
 
@@ -28,19 +22,13 @@ export function initFeed() {
     const posts = [];
     snap.forEach(doc => posts.push({ id: doc.id, ...doc.data() }));
 
-    /* CATEGORY FILTER */
     const filtered = category === "all"
       ? posts
       : posts.filter(p => p.category === category);
 
-    /* SEARCH FILTER */
     const searchTerm = (window.currentSearch || "").toLowerCase();
-
     const searched = filtered.filter(p => {
-      const priceText =
-        p.price === 0 ? "free" :
-        p.price ? `£${p.price}` : "";
-
+      const priceText = p.price === 0 ? "free" : p.price ? `£${p.price}` : "";
       return (
         p.title.toLowerCase().includes(searchTerm) ||
         p.description.toLowerCase().includes(searchTerm) ||
@@ -65,17 +53,14 @@ export function initFeed() {
         loadView("view-post");
       });
 
-      const imgSrc = post.imageUrl || "https://placehold.co/600x400?text=No+Image";
-      const isBusiness = post.businessId ? true : false;
-
-      const priceText =
-        post.price === 0 ? "FREE" :
-        post.price ? `£${post.price}` :
-        "";
+      const imgSrc = post.imageUrl || "/images/post-placeholder.jpg";
+      const isBusiness = !!post.businessId;
+      const priceText = post.price === 0 ? "FREE" : post.price ? `£${post.price}` : "";
 
       card.innerHTML = `
         <div class="post-image">
-          <img src="${imgSrc}" alt="${post.title}">
+          <img src="${imgSrc}" alt="${post.title}" loading="lazy"
+               onerror="this.onerror=null;this.src='/images/post-placeholder.jpg';">
           ${isBusiness ? `<div class="business-overlay">Business</div>` : ""}
           ${priceText ? `<div class="price-badge">${priceText}</div>` : ""}
         </div>
@@ -91,7 +76,6 @@ export function initFeed() {
     });
   }
 
-  /* ---------------- CATEGORY BUTTONS ---------------- */
   categoryBtns.forEach(btn => {
     btn.addEventListener("click", () => {
       categoryBtns.forEach(b => b.classList.remove("active"));
@@ -100,11 +84,9 @@ export function initFeed() {
     });
   });
 
-  /* ---------------- WEATHER ---------------- */
   async function loadWeather() {
     const emojiEl = document.querySelector(".weather-emoji");
     const textEl = document.querySelector(".weather-text");
-
     if (!emojiEl || !textEl) return;
 
     try {
@@ -124,14 +106,12 @@ export function initFeed() {
       const isDay = now >= sunrise && now <= sunset;
 
       let emoji = isDay ? "🌞" : "🌙";
-
       if ([51, 61, 63, 65, 80, 81, 82].includes(code)) emoji = "🌧️";
       if ([71, 73, 75].includes(code)) emoji = "❄️";
       if ([45, 48].includes(code)) emoji = "🌫️";
       if ([95, 96, 99].includes(code)) emoji = "⛈️";
 
       let message = "";
-
       if (!isDay) message = "Evening in the valley — cosy vibes.";
       else if (temp <= 3) message = "Cold enough to freeze your nan’s washing.";
       else if (rainChance > 60) message = "Rain’s on — grab your brolly, butt.";
@@ -146,4 +126,5 @@ export function initFeed() {
     }
   }
 }
+
 window.initFeed = initFeed;
