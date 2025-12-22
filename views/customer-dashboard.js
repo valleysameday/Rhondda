@@ -1,22 +1,7 @@
 import { getFirebase } from '/index/js/firebase/init.js';
-import { 
-  onAuthStateChanged, 
-  signOut 
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-import { 
-  collection, 
-  query, 
-  where, 
-  getDocs,
-  doc,
-  getDoc,
-  updateDoc,
-  deleteDoc
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-import { ref, deleteObject, uploadBytes, getDownloadURL } 
-from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { collection, query, where, getDocs, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { ref, deleteObject, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
 let auth, db, storage;
 
@@ -31,9 +16,13 @@ async function deletePostAndImages(post) {
     if (Array.isArray(post.imageUrls)) allImages.push(...post.imageUrls);
 
     for (const url of allImages) {
-      const path = url.split("/o/")[1].split("?")[0];
-      const storageRef = ref(storage, decodeURIComponent(path));
-      await deleteObject(storageRef);
+      try {
+        const path = url.split("/o/")[1].split("?")[0];
+        const storageRef = ref(storage, decodeURIComponent(path));
+        await deleteObject(storageRef);
+      } catch (e) {
+        console.warn("Image deletion skipped:", url);
+      }
     }
 
     await deleteDoc(doc(db, "posts", post.id));
@@ -50,18 +39,14 @@ async function deletePostAndImages(post) {
 async function autoDeleteExpiredPosts(userId) {
   const now = Date.now();
   const fourteenDays = 14 * 24 * 60 * 60 * 1000;
-
   const q = query(collection(db, "posts"), where("userId", "==", userId));
   const snap = await getDocs(q);
 
   snap.forEach(async docSnap => {
     const post = { id: docSnap.id, ...docSnap.data() };
     if (!post.createdAt) return;
-
     const age = now - post.createdAt.toMillis();
-    if (age > fourteenDays) {
-      await deletePostAndImages(post);
-    }
+    if (age > fourteenDays) await deletePostAndImages(post);
   });
 }
 
@@ -79,7 +64,6 @@ getFirebase().then(fb => {
       return;
     }
 
-    /* ---------------- LOAD PROFILE ---------------- */
     const userRef = doc(db, "users", user.uid);
     const snap = await getDoc(userRef);
 
@@ -94,7 +78,7 @@ getFirebase().then(fb => {
       avatarUrl = u.avatarUrl || "";
     }
 
-    /* ✅ Update header + profile view */
+    // ---------- Update header + profile ----------
     document.getElementById("headerName").textContent = name || "Your account";
     document.getElementById("headerAreaBadge").textContent = area || "Add your area";
     document.getElementById("headerTagline").textContent =
@@ -110,20 +94,14 @@ getFirebase().then(fb => {
     document.getElementById("profileAreaInput").value = area;
     document.getElementById("profileBioInput").value = bio;
 
-    /* ---------------------------------------------------
-       ✅ AVATAR DISPLAY + UPLOAD
-    --------------------------------------------------- */
+    // ---------- Avatar Handling ----------
     const avatarInput = document.getElementById("avatarUploadInput");
     const avatarCircle = document.getElementById("dashboardAvatar");
     const avatarClickArea = document.getElementById("avatarClickArea");
 
-    if (avatarUrl) {
-      avatarCircle.style.backgroundImage = `url('${avatarUrl}')`;
-    }
+    avatarCircle.style.backgroundImage = `url('${avatarUrl || 'https://via.placeholder.com/100?text=Avatar'}')`;
 
-    avatarClickArea.addEventListener("click", () => {
-      avatarInput.click();
-    });
+    avatarClickArea.addEventListener("click", () => avatarInput.click());
 
     avatarInput.addEventListener("change", async () => {
       const file = avatarInput.files[0];
@@ -134,29 +112,11 @@ getFirebase().then(fb => {
       const url = await getDownloadURL(storageRef);
 
       await updateDoc(userRef, { avatarUrl: url });
-
       avatarCircle.style.backgroundImage = `url('${url}')`;
     });
 
-    /* ---------------------------------------------------
-       ✅ AREA AUTOCOMPLETE
-    --------------------------------------------------- */
-    const AREAS = [
-      "Porth","Trealaw","Tonypandy","Penygraig","Llwynypia","Ystrad","Gelli",
-      "Ton Pentre","Pentre","Treorchy","Treherbert","Ferndale","Tylorstown",
-      "Maerdy","Cymmer","Wattstown","Blaenllechau","Blaencwm","Blaenrhondda",
-      "Clydach Vale","Edmondstown","Llwyncelyn","Penrhys","Pontygwaith",
-      "Williamstown","Ynyshir","Aberdare","Aberaman","Abercynon","Cwmbach",
-      "Hirwaun","Llwydcoed","Mountain Ash","Penrhiwceiber","Pen-y-waun",
-      "Rhigos","Cefnpennar","Cwaman","Godreaman","Miskin (Mountain Ash)",
-      "New Cardiff","Penderyn","Tyntetown","Ynysboeth","Pontypridd","Beddau",
-      "Church Village","Cilfynydd","Glyn-coch","Hawthorn","Llantrisant",
-      "Llantwit Fardre","Rhydfelen","Taff's Well","Talbot Green","Tonteg",
-      "Treforest","Trehafod","Ynysybwl","Coed-y-cwm","Graig","Hopkinstown",
-      "Nantgarw","Trallwng","Upper Boat","Brynna","Llanharan","Llanharry",
-      "Pontyclun","Tonyrefail","Tyn-y-nant","Gilfach Goch","Groesfaen",
-      "Miskin (Llantrisant)","Mwyndy","Thomastown"
-    ];
+    // ---------- Area autocomplete ----------
+    const AREAS = ["Porth","Trealaw","Tonypandy","Penygraig","Llwynypia","Ystrad","Gelli","Ton Pentre","Pentre","Treorchy","Treherbert","Ferndale","Tylorstown","Maerdy","Cymmer","Wattstown","Blaenllechau","Blaencwm","Blaenrhondda","Clydach Vale","Edmondstown","Llwyncelyn","Penrhys","Pontygwaith","Williamstown","Ynyshir","Aberdare","Aberaman","Abercynon","Cwmbach","Hirwaun","Llwydcoed","Mountain Ash","Penrhiwceiber","Pen-y-waun","Rhigos","Cefnpennar","Cwaman","Godreaman","Miskin (Mountain Ash)","New Cardiff","Penderyn","Tyntetown","Ynysboeth","Pontypridd","Beddau","Church Village","Cilfynydd","Glyn-coch","Hawthorn","Llantrisant","Llantwit Fardre","Rhydfelen","Taff's Well","Talbot Green","Tonteg","Treforest","Trehafod","Ynysybwl","Coed-y-cwm","Graig","Hopkinstown","Nantgarw","Trallwng","Upper Boat","Brynna","Llanharan","Llanharry","Pontyclun","Tonyrefail","Tyn-y-nant","Gilfach Goch","Groesfaen","Miskin (Llantrisant)","Mwyndy","Thomastown"];
 
     const areaInput = document.getElementById("profileAreaInput");
     const suggestionBox = document.getElementById("areaSuggestions");
@@ -164,21 +124,12 @@ getFirebase().then(fb => {
     areaInput.addEventListener("input", () => {
       const value = areaInput.value.toLowerCase();
       suggestionBox.innerHTML = "";
-
-      if (!value) {
-        suggestionBox.style.display = "none";
-        return;
-      }
+      if (!value) return suggestionBox.style.display = "none";
 
       const matches = AREAS.filter(a => a.toLowerCase().startsWith(value));
-
-      if (!matches.length) {
-        suggestionBox.style.display = "none";
-        return;
-      }
+      if (!matches.length) return suggestionBox.style.display = "none";
 
       suggestionBox.style.display = "block";
-
       matches.forEach(areaName => {
         const div = document.createElement("div");
         div.className = "suggestion-item";
@@ -197,10 +148,9 @@ getFirebase().then(fb => {
       }
     });
 
-    /* ---------------- LOAD POSTS ---------------- */
+    // ---------- Load posts ----------
     const q = query(collection(db, "posts"), where("userId", "==", user.uid));
     const postsSnap = await getDocs(q);
-
     const container = document.getElementById("userPosts");
     container.innerHTML = "";
 
@@ -213,14 +163,15 @@ getFirebase().then(fb => {
     postsSnap.forEach(docSnap => {
       const p = docSnap.data();
       const id = docSnap.id;
-
       adsCount++;
       if (p.views) totalViews += p.views;
       if (p.unlocks) totalUnlocks += p.unlocks;
 
+      const imgUrl = p.imageUrl || "https://via.placeholder.com/300x200?text=No+Image";
+
       container.innerHTML += `
         <div class="dash-card">
-          <img src="${p.imageUrl || '/images/post-placeholder.jpg'}" class="dash-img">
+          <img src="${imgUrl}" class="dash-img">
           <div class="dash-info">
             <h3>${p.title}</h3>
             <p>${p.description}</p>
@@ -237,24 +188,22 @@ getFirebase().then(fb => {
     document.getElementById("statTotalViews").textContent = totalViews;
     document.getElementById("statUnlocks").textContent = totalUnlocks;
 
-    /* ---------------- DELETE BUTTONS ---------------- */
+    // ---------- Delete buttons ----------
     document.querySelectorAll(".dash-delete").forEach(btn => {
       btn.addEventListener("click", async () => {
         if (!confirm("Delete this ad?")) return;
-
         const postId = btn.dataset.id;
         const postSnap = await getDoc(doc(db, "posts", postId));
         const post = { id: postId, ...postSnap.data() };
-
         await deletePostAndImages(post);
         loadView("customer-dashboard");
       });
     });
 
-    /* ---------------- AUTO DELETE OLD POSTS ---------------- */
+    // ---------- Auto-delete old posts ----------
     autoDeleteExpiredPosts(user.uid);
 
-    /* ---------------- EDIT + NEW + LOGOUT ---------------- */
+    // ---------- Edit / New / Logout ----------
     document.querySelectorAll(".dash-edit").forEach(btn => {
       btn.addEventListener("click", () => {
         openScreen("editPost");
@@ -262,9 +211,7 @@ getFirebase().then(fb => {
       });
     });
 
-    document.getElementById("newPostBtn").addEventListener("click", () => {
-      openScreen("post");
-    });
+    document.getElementById("newPostBtn").addEventListener("click", () => openScreen("post"));
 
     document.getElementById("logoutBtn").addEventListener("click", () => {
       document.getElementById("logoutOverlay").style.display = "flex";
