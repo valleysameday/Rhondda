@@ -456,7 +456,15 @@ a:hover {
   resize: vertical;
 }
 
+.form__hint {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  margin-top: var(--space-4);
+}
 
+.form__group input[type="file"] {
+  padding: var(--space-8) 0;
+}
 /* Feed layout */
 .feed {
   display: grid;
