@@ -2,5 +2,7 @@
 import { initFeed } from '/index/js/feed.js';
 
 export function init() {
-  initFeed(); // now called after HTML is in DOM
+  // this runs after home.html is inserted
+  console.log("🏠 Home view init");
+  initFeed();  // now #feed exists
 }
