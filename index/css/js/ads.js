@@ -1,4 +1,4 @@
-ffgt/// /index/js/ads.js
+/// /index/js/ads.js
 export function openAd(ad) {
   window.currentAd = ad;
   document.getElementById("viewAdTitle").textContent = ad.title;
