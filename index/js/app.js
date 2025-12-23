@@ -4,6 +4,7 @@ import { initUIRouter } from '/index/js/ui-router.js';
 
 let auth, db, storage;
 
+// globally expose loadView
 export async function loadView(view) {
   const app = document.getElementById("app");
   if (!app) return;
@@ -14,11 +15,13 @@ export async function loadView(view) {
 
   // dynamically import the view JS AFTER HTML exists
   import(`/views/${view}.js?cache=${Date.now()}`)
-  .then(mod => {
-    if(mod.init) mod.init();  // call the view's init function
-  })
-  .catch(err => console.error("View JS error:", err));
+    .then(mod => {
+      if (mod.init) mod.init();  // call the view's init function
+    })
+    .catch(err => console.error("View JS error:", err));
+}
 
+// expose globally
 window.loadView = loadView;
 
 async function startApp() {
@@ -36,6 +39,7 @@ async function startApp() {
   loadView("home"); // load initial view
 }
 
+// wait for DOM ready
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", startApp);
 } else {
