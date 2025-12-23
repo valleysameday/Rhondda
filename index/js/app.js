@@ -1,6 +1,6 @@
 // /index/js/app.js
-import { getFirebase } from "/js/firebase.js";
-import { initUI } from "/js/ui.js";
+import { getFirebase } from '/js/firebase.js";
+import { initUI } from '/js/ui.js";
 
 let auth, db, storage;
 
