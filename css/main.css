@@ -1,0 +1,29 @@
+/* GLOBAL SETTINGS - css/main.css */
+:root {
+  /* Rhondda Noticeboard Brand Colors */
+  --primary: #007bff;      /* Main Action Blue */
+  --secondary: #6c757d;    /* Neutral Grey */
+  --bg-light: #f8f9fa;     /* Light background for cards */
+  --text-dark: #212529;    /* Clear readable text */
+  --white: #ffffff;
+}
+
+* {
+  box-sizing: border-box; /* Makes padding easier to manage */
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif; /* Clean 2025 font choice */
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  line-height: 1.6;
+}
+
+/* Container to keep content centered on big screens */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
