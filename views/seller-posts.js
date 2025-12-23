@@ -49,7 +49,7 @@ async function loadSellerPosts() {
       loadView("view-post");
     });
 
-    // ---------- Image ----------
+    // ----------- Image ----------
     const img = document.createElement("img");
     img.src = post.imageUrl || (post.imageUrls && post.imageUrls[0]) || PLACEHOLDER_POST;
     img.alt = post.title || "Post image";
