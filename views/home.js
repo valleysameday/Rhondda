@@ -5,7 +5,7 @@ export function init() {
 
   // ensure postsContainer exists
   const containerCheck = setInterval(() => {
-    if (document.getElementById("postsContainer")) {
+    if (document.getElementById("feed")) {
       clearInterval(containerCheck);
       initFeed();
     }
