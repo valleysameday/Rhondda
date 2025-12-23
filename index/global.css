@@ -3,23 +3,23 @@
 ----------------------------- */
 @font-face {
   font-family: 'Poppins';
-  src: url('/sites/fonts/Poppins-Regular.woff2') format('woff2'),
-       url('/sites/fonts/Poppins-Regular.woff') format('woff');
+  src: url('/site/fonts/Poppins-Regular.woff2') format('woff2'),
+       url('/site/fonts/Poppins-Regular.woff') format('woff');
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Poppins';
-  src: url('/sites/fonts/Poppins-Medium.woff2') format('woff2'),
-       url('/sites/fonts/Poppins-Medium.woff') format('woff');
+  src: url('/site/fonts/Poppins-Medium.woff2') format('woff2'),
+       url('/site/fonts/Poppins-Medium.woff') format('woff');
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Bricolage Grotesque';
-  src: url('/sites/fonts/BricolageGrotesque-Regular.woff2') format('woff2');
+  src: url('/site/fonts/BricolageGrotesque-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
 }
