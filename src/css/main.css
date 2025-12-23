@@ -261,6 +261,87 @@ a:hover {
 .top-banners__item--minimal img {
   filter: grayscale(20%) brightness(1.1);
 }
+
+/* ===========================
+ 7.5..  Header (App-style)
+   =========================== */
+
+.header {
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-12) 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header__inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header__logo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.header__right {
+  display: flex;
+  gap: var(--space-12);
+}
+
+.header__icon {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: var(--space-4);
+  transition: opacity 0.2s ease;
+}
+
+.header__icon:hover {
+  opacity: 0.7;
+}
+
+/* ===========================
+     Smart Bar (Quick Actions)
+   =========================== */
+
+.smartbar {
+  background-color: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-12) 0;
+  position: sticky;
+  top: 60px; /* sits under header */
+  z-index: 999;
+}
+
+.smartbar__inner {
+  display: flex;
+  gap: var(--space-12);
+  align-items: center;
+}
+
+.smartbar__search {
+  flex: 1;
+  padding: var(--space-8) var(--space-12);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background-color: #fff;
+  font-size: 0.9rem;
+}
+
+.smartbar__search:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary-soft);
+}
+
+.smartbar__post-btn {
+  white-space: nowrap;
+}
 /* 8. Hint bubble (for AI-style tips) */
 .hint-bubble {
   margin-top: var(--space-8);
