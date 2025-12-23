@@ -149,35 +149,46 @@ a:hover {
   background-color: var(--color-primary-soft);
 }
 
-/* 6. Cards (base for posts, ads, dashboard panels, etc.) */
+/* ===========================
+   6. Cards (posts, ads, panels)
+   =========================== */
+
 .card {
   background-color: var(--color-surface);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-soft);
   border: 1px solid rgba(15, 23, 42, 0.03);
   padding: var(--space-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
 }
 
+/* Header */
 .card__header {
   margin-bottom: var(--space-8);
 }
 
+/* Title */
 .card__title {
   font-size: 1rem;
   font-weight: 600;
   margin-bottom: var(--space-4);
 }
 
+/* Subtitle */
 .card__subtitle {
   font-size: 0.8rem;
   color: var(--color-muted);
 }
 
+/* Body text */
 .card__body {
   font-size: 0.9rem;
   color: var(--color-text);
 }
 
+/* Footer */
 .card__footer {
   margin-top: var(--space-12);
   display: flex;
@@ -185,9 +196,60 @@ a:hover {
   align-items: center;
 }
 
-/* Variants we'll reuse later */
+/* ===========================
+   Post Card Enhancements
+   =========================== */
+
+/* Image */
+.card__img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+/* Price badge */
+.card__price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-top: var(--space-4);
+}
+
+/* Meta row (delivery, location, etc.) */
+.card__meta {
+  margin-top: var(--space-8);
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+/* Delivery badges */
+.card__delivery {
+  font-size: 0.8rem;
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--radius-pill);
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* Delivery variants */
+.card__delivery--help {
+  background-color: #e6f9e6;
+  color: #1b7a1b;
+}
+
+.card__delivery--collection {
+  background-color: #fff4e6;
+  color: #b36b00;
+}
+
+/* ===========================
+   Variants
+   =========================== */
+
 .card--post {
-  /* reserved for post card styling */
+  /* reserved for future post-specific styling */
 }
 
 .card--ad {
