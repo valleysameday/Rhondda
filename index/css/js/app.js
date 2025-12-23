@@ -1,4 +1,4 @@
-cggy/// /index/js/app.js
+/// /index/js/app.js
 import { getFirebase } from '/index/js/firebase.js';
 import { initUIRouter } from '/index/js/ui-router.js';
 
