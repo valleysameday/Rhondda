@@ -178,6 +178,72 @@
   </div>
 
 </div>
+ <div class="page container">
+
+  <h2 class="u-mb-16">Create a Listing</h2>
+
+  <form class="form">
+
+    <!-- Images -->
+    <div class="form__group">
+      <label class="form__label">Photos</label>
+      <input type="file" accept="image/*" multiple class="form__input">
+      <p class="form__hint">Add up to 6 photos</p>
+    </div>
+
+    <!-- Title -->
+    <div class="form__group">
+      <label class="form__label">Title</label>
+      <input type="text" class="form__input" placeholder="What are you selling?">
+    </div>
+
+    <!-- Price -->
+    <div class="form__group">
+      <label class="form__label">Price (£)</label>
+      <input type="number" class="form__input" placeholder="0.00">
+    </div>
+
+    <!-- Condition -->
+    <div class="form__group">
+      <label class="form__label">Condition</label>
+      <select class="form__select">
+        <option value="">Select condition</option>
+        <option>New</option>
+        <option>Like New</option>
+        <option>Used</option>
+        <option>Needs Repair</option>
+      </select>
+    </div>
+
+    <!-- Delivery -->
+    <div class="form__group">
+      <label class="form__label">Delivery Options</label>
+      <select class="form__select">
+        <option value="">Choose</option>
+        <option>Collection Only</option>
+        <option>Can Deliver</option>
+        <option>Delivery Available (extra cost)</option>
+      </select>
+    </div>
+
+    <!-- Description -->
+    <div class="form__group">
+      <label class="form__label">Description</label>
+      <textarea class="form__textarea" placeholder="Describe the item..."></textarea>
+    </div>
+
+    <!-- Location -->
+    <div class="form__group">
+      <label class="form__label">Location</label>
+      <input type="text" class="form__input" placeholder="e.g. Treorchy">
+    </div>
+
+    <!-- Submit -->
+    <button class="btn btn--primary u-mt-16">Post Listing</button>
+
+  </form>
+
+ </div>
     <!-- Test card to confirm CSS is working -->
     <div class="card">
       <h3 class="card__title">Welcome to Rhondda Noticeboard</h3>
