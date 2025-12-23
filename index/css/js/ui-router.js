@@ -1,4 +1,4 @@
-// /index/js/ui-router.js
+/// /index/js/ui-router.js
 // Central UI + SPA action router
 // This file MUST export initUIRouter
 
