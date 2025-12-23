@@ -1,14 +1,8 @@
-// /index/js/firebase.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-// --------------------------
-// CONFIG (Netlify env variables example)
-// Replace these with your Netlify environment variable names
-// process.env.YOUR_VAR_NAME is how Netlify exposes env vars in builds
-// --------------------------
 const firebaseConfig = {
   apiKey: window.PUBLIC_FIREBASE_API_KEY,
   authDomain: window.PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -18,16 +12,11 @@ const firebaseConfig = {
   appId: window.PUBLIC_FIREBASE_APP_ID
 };
 
-// --------------------------
-// INITIALIZE FIREBASE
-// --------------------------
 const app = initializeApp(firebaseConfig);
 
-// --------------------------
-// GLOBAL VARIABLES
-// --------------------------
-window.db = getFirestore(app);
-window.auth = getAuth(app);
-window.storage = getStorage(app);
+// ⭐ EXPORTS — this is what fixes your error
+export const db = getFirestore(app);
+export const auth = getAuth(app);
+export const storage = getStorage(app);
 
 console.log("Firebase initialised ✅");
