@@ -16,6 +16,63 @@
 <body>
 
     <!-- App Content will go here -->
+    <!-- App Content -->
+    <header class="main-header">
+        <div class="container flex-header">
+            <h1>Rhondda Noticeboard</h1>
+            <div id="auth-buttons">
+                <!-- We will use JS to show "Login" or "My Dashboard" here -->
+                <a href="login.html" class="btn btn-secondary">Login</a>
+                <button id="open-post-btn" class="btn btn-primary">+ Post Notice</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- 1. PWA Install Prompt (Hidden by default in ui.js) -->
+        <div id="pwa-install-banner" style="display:none;" class="card install-card">
+            <p>Get the Rhondda Noticeboard app for a better experience!</p>
+            <button id="pwa-install-btn" class="btn btn-upgrade">Install App</button>
+        </div>
+
+        <!-- 2. The Notice Feed -->
+        <section class="feed-section">
+            <div class="feed-header">
+                <h2>Local Notices</h2>
+                <select id="filter-category" class="filter-dropdown">
+                    <option value="all">All Categories</option>
+                    <option value="general">General</option>
+                    <option value="events">Events</option>
+                    <option value="buy-sell">Buy/Sell</option>
+                </select>
+            </div>
+
+            <!-- This is where our JS will inject the live Firebase notices -->
+            <div id="notices-container" class="notices-grid">
+                <p class="loading-text">Loading local notices...</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- 3. The "Post a Notice" Modal (The popup) -->
+    <dialog id="post-modal" class="modal">
+        <div class="modal-content">
+            <h2>Post to the Valley</h2>
+            <form id="notice-form">
+                <input type="text" id="notice-title" placeholder="Title (e.g. Free Wood in Tonypandy)" required>
+                <textarea id="notice-desc" placeholder="Details..." required></textarea>
+                <select id="notice-cat">
+                    <option value="general">General</option>
+                    <option value="events">Events</option>
+                    <option value="buy-sell">Buy/Sell</option>
+                </select>
+                <div class="modal-actions">
+                    <button type="button" id="close-modal" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Post Now</button>
+                </div>
+            </form>
+        </div>
+    </dialog>
 
     <!-- 3. Modular JS -->
   <script>
