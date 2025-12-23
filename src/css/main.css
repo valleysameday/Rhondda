@@ -524,26 +524,25 @@ a:hover {
   resize: vertical;
 }
 
-
 /* Feed layout */
 .feed {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr; /* 2 per row by default */
   gap: var(--space-16);
   margin-top: var(--space-24);
 }
 
-/* Mobile: 2 items per row */
+/* Mobile: still 2 items per row */
 @media (max-width: 600px) {
   .feed {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-/* Desktop: full width */
+/* Desktop: KEEP 2 per row (fixes layout issue) */
 @media (min-width: 768px) {
   .feed {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -552,6 +551,8 @@ a:hover {
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
+  max-width: 500px;   /* keeps cards tidy on desktop */
+  margin: 0 auto;     /* centers cards in grid */
 }
 
 /* Image styling */
@@ -564,7 +565,7 @@ a:hover {
 
 /* Premium full-width business post */
 .feed__item--full {
-  grid-column: 1 / -1;
+  grid-column: 1 / -1; /* spans both columns */
 }
 
 .card--premium {
@@ -589,6 +590,7 @@ a:hover {
   padding: var(--space-12) var(--space-16);
   background-color: #ffffff;
 }
+
 /* 10. Simple utility classes */
 .u-flex {
   display: flex;
