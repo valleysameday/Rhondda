@@ -8,12 +8,15 @@ export async function loadView(view) {
   const app = document.getElementById("app");
   if (!app) return;
 
-  // fetch HTML
+  // fetch HTML and inject into DOM
   const html = await fetch(`/views/${view}.html`).then(r => r.text());
   app.innerHTML = html;
 
-  // dynamically import the view JS
+  // dynamically import the view JS AFTER HTML exists
   import(`/views/${view}.js?cache=${Date.now()}`)
+    .then(mod => {
+      if (mod.init) mod.init(); // call init() if it exists
+    })
     .catch(err => console.error("View JS error:", err));
 }
 
