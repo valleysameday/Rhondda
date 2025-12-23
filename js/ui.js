@@ -1,5 +1,5 @@
 /* UI LOGIC - js/js/ui.js */
-import { loadNotices } from './js/notices.js';
+import { loadNotices } from '/js/notices.js';
 
 // --- 1. MODAL CONTROL CENTER ---
 function setupModal(modalId, openBtnId) {
