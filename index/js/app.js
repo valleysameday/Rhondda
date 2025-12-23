@@ -8,9 +8,11 @@ export async function loadView(view) {
   const app = document.getElementById("app");
   if (!app) return;
 
+  // fetch HTML
   const html = await fetch(`/views/${view}.html`).then(r => r.text());
   app.innerHTML = html;
 
+  // dynamically import the view JS
   import(`/views/${view}.js?cache=${Date.now()}`)
     .catch(err => console.error("View JS error:", err));
 }
@@ -28,10 +30,12 @@ async function startApp() {
   window.db = db;
   window.storage = storage;
 
-  initUIRouter();   // ✅ FIXED
-  loadView("home");
+  initUIRouter();   // initialize router once
+  loadView("home"); // load initial view
 }
 
-document.readyState === "loading"
-  ? document.addEventListener("DOMContentLoaded", startApp)
-  : startApp();
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", startApp);
+} else {
+  startApp();
+}
