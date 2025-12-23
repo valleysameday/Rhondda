@@ -1,3 +1,12 @@
+console.log("✅ view-post.js loaded");
+
+if (window.selectedPostId) {
+  console.log("▶ Auto-loading post:", window.selectedPostId);
+  loadPost();
+} else {
+  console.warn("⚠ No selectedPostId set when view-post loaded");
+}
+
 async function loadPost() {
     console.log("loadPost() called");
     const container = document.getElementById("viewPostContent");
