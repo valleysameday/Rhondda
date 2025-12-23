@@ -56,7 +56,10 @@ function setupAvatarUpload(uid) {
       const url = await getDownloadURL(refPath);
       await updateDoc(doc(db, "businesses", uid), { avatarUrl: url });
       avatar.style.backgroundImage = `url('${url}')`;
-    } catch (err) { console.error("Avatar upload failed:", err); avatar.style.backgroundImage = `url('${PLACEHOLDER_AVATAR}')`; }
+    } catch (err) {
+      console.error("Avatar upload failed:", err);
+      avatar.style.backgroundImage = `url('${PLACEHOLDER_AVATAR}')`;
+    }
   };
   avatar.onerror = () => { avatar.style.backgroundImage = `url('${PLACEHOLDER_AVATAR}')`; };
 }
@@ -125,10 +128,14 @@ async function loadBusinessPosts(uid) {
         </div>
       `;
 
-      card.querySelector(".biz-delete").onclick = async () => { if(!confirm("Delete this ad?")) return; await deletePostAndImages(post); loadBusinessPosts(uid); };
+      card.querySelector(".biz-delete").onclick = async () => {
+        if(!confirm("Delete this ad?")) return;
+        await deletePostAndImages(post);
+        loadBusinessPosts(uid);
+      };
       card.querySelector(".biz-edit").onclick = () => openEditModal(post);
       card.querySelector(".biz-repost").onclick = () => openRepostModal(post);
-      card.querySelector(".biz-share").onclick = () => { alert("Copy link to share: "+window.location.href+"#"+post.id); };
+      card.querySelector(".biz-share").onclick = () => shareAd(post);
 
       box.appendChild(card);
     });
@@ -146,40 +153,82 @@ modal.innerHTML=`<div class="biz-modal-content"><span id="bizModalClose" style="
 document.body.appendChild(modal);
 
 const modalBody = $("bizModalBody");
-$("bizModalClose").onclick = ()=> hide(modal);
+
+$("bizModalClose").onclick = () => { hide(modal); modalBody.innerHTML = ""; };
+document.addEventListener("keydown", e => { if(e.key==="Escape") { hide(modal); modalBody.innerHTML=""; } });
 
 function openEditModal(post){
   modalBody.innerHTML = `
     <h3>Edit Ad</h3>
-    <input id="editAdTitle" type="text" value="${post.title||''}" style="width:100%"/>
-    <textarea id="editAdDesc" style="width:100%">${post.description||''}</textarea>
+    <input id="editAdTitle" type="text" value="${post.title||''}" style="width:100%;margin-bottom:8px"/>
+    <textarea id="editAdDesc" style="width:100%;margin-bottom:8px">${post.description||''}</textarea>
+    <label>Change Image:</label>
+    <input type="file" id="editAdImage" accept="image/*"/>
     <button id="saveEditAdBtn">Save</button>
   `;
   show(modal);
-  $("saveEditAdBtn").onclick = async ()=>{
-    await updateDoc(doc(db,"posts",post.id),{title:$("editAdTitle").value, description:$("editAdDesc").value});
-    hide(modal); loadBusinessPosts(auth.currentUser.uid);
+
+  $("saveEditAdBtn").onclick = async () => {
+    const updateData = {
+      title: $("editAdTitle").value,
+      description: $("editAdDesc").value
+    };
+
+    const imgInput = $("editAdImage");
+    if(imgInput.files[0]){
+      const file = imgInput.files[0];
+      const refPath = ref(storage, `posts/${post.id}.jpg`);
+      await uploadBytes(refPath, file);
+      const url = await getDownloadURL(refPath);
+      updateData.imageUrl = url;
+    }
+
+    await updateDoc(doc(db,"posts",post.id), updateData);
+    hide(modal); modalBody.innerHTML=""; loadBusinessPosts(auth.currentUser.uid);
   };
 }
 
 function openRepostModal(post){
   modalBody.innerHTML = `
     <h3>Repost Ad</h3>
-    <input id="repostAdTitle" type="text" value="${post.title||''}" style="width:100%"/>
-    <textarea id="repostAdDesc" style="width:100%">${post.description||''}</textarea>
+    <input id="repostAdTitle" type="text" value="${post.title||''}" style="width:100%;margin-bottom:8px"/>
+    <textarea id="repostAdDesc" style="width:100%;margin-bottom:8px">${post.description||''}</textarea>
+    <label>Add Image:</label>
+    <input type="file" id="repostAdImage" accept="image/*"/>
     <button id="saveRepostAdBtn">Post</button>
   `;
   show(modal);
-  $("saveRepostAdBtn").onclick = async ()=>{
-    await addDoc(collection(db,"posts"),{
+
+  $("saveRepostAdBtn").onclick = async () => {
+    if(!confirm("Are you sure you want to repost this ad?")) return;
+
+    const newData = {
       businessId: auth.currentUser.uid,
-      title:$("repostAdTitle").value,
-      description:$("repostAdDesc").value,
-      views:0,
-      leads:0
-    });
-    hide(modal); loadBusinessPosts(auth.currentUser.uid);
+      title: $("repostAdTitle").value,
+      description: $("repostAdDesc").value,
+      views: 0,
+      leads: 0
+    };
+
+    const imgInput = $("repostAdImage");
+    const docRef = await addDoc(collection(db,"posts"), newData);
+    if(imgInput.files[0]){
+      const file = imgInput.files[0];
+      const refPath = ref(storage, `posts/${docRef.id}.jpg`);
+      await uploadBytes(refPath, file);
+      const url = await getDownloadURL(refPath);
+      await updateDoc(doc(db,"posts",docRef.id), { imageUrl: url });
+    }
+
+    hide(modal); modalBody.innerHTML=""; loadBusinessPosts(auth.currentUser.uid);
   };
+}
+
+function shareAd(post){
+  const adUrl = `${window.location.origin}/ad/${post.id}`;
+  navigator.clipboard.writeText(adUrl)
+    .then(()=> alert("Ad link copied!"))
+    .catch(()=> alert("Failed to copy link."));
 }
 
 /* ------------------ LOGOUT ------------------ */
