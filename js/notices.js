@@ -15,6 +15,20 @@ export function loadNotices() {
         });
     });
 }
+import { db } from './firebase.js';
+import { doc, updateDoc, increment } from "www.gstatic.com";
+
+export async function trackView(noticeId) {
+    const noticeRef = doc(db, "notices", noticeId);
+    try {
+        // Use 'increment' so multiple people can click at once without errors
+        await updateDoc(noticeRef, {
+            views: increment(1)
+        });
+    } catch (err) {
+        console.error("Stats error:", err);
+    }
+}
 
 // 2. Create the HTML for each card
 function renderNoticeCard(data, id) {
