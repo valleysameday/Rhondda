@@ -1,12 +1,15 @@
 // /index/js/feed.js
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+/**
+ * Initialize the posts feed
+ */
 export async function initFeed() {
-  const container = document.getElementById("feed");
+  const container = document.getElementById("postsContainer");
 
   // 🛡️ Guard: view not loaded or ID missing
   if (!container) {
-    console.warn("initFeed skipped: #feed not found");
+    console.warn("initFeed skipped: #postsContainer not found");
     return;
   }
 
@@ -32,6 +35,10 @@ export async function initFeed() {
   }
 }
 
+/**
+ * Render a single post card
+ * Buttons use data-action and data-id for global UI router
+ */
 function renderPost(post) {
   const div = document.createElement("div");
   div.className = "card";
@@ -39,7 +46,6 @@ function renderPost(post) {
   div.innerHTML = `
     <h3>${post.title || "Untitled"}</h3>
     <p>${post.description || ""}</p>
-
     <div class="flex gap-2">
       <button class="pill-btn" data-id="${post.id}" data-action="edit">Edit</button>
       <button class="pill-btn" data-id="${post.id}" data-action="repost">Repost</button>
@@ -49,3 +55,18 @@ function renderPost(post) {
 
   return div;
 }
+
+/* ---------------------------------
+   OPTIONAL GLOBAL HANDLERS
+---------------------------------- */
+window.edit = function(id) {
+  console.log("Edit post", id);
+};
+
+window.repost = function(id) {
+  console.log("Repost post", id);
+};
+
+window.share = function(id) {
+  console.log("Share post", id);
+};
