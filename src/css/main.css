@@ -207,24 +207,59 @@ a:hover {
   overflow-x: auto;
   gap: var(--space-8);
   padding: var(--space-8) var(--space-16);
+  scroll-behavior: smooth;
 }
 
+/* Base banner item */
 .top-banners__item {
   flex: 0 0 auto;
-  font-size: 0.8rem;
-  padding: var(--space-8) var(--space-12);
-  border-radius: var(--radius-pill);
-  background-color: var(--color-primary-soft);
-  color: #02415c;
-  white-space: nowrap;
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  position: relative;
+  background-color: transparent; /* no coloured pill background now */
 }
 
+/* Base image styling */
 .top-banners__img {
   height: 50px;
   width: auto;
   border-radius: var(--radius-md);
   object-fit: cover;
   display: block;
+}
+
+/* Variant A: full colour */
+.top-banners__item--full img {
+  filter: none;
+}
+
+/* Variant B: slightly faded */
+.top-banners__item--faded img {
+  opacity: 0.75;
+}
+
+/* Variant C: electric-blue gradient overlay */
+.top-banners__item--gradient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(0, 170, 255, 0.35),
+    rgba(0, 170, 255, 0.05)
+  );
+  pointer-events: none;
+}
+
+/* Variant D: pill-shaped image */
+.top-banners__item--pill img {
+  border-radius: var(--radius-pill);
+}
+
+/* Variant E: minimalist (flat, clean look) */
+.top-banners__item--minimal img {
+  filter: grayscale(20%) brightness(1.1);
 }
 /* 8. Hint bubble (for AI-style tips) */
 .hint-bubble {
