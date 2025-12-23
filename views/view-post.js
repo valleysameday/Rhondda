@@ -1,7 +1,6 @@
 console.log("✅ view-post.js loaded");
 
 import { getFirebase } from "/index/js/firebase/init.js";
-
 import {
   doc,
   getDoc,
@@ -9,48 +8,54 @@ import {
   increment
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+/* ---------------- CONSTANTS ---------------- */
+const PLACEHOLDER_IMG = "images/post-placeholder.jpg";
+
 let auth, db;
 
-/* ---------------- INIT FIREBASE FOR THIS VIEW ---------------- */
+/* ---------------- INIT ---------------- */
 getFirebase().then(fb => {
   auth = fb.auth;
   db = fb.db;
-
-  console.log("✅ Firebase ready in view-post");
+  console.log("🔥 Firebase ready in view-post");
 
   if (window.selectedPostId) {
     console.log("▶ Auto-loading post:", window.selectedPostId);
     loadPost();
   } else {
     console.warn("⚠ No selectedPostId set when view-post loaded");
-    const container = document.getElementById("viewPostContent");
-    if (container) container.textContent = "Post not found.";
   }
 });
 
-/* ---------------- LOAD POST ---------------- */
+/* ---------------- MAIN ---------------- */
 async function loadPost() {
-  console.log("loadPost() called");
+  console.log("🟢 loadPost() called");
 
   const container = document.getElementById("viewPostContent");
   if (!container) {
-    console.error("❌ viewPostContent container missing");
+    console.error("❌ viewPostContent not found");
     return;
   }
 
   container.innerHTML = "";
 
-  const postId = window.selectedPostId;
-  if (!postId) {
-    console.warn("❌ selectedPostId missing");
+  if (!window.selectedPostId) {
+    console.warn("❌ No selectedPostId");
     container.textContent = "Post not found.";
     return;
   }
 
-  console.log("📌 Loading post ID:", postId);
+  console.log("📌 Loading post ID:", window.selectedPostId);
 
-  const postRef = doc(db, "posts", postId);
-  const snap = await getDoc(postRef);
+  let snap;
+  try {
+    const ref = doc(db, "posts", window.selectedPostId);
+    snap = await getDoc(ref);
+  } catch (e) {
+    console.error("🔥 Firestore read failed:", e);
+    container.textContent = "Failed to load post.";
+    return;
+  }
 
   if (!snap.exists()) {
     console.warn("❌ Post does not exist");
@@ -59,24 +64,28 @@ async function loadPost() {
   }
 
   const post = snap.data();
-  console.log("✅ Post loaded:", post);
+  console.log("📦 Post data:", post);
 
-  // Increment views (fire & forget)
-  updateDoc(postRef, { views: increment(1) })
-    .then(() => console.log("👁 View incremented"))
-    .catch(err => console.error("Views update failed:", err));
+  /* Increment views */
+  try {
+    await updateDoc(doc(db, "posts", window.selectedPostId), {
+      views: increment(1)
+    });
+    console.log("👁️ View count incremented");
+  } catch (e) {
+    console.warn("⚠️ Failed to increment views:", e);
+  }
 
-  const isOwner = auth.currentUser?.uid === post.userId;
-
-  /* ---------------- Images ---------------- */
-  const images =
-    post.imageUrls?.length
-      ? post.imageUrls
-      : post.imageUrl
+  /* Images */
+  const images = post.imageUrls?.length
+    ? post.imageUrls
+    : post.imageUrl
       ? [post.imageUrl]
-      : [];
+      : [PLACEHOLDER_IMG];
 
-  /* ---------------- Seller ---------------- */
+  console.log("🖼 Images:", images);
+
+  /* Seller */
   let seller = null;
   if (post.userId) {
     try {
@@ -86,65 +95,39 @@ async function loadPost() {
         console.log("👤 Seller loaded:", seller);
       }
     } catch (e) {
-      console.warn("Seller load failed:", e);
+      console.warn("⚠️ Seller load failed:", e);
     }
   }
 
-  /* ---------------- Layout ---------------- */
+  /* ---------------- BUILD UI ---------------- */
   const layout = document.createElement("div");
   layout.className = "view-post-layout";
 
-  /* ---------- LEFT (Gallery) ---------- */
+  /* LEFT — GALLERY */
   const left = document.createElement("div");
   left.className = "view-post-left";
 
   const gallery = document.createElement("div");
   gallery.className = "gallery";
 
-  images.forEach((url, idx) => {
+  images.forEach((url, i) => {
     const slide = document.createElement("div");
     slide.className = "gallery-slide";
-    slide.dataset.index = idx;
 
     const img = document.createElement("img");
-    img.src = url || "/index/img/post-placeholder.png";
-    img.alt = `${post.title} image ${idx + 1}`;
+    img.src = url || PLACEHOLDER_IMG;
+    img.onerror = () => img.src = PLACEHOLDER_IMG;
+    img.alt = `${post.title || "Post"} image ${i + 1}`;
     img.loading = "lazy";
-    img.onerror = () => {
-      console.warn("🖼 Image failed:", img.src);
-      img.src = "/index/img/post-placeholder.png";
-    };
 
     slide.appendChild(img);
     gallery.appendChild(slide);
   });
 
   left.appendChild(gallery);
-
-  if (images.length > 1) {
-    const thumbs = document.createElement("div");
-    thumbs.className = "gallery-thumbs";
-
-    images.forEach((url, idx) => {
-      const btn = document.createElement("button");
-      btn.className = "thumb-btn";
-      btn.dataset.index = idx;
-
-      const img = document.createElement("img");
-      img.src = url || "/index/img/post-placeholder.png";
-      img.loading = "lazy";
-      img.onerror = () => (img.src = "/index/img/post-placeholder.png");
-
-      btn.appendChild(img);
-      thumbs.appendChild(btn);
-    });
-
-    left.appendChild(thumbs);
-  }
-
   layout.appendChild(left);
 
-  /* ---------- RIGHT (Content) ---------- */
+  /* RIGHT — CONTENT */
   const right = document.createElement("div");
   right.className = "view-post-right";
 
@@ -154,45 +137,28 @@ async function loadPost() {
 
   const avatar = document.createElement("img");
   avatar.className = "seller-header-avatar";
-  avatar.src = seller?.photoURL || "/index/img/default-avatar.png";
-  avatar.onerror = () => (avatar.src = "/index/img/default-avatar.png");
+  avatar.src = seller?.photoURL || PLACEHOLDER_IMG;
+  avatar.onerror = () => avatar.src = PLACEHOLDER_IMG;
 
   const info = document.createElement("div");
   info.className = "seller-header-info";
 
-  const postedBy = document.createElement("p");
-  postedBy.className = "posted-by";
-  postedBy.innerHTML = `Posted by <strong>${seller?.name || "Local Seller"}</strong>`;
+  info.innerHTML = `
+    <p class="posted-by">Posted by <strong>${seller?.name || "Local Seller"}</strong></p>
+    <p class="posted-on">Posted on Rhondda Noticeboard</p>
+  `;
 
-  const postedOn = document.createElement("p");
-  postedOn.className = "posted-on";
-  postedOn.textContent = "Posted on Rhondda Noticeboard";
-
-  const badges = document.createElement("div");
-  if (seller?.isBusiness) {
-    const b = document.createElement("span");
-    b.className = "badge business";
-    b.textContent = "Business";
-    badges.appendChild(b);
-  }
-  if (seller?.trusted) {
-    const t = document.createElement("span");
-    t.className = "badge trusted";
-    t.textContent = "Trusted";
-    badges.appendChild(t);
-  }
-
-  info.append(postedBy, postedOn, badges);
   header.append(avatar, info);
   right.appendChild(header);
 
-  /* Title & price */
+  /* Title */
   const h1 = document.createElement("h1");
-  h1.textContent = post.title;
+  h1.textContent = post.title || "Untitled post";
   right.appendChild(h1);
 
+  /* Price */
   if (post.price !== undefined) {
-    const price = document.createElement("div");
+    const price = document.createElement("h2");
     price.className = "post-price";
     price.textContent = post.price === 0 ? "FREE" : `£${post.price}`;
     right.appendChild(price);
@@ -201,71 +167,22 @@ async function loadPost() {
   /* Description */
   const desc = document.createElement("p");
   desc.className = "view-post-desc";
-  desc.textContent = post.description;
+  desc.textContent = post.description || "No description provided.";
   right.appendChild(desc);
 
-  /* Meta */
-  const meta = document.createElement("div");
-  meta.className = "view-post-meta";
+  /* Back button */
+  const backBtn = document.createElement("button");
+  backBtn.className = "secondary-btn";
+  backBtn.textContent = "← Back to home";
+  backBtn.onclick = () => {
+    console.log("↩ Back clicked");
+    window.navigateToHome();
+  };
 
-  ["category", "subcategory", "area"].forEach(f => {
-    if (post[f]) {
-      const p = document.createElement("p");
-      p.innerHTML = `<strong>${f}:</strong> ${post[f]}`;
-      meta.appendChild(p);
-    }
-  });
-
-  meta.innerHTML += `<p><strong>Views:</strong> ${(post.views || 0) + 1}</p>`;
-  right.appendChild(meta);
-
-  /* CTA */
-  const engageBtn = document.createElement("button");
-  engageBtn.className = "engage-btn";
-  engageBtn.textContent = `👍 I'm interested (${post.engagement || 0})`;
-  engageBtn.onclick = () => window.engagePost?.(postId);
-  right.appendChild(engageBtn);
-
-  /* Actions */
-  if (isOwner) {
-    const manage = document.createElement("button");
-    manage.className = "secondary-btn";
-    manage.textContent = "Manage this ad";
-    manage.onclick = window.navigateToDashboard;
-    right.appendChild(manage);
-  }
-
-  const back = document.createElement("button");
-  back.className = "secondary-btn";
-  back.textContent = "Back to home";
-  back.onclick = window.navigateToHome;
-  right.appendChild(back);
+  right.appendChild(backBtn);
 
   layout.appendChild(right);
   container.appendChild(layout);
 
-  setupGallery();
-}
-
-/* ---------------- GALLERY ---------------- */
-function setupGallery() {
-  const slides = document.querySelectorAll(".gallery-slide");
-  const thumbs = document.querySelectorAll(".thumb-btn");
-
-  if (!slides.length) return;
-
-  slides.forEach((s, i) => (s.style.display = i === 0 ? "block" : "none"));
-  thumbs[0]?.classList.add("active");
-
-  thumbs.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const i = btn.dataset.index;
-      slides.forEach(s => (s.style.display = "none"));
-      slides[i].style.display = "block";
-      thumbs.forEach(t => t.classList.remove("active"));
-      btn.classList.add("active");
-    });
-  });
-
-  console.log("🖼 Gallery ready");
+  console.log("✅ Post rendered successfully");
 }
