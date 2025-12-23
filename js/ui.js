@@ -1,31 +1,50 @@
-/* UI LOGIC - js/ui.js */
+/* UI LOGIC - js/js/ui.js */
+import { loadNotices } from './notices.js';
 
-// 1. Handle the "Post a Notice" Modal
-const modal = document.getElementById('post-modal');
-const openBtn = document.getElementById('open-post-btn');
-const closeBtn = document.getElementById('close-modal');
+// --- 1. MODAL CONTROL CENTER ---
+function setupModal(modalId, openBtnId) {
+    const modal = document.getElementById(modalId);
+    const openBtn = document.getElementById(openBtnId);
+    if (!modal) return;
 
-if (openBtn && modal) {
-    openBtn.addEventListener('click', () => {
-        modal.showModal(); // Standard 2025 way to open popups
+    // Open Modal
+    if (openBtn) {
+        openBtn.addEventListener('click', () => modal.showModal());
+    }
+
+    // Close Modal (Finds any button with class "close-btn" or the ID "close-modal")
+    const closeButtons = modal.querySelectorAll('.close-btn, #close-modal');
+    closeButtons.forEach(btn => {
+        btn.addEventListener('click', () => modal.close());
+    });
+
+    // Close if clicking the dark background
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.close();
     });
 }
 
-if (closeBtn && modal) {
-    closeBtn.addEventListener('click', () => {
-        modal.close();
-    });
-}
+// Initialize all your modals
+setupModal('post-modal', 'open-post-btn');
+setupModal('login-modal', 'open-login-btn');
+setupModal('signup-modal', 'switch-to-signup'); // Opens signup from the login link
 
-// 2. Handle the PWA "Install" Button
-// This only shows the button if the user's phone/browser supports installing it
+// --- 2. START THE ENGINE ---
+// This stops the "Loading the valley's notices..." message
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("UI Ready - Starting Notice Feed...");
+    loadNotices(); 
+});
+
+// --- 3. PWA INSTALL LOGIC ---
 let deferredPrompt;
 const installBtn = document.getElementById('pwa-install-btn');
+const installBanner = document.getElementById('pwa-install-banner');
 
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    if (installBtn) installBtn.style.display = 'block'; 
+    if (installBanner) installBanner.style.display = 'block'; 
 });
 
 if (installBtn) {
@@ -33,20 +52,17 @@ if (installBtn) {
         if (deferredPrompt) {
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                installBtn.style.display = 'none';
-            }
+            if (outcome === 'accepted') installBanner.style.display = 'none';
             deferredPrompt = null;
         }
     });
 }
 
-// 3. Simple Loading Spinner Helper
-// Use this to show users something is happening when they click "Post"
-export function toggleLoading(buttonId, isLoading) {
+// --- 4. HELPERS ---
+export function toggleLoading(buttonId, isLoading, originalText = 'Submit') {
     const btn = document.getElementById(buttonId);
     if (btn) {
         btn.disabled = isLoading;
-        btn.innerHTML = isLoading ? 'Processing...' : 'Submit';
+        btn.innerHTML = isLoading ? '<span class="spinner"></span> Processing...' : originalText;
     }
 }
