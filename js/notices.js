@@ -11,22 +11,30 @@ import {
 
 // 1. Listen for Live Updates
 export function loadNotices() {
+    console.log("loadNotices() STARTED");
+
     const container = document.getElementById('notices-container');
     const q = query(collection(db, "notices"), orderBy("timestamp", "desc"));
-    
+
+    console.log("Firestore query created:", q);
+
     onSnapshot(q, (snapshot) => {
+        console.log("🔥 SNAPSHOT RECEIVED:", snapshot.size);
+
         if (snapshot.empty) {
             container.innerHTML = "<p>No notices yet. Be the first to post!</p>";
             return;
         }
-        
-        container.innerHTML = ""; 
+
+        container.innerHTML = "";
         snapshot.forEach((doc) => {
             const data = doc.data();
+            console.log("Doc:", doc.id, data);
             renderNoticeCard(data, doc.id, container);
         });
+
     }, (error) => {
-        console.error("Firebase Error:", error);
+        console.error("❌ SNAPSHOT ERROR:", error);
         container.innerHTML = "<p>Error loading notices. Check database rules.</p>";
     });
 }
@@ -53,15 +61,6 @@ function renderNoticeCard(data, id, container) {
     `;
     container.appendChild(card);
 }
-
-
-console.log("loadNotices() STARTED");
-
-onSnapshot(q, (snapshot) => {
-    console.log("🔥 SNAPSHOT RECEIVED:", snapshot.size);
-}, (error) => {
-    console.error("❌ SNAPSHOT ERROR:", error);
-});
 
 // 3. Stats Tracking
 export async function trackView(noticeId) {
