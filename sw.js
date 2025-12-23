@@ -1,18 +1,31 @@
 // Service Worker for Rhondda Noticeboard
-const CACHE_NAME = 'rhondda-v1';
+const CACHE_NAME = 'rhondda-v2';
 
-// We tell the browser to install the worker
+// Install
 self.addEventListener('install', (event) => {
   console.log('SW: Installed');
   self.skipWaiting();
 });
 
-// We tell the browser to activate the worker
+// Activate
 self.addEventListener('activate', (event) => {
   console.log('SW: Active');
 });
 
-// This handles the "Fetch" events to stop the 404 error
+// Fetch handler
 self.addEventListener('fetch', (event) => {
+  const url = event.request.url;
+
+  // 🔥 IMPORTANT: Do NOT intercept Firebase or Google API requests
+  if (
+    url.includes('firestore.googleapis.com') ||
+    url.includes('googleapis.com') ||
+    url.includes('gstatic.com') ||
+    url.includes('google.com')
+  ) {
+    return; // Let the browser handle these normally
+  }
+
+  // Default behaviour: just fetch normally
   event.respondWith(fetch(event.request));
 });
