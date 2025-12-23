@@ -47,18 +47,18 @@ body {
 }
 
 .biz-type-badge {
-  background: rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.15);
   padding: 0.25rem 0.7rem;
   border-radius: 999px;
   font-size: 0.8rem;
-  border: 1px solid rgba(255,255,255,0.25);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 /* ============================
    LOGOUT BUTTON
 ============================ */
 .biz-logout-btn {
-  background: rgba(0,0,0,0.25);
+  background: rgba(0, 0, 0, 0.25);
   border: none;
   padding: 0.45rem 0.9rem;
   color: white;
@@ -70,7 +70,7 @@ body {
 }
 
 .biz-logout-btn:hover {
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   transform: translateY(-1px);
 }
 
@@ -152,7 +152,6 @@ body {
   font-size: 1.1rem;
 }
 
-/* Edit profile button */
 .biz-edit-profile-btn {
   background: #e8f0ff;
   color: #003366;
@@ -167,22 +166,26 @@ body {
   background: #dce7ff;
 }
 
-/* VIEW MODE */
-.biz-profile-view {
+/* ============================
+   PROFILE VIEW & EDIT
+============================ */
+.biz-profile-view,
+.biz-profile-edit {
   border-top: 1px solid #f1f1f1;
   padding-top: 0.8rem;
 }
 
-.biz-profile-line {
+.biz-profile-line,
+.biz-profile-row {
   display: flex;
   flex-direction: column;
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.8rem;
 }
 
 .biz-profile-label {
-  font-size: 0.8rem;
-  color: #777;
-  margin-bottom: 0.1rem;
+  font-size: 0.85rem;
+  margin-bottom: 0.2rem;
+  color: #555;
 }
 
 .biz-profile-value {
@@ -195,24 +198,6 @@ body {
 
 .biz-profile-line-bio .biz-profile-value {
   min-height: 40px;
-}
-
-/* EDIT MODE */
-.biz-profile-edit {
-  border-top: 1px solid #f1f1f1;
-  padding-top: 0.8rem;
-}
-
-.biz-profile-row {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 0.8rem;
-}
-
-.biz-profile-row label {
-  font-size: 0.85rem;
-  margin-bottom: 0.2rem;
-  color: #555;
 }
 
 .biz-profile-row input,
@@ -237,7 +222,6 @@ body {
   resize: vertical;
 }
 
-/* EDIT MODE ACTIONS */
 .biz-profile-edit-actions {
   display: flex;
   gap: 0.6rem;
@@ -268,17 +252,6 @@ body {
   border: none;
   cursor: pointer;
   font-size: 0.9rem;
-}
-
-/* FEEDBACK TEXT */
-.biz-feedback-text {
-  margin-top: 0.5rem;
-  font-size: 0.85rem;
-  min-height: 18px;
-}
-
-.biz-feedback-success {
-  color: #2a8f2a;
 }
 
 /* ============================
@@ -345,47 +318,45 @@ body {
   gap: 0.9rem;
 }
 
-.biz-card {
-  background: white;
+#bizPosts .biz-card {
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
   border-radius: 12px;
-  padding: 0.7rem;
-  display: flex;
-  gap: 0.7rem;
-  align-items: flex-start;
   box-shadow: 0 8px 22px rgba(0,0,0,0.04);
 }
 
-.biz-img {
-  width: 86px;
-  height: 86px;
+#bizPosts .biz-card img {
+  width: 100%;
+  max-height: 200px; /* limits huge images */
   object-fit: cover;
-  border-radius: 8px;
-  flex-shrink: 0;
+  display: block;
+  border-radius: 12px 12px 0 0;
 }
 
-.biz-info h3 {
+#bizPosts .biz-info {
+  padding: 0.6rem 0.8rem;
+}
+
+#bizPosts .biz-info h3 {
   margin: 0 0 0.25rem;
-  font-size: 0.98rem;
+  font-size: 1rem;
 }
 
-.biz-info p {
+#bizPosts .biz-info p {
   margin: 0 0 0.3rem;
   font-size: 0.85rem;
   color: #444;
 }
 
-.biz-info small {
-  font-size: 0.8rem;
+#bizPosts .biz-info small {
+  font-size: 0.75rem;
   color: #777;
 }
 
-.biz-actions {
-  margin-left: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-
+/* ============================
+   OTHER CARDS & ELEMENTS
+============================ */
 .biz-btn {
   padding: 0.3rem 0.6rem;
   border: none;
@@ -394,16 +365,9 @@ body {
   font-size: 0.8rem;
 }
 
-.biz-edit {
-  background: #ffc107;
-}
+.biz-edit { background: #ffc107; }
+.biz-delete { background: #ff4d4d; color: white; }
 
-.biz-delete {
-  background: #ff4d4d;
-  color: white;
-}
-
-/* EMPTY STATE */
 .biz-empty-msg {
   color: #666;
   padding: 1rem 0.3rem;
@@ -433,7 +397,11 @@ body {
 
 .biz-logout-card p {
   margin: 0 0 0.2rem;
-  }
+}
+
+/* ============================
+   AVATAR
+============================ */
 .biz-avatar-section {
   text-align: center;
   margin-bottom: 20px;
@@ -464,48 +432,4 @@ body {
   font-size: 12px;
   color: #777;
   margin-top: 6px;
-}
-.gallery-slide img {
-  width: 100%;       /* fit container width */
-  max-height: 300px; /* limit height */
-  object-fit: cover; /* crop nicely if too tall */
-  border-radius: 8px;
-}
-
-
-/* ============================
-   BUSINESS ADS GRID POSTS
-============================ */
-#bizPosts .biz-card {
-  flex-direction: column;       /* stack image on top of text */
-  padding: 0;
-  overflow: hidden;
-}
-
-#bizPosts .biz-card img {
-  width: 100%;                  /* full width of the card */
-  max-height: 200px;            /* cap the height */
-  object-fit: cover;            /* crop nicely if image is big */
-  display: block;
-  border-radius: 12px 12px 0 0; /* rounded top corners */
-}
-
-#bizPosts .biz-info {
-  padding: 0.6rem 0.8rem;
-}
-
-#bizPosts .biz-info h3 {
-  margin: 0 0 0.25rem;
-  font-size: 1rem;
-}
-
-#bizPosts .biz-info p {
-  margin: 0 0 0.3rem;
-  font-size: 0.85rem;
-  color: #444;
-}
-
-#bizPosts .biz-info small {
-  font-size: 0.75rem;
-  color: #777;
 }
