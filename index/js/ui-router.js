@@ -15,6 +15,7 @@ export function initUIRouter() {
 
     const action = btn.dataset.action;
     const value = btn.dataset.value;
+    const id = btn.dataset.id;  // for posts
 
     switch (action) {
       case "navigate":
@@ -31,6 +32,19 @@ export function initUIRouter() {
 
       case "logout":
         window.logoutUser?.();
+        break;
+
+      // NEW: Feed post actions
+      case "edit":
+        if (id) window.editAd?.(id);
+        break;
+
+      case "repost":
+        if (id) window.repostAd?.(id);
+        break;
+
+      case "share":
+        if (id) window.shareAd?.(id);
         break;
 
       default:
