@@ -1,0 +1,273 @@
+/* ==========================================
+   GLOBAL CSS — Shared across all pages
+   Fonts, colors, variables, common layout
+========================================== */
+
+/* -----------------------------
+   FONTS
+----------------------------- */
+@font-face {
+  font-family: 'Poppins';
+  src: url('../fonts/Poppins-Regular.woff2') format('woff2'),
+       url('../fonts/Poppins-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('../fonts/Poppins-Medium.woff2') format('woff2'),
+       url('../fonts/Poppins-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('../fonts/BricolageGrotesque-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* -----------------------------
+   ROOT VARIABLES
+----------------------------- */
+:root {
+  --brand-primary: #FF7EB3;
+  --brand-secondary: #FF7E5F;
+  --brand-dark: #1E293B;
+  --bg-main: #F2F4F5;
+  --surface: #FFFFFF;
+  --surface-glass: rgba(255, 255, 255, 0.9);
+  --border-soft: #E2E8F0;
+  --text-main: #111111;
+  --text-muted: #64748B;
+  --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+  --border-radius: 14px;
+  --pill-radius: 999px;
+}
+
+/* -----------------------------
+   GLOBAL ELEMENTS
+----------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+  background: var(--bg-main);
+  color: var(--text-main);
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* -----------------------------
+   HEADERS & NAV
+----------------------------- */
+header {
+  background: linear-gradient(135deg, #FF7EB3, #FF758C);
+  color: #fff;
+  text-align: center;
+  padding: 15px 10px 45px;
+  position: relative;
+  z-index: 10;
+}
+
+header img.logo {
+  height: 60px;
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / .1));
+}
+
+nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+/* -----------------------------
+   FOOTER
+----------------------------- */
+footer {
+  margin-top: auto;
+  background: #fff;
+  border-top: 1px solid var(--border-soft);
+  padding: 40px 20px 120px;
+  text-align: center;
+}
+
+footer a {
+  color: var(--brand-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* -----------------------------
+   BUTTONS
+----------------------------- */
+button,
+.btn {
+  border: none;
+  border-radius: var(--pill-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.primary-btn {
+  background: var(--brand-primary);
+  color: #fff;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.primary-btn:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
+.secondary-btn {
+  background: #e2e8f0;
+  color: var(--text-main);
+  padding: 6px 14px;
+  font-size: 0.85rem;
+}
+
+.pill-btn {
+  border-radius: var(--pill-radius);
+  padding: 4px 12px;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+/* -----------------------------
+   CARDS & GRIDS
+----------------------------- */
+.card {
+  background: var(--surface);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.cards-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+/* -----------------------------
+   BADGES
+----------------------------- */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-right: 5px;
+  background: var(--brand-primary);
+  color: #fff;
+}
+
+.badge.trusted {
+  background: #10B981;
+}
+
+/* -----------------------------
+   TYPOGRAPHY
+----------------------------- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  margin-bottom: 0.5rem;
+  color: var(--brand-dark);
+}
+
+p, span, li, label {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-weight: 400;
+}
+
+/* Headings weights */
+h1 { font-size: 2rem; font-weight: 400; }
+h2 { font-size: 1.5rem; font-weight: 400; }
+h3 { font-size: 1.2rem; font-weight: 400; }
+
+/* -----------------------------
+   FORMS & INPUTS
+----------------------------- */
+input, textarea, select {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fafafa;
+  transition: all 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px rgba(255, 126, 179, 0.15);
+  outline: none;
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* -----------------------------
+   UTILITIES
+----------------------------- */
+.flex { display: flex; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.text-center { text-align: center; }
+.hidden { display: none !important; }
+.rounded { border-radius: var(--border-radius); }
+.shadow-md { box-shadow: var(--shadow-md); }
+
+/* -----------------------------
+   MEDIA QUERIES
+----------------------------- */
+@media (max-width: 600px) {
+  .cards-grid { grid-template-columns: 1fr; }
+  header { padding: 10px; }
+}
+
+@media (min-width: 1024px) {
+  .cards-grid { gap: 20px; }
+}
