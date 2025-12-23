@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* 1. Modern Reset & 2025 Standards */
+/* 1. Global Reset & Modern Setup */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -8,38 +8,40 @@
 }
 
 :root {
-  /* Dynamic Color Palette */
+  /* 2025 Fluid Palette */
   --color-primary: #00aaff;
   --color-primary-soft: color-mix(in srgb, var(--color-primary), white 90%);
-  --color-bg: #f8fafc;
+  --color-primary-dark: color-mix(in srgb, var(--color-primary), black 20%);
+  --color-bg: #f7f9fc;
   --color-surface: #ffffff;
-  --color-text: #0f172a;
+  --color-text: #1e293b;
   --color-muted: #64748b;
   --color-border: #e2e8f0;
+  --color-danger: #ef4444;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
   
-  /* Modern Spacing Scale */
+  /* Modern Tokens */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 9999px;
+  
   --space-4: 0.25rem;
   --space-8: 0.5rem;
   --space-12: 0.75rem;
   --space-16: 1rem;
+  --space-20: 1.25rem;
   --space-24: 1.5rem;
   --space-32: 2rem;
   
-  /* Radii & Shadows */
-  --radius-md: 12px;
-  --radius-lg: 20px;
-  --radius-pill: 9999px;
-  --shadow-soft: 0 2px 8px -2px rgba(15, 23, 42, 0.08);
-  --shadow-md: 0 12px 16px -4px rgba(15, 23, 42, 0.08);
-  
-  --max-width: 1200px;
+  --shadow-soft: 0 2px 10px -2px rgba(15, 23, 42, 0.08);
+  --shadow-medium: 0 10px 15px -3px rgba(15, 23, 42, 0.1);
+  --max-width: 1200px; /* Increased for wider cards */
 }
 
-/* 2. Base Typography */
-html {
-  scroll-behavior: smooth;
-  interpolate-size: allow-keywords; /* 2025 Height Transition Support */
-}
+/* 2. Base Styles */
+html, body { height: 100%; scroll-behavior: smooth; }
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -47,15 +49,19 @@ body {
   color: var(--color-text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  interpolate-size: allow-keywords; /* 2025 smooth auto-heights */
 }
 
-h1, h2, h3 { 
-  font-weight: 700; 
-  line-height: 1.2;
-  margin-block-end: var(--space-8);
-}
+h1, h2, h3, h4 { font-weight: 700; color: var(--color-text); line-height: 1.2; }
+h1 { font-size: clamp(1.5rem, 5vw, 2rem); }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+p { font-size: 0.95rem; }
+a { color: var(--color-primary); text-decoration: none; transition: 0.2s; }
+a:hover { color: var(--color-primary-dark); }
 
-/* 3. Layout Container */
+/* 3. Containers */
+.page { min-height: 100vh; display: flex; flex-direction: column; }
 .container {
   width: 100%;
   max-width: var(--max-width);
@@ -63,116 +69,34 @@ h1, h2, h3 {
   padding-inline: var(--space-16);
 }
 
-/* 4. The Feed: 2 Columns Side-by-Side */
-.feed {
-  display: grid;
-  /* Strictly 2 columns by default, expanding to fit wide containers */
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-16);
-  margin-block-start: var(--space-24);
-  align-items: start;
-}
-
-@media (min-width: 1024px) {
-  .feed { gap: var(--space-24); }
-}
-
-/* 5. Feed Items & Subgrid Logic */
-.feed__item {
-  grid-row: span 3; /* Title, Body, Footer align */
-  display: grid;
-  grid-template-rows: subgrid;
-  height: 100%;
-}
-
-/* Forces Business/Premium to take full row width */
-.feed__item--full {
-  grid-column: 1 / -1;
-}
-
-/* 6. Refined Card Component */
-.card {
-  container-type: inline-size; /* Modular responsiveness */
-  background-color: var(--color-surface);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-soft);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.card__header, .card__body, .card__footer {
-  padding-inline: var(--space-16);
-}
-
-.card__header { padding-block-start: var(--space-16); }
-.card__footer { 
-  padding-block: var(--space-12);
-  margin-block-start: auto; 
-  border-block-start: 1px solid var(--color-border);
-}
-
-/* 7. Image Handling */
-.card__img {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  background-color: var(--color-bg);
-}
-
-/* 8. Variants */
-.card--ad {
-  background-color: light-dark(#f0f8ff, #111d27);
-  border: 2px dashed var(--color-primary-soft);
-}
-
-.card--premium {
-  border: 2px solid var(--color-primary);
-  background: var(--color-surface);
-}
-
-/* Premium Layout: Side-by-side text/image if wide */
-@container (min-width: 600px) {
-  .card--premium .card__banner {
-    display: grid;
-    grid-template-columns: 1fr 1.5fr;
-  }
-  
-  .card--premium .card__banner-img {
-    height: 100%;
-    aspect-ratio: auto;
-  }
-}
-
-/* 9. Navigation & UI Elements */
+/* 4. Navigation & Headers */
 .header {
+  background: color-mix(in srgb, var(--color-surface), transparent 5%);
+  backdrop-filter: blur(10px);
+  border-block-end: 1px solid var(--color-border);
+  padding-block: var(--space-12);
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: color-mix(in srgb, var(--color-surface), transparent 5%);
-  backdrop-filter: blur(12px);
-  border-block-end: 1px solid var(--color-border);
-  padding-block: var(--space-12);
 }
 
-.header__inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+.header__inner { display: flex; justify-content: space-between; align-items: center; }
+.header__logo { font-size: 1.25rem; font-weight: 800; color: var(--color-primary); letter-spacing: -0.02em; }
+.header__right { display: flex; gap: var(--space-12); }
+.header__icon { background: none; border: none; font-size: 1.4rem; cursor: pointer; padding: var(--space-4); }
 
+.top-banners { background: var(--color-surface); border-block-end: 1px solid var(--color-border); }
+.top-banners__inner { display: flex; overflow-x: auto; gap: var(--space-12); padding: var(--space-12); scrollbar-width: none; }
+.top-banners__item { flex: 0 0 auto; border-radius: var(--radius-md); overflow: hidden; position: relative; }
+.top-banners__img { height: 60px; width: auto; object-fit: cover; display: block; transition: 0.3s; }
+
+/* 5. Smartbar & Filter UI */
 .smartbar {
   background: var(--color-bg);
+  border-block-end: 1px solid var(--color-border);
   padding-block: var(--space-12);
   position: sticky;
-  top: 64px; /* Adjust based on header height */
+  top: 64px;
   z-index: 999;
 }
 
@@ -181,39 +105,125 @@ h1, h2, h3 {
   padding: var(--space-12) var(--space-20);
   border-radius: var(--radius-pill);
   border: 1px solid var(--color-border);
+  background: var(--color-surface);
   font-size: 0.95rem;
-  transition: all 0.2s ease;
+  transition: 0.2s;
 }
 
-.smartbar__search:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 4px var(--color-primary-soft);
+.smartbar__search:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 4px var(--color-primary-soft); }
+
+.smartbar__chips { display: flex; gap: var(--space-8); overflow-x: auto; padding-block: var(--space-12) var(--space-4); }
+.chip {
+  padding: var(--space-8) var(--space-16);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.chip:hover { border-color: var(--color-primary); color: var(--color-primary); }
+
+/* 6. The Grid System */
+.feed {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Force side-by-side */
+  gap: var(--space-20);
+  margin-block: var(--space-24) var(--space-32);
 }
 
-/* 10. Buttons */
+.feed__item {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 4;
+}
+
+.feed__item--full { grid-column: 1 / -1; }
+
+/* 7. Card Components */
+.card {
+  container-type: inline-size;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.card__img { 
+  width: 100%; 
+  aspect-ratio: 16 / 9; 
+  object-fit: cover; 
+  background: var(--color-border);
+}
+
+.card__header, .card__body, .card__footer { padding-inline: var(--space-16); }
+.card__header { padding-block-start: var(--space-16); }
+.card__footer { 
+  padding-block: var(--space-12); 
+  margin-block-start: auto; 
+  border-block-start: 1px solid var(--color-border);
+}
+
+/* Premium / Business Upgrade */
+.card--premium {
+  border: 2px solid var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.card--premium .card__banner {
+  display: flex;
+  flex-direction: column;
+}
+
+@container (min-width: 600px) {
+  .card--premium .card__banner {
+    flex-direction: row-reverse;
+  }
+  .card--premium .card__banner-img {
+    width: 40%;
+    aspect-ratio: auto;
+  }
+}
+
+.card--ad {
+  background: light-dark(#f0f8ff, #111d27);
+  border: 2px dashed var(--color-primary-soft);
+}
+
+/* 8. Interactive Elements */
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-8);
-  padding: var(--space-8) var(--space-20);
+  justify-content: center;
+  padding: var(--space-12) var(--space-24);
   border-radius: var(--radius-pill);
   font-weight: 600;
-  cursor: pointer;
-  transition: filter 0.2s;
+  font-size: 0.95rem;
   border: none;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-.btn--primary {
-  background: var(--color-primary);
-  color: white;
-}
+.btn--primary { background: var(--color-primary); color: white; box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary), transparent 60%); }
+.btn--primary:hover { transform: translateY(-1px); background: var(--color-primary-dark); }
 
-.btn:hover {
-  filter: brightness(1.1);
+/* 9. Forms */
+.form { display: flex; flex-direction: column; gap: var(--space-16); }
+.form__input, .form__textarea, .form__select {
+  padding: var(--space-12);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-family: inherit;
 }
+.form__input:focus { outline: none; border-color: var(--color-primary); }
 
-/* 11. Quickbar (Mobile Bottom Nav) */
+/* 10. Quickbar (Bottom Nav) */
 .quickbar {
   position: fixed;
   bottom: 0;
@@ -228,6 +238,26 @@ h1, h2, h3 {
   z-index: 2000;
 }
 
-/* Utility Classes */
+.quickbar__btn--post {
+  background: var(--color-primary);
+  color: white;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-block-start: -24px;
+  box-shadow: 0 4px 12px rgba(0, 170, 255, 0.4);
+}
+
+/* 11. Utilities */
 .u-text-muted { color: var(--color-muted); font-size: 0.85rem; }
-.u-mb-8 { margin-block-end: var(--space-8); }
+.u-mb-16 { margin-block-end: var(--space-16); }
+
+/* Mobile logic for Feed - ensures cards don't break on tiny screens */
+@media (max-width: 480px) {
+  .feed {
+    grid-template-columns: 1fr; /* Switch to 1 column on very small phones */
+  }
+}
