@@ -342,6 +342,72 @@ a:hover {
 .smartbar__post-btn {
   white-space: nowrap;
 }
+
+/* Smart Bar Extras */
+.smartbar__extras {
+  margin-top: var(--space-12);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+/* Category chips */
+.smartbar__chips {
+  display: flex;
+  gap: var(--space-8);
+  overflow-x: auto;
+  padding-bottom: var(--space-4);
+}
+
+.chip {
+  padding: var(--space-6) var(--space-12);
+  background-color: var(--color-primary-soft);
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.chip:hover {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+
+/* Location selector */
+.smartbar__location {
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+/* Weather widget */
+.smartbar__weather {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: 0.85rem;
+}
+
+/* Trending tags */
+.smartbar__trending {
+  display: flex;
+  gap: var(--space-8);
+  overflow-x: auto;
+}
+
+.trending-tag {
+  font-size: 0.8rem;
+  color: var(--color-primary);
+}
+
+/* AI suggestion */
+.smartbar__ai {
+  background-color: var(--color-primary-soft);
+  padding: var(--space-8) var(--space-12);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  border-left: 3px solid var(--color-primary);
+}
 /* 8. Hint bubble (for AI-style tips) */
 .hint-bubble {
   margin-top: var(--space-8);
