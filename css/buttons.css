@@ -1,0 +1,43 @@
+/* REUSABLE BUTTONS - css/buttons.css */
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 8px; /* Modern rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease; /* Smooth hover effect */
+  border: none;
+  min-width: 44px; /* Minimum size for mobile fingers */
+  min-height: 44px;
+}
+
+/* Main Post/Search Button */
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background-color: #0056b3; /* Slightly darker on hover */
+  transform: translateY(-2px); /* Subtle "pop" effect */
+}
+
+/* Cancel/Close Button */
+.btn-secondary {
+  background-color: var(--secondary);
+  color: var(--white);
+}
+
+.btn-secondary:hover {
+  background-color: #545b62;
+}
+
+/* Featured/Upgrade Button */
+.btn-upgrade {
+  background-color: #ffc107; /* Gold for premium */
+  color: #212529;
+  box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+}
