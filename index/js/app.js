@@ -14,11 +14,10 @@ export async function loadView(view) {
 
   // dynamically import the view JS AFTER HTML exists
   import(`/views/${view}.js?cache=${Date.now()}`)
-    .then(mod => {
-      if (mod.init) mod.init(); // call init() if it exists
-    })
-    .catch(err => console.error("View JS error:", err));
-}
+  .then(mod => {
+    if(mod.init) mod.init();  // call the view's init function
+  })
+  .catch(err => console.error("View JS error:", err));
 
 window.loadView = loadView;
 
