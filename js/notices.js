@@ -54,6 +54,15 @@ function renderNoticeCard(data, id, container) {
     container.appendChild(card);
 }
 
+
+console.log("loadNotices() STARTED");
+
+onSnapshot(q, (snapshot) => {
+    console.log("🔥 SNAPSHOT RECEIVED:", snapshot.size);
+}, (error) => {
+    console.error("❌ SNAPSHOT ERROR:", error);
+});
+
 // 3. Stats Tracking
 export async function trackView(noticeId) {
     const noticeRef = doc(db, "notices", noticeId);
