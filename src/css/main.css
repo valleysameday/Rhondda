@@ -1,4 +1,5 @@
-*,
+  
+  *,
 *::before,
 *::after {
   box-sizing: border-box;
@@ -58,7 +59,7 @@ body {
 
 /* 3. Typography */
 h1, h2, h3, h4 {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-text);
 }
 
@@ -216,7 +217,7 @@ a:hover {
 
 /* Base image styling */
 .top-banners__img {
-  height: 50px;
+  height: 110px;
   width: auto;
   border-radius: var(--radius-md);
   object-fit: cover;
@@ -548,15 +549,12 @@ a:hover {
 .feed__item--full {
   grid-column: 1 / -1; /* spans both columns */
 }
-.feed__item--full {
-  margin-left: calc(-1 * var(--space-12));
-  margin-right: calc(-1 * var(--space-12));
-}
+
 /* Premium card styling */
 .card--premium {
   background-color: var(--color-primary-soft);
-  border: 2px solid var(--color-primary);
-  padding: 0;
+  border: 1px solid var(--color-primary);
+  padding: 0.1;
   overflow: hidden;
   border-radius: var(--radius-md);
 }
@@ -584,7 +582,7 @@ a:hover {
 
 @media (min-width: 768px) {
   .card__banner-img {
-    width: 45%;      /* image takes right side */
+    width: 55%;      /* image takes right side */
     height: auto;    /* natural height on desktop */
   }
 }
@@ -596,7 +594,12 @@ a:hover {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: var(--space-8);
+  gap: vertical-align: text-outline: ;
+  -webkit-space: -8px;
+  -moz-space: -8px;
+  -ms-space: -8px;
+  -o-space: -8px;
+  space: -8px;
   flex: 1;
 }
 
@@ -651,7 +654,7 @@ a:hover {
 }
 
 /* 11. Responsive tweaks */
-@media (min-width: 768px) {
+@media (min-width: 890px) {
   h1 {
     font-size: 2rem;
   }
