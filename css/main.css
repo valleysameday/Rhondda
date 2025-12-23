@@ -1,6 +1,33 @@
-/* MODERN 2025 COMMUNITY UI - css/main.css */
+/* 1. LOAD LOCAL FONTS */
 
-/* 1. The Foundation */
+/* Heading Font: Playful & Fancy */
+@font-face {
+  font-family: 'Bricolage';
+  src: url('../fonts/BricolageGrotesque-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Body Font: Clean & Modern */
+@font-face {
+  font-family: 'Poppins';
+  src: url('../fonts/Poppins-Regular.woff2') format('woff2'),
+       url('../fonts/Poppins-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('../fonts/Poppins-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 2. THE FOUNDATION */
 :root {
   --brand: #007bff;
   --bg: #f4f7f9;
@@ -13,12 +40,23 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Inter', sans-serif;}
+  /* Set Poppins as the default for the whole site */
+  font-family: 'Poppins', sans-serif;
   background-color: var(--bg);
   color: var(--text);
   line-height: 1.6;
-  padding-bottom: 50px; /* Space for mobile nav */
+  padding-bottom: 50px; 
 }
+
+/* Use Bricolage for all Headings to make it look "Fancy" */
+h1, h2, h3, h4 {
+  font-family: 'Bricolage', sans-serif;
+  font-weight: normal;
+  letter-spacing: -0.5px;
+}
+
+.container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+
 
 .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
 
