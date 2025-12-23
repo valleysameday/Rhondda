@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rhondda Noticeboard</title>
+
+    <!-- 1. PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007bff">
+
+    <!-- 2. Modular CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/buttons.css">
+</head>
+<body>
+
+    <!-- App Content will go here -->
+
+    <!-- 3. Modular JS -->
+    <script type="module" src="js/firebase.js"></script>
+    <script>
+      // 4. Register Service Worker (The PWA engine)
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js');
+      }
+    </script>
+</body>
+</html>
