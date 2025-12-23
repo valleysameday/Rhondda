@@ -3,7 +3,7 @@
 /* Heading Font: Playful & Fancy */
 @font-face {
   font-family: 'Bricolage';
-  src: url('../fonts/BricolageGrotesque-Regular.woff2') format('woff2');
+  src: url('../site/fonts/BricolageGrotesque-Regular.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -12,8 +12,8 @@
 /* Body Font: Clean & Modern */
 @font-face {
   font-family: 'Poppins';
-  src: url('../fonts/Poppins-Regular.woff2') format('woff2'),
-       url('../fonts/Poppins-Regular.woff') format('woff');
+  src: url('../site/fonts/Poppins-Regular.woff2') format('woff2'),
+       url('../site/fonts/Poppins-Regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -21,7 +21,7 @@
 
 @font-face {
   font-family: 'Poppins';
-  src: url('../fonts/Poppins-Medium.woff2') format('woff2');
+  src: url('../site/fonts/Poppins-Medium.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
