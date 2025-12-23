@@ -1,5 +1,5 @@
-import { initFeed } from "/index/js/feed.js";
-import { initUIRouter } from "/index/js/ui-router.js";
+// /views/home.js
+import { initFeed } from '/index/js/feed.js';
 
-initFeed();       // ✅ Weather, categories, posts
-initUIRouter();   // ✅ Modals, action bar, category buttons
+// initialize feed AFTER the HTML is injected
+initFeed();
