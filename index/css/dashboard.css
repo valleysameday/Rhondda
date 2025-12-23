@@ -1,0 +1,99 @@
+/* ==========================================
+   DASHBOARD CSS — page-specific tweaks
+========================================== */
+
+/* -----------------------------
+   DASHBOARD LAYOUT
+----------------------------- */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-header h2 {
+  font-size: 1.5rem;
+  color: var(--brand-dark);
+}
+
+.dashboard-cards {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+/* -----------------------------
+   DASHBOARD SIDEBAR
+----------------------------- */
+.sidebar {
+  width: 250px;
+  background: var(--surface);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  box-shadow: var(--shadow-md);
+}
+
+.sidebar ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar li a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--border-radius);
+  transition: background 0.2s;
+}
+
+.sidebar li a:hover {
+  background: rgba(255, 126, 179, 0.1);
+}
+
+/* -----------------------------
+   DASHBOARD TABLES
+----------------------------- */
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.dashboard-table th,
+.dashboard-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.dashboard-table th {
+  background: #f9fafb;
+  font-weight: 600;
+}
+
+/* -----------------------------
+   RESPONSIVE DASHBOARD
+----------------------------- */
+@media (max-width: 1024px) {
+  .dashboard-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    width: 100%;
+    padding: 15px;
+  }
+}
