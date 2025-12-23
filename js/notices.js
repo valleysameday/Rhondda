@@ -1,6 +1,13 @@
-/* js/notices.js */
 import { db } from './firebase.js';
-import { collection, query, onSnapshot, orderBy, doc, updateDoc, increment } from "www.gstatic.com";
+import {
+    collection,
+    query,
+    onSnapshot,
+    orderBy,
+    doc,
+    updateDoc,
+    increment
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // 1. Listen for Live Updates
 export function loadNotices() {
@@ -13,7 +20,7 @@ export function loadNotices() {
             return;
         }
         
-        container.innerHTML = ""; // Clear the loading message
+        container.innerHTML = ""; 
         snapshot.forEach((doc) => {
             const data = doc.data();
             renderNoticeCard(data, doc.id, container);
@@ -29,8 +36,9 @@ function renderNoticeCard(data, id, container) {
     const card = document.createElement('div');
     card.className = 'card notice-card';
     
-    // Safety check for timestamp
-    const dateStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleDateString() : "Just now";
+    const dateStr = data.timestamp
+        ? new Date(data.timestamp.toDate()).toLocaleDateString()
+        : "Just now";
 
     card.innerHTML = `
         <div class="card-header">
@@ -46,7 +54,7 @@ function renderNoticeCard(data, id, container) {
     container.appendChild(card);
 }
 
-// 3. Stats Tracking (Income Proof)
+// 3. Stats Tracking
 export async function trackView(noticeId) {
     const noticeRef = doc(db, "notices", noticeId);
     try {
