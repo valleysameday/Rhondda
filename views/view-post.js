@@ -1,4 +1,4 @@
-.console.log("✅ view-post.js loaded");
+console.log("✅ view-post.js loaded");
 
 import { getFirebase } from "/index/js/firebase/init.js";
 import {
