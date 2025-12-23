@@ -10,7 +10,7 @@ if (window.selectedPostId) {
 async function loadPost() {
     console.log("loadPost() called");
     const container = document.getElementById("viewPostContent");
-    showPage('viewPostPage'); // Ensure page is visible
+     // Ensure page is visible
     container.innerHTML = ''; // clear previous
 
     if (!window.selectedPostId) {
