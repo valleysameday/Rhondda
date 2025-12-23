@@ -548,7 +548,10 @@ a:hover {
 .feed__item--full {
   grid-column: 1 / -1; /* spans both columns */
 }
-
+.feed__item--full {
+  margin-left: calc(-1 * var(--space-12));
+  margin-right: calc(-1 * var(--space-12));
+}
 /* Premium card styling */
 .card--premium {
   background-color: var(--color-primary-soft);
