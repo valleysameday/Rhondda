@@ -1,48 +1,78 @@
-// /index/js/ui.js
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+// /index/js/ui-router.js
+// Central UI + SPA action router
+// This file MUST export initUIRouter
 
-export function initUI() {
-  bindModals();
-  bindAuth();
-}
+export function initUIRouter() {
+  console.log("🧭 UI Router initialised");
 
-function bindModals() {
+  /* ---------------------------------
+     GLOBAL CLICK HANDLER
+     (event delegation – very important)
+  ---------------------------------- */
   document.addEventListener("click", e => {
-    const open = e.target.closest("[data-open]");
-    const close = e.target.closest("[data-close]");
+    const btn = e.target.closest("[data-action]");
+    if (!btn) return;
 
-    if (open) openModal(open.dataset.open);
-    if (close) closeModal(close.dataset.close);
+    const action = btn.dataset.action;
+    const value = btn.dataset.value;
+
+    switch (action) {
+      case "navigate":
+        if (value) window.loadView?.(value);
+        break;
+
+      case "open-screen":
+        if (value) window.openScreen?.(value);
+        break;
+
+      case "close-screens":
+        window.closeScreens?.();
+        break;
+
+      case "logout":
+        window.logoutUser?.();
+        break;
+
+      default:
+        console.warn("Unknown UI action:", action);
+    }
+  });
+
+  /* ---------------------------------
+     ESC KEY — CLOSE MODALS
+  ---------------------------------- */
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") {
+      window.closeScreens?.();
+    }
   });
 }
 
-function openModal(id) {
+/* ---------------------------------
+   OPTIONAL HELPERS (GLOBAL)
+---------------------------------- */
+
+/**
+ * Opens a modal/screen by id
+ * <div class="modal" id="login">
+ */
+window.openScreen = function (id) {
+  document.querySelectorAll(".modal.active")
+    .forEach(m => m.classList.remove("active"));
+
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  el.classList.add("active");
   document.body.classList.add("modal-open");
-  document.getElementById(id)?.classList.add("active");
-}
+};
 
-function closeModal(id) {
+/**
+ * Closes all modals/screens
+ */
+window.closeScreens = function () {
+  document.querySelectorAll(".modal.active")
+    .forEach(m => m.classList.remove("active"));
+
   document.body.classList.remove("modal-open");
-  document.getElementById(id)?.classList.remove("active");
-}
-
-function bindAuth() {
-  onAuthStateChanged(window.auth, user => {
-    window.currentUser = user || null;
-    document.body.classList.toggle("logged-in", !!user);
-  });
-}
-
-window.loginUser = async (email, password) =>
-  signInWithEmailAndPassword(window.auth, email, password);
-
-window.registerUser = async (email, password) =>
-  createUserWithEmailAndPassword(window.auth, email, password);
-
-window.resetPassword = async email =>
-  sendPasswordResetEmail(window.auth, email);
+};
