@@ -141,7 +141,7 @@ function setupProfileEditToggle(uid) {
 }
 
 /* ---------------------------------------------------
-   📦 LOAD BUSINESS ADS (WITH PLACEHOLDERS + LAZY LOAD)
+   📦 LOAD BUSINESS ADS (WITH SORTING)
 --------------------------------------------------- */
 async function loadBusinessPosts(uid) {
   try {
@@ -152,72 +152,71 @@ async function loadBusinessPosts(uid) {
     const box = $("bizPosts");
     box.innerHTML = "";
 
-    let adsCount = 0, totalViews = 0, totalLeads = 0;
-
     if (snap.empty) {
       box.innerHTML = `<p class="biz-empty-msg">No ads yet.</p>`;
-      $("bizStatAdsCount").textContent = adsCount;
-      $("bizStatTotalViews").textContent = totalViews;
-      $("bizStatLeads").textContent = totalLeads;
+      ["bizStatAdsCount", "bizStatTotalViews", "bizStatLeads"]
+        .forEach(id => $(id).textContent = "0");
       return;
     }
 
+    // Convert snapshot → array
+    const ads = [];
     snap.forEach(docSnap => {
-      const post = docSnap.data();
-      const id = docSnap.id;
+      ads.push({ id: docSnap.id, ...docSnap.data() });
+    });
 
-      adsCount++;
+    // 🔀 SORT OPTIONS (pick ONE)
+    ads.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+    // ads.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    // ads.sort((a, b) => (b.views || 0) - (a.views || 0));
+
+    let totalViews = 0;
+    let totalLeads = 0;
+
+    $("bizStatAdsCount").textContent = ads.length;
+
+    ads.forEach(post => {
       totalViews += post.views || 0;
       totalLeads += post.leads || 0;
-
-      const imgSrc = post.imageUrl || PLACEHOLDER_POST;
 
       const card = document.createElement("div");
       card.className = "biz-card";
 
-      const img = document.createElement("img");
-      img.src = imgSrc;
-      img.alt = post.title || "Ad image";
-      img.className = "biz-card-img";
-      img.loading = "lazy";
-      img.onerror = () => { img.src = PLACEHOLDER_POST; };
+      card.innerHTML = `
+        <img src="${post.imageUrl || PLACEHOLDER_POST}"
+             class="biz-card-img"
+             alt="${post.title || "Ad"}"
+             loading="lazy"
+             onerror="this.src='${PLACEHOLDER_POST}'">
 
-      const info = document.createElement("div");
-      const h3 = document.createElement("h3");
-      h3.textContent = post.title || "Untitled Ad";
-      const p = document.createElement("p");
-      p.textContent = post.description || "";
-      info.appendChild(h3);
-      info.appendChild(p);
+        <div class="biz-info">
+          <h3>${post.title || "Untitled Ad"}</h3>
+          <p>${post.description || ""}</p>
+        </div>
 
-      const delBtn = document.createElement("button");
-      delBtn.className = "biz-delete";
-      delBtn.dataset.id = id;
-      delBtn.textContent = "Delete";
-      delBtn.onclick = async () => {
+        <div class="biz-actions">
+          <button class="biz-btn biz-delete">Delete</button>
+        </div>
+      `;
+
+      card.querySelector(".biz-delete").onclick = async () => {
         if (!confirm("Delete this ad?")) return;
-        const snap = await getDoc(doc(db, "posts", id));
-        await deletePostAndImages({ id, ...snap.data() });
+        await deletePostAndImages(post);
         loadBusinessPosts(uid);
       };
-
-      card.appendChild(img);
-      card.appendChild(info);
-      card.appendChild(delBtn);
 
       box.appendChild(card);
     });
 
-    $("bizStatAdsCount").textContent = adsCount;
     $("bizStatTotalViews").textContent = totalViews;
     $("bizStatLeads").textContent = totalLeads;
 
   } catch (err) {
     console.error("Failed to load business posts:", err);
-    $("bizPosts").innerHTML = `<p class="biz-empty-msg">Error loading ads. Please try again.</p>`;
+    $("bizPosts").innerHTML =
+      `<p class="biz-empty-msg">Error loading ads.</p>`;
   }
-}
-
+  }
 /* ---------------------------------------------------
    🚪 LOGOUT
 --------------------------------------------------- */
