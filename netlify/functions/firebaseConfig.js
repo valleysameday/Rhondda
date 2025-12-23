@@ -1,10 +1,6 @@
 export async function handler() {
   return {
     statusCode: 200,
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*"
-    },
     body: JSON.stringify({
       apiKey: process.env.RN_FIREBASE_API_KEY,
       authDomain: process.env.RN_FIREBASE_AUTH_DOMAIN,
