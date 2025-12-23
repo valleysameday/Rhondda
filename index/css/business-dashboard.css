@@ -1,165 +1,50 @@
-/* Base Styles */
-body {
-  font-family: system-ui, -apple-system, sans-serif;
-  background: #f4f6f8;
-  margin: 0;
-  padding: 0;
-  color: #222;
-}
+/* ==========================================
+   BUSINESS DASHBOARD — page-specific tweaks
+========================================== */
 
-/* Layout & Containers */
-.biz-section {
-  padding: 1rem;
-  max-width: 850px;
-  margin: 0 auto 2.5rem;
-}
-
-.biz-section-title {
-  margin: 1rem 0 .5rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #111;
-}
-
-/* Header */
-.biz-header {
-  background: linear-gradient(135deg, #0a0a0a, #003366, #007bff);
-  color: #fff;
-  padding: 1.2rem 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
+/* -----------------------------
+   BUSINESS DASHBOARD HEADER
+----------------------------- */
 .biz-header-left h1 {
-  margin: 0;
   font-size: 1.5rem;
+  margin: 0;
 }
 
 .biz-tagline {
-  margin: .2rem 0 0;
-  font-size: .9rem;
-  opacity: .85;
+  margin: 0.2rem 0 0;
+  font-size: 0.9rem;
+  opacity: 0.85;
 }
 
-.biz-header-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: .4rem;
-}
-
-/* Stats Section */
+/* -----------------------------
+   STATS BOXES
+----------------------------- */
 .biz-stats-box {
-  background: #fff;
-  padding: 1rem;
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgb(0 0 0 / .06);
   margin-top: -1.2rem;
   margin-bottom: 1.3rem;
   position: relative;
   z-index: 1;
 }
 
-.biz-stats-box h2 {
-  margin: 0 0 .7rem;
-  font-size: 1.05rem;
-}
-
-.biz-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: .7rem;
-}
-
-.biz-stat-pill {
-  background: linear-gradient(135deg, #eef3ff, #dce9ff);
-  border-radius: 999px;
-  padding: .6rem .7rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border: 1px solid rgb(0 123 255 / .25);
-}
-
-.biz-stat-number {
-  font-weight: 700;
-  font-size: 1.05rem;
-  color: #007bff;
-}
-
-.biz-stat-label {
-  font-size: .75rem;
-  color: #555;
-}
-
-/* Profile Section */
+/* -----------------------------
+   PROFILE BOX LAYOUT
+----------------------------- */
 .biz-profile-box {
-  background: #fff;
-  padding: 1.1rem;
-  border-radius: 14px;
-  box-shadow: 0 8px 24px rgb(0 0 0 / .06);
   margin-bottom: 1.5rem;
 }
 
 .biz-profile-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: .8rem;
+  margin-bottom: 0.8rem;
 }
 
-.biz-profile-header h2 {
-  margin: 0;
-  font-size: 1.1rem;
+.biz-profile-line,
+.biz-profile-row {
+  margin-bottom: 0.8rem;
 }
 
-.biz-profile-line, .biz-profile-row {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: .8rem;
-}
-
-.biz-profile-label {
-  font-size: .85rem;
-  margin-bottom: .2rem;
-  color: #555;
-}
-
-.biz-profile-value {
-  font-size: .95rem;
-  color: #222;
-  background: #f7f9fc;
-  padding: .5rem .7rem;
-  border-radius: 8px;
-}
-
-.biz-profile-line-bio .biz-profile-value {
-  min-height: 40px;
-}
-
-/* Forms & Inputs */
-.biz-profile-row input, .biz-profile-row textarea {
-  padding: .55rem .7rem;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background: #fafafa;
-  font-size: .95rem;
-  transition: all 0.2s ease;
-}
-
-.biz-profile-row input:focus, .biz-profile-row textarea:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgb(0 123 255 / .15);
-  outline: none;
-}
-
-.biz-profile-row textarea {
-  min-height: 80px;
-  resize: vertical;
-}
-
-/* Avatar Styles */
+/* -----------------------------
+   AVATAR SECTION
+----------------------------- */
 .biz-avatar-section {
   text-align: center;
   margin-bottom: 20px;
@@ -172,182 +57,30 @@ body {
   border-radius: 50%;
   overflow: hidden;
   cursor: pointer;
-  border: 3px solid #ff7b00;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 3px solid #ff7b00;
 }
 
-.biz-avatar-circle {
-  width: 100%;
-  height: 100%;
-  background-color: #ddd;
-  background-size: cover;
-  background-position: center;
-}
-
-.biz-avatar-edit-hint {
-  font-size: 12px;
-  color: #777;
-  margin-top: 6px;
-}
-
-/* Post Cards & Grid */
+/* -----------------------------
+   POSTS GRID
+----------------------------- */
 #bizPosts {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
 
-.biz-card {
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 6px 20px rgb(0 0 0 / .05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.biz-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgb(0 0 0 / .08);
-}
-
-.biz-card img {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-}
-
-.biz-info {
-  padding: .6rem .8rem;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  gap: .3rem;
-}
-
-.biz-info h3 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #222;
-}
-
-.biz-info p {
-  margin: 0;
-  font-size: .85rem;
-  color: #444;
-  line-height: 1.3;
-  flex-grow: 1;
-}
-
-/* Buttons & Badges */
-.biz-btn, .biz-logout-btn, .biz-edit-profile-btn, .biz-save-btn, .biz-cancel-edit-btn {
-  border: none;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.biz-btn { padding: .3rem .6rem; font-size: .8rem; }
-
-.biz-type-badge {
-  background: rgb(255 255 255 / .15);
-  padding: .25rem .7rem;
-  border-radius: 999px;
-  font-size: .8rem;
-  border: 1px solid rgb(255 255 255 / .25);
-}
-
-.biz-logout-btn {
-  background: #ef4444;
-  padding: .45rem .9rem;
-  color: #fff;
-  font-size: .85rem;
-  backdrop-filter: blur(4px);
-}
-
-.biz-logout-btn:hover { background: #dc2626; transform: translateY(-1px); }
-
-.biz-edit { background: #ffc107; color: #222; }
-
-.biz-delete { background: #ef4444; color: #fff; }
-.biz-delete:hover { background: #dc2626; }
-
-.biz-edit-profile-btn {
-  background: #facc15;
-  color: #1f2937;
-  padding: .3rem .8rem;
-  font-size: .85rem;
-}
-
-.biz-edit-profile-btn:hover { background: #eab308; }
-
-.biz-save-btn, .biz-new-post {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: #fff;
-  padding: .6rem 1rem;
-  font-weight: 600;
-}
-
-.biz-new-post {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.3rem;
-}
-
-.biz-cancel-edit-btn {
-  background: #2a2a2a;
-  color: #e5e7eb;
-  padding: .6rem 1rem;
-}
-
-/* Overlays & Misc */
-.biz-logout-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgb(0 0 0 / .4);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-
-.biz-logout-card {
-  background: #fff;
-  padding: 1rem 1.3rem;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 10px 30px rgb(0 0 0 / .25);
-}
-
-.biz-suggestions-box {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  margin-top: 4px;
-  max-height: 160px;
-  overflow-y: auto;
-  display: none;
-  position: absolute;
-  width: 100%;
-  z-index: 10;
-  box-shadow: 0 10px 25px rgb(0 0 0 / .08);
-}
-
-.biz-empty-msg {
-  color: #666;
-  padding: 1rem;
-  font-size: .9rem;
-  text-align: center;
-}
-
-/* Mobile Adjustments */
+/* -----------------------------
+   RESPONSIVE BUSINESS DASHBOARD
+----------------------------- */
 @media (max-width: 600px) {
-  #bizPosts { grid-template-columns: 1fr; }
-  #bizPosts .biz-card img { height: 180px; }
+  #bizPosts {
+    grid-template-columns: 1fr;
+  }
+  
+  #bizPosts .biz-card img {
+    height: 180px;
+  }
 }
