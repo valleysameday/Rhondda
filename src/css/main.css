@@ -219,6 +219,11 @@ a:hover {
   white-space: nowrap;
 }
 
+.top-banners__img {
+  height: 40px;
+  width: auto;
+  display: block;
+}
 /* 8. Hint bubble (for AI-style tips) */
 .hint-bubble {
   margin-top: var(--space-8);
