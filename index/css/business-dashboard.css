@@ -860,3 +860,75 @@ body {
 .biz-logout-card p {
   margin: 0 0 0.2rem;
    }
+
+
+
+
+
+
+
+.biz-posts-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.biz-card {
+  background: #1f1f1f;
+  border-radius: 14px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.biz-card img {
+  width: 90px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+
+.biz-cancel-edit-btn {
+  background: #2a2a2a;
+  color: #e5e7eb;
+}
+
+.biz-cancel-edit-btn:hover {
+  background: #3a3a3a;
+}
+
+
+.biz-delete,
+.biz-logout-btn {
+  background: #ef4444;
+  color: #fff;
+}
+
+.biz-delete:hover,
+.biz-logout-btn:hover {
+  background: #dc2626;
+}
+
+
+.biz-edit-profile-btn {
+  background: #facc15;
+  color: #1f2937;
+}
+
+.biz-edit-profile-btn:hover {
+  background: #eab308;
+}
+
+
+.biz-save-btn,
+.biz-new-post {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+}
+
+.biz-save-btn:hover,
+.biz-new-post:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+}
