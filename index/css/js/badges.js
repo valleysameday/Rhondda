@@ -1,4 +1,4 @@
-ftg//* ---------------- SVG BADGES ---------------- */
+//* ---------------- SVG BADGES ---------------- */
 
 export const BADGE_SVGS = {
   localPro: `
