@@ -1,4 +1,4 @@
-// post-gate.js
+/// post-gate.js
 import { getFirebase } from '/index/js/firebase/init.js';
 
 import {
