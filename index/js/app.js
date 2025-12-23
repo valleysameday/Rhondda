@@ -1,7 +1,6 @@
 // /index/js/app.js
-// /index/js/app.js
 import { getFirebase } from '/index/js/firebase.js';
-import { initUI } from '/index/js/ui-router.js';
+import { initUIRouter } from '/index/js/ui-router.js';
 
 let auth, db, storage;
 
@@ -24,11 +23,12 @@ async function startApp() {
   db = fb.db;
   storage = fb.storage;
 
+  // expose globally for view scripts
   window.auth = auth;
   window.db = db;
   window.storage = storage;
 
-  initUI();
+  initUIRouter();   // ✅ FIXED
   loadView("home");
 }
 
