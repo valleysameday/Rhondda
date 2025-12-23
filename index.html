@@ -4,90 +4,110 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rhondda Noticeboard</title>
-
-    <!-- 1. PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#007bff">
-
-    <!-- 2. Modular CSS -->
+    <link rel="stylesheet" href="rsms.me">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/buttons.css">
 </head>
 <body>
 
-    <!-- App Content will go here -->
-    <!-- App Content -->
     <header class="main-header">
         <div class="container flex-header">
             <h1>Rhondda Noticeboard</h1>
             <div id="auth-buttons">
-                <!-- We will use JS to show "Login" or "My Dashboard" here -->
-                <a href="login.html" class="btn btn-secondary">Login</a>
+                <!-- If logged out -->
+                <button id="open-login-btn" class="btn btn-secondary">Login</button>
                 <button id="open-post-btn" class="btn btn-primary">+ Post Notice</button>
+                
+                <!-- If logged in (JS will toggle these) -->
+                <button id="logout-btn" class="btn btn-secondary" style="display:none;">Logout</button>
             </div>
         </div>
     </header>
 
     <main class="container">
-        <!-- 1. PWA Install Prompt (Hidden by default in ui.js) -->
+        <!-- PWA Install Prompt -->
         <div id="pwa-install-banner" style="display:none;" class="card install-card">
-            <p>Get the Rhondda Noticeboard app for a better experience!</p>
+            <p>Add Rhondda Noticeboard to your home screen.</p>
             <button id="pwa-install-btn" class="btn btn-upgrade">Install App</button>
         </div>
 
-        <!-- 2. The Notice Feed -->
         <section class="feed-section">
             <div class="feed-header">
                 <h2>Local Notices</h2>
-                <select id="filter-category" class="filter-dropdown">
+                <select id="filter-category">
                     <option value="all">All Categories</option>
                     <option value="general">General</option>
                     <option value="events">Events</option>
                     <option value="buy-sell">Buy/Sell</option>
                 </select>
             </div>
-
-            <!-- This is where our JS will inject the live Firebase notices -->
             <div id="notices-container" class="notices-grid">
-                <p class="loading-text">Loading local notices...</p>
+                <p>Loading the valley's notices...</p>
             </div>
         </section>
     </main>
 
-    <!-- 3. The "Post a Notice" Modal (The popup) -->
+    <!-- MODEL 1: POST A NOTICE -->
     <dialog id="post-modal" class="modal">
         <div class="modal-content">
             <h2>Post to the Valley</h2>
             <form id="notice-form">
-                <input type="text" id="notice-title" placeholder="Title (e.g. Free Wood in Tonypandy)" required>
-                <textarea id="notice-desc" placeholder="Details..." required></textarea>
+                <input type="text" id="notice-title" placeholder="Title (e.g. Free Sofa)" required>
+                <textarea id="notice-desc" placeholder="Details..."></textarea>
                 <select id="notice-cat">
                     <option value="general">General</option>
                     <option value="events">Events</option>
                     <option value="buy-sell">Buy/Sell</option>
                 </select>
                 <div class="modal-actions">
-                    <button type="button" id="close-modal" class="btn btn-secondary">Cancel</button>
+                    <button type="button" class="close-btn btn btn-secondary">Cancel</button>
                     <button type="submit" class="btn btn-primary">Post Now</button>
                 </div>
             </form>
         </div>
     </dialog>
 
-    <!-- 3. Modular JS -->
-  <script>
+    <!-- MODEL 2: LOGIN -->
+    <dialog id="login-modal" class="modal">
+        <div class="modal-content">
+            <h2>Welcome Back</h2>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="Email" required>
+                <input type="password" id="login-password" placeholder="Password" required>
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+                <p>Need an account? <button type="button" id="switch-to-signup" class="link-btn">Create one</button></p>
+                <button type="button" class="close-btn btn btn-secondary">Close</button>
+            </form>
+        </div>
+    </dialog>
+
+    <!-- MODEL 3: CREATE ACCOUNT -->
+    <dialog id="signup-modal" class="modal">
+        <div class="modal-content">
+            <h2>Join the Community</h2>
+            <form id="signup-form">
+                <input type="text" id="signup-name" placeholder="Full Name" required>
+                <input type="email" id="signup-email" placeholder="Email" required>
+                <input type="password" id="signup-password" placeholder="Create Password" required>
+                <button type="submit" class="btn btn-primary w-100">Create Account</button>
+                <button type="button" class="close-btn btn btn-secondary">Close</button>
+            </form>
+        </div>
+    </dialog>
+<script>
   window.PUBLIC_FIREBASE_API_KEY = "{{PUBLIC_FIREBASE_API_KEY}}";
   window.PUBLIC_FIREBASE_AUTH_DOMAIN = "{{PUBLIC_FIREBASE_AUTH_DOMAIN}}";
   window.PUBLIC_FIREBASE_PROJECT_ID = "{{PUBLIC_FIREBASE_PROJECT_ID}}";
   window.PUBLIC_FIREBASE_STORAGE_BUCKET = "{{PUBLIC_FIREBASE_STORAGE_BUCKET}}";
   window.PUBLIC_FIREBASE_MESSAGING_SENDER_ID = "{{PUBLIC_FIREBASE_MESSAGING_SENDER_ID}}";
   window.PUBLIC_FIREBASE_APP_ID = "{{PUBLIC_FIREBASE_APP_ID}}";
-  </script>
+</script>
+    <!-- JS MODULES -->
     <script type="module" src="js/firebase.js"></script>
- <script type="module" src="js/ui.js"></script>
-
+    <script type="module" src="js/ui.js"></script>
     <script>
-      // 4. Register Service Worker (The PWA engine)
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js');
       }
