@@ -412,7 +412,6 @@ footer {
     font-weight: 500;
 }
 
-
 /* ===== FEATURED ADS ===== */
 .featured-ads {
   margin: 12px 0 6px;
@@ -421,17 +420,25 @@ footer {
 
 .featured-track {
   display: flex;
-  overflow: hidden;
-  width: 100%;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding: 6px 12px;
+}
+
+.featured-track::-webkit-scrollbar {
+  display: none;
 }
 
 .featured-card {
-  min-width: 100%;
-  height: 130px;
+  min-width: 85%;
+  max-width: 85%;
+  height: 160px;
   position: relative;
   border-radius: 14px;
   overflow: hidden;
-  flex-shrink: 0;
+  scroll-snap-align: start;
   box-shadow: 0 6px 16px rgba(0,0,0,0.15);
 }
 
@@ -451,4 +458,10 @@ footer {
   font-weight: 700;
   padding: 4px 8px;
   border-radius: 999px;
+}
+
+  // Initial load
+  loadPosts();
+  loadWeather();
+  initFeaturedAds();
 }
