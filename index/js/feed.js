@@ -1,4 +1,4 @@
-ggexport function initFeed() {
+export function initFeed() {
   const postsContainer = document.getElementById('postsContainer');
   const categoryBtns = document.querySelectorAll('.category-btn');
   const businessCheckbox = document.getElementById('isBusinessAccount');
