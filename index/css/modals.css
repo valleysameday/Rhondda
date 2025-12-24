@@ -1,4 +1,5 @@
 /* ================= 2025 MODAL & POSTING REFRESH ================= */
+.card { border: 2px solid red; }
 
 body.modal-open {
     overflow: hidden;
