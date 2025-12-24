@@ -460,7 +460,7 @@ footer {
   border-radius: 999px;
 }
 
-  // Initial load
+
   loadPosts();
   loadWeather();
   initFeaturedAds();
