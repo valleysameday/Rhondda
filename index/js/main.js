@@ -5,24 +5,47 @@ import '/index/js/post-gate.js';
 let auth, db, storage;
 
 /* ---------------- SPA VIEW LOADER ---------------- */
+/* ---------------- SPA VIEW LOADER (PERSISTENT VIEWS) ---------------- */
 export async function loadView(view) {
-  const app = document.getElementById("app");
-  if (!app) return;
+  const container = document.getElementById("app");
+  if (!container) return;
 
-  // Load HTML fragment
-  const html = await fetch(`/views/${view}.html`).then(r => r.text());
-  app.innerHTML = html;
+  // Hide all views
+  const views = container.querySelectorAll(".view");
+  views.forEach(v => v.hidden = true);
 
-  // Dynamically import the view JS after HTML is in the DOM
-  try {
-    const mod = await import(`/views/${view}.js?cache=${Date.now()}`);
-    if (mod.init) mod.init(); // run the view init function
-  } catch (err) {
-    console.error("View JS error:", err);
+  // Target view element
+  let target = document.getElementById(`view-${view}`);
+
+  // If the view container doesn't exist yet, create it
+  if (!target) {
+    target = document.createElement("div");
+    target.id = `view-${view}`;
+    target.className = "view";
+    target.hidden = true;
+    container.appendChild(target);
   }
-}
-window.loadView = loadView;
 
+  // Load HTML only once
+  if (!target.dataset.loaded) {
+    const html = await fetch(`/views/${view}.html`).then(r => r.text());
+    target.innerHTML = html;
+    target.dataset.loaded = "true";
+
+    // Load JS for this view
+    try {
+      const mod = await import(`/views/${view}.js?cache=${Date.now()}`);
+      if (mod.init) mod.init();
+    } catch (err) {
+      console.error("View JS error:", err);
+    }
+  }
+
+  // Show the view
+  target.hidden = false;
+}
+
+window.loadView = loadView;
 /* ---------------- INITIALISE APP ---------------- */
 getFirebase().then(fb => {
   auth = fb.auth;
