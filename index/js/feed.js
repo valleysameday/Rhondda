@@ -5,11 +5,11 @@ import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/f
  * Initialize the posts feed
  */
 export async function initFeed() {
-  const container = document.getElementById("postsContainer");
+  const container = document.getElementById("feed");
 
   // 🛡️ Guard: view not loaded or ID missing
   if (!container) {
-    console.warn("initFeed skipped: #postsContainer not found");
+    console.warn("initFeed skipped: #feed not found");
     return;
   }
 
