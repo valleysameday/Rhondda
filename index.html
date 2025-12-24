@@ -30,7 +30,10 @@
 <!-- ================= LOGIN MODAL ================= -->
 <div id="login" class="modal">
   <div class="modal-content">
-    <button class="close" aria-label="Close">&times;</button>
+    <button class="close"
+            aria-label="Close"
+            data-action="close-screens">&times;</button>
+
     <h2>Log in</h2>
 
     <input type="email" id="loginEmail" placeholder="Email" autocomplete="email">
@@ -38,22 +41,28 @@
 
     <button id="loginSubmit">Log in</button>
 
-    <!-- LOGIN FEEDBACK -->
     <p id="loginFeedback" class="feedback-text"></p>
 
     <p class="modal-switch">
       No account?
-      <span onclick="openScreen('signup')">Create one</span>
+      <span data-action="open-screen" data-value="signup">Create one</span>
     </p>
 
-    <p id="forgotPasswordLink" class="modal-link">Forgot password?</p>
+    <p class="modal-link"
+       data-action="open-screen"
+       data-value="forgot">
+      Forgot password?
+    </p>
   </div>
 </div>
 
 <!-- ================= FORGOT PASSWORD MODAL ================= -->
 <div id="forgot" class="modal">
   <div class="modal-content">
-    <button class="close" aria-label="Close">&times;</button>
+    <button class="close"
+            aria-label="Close"
+            data-action="close-screens">&times;</button>
+
     <h2>Reset Password</h2>
 
     <input type="email" id="forgotEmail" placeholder="Enter your email" autocomplete="email">
@@ -62,7 +71,7 @@
 
     <p class="modal-switch">
       Remembered your password?
-      <span onclick="openScreen('login')">Back to login</span>
+      <span data-action="open-screen" data-value="login">Back to login</span>
     </p>
   </div>
 </div>
@@ -70,18 +79,26 @@
 <!-- ================= PASSWORD RESET CONFIRMATION MODAL ================= -->
 <div id="resetConfirm" class="modal">
   <div class="modal-content">
-    <button class="close" aria-label="Close">&times;</button>
+    <button class="close"
+            aria-label="Close"
+            data-action="close-screens">&times;</button>
+
     <h2>Email Sent ✅</h2>
     <p>Check your inbox for a password reset link.</p>
 
-    <button onclick="openScreen('login')">Back to Login</button>
+    <button data-action="open-screen" data-value="login">
+      Back to Login
+    </button>
   </div>
 </div>
 
 <!-- ================= SIGNUP MODAL ================= -->
 <div id="signup" class="modal">
   <div class="modal-content">
-    <button class="close" aria-label="Close">&times;</button>
+    <button class="close"
+            aria-label="Close"
+            data-action="close-screens">&times;</button>
+
     <h2>Create account</h2>
 
     <input type="email" id="signupEmail" placeholder="Email" autocomplete="email">
@@ -104,12 +121,11 @@
 
     <button id="signupSubmit">Create account</button>
 
-    <!-- SIGNUP FEEDBACK -->
     <p id="signupFeedback" class="feedback-text"></p>
 
     <p class="modal-switch">
       Already have an account?
-      <span onclick="openScreen('login')">Log in</span>
+      <span data-action="open-screen" data-value="login">Log in</span>
     </p>
   </div>
 </div>
@@ -117,11 +133,12 @@
 <!-- ================= POST MODAL ================= -->
 <div id="post" class="modal">
   <div class="modal-content">
-    <button class="close" aria-label="Close">&times;</button>
+    <button class="close"
+            aria-label="Close"
+            data-action="close-screens">&times;</button>
 
     <div id="postFlow">
 
-      <!-- STEP 1: CATEGORY -->
       <div class="post-step" data-step="1">
         <h2>Select a Category</h2>
         <select id="postCategory">
@@ -136,7 +153,6 @@
         <button class="post-next">Next</button>
       </div>
 
-      <!-- STEP 2: SUBCATEGORY -->
       <div class="post-step" data-step="2">
         <h2>Select a Subcategory</h2>
         <select id="postSubcategory"></select>
@@ -144,12 +160,10 @@
         <button class="post-next">Next</button>
       </div>
 
-      <!-- STEP 3: AD DETAILS -->
       <div class="post-step" data-step="3">
         <h2>Ad Details</h2>
 
         <input type="text" id="postTitle" placeholder="Title" required>
-
         <textarea id="postDescription" rows="4" placeholder="Description" required></textarea>
 
         <label>Price (optional)</label>
@@ -160,7 +174,7 @@
 
         <label>Add Photos</label>
         <button id="chooseImageBtn">Choose Photo</button>
-        <input type="file" id="postImage" accept="image/*" style="display:none;">
+        <input type="file" id="postImage" accept="image/*" hidden>
         <div id="imagePreview"></div>
 
         <button class="post-prev">Back</button>
@@ -172,7 +186,6 @@
     <p id="postFeedback" class="feedback-text"></p>
   </div>
 </div>
-
 <!-- ================= FIXED ACTION BAR ================= -->
 <div class="action-bar">
 
