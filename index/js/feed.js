@@ -107,21 +107,17 @@ export function initFeed() {
 
 /* ===== FEATURED ADS AUTO SLIDER ===== */
   function initFeaturedAds() {
-    const track = document.getElementById("featuredTrack");
-    if (!track) return;
+  const track = document.getElementById("featuredTrack");
+  if (!track) return;
 
-    let index = 0;
+  let index = 0;
+  const cards = track.children;
+  if (!cards.length) return;
 
-    setInterval(() => {
-      const cards = track.children;
-      if (!cards.length) return;
-
-      index = (index + 1) % cards.length;
-      cards[index].scrollIntoView({
-        behavior: "smooth",
-        inline: "start"
-      });
-    }, 4500);
+  setInterval(() => {
+    index = (index + 1) % cards.length;
+    track.style.transform = `translateX(-${index * 100}%)`;
+  }, 4500);
   }
   // Initial load
   loadPosts();
