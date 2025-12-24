@@ -459,9 +459,3 @@ footer {
   padding: 4px 8px;
   border-radius: 999px;
 }
-
-
-  loadPosts();
-  loadWeather();
-  initFeaturedAds();
-}
