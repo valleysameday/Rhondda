@@ -110,12 +110,11 @@ export function initFeed() {
   const track = document.getElementById("featuredTrack");
   if (!track) return;
 
-  // Make sure children exist
   const checkInterval = setInterval(() => {
     const cards = track.children;
     if (!cards.length) return;
 
-    clearInterval(checkInterval); // stop waiting once we have cards
+    clearInterval(checkInterval);
 
     let index = 0;
     track.style.transition = 'transform 0.5s ease-in-out';
@@ -124,8 +123,7 @@ export function initFeed() {
       index = (index + 1) % cards.length;
       track.style.transform = `translateX(-${index * 100}%)`;
     }, 4500);
-
-  }, 100); // check every 100ms
+  }, 100);
   }
 
   
