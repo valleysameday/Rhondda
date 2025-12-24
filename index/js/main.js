@@ -1,4 +1,4 @@
-import { getFirebase } from '/index/js/firebase/init.js';
+ffimport { getFirebase } from '/index/js/firebase/init.js';
 import { initUIRouter } from '/index/js/ui-router.js';
 import { initFeed } from '/index/js/feed.js';
 import '/index/js/post-gate.js';
