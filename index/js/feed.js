@@ -1,5 +1,5 @@
 export function initFeed() {
-  const postsContainer = document.getElementById('postsContainer');
+  const postsContainer = document.getElementById('feed');
   const categoryBtns = document.querySelectorAll('.category-btn');
   const businessCheckbox = document.getElementById('isBusinessAccount');
   const businessBenefits = document.getElementById('businessBenefits');
