@@ -173,9 +173,26 @@
         <input type="text" id="postArea" placeholder="e.g. Ferndale, Pentre, Tonypandy">
 
         <label>Add Photos</label>
-        <button id="chooseImageBtn">Choose Photo</button>
-        <input type="file" id="postImage" accept="image/*" hidden>
-        <div id="imagePreview"></div>
+
+<div class="photo-uploader">
+  <input
+    type="file"
+    id="postImages"
+    accept="image/*"
+    multiple
+    hidden
+  >
+
+  <button type="button" id="addPhotosBtn" class="ghost-btn">
+    + Add photos
+  </button>
+
+  <small class="hint-text">
+    Add up to 10 photos. First photo becomes the cover.
+  </small>
+
+  <div id="imagePreview" class="image-preview-grid"></div>
+</div>
 
         <button class="post-prev">Back</button>
         <button id="postSubmitBtn">Submit Ad</button>
