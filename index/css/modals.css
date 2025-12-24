@@ -140,3 +140,38 @@ body.modal-open main {
 .price-wrapper {
   display: none;
 }
+
+
+.photo-uploader {
+  margin-top: 12px;
+}
+
+.image-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.image-preview-grid img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.ghost-btn {
+  background: #f5f5f5;
+  border: 1px dashed #bbb;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.hint-text {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
