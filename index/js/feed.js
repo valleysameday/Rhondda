@@ -1,21 +1,31 @@
 export function initFeed() {
-  const postsContainer = document.getElementById('feed');
+  const postsContainer = document.getElementById('feed'); // make sure your home view has id="feed"
   const categoryBtns = document.querySelectorAll('.category-btn');
   const businessCheckbox = document.getElementById('isBusinessAccount');
   const businessBenefits = document.getElementById('businessBenefits');
 
+  if (!postsContainer) return console.warn("Feed container not found");
+
+  // Toggle business benefits panel
   if (businessCheckbox && businessBenefits) {
     businessCheckbox.addEventListener('change', () => {
       businessBenefits.style.display = businessCheckbox.checked ? 'block' : 'none';
     });
   }
 
-  const mockPosts = [/* your mockPosts array here */];
+  // Mock posts
+  const mockPosts = [
+    { id: 1, title: "Chair for Sale", content: "A comfy chair", category: "forsale", price: 25 },
+    { id: 2, title: "Lawn Mowing", content: "Professional service", category: "jobs" },
+    { id: 3, title: "Flat to Rent", content: "2-bed flat in town", category: "property", price: 450 },
+  ];
 
+  // Load posts function
   function loadPosts(category = 'all') {
     postsContainer.innerHTML = '';
     const filtered = category === 'all' ? mockPosts : mockPosts.filter(p => p.category === category);
     if (!filtered.length) return postsContainer.innerHTML = '<p>No posts yet!</p>';
+
     filtered.forEach(post => {
       const card = document.createElement('div');
       card.className = `post-card ${post.type || ''}`;
@@ -35,12 +45,14 @@ export function initFeed() {
     });
   }
 
+  // Category buttons
   categoryBtns.forEach(btn => btn.addEventListener('click', () => {
     categoryBtns.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     loadPosts(btn.dataset.category);
   }));
 
+  // Report post
   document.addEventListener('click', e => {
     if (!e.target.classList.contains('report-btn')) return;
     const postId = e.target.dataset.postId;
@@ -52,7 +64,12 @@ export function initFeed() {
     alert("Thanks — this post has been flagged for review.");
   });
 
+  // Weather function
   async function loadWeather() {
+    const emojiEl = document.querySelector(".weather-emoji");
+    const textEl = document.querySelector(".weather-text");
+    if (!emojiEl || !textEl) return;
+
     try {
       const res = await fetch(
         "https://api.open-meteo.com/v1/forecast?latitude=51.65&longitude=-3.45&current_weather=true&daily=sunrise,sunset&timezone=auto"
@@ -64,17 +81,23 @@ export function initFeed() {
       const sunset = new Date(data.daily.sunset[0]);
       const now = new Date(data.current_weather.time);
       const isDay = now >= sunrise && now <= sunset;
+
       let emoji = isDay ? "🌞" : "🌙";
       let message = isDay ? "Another tidy day in the Rhondda." : "Evening in the valley — cosy vibes.";
-      if ([51,61,63,65].includes(code)) { emoji = "🌧️"; message = "Rain’s on — brolly time"; }
-      document.querySelector(".weather-emoji").textContent = emoji;
-      document.querySelector(".weather-text").textContent = `${message} · ${temp}°C`;
+
+      if ([51, 61, 63, 65].includes(code)) {
+        emoji = "🌧️";
+        message = "Rain’s on — brolly time";
+      }
+
+      emojiEl.textContent = emoji;
+      textEl.textContent = `${message} · ${temp}°C`;
     } catch {
-      document.querySelector(".weather-text").textContent =
-        "Local updates available — keep an eye out, butt!";
+      textEl.textContent = "Local updates available — keep an eye out, butt!";
     }
   }
 
+  // Initial load
   loadPosts();
   loadWeather();
 }
