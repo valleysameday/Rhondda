@@ -1,0 +1,142 @@
+/* ================= MODAL FUN & MODERN ================= */
+body.modal-open {
+    overflow: hidden;
+}
+body.modal-open main {
+    filter: blur(3px);
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+}
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: #fff;
+    width: 90%;
+    max-width: 420px;
+    padding: 28px;
+    border-radius: 20px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+    position: relative;
+    animation: popIn 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.modal .close {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    font-size: 24px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+.modal .close:hover { opacity: 1; }
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+    width: 100%;
+    padding: 16px 14px;
+    border-radius: 16px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+    background: #f9f9f9;
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.06);
+    transition: all 0.25s ease;
+}
+.modal-content input:focus,
+.modal-content textarea:focus,
+.modal-content select:focus {
+    outline: none;
+    border-color: #FF7EB3;
+    box-shadow: 0 0 0 3px rgba(255,126,179,0.15);
+}
+
+.modal-content button {
+    padding: 14px 0;
+    border-radius: 24px;
+    font-size: 16px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #FF7EB3, #FF758C);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(255,126,179,0.3);
+    transition: all 0.25s ease;
+    border: none;
+}
+.modal-content button:hover {
+    transform: translateY(-2px);
+    opacity: 0.95;
+    box-shadow: 0 10px 25px rgba(255,126,179,0.35);
+}
+
+.modal-switch {
+    margin-top: 14px;
+    font-size: 13px;
+    text-align: center;
+}
+.modal-switch span {
+    color: #FF7EB3;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    gap: 8px;
+}
+
+@keyframes popIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+.business-benefits {
+    display: none;                 /* hidden by default */
+    background: #fff0f5;           /* soft pink background */
+    border: 1px solid #ff7eb3;     /* accent border */
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-top: 12px;
+    box-shadow: 0 6px 18px rgba(255,126,179,0.25);
+    font-size: 0.9rem;
+    color: #333;
+    animation: fadeSlide 0.3s ease forwards;
+}
+
+.business-benefits h4 {
+    font-size: 1rem;
+    margin-bottom: 6px;
+    color: #ff4f8b;
+}
+
+.business-benefits ul {
+    list-style: disc;
+    margin-left: 18px;
+}
+
+@keyframes fadeSlide {
+    0% { opacity: 0; transform: translateY(-8px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+.subcategory-wrapper,
+.price-wrapper {
+  display: none;
+}
