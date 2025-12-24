@@ -105,7 +105,26 @@ export function initFeed() {
     }
   }
 
+/* ===== FEATURED ADS AUTO SLIDER ===== */
+  function initFeaturedAds() {
+    const track = document.getElementById("featuredTrack");
+    if (!track) return;
+
+    let index = 0;
+
+    setInterval(() => {
+      const cards = track.children;
+      if (!cards.length) return;
+
+      index = (index + 1) % cards.length;
+      cards[index].scrollIntoView({
+        behavior: "smooth",
+        inline: "start"
+      });
+    }, 4500);
+  }
   // Initial load
   loadPosts();
   loadWeather();
+  initFeaturedAds();
 }
