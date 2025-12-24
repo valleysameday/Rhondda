@@ -2,12 +2,12 @@
 export function initUIRouter() {
 
   const routes = {
-    login: document.getElementById('loginModal'),
-    post: document.getElementById('postModal'),
-    signup: document.getElementById('signupModal'),
-    forgot: document.getElementById('forgotPasswordModal'),
-    resetConfirm: document.getElementById('resetConfirmModal')
-  };
+  login: document.getElementById('login'),
+  signup: document.getElementById('signup'),
+  forgot: document.getElementById('forgot'),
+  resetConfirm: document.getElementById('resetConfirm'),
+  post: document.getElementById('posts-grid')
+};
 
   function openScreen(name) {
     closeAll();
@@ -91,6 +91,24 @@ export function initUIRouter() {
   }
 
   /* -------------------- ACTION BAR BUTTONS -------------------- */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+
+  const action = el.dataset.action;
+  const value = el.dataset.value;
+
+  if (action === 'open-screen') {
+    openScreen(value);
+  }
+
+  if (action === 'close-screens') {
+    closeAll();
+  }
+});
+  
+  
+  
   document.getElementById('openPostModal')?.addEventListener('click', e => {
     e.preventDefault();
     openScreen('post');
