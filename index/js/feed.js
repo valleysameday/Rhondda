@@ -41,6 +41,14 @@ export function initFeed() {
         </div>
         <button class="report-btn" title="Report this post" data-post-id="${post.id}">⚑</button>
       `;
+
+      card.addEventListener('click', e => {
+  if (e.target.closest('.report-btn')) return;
+
+  sessionStorage.setItem("viewPostId", post.id);
+  loadView("view-post");
+});
+      
       postsContainer.appendChild(card);
     });
   }
