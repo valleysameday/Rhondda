@@ -110,15 +110,25 @@ export function initFeed() {
   const track = document.getElementById("featuredTrack");
   if (!track) return;
 
-  let index = 0;
-  const cards = track.children;
-  if (!cards.length) return;
+  // Make sure children exist
+  const checkInterval = setInterval(() => {
+    const cards = track.children;
+    if (!cards.length) return;
 
-  setInterval(() => {
-    index = (index + 1) % cards.length;
-    track.style.transform = `translateX(-${index * 100}%)`;
-  }, 4500);
+    clearInterval(checkInterval); // stop waiting once we have cards
+
+    let index = 0;
+    track.style.transition = 'transform 0.5s ease-in-out';
+
+    setInterval(() => {
+      index = (index + 1) % cards.length;
+      track.style.transform = `translateX(-${index * 100}%)`;
+    }, 4500);
+
+  }, 100); // check every 100ms
   }
+
+  
   // Initial load
   loadPosts();
   loadWeather();
