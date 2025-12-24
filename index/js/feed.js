@@ -105,26 +105,6 @@ export function initFeed() {
     }
   }
 
-/* ===== FEATURED ADS AUTO SLIDER ===== */
-  function initFeaturedAds() {
-  const track = document.getElementById("featuredTrack");
-  if (!track) return;
-
-  const checkInterval = setInterval(() => {
-    const cards = track.children;
-    if (!cards.length) return;
-
-    clearInterval(checkInterval);
-
-    let index = 0;
-    track.style.transition = 'transform 0.5s ease-in-out';
-
-    setInterval(() => {
-      index = (index + 1) % cards.length;
-      track.style.transform = `translateX(-${index * 100}%)`;
-    }, 4500);
-  }, 100);
-  }
 
   
   // Initial load
