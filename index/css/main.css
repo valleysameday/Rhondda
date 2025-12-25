@@ -461,7 +461,7 @@ footer {
 
 .featured-track {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
@@ -473,9 +473,9 @@ footer {
 }
 
 .featured-card {
-  min-width: 85%;
-  max-width: 85%;
-  height: 160px;
+  min-width: 80%;
+  max-width: 80%;
+  height: 100px;
   position: relative;
   border-radius: 14px;
   overflow: hidden;
