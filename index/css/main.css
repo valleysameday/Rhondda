@@ -287,3 +287,37 @@ footer {
   display: block;
   color: #000;
 }
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.install-pwa {
+  margin: 16px 12px;
+  padding: 16px;
+  background: #0a0a0a;
+  color: #fff;
+  border-radius: 14px;
+  text-align: center;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  opacity: 0;                /* start hidden */
+  pointer-events: none;      /* prevent clicks before visible */
+  transform: translateY(10px);
+}
+
+.install-pwa.show {
+  animation: fadeIn 0.5s ease forwards;
+  pointer-events: auto;
+}
+
+.install-pwa button {
+  margin-top: 10px;
+  padding: 8px 14px;
+  background: gold;
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+}
