@@ -66,6 +66,29 @@ getFirebase().then(fb => {
   }
 });
 
+
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // Fade in the install section
+  document.getElementById('installPwaSection').classList.add('show');
+});
+
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+
+  // Hide after interaction
+  document.getElementById('installPwaSection').style.display = 'none';
+
+  deferredPrompt = null;
+});
+
 /* ---------------- GLOBAL NAVIGATION ---------------- */
 window.navigateToDashboard = function () {
   if (!window.currentUser) {
