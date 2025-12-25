@@ -126,10 +126,9 @@ header img.logo {
 .posts-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    max-width: 1400px;
-    margin: 0 auto 50px;
-    padding: 12px;
+    gap: 12px;
+    margin: 0;
+    padding: 6px;
 }
 
 
