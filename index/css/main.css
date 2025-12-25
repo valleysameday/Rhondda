@@ -1,4 +1,4 @@
-  /* =====================================================
+    /* =====================================================
    GLOBAL RESET
 ===================================================== */
 *, *::before, *::after {
@@ -21,47 +21,69 @@ a { text-decoration: none; }
    HEADER
 ===================================================== */
 header {
-    background: #FF7EB3;
+    background: #00D2D3;
     color: #fff;
     text-align: center;
-    padding: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    padding: 15px;
+    /* Deeper shadow for a "floating" glassmorphism effect */
+    box-shadow: 0 4px 12px rgba(255, 130, 71, 0.25);
 }
 
 header img.logo {
-    height: 45px;
+    height: 50px;
+    /* Subtle drop shadow to make the logo pop against the vibrant header */
+    filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.1));
 }
 
 /* =====================================================
-   WEATHER SNIPPET
+   WEATHER SNIPPET (2026 SLIM & MODERN)
 ===================================================== */
 .weather-snippet {
-    background: #f0f7ff;
-    border: 1px solid #d1e5ff;
-    color: #2d3748;
+    /* 2026 Transformative Teal: Organic and Digital mix */
+    background: #008080; 
+    color: #ffffff;
     display: flex;
     align-items: center;
-    gap: 20px;
-    padding: 20px 30px;
-    margin: 20px 0;
-    width: 100%;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    justify-content: center;
+    gap: 15px;
+    
+    /* Slimmer vertical padding (Reduced from 20px to 8px) */
+    padding: 8px 24px; 
+    margin: 12px auto;
+    
+    /* Modern 2026 Pill-shape (Increased from 12px) */
+    border-radius: 50px; 
+    
+    /* Inset width makes it feel like a "floating" badge */
+    width: fit-content;
+    min-width: 280px;
+    
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 128, 128, 0.2);
 }
 
 .weather-emoji {
-    font-size: 2.5rem;
+    /* Scaled down for a slimmer profile */
+    font-size: 1.6rem; 
 }
 
 .weather-info {
-    font-size: 1.2rem;
-    font-weight: 500;
+    /* Slightly smaller font to keep it on one line */
+    font-size: 1rem; 
+    font-weight: 600;
+    letter-spacing: 0.5px;
 }
 
 @media (min-width: 1024px) {
-    .weather-snippet { padding: 30px 40px; }
-    .weather-info { font-size: 1.4rem; }
+    .weather-snippet { 
+        padding: 10px 32px; 
+        margin: 18px auto;
+    }
+    .weather-info { 
+        font-size: 1.1rem; 
+    }
 }
+
 
 /* =====================================================
    CATEGORIES
@@ -354,62 +376,81 @@ header img.logo {
     justify-content: center;
     gap: 30px;
     padding: 14px 0;
-    background: #FF7EB3;
-    border-top: 1px solid #eee;
+    /* Aquatic Awe: Vibrant, fresh, and modern for 2026 */
+    background: #00D2D3; 
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    /* Subtle glassmorphism effect trending for 2026 */
+    backdrop-filter: blur(10px);
+    box-shadow: 0 -4px 20px rgba(0, 210, 211, 0.15);
 }
 
 .action-link {
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: #eee;
+    /* High contrast white for readability */
+    color: #FFFFFF; 
     font-size: 13px;
-    font-weight: 500;
-    transition: 0.2s;
+    font-weight: 600;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .action-link:hover {
-    color: #FF7E5F;
-    transform: translateY(-2px);
+    /* Electric Lavender highlight for attention */
+    color: #E0B1FF; 
+    transform: translateY(-4px);
 }
 
 .icon-wrap { position: relative; }
 
 .free-ribbon {
     position: absolute;
-    top: -6px;
-    right: -20px;
-    background: #FF7E5F;
+    top: -8px;
+    right: -24px;
+    /* Neon Shock accent: Blazing Orange to grab instant attention */
+    background: #FF5F1F; 
     color: #fff;
-    font-size: 9px;
-    font-weight: 600;
-    padding: 2px 4px;
-    border-radius: 4px;
-    transform: rotate(18deg);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 6px;
+    border-radius: 6px;
+    transform: rotate(12deg);
+    box-shadow: 0 2px 8px rgba(255, 95, 31, 0.4);
 }
 
-/* =====================================================
+
+=====================================================
    FOOTER
 ===================================================== */
 footer {
     text-align: center;
-    padding: 40px 20px;
-    background: #f1f1f1;
-    color: #666;
+    padding: 60px 20px;
+    /* Soft dark background makes the vibrant links pop */
+    background: #1A1A1B; 
+    color: #A4A4A4;
     font-size: 0.9rem;
-    border-top: 1px solid #ddd;
-    margin-top: 30px;
+    border-top: 1px solid #333;
+    margin-top: 50px;
 }
 
 .footer-links {
     display: flex;
     justify-content: center;
-    gap: 12px;
+    gap: 20px;
     flex-wrap: wrap;
 }
 
 .footer-links a {
-    color: #FF7EB3;
-    font-weight: 500;
+    /* Vibrant Apricot: Modern, energetic, and approachable */
+    color: #FF8247; 
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: #FFA37A;
+    text-decoration: underline;
 }
 
 /* ===== FEATURED ADS ===== */
