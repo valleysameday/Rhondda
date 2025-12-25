@@ -28,12 +28,12 @@ export async function loadView(view) {
   }
 
   if (!target.dataset.loaded) {
-    const html = await fetch(`/views/${view}.html`).then(r => r.text());
+    const html = await fetch(`/index/js/views/${view}.html`).then(r => r.text());
     target.innerHTML = html;
     target.dataset.loaded = "true";
 
     try {
-      const mod = await import(`/views/${view}.js?cache=${Date.now()}`);
+      const mod = await import(`/index/js/views/${view}.js?cache=${Date.now()}`);
       mod.init?.();
     } catch (err) {
       console.error("View JS error:", err);
