@@ -56,4 +56,20 @@ export function initUIRouter() {
       if (e.target === modal) closeAll();
     });
   });
+/* -------------------- GENERIC DATA-ACTION HANDLER -------------------- */
+document.addEventListener("click", (e) => {
+  const action = e.target.dataset.action;
+  const value = e.target.dataset.value;
+
+  if (!action) return;
+
+  if (action === "open-screen") {
+    openScreen(value);
+  }
+
+  if (action === "close-screens") {
+    closeAll();
+  }
+});
+  
 }
