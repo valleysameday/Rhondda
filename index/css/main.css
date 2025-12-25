@@ -500,3 +500,20 @@ footer {
   padding: 4px 8px;
   border-radius: 999px;
 }
+
+.greeting-snippet {
+  margin: 12px 0 6px;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 0 12px;
+}
+
+.greeting-welsh {
+  display: block;
+  color: #444;
+}
+
+.greeting-english {
+  display: block;
+  color: #000;
+}
