@@ -46,29 +46,6 @@ export async function loadView(view) {
 window.loadView = loadView;
 
 /* =====================================================
-   ACCOUNT BUTTON (SINGLE SOURCE OF TRUTH)
-===================================================== */
-function initAccountButton() {
-  const btn = document.getElementById("openAccountModal");
-  if (!btn) return;
-
-  btn.addEventListener("click", e => {
-    e.preventDefault();
-
-    if (!window.currentUser) {
-      window.openScreen("login");
-      return;
-    }
-
-    loadView(
-      window.firebaseUserDoc?.isBusiness
-        ? "business-dashboard"
-        : "customer-dashboard"
-    );
-  });
-}
-
-/* =====================================================
    INIT APP
 ===================================================== */
 getFirebase().then(fb => {
@@ -87,7 +64,6 @@ getFirebase().then(fb => {
 
   const start = () => {
     initUIRouter();
-    initAccountButton();
     loadView("home");
   };
 
