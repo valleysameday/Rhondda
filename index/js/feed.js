@@ -105,10 +105,29 @@ export function initFeed() {
     }
   }
 
+function loadGreeting() {
+  const welshEl = document.querySelector(".greeting-welsh");
+  const englishEl = document.querySelector(".greeting-english");
 
+  if (!welshEl || !englishEl) return;
+
+  // Always show Welsh greeting
+  welshEl.textContent = "Shwmae";
+
+  // If logged in, show name
+  const user = window.currentUser;
+
+  if (user && user.displayName) {
+    englishEl.textContent = `${user.displayName}, welcome back`;
+  } else {
+    englishEl.textContent = "Welcome to Rhondda Noticeboard";
+  }
+}
   
   // Initial load
+  
   loadPosts();
+  loadGreeting();
   loadWeather();
-  initFeaturedAds();
+  initFeaturedAds()
 }
