@@ -168,7 +168,7 @@ header img.logo {
 .posts-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: 15px;
     max-width: 1400px;
     margin: 0 auto 50px;
     padding: 12px;
@@ -186,7 +186,7 @@ header img.logo {
     border: 1px solid #e5e7eb;
     box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     transition: transform .18s ease, box-shadow .18s ease;
-    height: 320px; /* slightly taller for breathing room */
+    height: 340px; /* slightly taller for breathing room */
 }
 
 .post-card:hover {
