@@ -127,7 +127,7 @@ header img.logo {
     display: flex;
     gap: 10px;
     padding: 10px 16px;
-    margin-bottom: 20px;
+    margin-bottom: 6px;
 
     overflow-x: auto;        /* ✅ horizontal scroll */
     white-space: nowrap;     /* ✅ keep in one line */
