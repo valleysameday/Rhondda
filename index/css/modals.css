@@ -5,7 +5,7 @@ body.modal-open {
 body.modal-open main {
     filter: blur(3px);
     opacity: 0.35;
-    
+    pointer-events: none;
 }
 
 .modal {
