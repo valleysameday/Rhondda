@@ -255,7 +255,8 @@ footer {
 .featured-card img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  background: #000; /* optional: fills the empty space */
 }
 
 .featured-badge {
