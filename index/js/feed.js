@@ -1,3 +1,4 @@
+import { initFeaturedAds } from './featured-ads.js';
 export function initFeed() {
   const postsContainer = document.getElementById('feed'); // make sure your home view has id="feed"
   const categoryBtns = document.querySelectorAll('.category-btn');
