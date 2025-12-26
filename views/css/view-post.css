@@ -22,9 +22,11 @@
 
 .gallery-section img {
   width: 100%;
-  height: 500px;
-  object-fit: contain;
-  background: #000; /* Letterboxing for vertical images */
+  height: auto;        /* Let height adjust automatically */
+  max-height: 600px;   /* Optional: cap very tall images */
+  object-fit: cover;   /* Fill container nicely without black bars */
+  border-radius: 12px;
+  display: block;
 }
 
 /* Action Sidebar (Sticky) */
