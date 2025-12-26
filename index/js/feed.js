@@ -1,6 +1,10 @@
+// /index/js/feed.js
+import { db } from '/index/js/firebase/init.js';
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { initFeaturedAds } from '/index/js/featured-ads.js';
+
 export function initFeed() {
-  const postsContainer = document.getElementById('feed'); // make sure your home view has id="feed"
+  const postsContainer = document.getElementById('feed'); // must exist
   const categoryBtns = document.querySelectorAll('.category-btn');
   const businessCheckbox = document.getElementById('isBusinessAccount');
   const businessBenefits = document.getElementById('businessBenefits');
@@ -14,116 +18,100 @@ export function initFeed() {
     });
   }
 
-// Mock posts (with featured business ad)
-const mockPosts = [
-  {
-    id: 1,
-    title: "Oak Dining Chair",
-    teaser: "Solid oak chair in great condition. Ideal for kitchen or dining room.",
-    category: "forsale",
-    categoryLabel: "For Sale",
-    price: 25,
-    area: "Porth",
-    image: "/images/post-placeholder.jpg",
-    type: "standard"
-  },
+  // ------------------- FIREBASE -------------------
+  async function fetchPosts() {
+    try {
+      const postsCol = collection(db, 'posts');
+      const postsQuery = query(postsCol, orderBy('createdAt', 'desc'));
+      const snapshot = await getDocs(postsQuery);
 
-  // ⭐ FEATURED BUSINESS AD
-  {
-    id: "biz-1",
-    title: "Rhonda Pro Cleaning Services",
-    teaser: "Professional home & end-of-tenancy cleaning. Trusted local business.",
-    category: "business",
-    categoryLabel: "Sponsored",
-    price: null,
-    area: "Rhondda Valleys",
-    image: "/images/business-cleaning.jpg",
-    type: "business",
-    cta: "Get a Quote"
-  },
+      const posts = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          title: data.title,
+          teaser: data.description || data.teaser || "",
+          category: data.category || "misc",
+          categoryLabel: data.categoryLabel || data.category,
+          price: data.price || null,
+          area: data.area || "Rhondda",
+          image: data.imageUrl || "/images/post-placeholder.jpg",
+          type: data.isBusiness ? "business" : "standard",
+          cta: data.cta || null
+        };
+      });
 
-  {
-    id: 2,
-    title: "Lawn Mowing & Garden Care",
-    teaser: "Local, reliable garden maintenance. One-off cuts or regular slots.",
-    category: "jobs",
-    categoryLabel: "Services",
-    area: "Treorchy",
-    image: "/images/post-placeholder.jpg",
-    type: "standard"
-  },
+      // Add featured business ads at the top if needed
+      const featuredAd = {
+        id: "biz-1",
+        title: "Rhonda Pro Cleaning Services",
+        teaser: "Professional home & end-of-tenancy cleaning. Trusted local business.",
+        category: "business",
+        categoryLabel: "Sponsored",
+        price: null,
+        area: "Rhondda Valleys",
+        image: "/images/business-cleaning.jpg",
+        type: "business",
+        cta: "Get a Quote"
+      };
+      posts.unshift(featuredAd);
 
-  {
-    id: 3,
-    title: "2-Bed Flat to Rent",
-    teaser: "Bright, recently decorated flat close to shops and transport links.",
-    category: "property",
-    categoryLabel: "Property",
-    price: 450,
-    area: "Tonypandy",
-    image: "/images/post-placeholder.jpg",
-    type: "standard"
+      return posts;
+    } catch (err) {
+      console.error("Error fetching posts:", err);
+      return [];
+    }
   }
-];
 
-  // Load posts function
-  function loadPosts(category = 'all') {
+  // ------------------- LOAD POSTS -------------------
+  function loadPosts(category = 'all', posts = []) {
     postsContainer.innerHTML = '';
-    const filtered = category === 'all' ? mockPosts : mockPosts.filter(p => p.category === category);
+    const filtered = category === 'all' ? posts : posts.filter(p => p.category === category);
     if (!filtered.length) return postsContainer.innerHTML = '<p>No posts yet!</p>';
 
     filtered.forEach(post => {
-  const card = document.createElement('div');
-  card.className = `post-card ${post.type || ''}`;
+      const card = document.createElement('div');
+      card.className = `post-card ${post.type || ''}`;
 
-  const imgSrc = post.image || '/images/post-placeholder.jpg';
-  const area = post.area || "Rhondda"; // mock for now
+      const imgSrc = post.image || '/images/post-placeholder.jpg';
+      const area = post.area || "Rhondda";
 
-  card.innerHTML = `
-    <div class="post-image">
-      <img src="${imgSrc}" alt="${post.title}">
-    </div>
+      card.innerHTML = `
+        <div class="post-image">
+          <img src="${imgSrc}" alt="${post.title}">
+        </div>
+        <div class="post-body">
+          <h3 class="post-title">${post.title}</h3>
+          <p class="post-teaser">${post.teaser}</p>
+          <div class="post-meta">
+            ${post.price ? `<span class="post-price">£${post.price}</span>` : ''}
+            <span class="post-area">📍 ${area}</span>
+            <span class="post-category">${post.categoryLabel || post.category}</span>
+          </div>
+          ${post.type === "business" && post.cta ? `<button class="cta-btn">${post.cta}</button>` : ''}
+        </div>
+        <button class="report-btn" title="Report this post" data-post-id="${post.id}">⚑</button>
+      `;
 
-    <div class="post-body">
-      <h3 class="post-title">${post.title}</h3>
+      card.addEventListener('click', e => {
+        if (e.target.closest('.report-btn')) return;
+        sessionStorage.setItem("viewPostId", post.id);
+        loadView("view-post");
+      });
 
-      <p class="post-teaser">
-        ${post.content}
-      </p>
-
-      <div class="post-meta">
-        ${post.price ? `<span class="post-price">£${post.price}</span>` : ''}
-        <span class="post-area">📍 ${area}</span>
-        <span class="post-category">${post.category}</span>
-      </div>
-    </div>
-
-    <button
-      class="report-btn"
-      title="Report this post"
-      data-post-id="${post.id}"
-    >⚑</button>
-  `;
-
-  card.addEventListener('click', e => {
-    if (e.target.closest('.report-btn')) return;
-
-    sessionStorage.setItem("viewPostId", post.id);
-    loadView("view-post");
-  });
-
-  postsContainer.appendChild(card);
-});
+      postsContainer.appendChild(card);
+    });
   }
 
-  // Category buttons
-  categoryBtns.forEach(btn => btn.addEventListener('click', () => {
+  // ------------------- CATEGORY FILTER -------------------
+  categoryBtns.forEach(btn => btn.addEventListener('click', async () => {
     categoryBtns.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    loadPosts(btn.dataset.category);
+    const posts = await fetchPosts();
+    loadPosts(btn.dataset.category, posts);
   }));
 
-  // Report post
+  // ------------------- REPORT POST -------------------
   document.addEventListener('click', e => {
     if (!e.target.classList.contains('report-btn')) return;
     const postId = e.target.dataset.postId;
@@ -135,7 +123,7 @@ const mockPosts = [
     alert("Thanks — this post has been flagged for review.");
   });
 
-  // Weather function
+  // ------------------- WEATHER -------------------
   async function loadWeather() {
     const emojiEl = document.querySelector(".weather-emoji");
     const textEl = document.querySelector(".weather-text");
@@ -168,29 +156,26 @@ const mockPosts = [
     }
   }
 
-function loadGreeting() {
-  const welshEl = document.querySelector(".greeting-welsh");
-  const englishEl = document.querySelector(".greeting-english");
+  // ------------------- GREETING -------------------
+  function loadGreeting() {
+    const welshEl = document.querySelector(".greeting-welsh");
+    const englishEl = document.querySelector(".greeting-english");
 
-  if (!welshEl || !englishEl) return;
+    if (!welshEl || !englishEl) return;
+    welshEl.textContent = "Shwmae";
 
-  // Always show Welsh greeting
-  welshEl.textContent = "Shwmae";
-
-  // If logged in, show name
-  const user = window.currentUser;
-
-  if (user && user.displayName) {
-    englishEl.textContent = `${user.displayName}, welcome back`;
-  } else {
-    englishEl.textContent = "Welcome to Rhondda Noticeboard";
+    const user = window.currentUser;
+    englishEl.textContent = user && user.displayName
+      ? `${user.displayName}, welcome back`
+      : "Welcome to Rhondda Noticeboard";
   }
-}
-  
-  // Initial load
-  
-  loadPosts();
-  loadGreeting();
-  loadWeather();
-  initFeaturedAds()
+
+  // ------------------- INITIAL LOAD -------------------
+  (async () => {
+    const posts = await fetchPosts();
+    loadPosts('all', posts);
+    loadGreeting();
+    loadWeather();
+    initFeaturedAds();
+  })();
 }
