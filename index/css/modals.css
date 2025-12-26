@@ -175,25 +175,3 @@ body.modal-open main {
   color: #666;
   margin-top: 4px;
 }
-
-/* STEP SYSTEM */
-.post-step {
-  display: none;
-  animation: stepIn 0.25s ease;
-}
-
-.post-step.active {
-  display: block;
-}
-
-/* Nice transition */
-@keyframes stepIn {
-  from {
-    opacity: 0;
-    transform: translateX(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
