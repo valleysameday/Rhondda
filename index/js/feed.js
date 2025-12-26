@@ -28,30 +28,47 @@ export function initFeed() {
     if (!filtered.length) return postsContainer.innerHTML = '<p>No posts yet!</p>';
 
     filtered.forEach(post => {
-      const card = document.createElement('div');
-      card.className = `post-card ${post.type || ''}`;
-      const imgSrc = post.image || '/images/post-placeholder.jpg';
-      const overlayText = post.type === 'business' ? `<div class="business-overlay">${post.title}</div>` : '';
-      card.innerHTML = `
-        <div class="post-image"><img src="${imgSrc}" alt="${post.title}">${overlayText}</div>
-        <div class="post-body">
-          <h3>${post.title}</h3>
-          ${post.price ? `<div class="post-price">£${post.price}</div>` : ''}
-          <p class="post-desc">${post.content}</p>
-          <small class="post-category">Category: ${post.category}</small>
-        </div>
-        <button class="report-btn" title="Report this post" data-post-id="${post.id}">⚑</button>
-      `;
+  const card = document.createElement('div');
+  card.className = `post-card ${post.type || ''}`;
 
-      card.addEventListener('click', e => {
-  if (e.target.closest('.report-btn')) return;
+  const imgSrc = post.image || '/images/post-placeholder.jpg';
+  const area = post.area || "Rhondda"; // mock for now
 
-  sessionStorage.setItem("viewPostId", post.id);
-  loadView("view-post");
+  card.innerHTML = `
+    <div class="post-image">
+      <img src="${imgSrc}" alt="${post.title}">
+    </div>
+
+    <div class="post-body">
+      <h3 class="post-title">${post.title}</h3>
+
+      <p class="post-teaser">
+        ${post.content}
+      </p>
+
+      <div class="post-meta">
+        ${post.price ? `<span class="post-price">£${post.price}</span>` : ''}
+        <span class="post-area">📍 ${area}</span>
+        <span class="post-category">${post.category}</span>
+      </div>
+    </div>
+
+    <button
+      class="report-btn"
+      title="Report this post"
+      data-post-id="${post.id}"
+    >⚑</button>
+  `;
+
+  card.addEventListener('click', e => {
+    if (e.target.closest('.report-btn')) return;
+
+    sessionStorage.setItem("viewPostId", post.id);
+    loadView("view-post");
+  });
+
+  postsContainer.appendChild(card);
 });
-      
-      postsContainer.appendChild(card);
-    });
   }
 
   // Category buttons
