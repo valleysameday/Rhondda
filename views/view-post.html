@@ -1,93 +1,54 @@
 <div id="view-post" class="view-post-page">
   <div class="view-post-container">
-    <!-- Main Content -->
-    <main class="main-content">
-      <div class="gallery-wrapper">
-        <div class="gallery-section">
-          <div class="gallery-track" id="galleryContainer">
-            <!-- Images injected here -->
-          </div>
-
-          <button
-            class="gallery-nav left"
-            id="galleryPrev"
-            aria-label="Previous image"
-          >
-            ❮
-          </button>
-          <button
-            class="gallery-nav right"
-            id="galleryNext"
-            aria-label="Next image"
-          >
-            ❯
-          </button>
-
-          <div class="image-counter">
-            <span id="currentImg">1</span> / <span id="totalImg">1</span>
-          </div>
-
-          <div class="gallery-dots" id="galleryDots"></div>
+    <!-- Gallery -->
+    <div class="gallery-wrapper">
+      <div class="gallery-section">
+        <div class="gallery-track" id="galleryContainer">
+          <!-- Images injected by JS -->
         </div>
+
+        <button class="gallery-nav left" id="galleryPrev" aria-label="Previous image">❮</button>
+        <button class="gallery-nav right" id="galleryNext" aria-label="Next image">❯</button>
+
+        <div class="image-counter">
+          <span id="currentImg">1</span> / <span id="totalImg">1</span>
+        </div>
+
+        <div class="gallery-dots" id="galleryDots"></div>
       </div>
-
-      <section class="details-section">
-        <div class="meta-header">
-          <span id="viewCategory" class="badge-pill"></span>
-          <span id="viewTime" class="time-ago"></span>
-        </div>
-
-        <h1 id="viewTitle" class="post-title">Loading...</h1>
-
-        <div class="mobile-price-row">
-          <span id="viewPriceMobile" class="price-tag"></span>
-          <div class="location-tag">
-            <svg
-              width="14"
-              height="14"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1118 0z"
-              ></path>
-              <circle cx="12" cy="10" r="3"></circle>
-            </svg>
-            <span id="viewArea"></span>
-          </div>
-        </div>
-
-        <div class="content-card">
-          <h3>Description</h3>
-          <p id="viewDescription" class="description-text"></p>
-        </div>
-
-        <button id="reportPost" class="report-link">Report Listing</button>
-      </section>
-    </main>
-
-    <!-- Desktop Sidebar -->
-    <aside class="action-sidebar">
-      <div class="sticky-card">
-        <span id="viewPrice" class="price-tag"></span>
-        <div class="location-box">
-          📍 <span id="viewAreaDesk"></span>
-        </div>
-        <button id="messageSeller" class="primary-btn">Message Seller</button>
-        <p class="safety-note">Verified seller • Keep all chats in app</p>
-      </div>
-    </aside>
-  </div>
-
-  <!-- Mobile Floating Action Bar -->
-  <div class="mobile-action-bar">
-    <div class="price-group">
-      <small>Total price</small>
-      <strong id="viewPriceFloating"></strong>
     </div>
-    <button id="messageSellerMobile" class="primary-btn">Message</button>
+
+    <!-- Post Details -->
+    <section class="details-section">
+      <div class="meta-header">
+        <span id="viewCategory" class="badge-pill"></span>
+        <span id="viewTime" class="time-ago"></span>
+      </div>
+
+      <h1 id="viewTitle" class="post-title">Loading...</h1>
+
+      <div class="mobile-price-row">
+        <span id="viewPriceMobile" class="price-tag"></span>
+        <div class="location-tag">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1118 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span id="viewArea"></span>
+        </div>
+      </div>
+
+      <div class="content-card">
+        <h3>Description</h3>
+        <p id="viewDescription" class="description-text"></p>
+      </div>
+
+      <div class="message-btn-wrapper">
+        <button id="messageSeller" class="primary-btn">Message Seller</button>
+      </div>
+
+      <button id="reportPost" class="report-link">Report Listing</button>
+    </section>
   </div>
 </div>
 
