@@ -136,71 +136,113 @@
 <!-- ================= POST MODAL ================= -->
 <div id="posts-grid" class="modal">
   <div class="modal-content">
+
     <button class="close"
             aria-label="Close"
             data-action="close-screens">&times;</button>
 
+    <!-- Progress dots -->
+    <div class="post-progress">
+      <span class="dot active"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+
     <div id="postFlow">
 
-      <div class="post-step" data-step="1">
-        <h2>Select a Category</h2>
-        <select id="postCategory">
-          <option value="">Choose category</option>
-          <option value="forsale">For Sale</option>
-          <option value="jobs">Jobs & Services</option>
-          <option value="property">Property</option>
-          <option value="events">Events</option>
-          <option value="community">Community</option>
-          <option value="free">Free</option>
-        </select>
-        <button class="post-next">Next</button>
+      <!-- ========== STEP 1: CATEGORY ========== -->
+      <div class="post-step active" data-step="1">
+        <h2>What are you posting?</h2>
+
+        <div class="category-grid">
+          <button type="button" data-category="forsale">🛋 For Sale</button>
+          <button type="button" data-category="jobs">💼 Jobs & Services</button>
+          <button type="button" data-category="property">🏠 Property</button>
+          <button type="button" data-category="events">📅 Events</button>
+          <button type="button" data-category="community">👥 Community</button>
+          <button type="button" data-category="free">🎁 Free</button>
+        </div>
       </div>
 
+      <!-- ========== STEP 2: CORE DETAILS ========== -->
       <div class="post-step" data-step="2">
-        <h2>Ad Details</h2>
+        <h2>Tell people about it</h2>
 
-        <input type="text" id="postTitle" placeholder="Title" required>
-        <textarea id="postDescription" rows="4" placeholder="Description" required></textarea>
+        <input
+          type="text"
+          id="postTitle"
+          placeholder="Ad title"
+          maxlength="70"
+          required
+        >
 
-        <label>Price (optional)</label>
-        <input type="number" id="postPrice" placeholder="0" min="0" step="0.01">
+        <textarea
+          id="postDescription"
+          rows="5"
+          placeholder="Add a description"
+          required
+        ></textarea>
 
-        <label>Your Area</label>
-        <input type="text" id="postArea" placeholder="e.g. Ferndale, Pentre, Tonypandy">
+        <div class="post-nav">
+          <button type="button" class="post-prev ghost-btn">Back</button>
+          <button type="button" class="post-next primary-btn" disabled>
+            Continue
+          </button>
+        </div>
+      </div>
 
-        <label>Add Photos</label>
+      <!-- ========== STEP 3: OPTIONAL DETAILS ========== -->
+      <div class="post-step" data-step="3">
+        <h2>Optional details</h2>
 
-<div class="photo-uploader">
-  <input
-    type="file"
-    id="postImages"
-    accept="image/*"
-    multiple
-    hidden
-  >
+        <input
+          type="number"
+          id="postPrice"
+          placeholder="Price (optional)"
+          min="0"
+          step="0.01"
+        >
 
-  <button type="button" id="addPhotosBtn" class="ghost-btn">
-    + Add photos
-  </button>
+        <input
+          type="text"
+          id="postArea"
+          placeholder="Area (optional)"
+        >
 
-  <small class="hint-text">
-    Add up to 4 photos. First photo becomes the cover.
-  </small>
+        <div class="photo-uploader">
+          <input
+            type="file"
+            id="postImages"
+            accept="image/*"
+            multiple
+            hidden
+          >
 
-  <div id="imagePreview" class="image-preview-grid"></div>
-</div>
+          <button type="button" id="addPhotosBtn" class="ghost-btn">
+            + Add photos
+          </button>
 
-        <button class="post-prev">Back</button>
-        <button id="postSubmitBtn">Submit Ad</button>
+          <small class="hint-text">
+            Add up to 4 photos. First photo becomes the cover.
+          </small>
+
+          <div id="imagePreview" class="image-preview-grid"></div>
+        </div>
+
+        <div class="post-nav">
+          <button type="button" class="post-prev ghost-btn">Back</button>
+          <button type="button" id="postSubmitBtn" class="primary-btn">
+            Post ad
+          </button>
+        </div>
       </div>
 
     </div>
 
     <p id="postFeedback" class="feedback-text"></p>
+
   </div>
 </div>
-
-
 <!-- ================= FIXED ACTION BAR ================= -->
 <div class="action-bar">
 
