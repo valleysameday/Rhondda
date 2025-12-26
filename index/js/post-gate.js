@@ -43,48 +43,74 @@ getFirebase().then(fb => {
 
     let postAttemptedData = null;
 
-    /* ---------------- POST SUBMISSION ---------------- */
-    postSubmitBtn?.addEventListener('click', async e => {
-      e.preventDefault();
+/* ---------------- POST SUBMISSION ---------------- */
+postSubmitBtn?.addEventListener('click', async e => {
+  e.preventDefault();
 
-      const title = document.getElementById('postTitle').value.trim();
-      const description = document.getElementById('postDescription').value.trim();
-      const category = document.getElementById('postCategory').value;
-      const subcategory = document.getElementById('postSubcategory').value;
-      const image = document.getElementById('postImage').files[0];
+  const title = document.getElementById('postTitle')?.value.trim();
+  const description = document.getElementById('postDescription')?.value.trim();
+  const category = document.getElementById('postCategory')?.value;
+  const subcategory = document.getElementById('postSubcategory')?.value || null;
+  const area = document.getElementById('postArea')?.value.trim() || null;
+  const priceInput = document.getElementById('postPrice')?.value;
+  const image = document.getElementById('postImage')?.files[0];
 
-      if (!title || !description || !category) {
-        alert('Please fill all required fields.');
-        return;
-      }
+  // Business toggle (checkbox or hidden input)
+  const isBusiness = document.getElementById('isBusinessPost')?.checked || false;
 
-      if (!auth.currentUser) {
-        postAttemptedData = { title, description, category, subcategory, image };
-        openScreen('login');
-        return;
-      }
+  if (!title || !description || !category) {
+    alert('Please fill all required fields.');
+    return;
+  }
 
-      let imageUrl = null;
-      if (image) {
-        const storageRef = ref(storage, `posts/${Date.now()}_${image.name}`);
-        await uploadBytes(storageRef, image);
-        imageUrl = await getDownloadURL(storageRef);
-      }
+  if (!auth.currentUser) {
+    postAttemptedData = {
+      title,
+      description,
+      category,
+      subcategory,
+      area,
+      price: priceInput,
+      isBusiness
+    };
+    openScreen('login');
+    return;
+  }
 
-      await addDoc(collection(db, 'posts'), {
-        title,
-        description,
-        category,
-        subcategory,
-        imageUrl,
-        createdAt: serverTimestamp(),
-        userId: auth.currentUser.uid
-      });
+  /* ---------------- IMAGE UPLOAD ---------------- */
+  let imageUrl = null;
+  if (image) {
+    const storageRef = ref(storage, `posts/${Date.now()}_${image.name}`);
+    await uploadBytes(storageRef, image);
+    imageUrl = await getDownloadURL(storageRef);
+  }
 
-      alert('Your ad has been posted!');
-      window.closeScreens();
-    });
+  /* ---------------- POST OBJECT ---------------- */
+  const postData = {
+    title,
+    teaser: description.slice(0, 140), // short preview text
+    description,
+    category,
+    subcategory,
+    area,
+    price: priceInput ? Number(priceInput) : null,
+    imageUrl,
+    type: isBusiness ? "business" : "standard",
+    createdAt: serverTimestamp(),
+    userId: auth.currentUser.uid
+  };
 
+  // Optional: auto-feature business posts (later make this paid)
+  if (isBusiness) {
+    postData.featured = true;
+    postData.categoryLabel = "Sponsored";
+  }
+
+  await addDoc(collection(db, 'posts'), postData);
+
+  alert(isBusiness ? 'Your business ad is live!' : 'Your ad has been posted!');
+  window.closeScreens();
+});
     /* ---------------- LOGIN ---------------- */
     loginSubmitBtn?.addEventListener('click', async e => {
       e.preventDefault();
