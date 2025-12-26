@@ -22,16 +22,18 @@
   min-height: 300px;
 }
 
+/* hide all images by default */
 .gallery-section img {
+  display: none;       /* hide all images initially */
   width: 100%;
   height: auto;
   max-height: 600px;
   object-fit: cover;
   border-radius: 12px;
-  display: none; /* hide all initially */
   transition: opacity 0.3s ease;
 }
 
+/* only show the active image */
 .gallery-section img.active {
   display: block;
 }
