@@ -2,14 +2,10 @@ import { getFirebase } from '/index/js/firebase/init.js';
 import { initUIRouter } from '/index/js/ui-router.js';
 import '/index/js/post-gate.js';
 
-import {
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
 let auth, db, storage;
 
 /* =====================================================
-   SPA VIEW LOADER (SINGLE VERSION)
+   SPA VIEW LOADER
 ===================================================== */
 export async function loadView(view) {
   const container = document.getElementById("app");
@@ -18,7 +14,6 @@ export async function loadView(view) {
   container.querySelectorAll(".view").forEach(v => v.hidden = true);
 
   let target = document.getElementById(`view-${view}`);
-
   if (!target) {
     target = document.createElement("div");
     target.id = `view-${view}`;
@@ -34,7 +29,7 @@ export async function loadView(view) {
 
     try {
       const mod = await import(`/views/${view}.js?cache=${Date.now()}`);
-      mod.init?.();
+      mod.init?.({ db, auth, storage });
     } catch (err) {
       console.error("View JS error:", err);
     }
@@ -46,7 +41,7 @@ export async function loadView(view) {
 window.loadView = loadView;
 
 /* =====================================================
-   ACCOUNT BUTTON (SINGLE SOURCE OF TRUTH)
+   ACCOUNT BUTTON
 ===================================================== */
 function initAccountButton() {
   const btn = document.getElementById("openAccountModal");
@@ -78,7 +73,7 @@ getFirebase().then(fb => {
 
   console.log("✅ Firebase ready");
 
-  onAuthStateChanged(auth, user => {
+  auth.onAuthStateChanged(user => {
     window.currentUser = user || null;
 
     const label = document.querySelector("#openAccountModal .label-main");
@@ -91,7 +86,9 @@ getFirebase().then(fb => {
     loadView("home");
   };
 
-  document.readyState === "loading"
-    ? document.addEventListener("DOMContentLoaded", start)
-    : start();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start);
+  } else {
+    start();
+  }
 });
