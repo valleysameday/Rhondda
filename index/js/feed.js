@@ -14,12 +14,57 @@ export function initFeed() {
     });
   }
 
-  // Mock posts
-  const mockPosts = [
-    { id: 1, title: "Chair for Sale", content: "A comfy chair", category: "forsale", price: 25 },
-    { id: 2, title: "Lawn Mowing", content: "Professional service", category: "jobs" },
-    { id: 3, title: "Flat to Rent", content: "2-bed flat in town", category: "property", price: 450 },
-  ];
+// Mock posts (with featured business ad)
+const mockPosts = [
+  {
+    id: 1,
+    title: "Oak Dining Chair",
+    teaser: "Solid oak chair in great condition. Ideal for kitchen or dining room.",
+    category: "forsale",
+    categoryLabel: "For Sale",
+    price: 25,
+    area: "Porth",
+    image: "/images/post-placeholder.jpg",
+    type: "standard"
+  },
+
+  // ⭐ FEATURED BUSINESS AD
+  {
+    id: "biz-1",
+    title: "Rhonda Pro Cleaning Services",
+    teaser: "Professional home & end-of-tenancy cleaning. Trusted local business.",
+    category: "business",
+    categoryLabel: "Sponsored",
+    price: null,
+    area: "Rhondda Valleys",
+    image: "/images/business-cleaning.jpg",
+    type: "business",
+    cta: "Get a Quote"
+  },
+
+  {
+    id: 2,
+    title: "Lawn Mowing & Garden Care",
+    teaser: "Local, reliable garden maintenance. One-off cuts or regular slots.",
+    category: "jobs",
+    categoryLabel: "Services",
+    area: "Treorchy",
+    image: "/images/post-placeholder.jpg",
+    type: "standard"
+  },
+
+  {
+    id: 3,
+    title: "2-Bed Flat to Rent",
+    teaser: "Bright, recently decorated flat close to shops and transport links.",
+    category: "property",
+    categoryLabel: "Property",
+    price: 450,
+    area: "Tonypandy",
+    image: "/images/post-placeholder.jpg",
+    type: "standard"
+  }
+];
 
   // Load posts function
   function loadPosts(category = 'all') {
