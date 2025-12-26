@@ -1,10 +1,9 @@
-// /index/js/feed.js
-import { db } from '/index/js/firebase/init.js';
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { initFeaturedAds } from '/index/js/featured-ads.js';
+import { loadView } from '/index/js/main.js';
 
-export function initFeed() {
-  const postsContainer = document.getElementById('feed'); // must exist
+export async function initFeed({ db }) {
+  const postsContainer = document.getElementById('feed');
   const categoryBtns = document.querySelectorAll('.category-btn');
   const businessCheckbox = document.getElementById('isBusinessAccount');
   const businessBenefits = document.getElementById('businessBenefits');
@@ -18,7 +17,7 @@ export function initFeed() {
     });
   }
 
-  // ------------------- FIREBASE -------------------
+  // ------------------- FIREBASE POSTS -------------------
   async function fetchPosts() {
     try {
       const postsCol = collection(db, 'posts');
@@ -41,7 +40,7 @@ export function initFeed() {
         };
       });
 
-      // Add featured business ads at the top if needed
+      // Add a featured business ad at the top
       const featuredAd = {
         id: "biz-1",
         title: "Rhonda Pro Cleaning Services",
@@ -63,7 +62,7 @@ export function initFeed() {
     }
   }
 
-  // ------------------- LOAD POSTS -------------------
+  // ------------------- RENDER POSTS -------------------
   function loadPosts(category = 'all', posts = []) {
     postsContainer.innerHTML = '';
     const filtered = category === 'all' ? posts : posts.filter(p => p.category === category);
@@ -171,11 +170,9 @@ export function initFeed() {
   }
 
   // ------------------- INITIAL LOAD -------------------
-  (async () => {
-    const posts = await fetchPosts();
-    loadPosts('all', posts);
-    loadGreeting();
-    loadWeather();
-    initFeaturedAds();
-  })();
+  const posts = await fetchPosts();
+  loadPosts('all', posts);
+  loadGreeting();
+  loadWeather();
+  initFeaturedAds();
 }
