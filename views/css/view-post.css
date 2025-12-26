@@ -4,7 +4,7 @@
   max-width: 1100px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 350px;
+  grid-template-columns: 1fr 350px; /* Split layout */
   gap: 32px;
 }
 
@@ -14,93 +14,143 @@
 
 /* Image Gallery Section */
 .gallery-section {
+  position: relative; /* Needed for absolute arrows & images */
   background: #f8fafc;
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid #e2e8f0;
-  position: relative;
+  min-height: 300px;
 }
 
 .gallery-section img {
   width: 100%;
+  height: auto;
   max-height: 600px;
   object-fit: cover;
   border-radius: 12px;
-  display: block;
-  transition: transform 0.35s ease;
+  display: none; /* hide all initially */
+  transition: opacity 0.3s ease;
 }
 
+.gallery-section img.active {
+  display: block;
+}
+
+/* Navigation Arrows for Desktop */
 .gallery-nav {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 5;
-  background: rgba(255,255,255,0.7);
+  background: rgba(0,0,0,0.3);
+  color: white;
   border: none;
   font-size: 2rem;
-  padding: 8px 14px;
+  padding: 6px 12px;
   border-radius: 50%;
   cursor: pointer;
   display: none;
-  user-select: none;
+  z-index: 10;
 }
-
-.gallery-nav.left { left: 8px; }
-.gallery-nav.right { right: 8px; }
-
-@media (min-width: 851px) {
+.gallery-nav.left { left: 10px; }
+.gallery-nav.right { right: 10px; }
+@media(min-width: 850px) {
   .gallery-nav { display: block; }
 }
 
+/* Swipe hint for mobile */
 .swipe-hint {
   position: absolute;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.9rem;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(0,0,0,0.5);
   color: #fff;
-  background: rgba(0,0,0,0.3);
-  padding: 4px 10px;
+  font-size: 0.8rem;
+  padding: 4px 8px;
   border-radius: 12px;
   display: none;
-  pointer-events: none;
-  z-index: 5;
 }
-
-@media (max-width: 850px) {
+@media(max-width: 849px) {
   .swipe-hint { display: block; }
 }
 
-.gallery-indicators {
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
+/* Action Sidebar (Sticky) */
+.action-sidebar {
   display: flex;
-  gap: 6px;
-  z-index: 5;
+  flex-direction: column;
+  gap: 20px;
+  position: sticky;
+  top: 24px;
+  height: fit-content;
 }
 
-.gallery-indicators .dot {
-  width: 8px;
-  height: 8px;
-  background: rgba(255,255,255,0.7);
-  border-radius: 50%;
-  transition: all 0.2s ease;
+.price-card {
+  padding: 24px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  border: 1px solid #f1f5f9;
 }
 
-.gallery-indicators .dot.active { background: #ff7eb3; }
+.price-tag {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #0f172a;
+  display: block;
+  margin-bottom: 8px;
+}
 
-/* Action Sidebar */
-.action-sidebar { display: flex; flex-direction: column; gap: 20px; position: sticky; top: 24px; height: fit-content; }
-.price-card { padding: 24px; background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
-.price-tag { font-size: 2rem; font-weight: 800; color: #0f172a; display: block; margin-bottom: 8px; }
-.contact-btn { width: 100%; background: #2563eb; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: transform 0.1s, background 0.2s; }
+.contact-btn {
+  width: 100%;
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.1s, background 0.2s;
+}
+
 .contact-btn:hover { background: #1d4ed8; }
 .contact-btn:active { transform: scale(0.98); }
 
-.details-section h1 { font-size: 1.8rem; font-weight: 700; color: #1e293b; margin-bottom: 12px; }
-.badge-group { display: flex; gap: 8px; margin-bottom: 24px; }
-.badge { background: #f1f5f9; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; color: #475569; font-weight: 500; }
-.description-text { font-size: 1.05rem; line-height: 1.7; color: #334155; white-space: pre-line; }
-.report-link { margin-top: 40px; background: none; border: none; color: #94a3b8; text-decoration: underline; cursor: pointer; font-size: 0.9rem; }
+/* Content Section */
+.details-section h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 12px;
+}
+
+.badge-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.badge {
+  background: #f1f5f9;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+.description-text {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #334155;
+  white-space: pre-line;
+}
+
+.report-link {
+  margin-top: 40px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
