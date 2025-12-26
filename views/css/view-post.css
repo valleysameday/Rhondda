@@ -14,28 +14,29 @@
 }
 
 .view-post-container {
-  max-width: 900px;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding: 20px;
+  padding: 0 20px;
 }
 
-/* GALLERY */
+/* FULL-WIDTH GALLERY */
 .gallery-wrapper {
   position: relative;
-  border-radius: var(--radius);
+  width: 100%;
+  height: auto;           /* remove locked aspect ratio */
   overflow: hidden;
-  aspect-ratio: 4 / 3;
   background: #000;
+  border-radius: 0;       /* full-width on desktop */
   box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);
 }
 
 .gallery-track {
   display: flex;
   width: 100%;
-  height: 100%;
   transition: transform 0.35s cubic-bezier(0.22,0.61,0.36,1);
   will-change: transform;
 }
@@ -45,14 +46,13 @@
 .gallery-image {
   flex: 0 0 100%;
   width: 100%;
-  height: 100%;
-  object-fit: contain;
+  height: auto;       /* maintain natural height */
+  object-fit: cover;  /* fills width while cropping height slightly */
+  display: block;
   background: #000;
 }
 
-.gallery-image.loading { filter: blur(10px); transform: scale(1.02); }
-
-/* Arrows */
+/* NAVIGATION ARROWS */
 .gallery-nav {
   position: absolute;
   top: 50%;
@@ -61,10 +61,10 @@
   color: #fff;
   border: none;
   border-radius: 999px;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   cursor: pointer;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -75,9 +75,9 @@
 .gallery-nav.left { left: 12px; }
 .gallery-nav.right { right: 12px; }
 
-.gallery-nav:hover { background: rgba(15,23,42,0.85); transform: translateY(-50%) scale(1.05); }
+.gallery-nav:hover { background: rgba(15,23,42,0.85); transform: translateY(-50%) scale(1.1); }
 
-/* Counter */
+/* IMAGE COUNTER & DOTS */
 .image-counter {
   position: absolute;
   bottom: 16px;
@@ -89,10 +89,8 @@
   padding: 4px 12px;
   border-radius: 999px;
   font-size: 0.78rem;
-  letter-spacing: 0.02em;
 }
 
-/* Dots */
 .gallery-dots {
   position: absolute;
   bottom: 16px;
@@ -114,13 +112,16 @@
 
 .gallery-dot.active { width: 16px; background: #fff; }
 
-/* DETAILS */
-.details-section { display: flex; flex-direction: column; gap: 16px; }
+/* DETAILS SECTION */
+.details-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
 .meta-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   font-size: 0.85rem;
   color: #6b7280;
 }
@@ -136,8 +137,7 @@
 }
 
 .post-title {
-  font-size: 1.6rem;
-  line-height: 1.3;
+  font-size: 1.8rem;
   font-weight: 700;
   color: var(--text-main);
 }
@@ -150,7 +150,7 @@
 }
 
 .price-tag {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-main);
 }
@@ -166,6 +166,7 @@
   font-size: 0.85rem;
 }
 
+/* DESCRIPTION CARD */
 .content-card {
   background: var(--surface);
   padding: 18px 20px;
@@ -177,14 +178,53 @@
 .content-card h3 { margin:0 0 8px; font-size:1rem; font-weight:600; color:#111827; }
 .description-text { margin:0; color:#4b5563; line-height:1.5; font-size:0.95rem; }
 
-/* REPORT */
-.report-link { border:none; background:none; color:#9b1c1c; font-size:0.85rem; text-decoration:underline; cursor:pointer; }
-
 /* MESSAGE SELLER */
-.message-btn-wrapper { display:flex; flex-direction:column; align-items:center; gap:6px; margin-top:12px; }
-.message-btn-wrapper .primary-btn { max-width:300px; width:100%; }
+.message-btn-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 12px;
+  gap: 6px;
+}
 
-.safety-note { font-size:0.85rem; color:#6b7280; text-align:center; }
+.message-btn-wrapper .primary-btn {
+  max-width: 320px;
+  width: 100%;
+  padding: 14px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.message-btn-wrapper .primary-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px -8px rgba(37,99,235,0.55);
+}
+
+.safety-note {
+  font-size: 0.85rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+/* REPORT LINK */
+.report-link {
+  border: none;
+  background: none;
+  color: #9b1c1c;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
 
 /* RESPONSIVE */
-@media (max-width:849px) { .gallery-wrapper { border-radius:0; } .details-section { padding-bottom:20px; } }
+@media (max-width:849px) {
+  .gallery-wrapper { border-radius: 0; }
+  .details-section { padding-bottom: 20px; }
+}
