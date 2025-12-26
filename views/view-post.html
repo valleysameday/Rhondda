@@ -1,14 +1,15 @@
 <!-- /views/view-post.html -->
 <div id="view-post" class="view-post-container">
-
+  
   <!-- Left Column: Gallery & Details -->
   <main class="main-content">
     <div class="gallery-section" id="galleryContainer">
-      <!-- Images injected via JS -->
-      <div class="swipe-hint">◀ Swipe ▶</div>
-      <button class="gallery-nav left">&lt;</button>
-      <button class="gallery-nav right">&gt;</button>
-      <div class="gallery-indicators"></div>
+      <!-- Images will be injected here -->
+      <!-- Navigation arrows for desktop -->
+      <button class="gallery-nav left" id="galleryPrev">&#10094;</button>
+      <button class="gallery-nav right" id="galleryNext">&#10095;</button>
+      <!-- Swipe hint for mobile -->
+      <div class="swipe-hint">Swipe &larr;&rarr;</div>
     </div>
 
     <section class="details-section" style="margin-top: 32px;">
@@ -18,7 +19,7 @@
       </div>
       <h1 id="viewTitle">Loading Post...</h1>
       <p id="viewDescription" class="description-text"></p>
-
+      
       <button id="reportPost" class="report-link">⚑ Report this listing</button>
     </section>
   </main>
@@ -31,9 +32,9 @@
         <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
         <span id="viewArea"></span>
       </div>
-
+      
       <button id="messageSeller" class="contact-btn">Message Seller</button>
-
+      
       <div style="margin-top: 16px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
         <small style="color: #94a3b8;">Safety Tip: Always meet in public places and never send money via bank transfer before seeing the item.</small>
       </div>
