@@ -2,6 +2,7 @@
    BASE CARD
 ===================================================== */
 .post-card {
+    position: relative;
     background: #ffffff;
     border-radius: 12px;
     overflow: hidden;
@@ -10,21 +11,16 @@
     border: 1px solid #e5e7eb;
     box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     transition: transform .18s ease, box-shadow .18s ease;
-    height: 340px; /* slightly taller for breathing room */
+    height: 340px;
 }
 
 .post-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 22px rgba(0,0,0,0.12);
 }
-.post-price {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #2d333f;
-    margin: 4px 0 6px;
-}
+
 /* =====================================================
-   IMAGES — FULL WIDTH & IMPACTFUL
+   IMAGE
 ===================================================== */
 .post-image {
     width: 100%;
@@ -39,7 +35,6 @@
     object-fit: cover;
 }
 
-/* subtle gradient improves text readability if needed */
 .post-image::after {
     content: '';
     position: absolute;
@@ -52,29 +47,28 @@
 }
 
 /* =====================================================
-   BODY CONTENT
+   BODY
 ===================================================== */
 .post-body {
     padding: 12px 14px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     flex: 1;
 }
 
 /* Title */
-.post-card h3 {
+.post-title {
     font-size: 1.05rem;
     font-weight: 600;
     color: #0f172a;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* Description */
-.post-card p {
+/* Teaser text */
+.post-teaser {
     font-size: .9rem;
     color: #374151;
     line-height: 1.35;
@@ -85,14 +79,76 @@
     overflow: hidden;
 }
 
-/* Meta */
-.post-card small {
+/* =====================================================
+   META ROW (PRICE · AREA · CATEGORY)
+===================================================== */
+.post-meta {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
     font-size: .78rem;
     color: #6b7280;
 }
 
+.post-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Price */
+.post-price {
+    font-size: .95rem;
+    font-weight: 700;
+    color: #16a34a;
+}
+
+/* Area */
+.post-area {
+    font-weight: 500;
+    color: #374151;
+}
+
+/* Category pill */
+.post-category {
+    background: #f1f5f9;
+    color: #334155;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 600;
+}
+
 /* =====================================================
-   BUSINESS / FEATURED CARDS — PREMIUM STANDOUT
+   FLAG / REPORT BUTTON
+===================================================== */
+.report-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255,255,255,0.85);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background .15s ease, transform .15s ease;
+    z-index: 10;
+}
+
+.report-btn:hover {
+    background: #fee2e2;
+    transform: scale(1.1);
+}
+
+/* =====================================================
+   BUSINESS / FEATURED CARDS
 ===================================================== */
 .post-card.business {
     grid-column: span 2;
@@ -104,46 +160,31 @@
     overflow: hidden;
 }
 
-/* Business image */
-.post-card.business .post-image {
-    height: 200px;
-    width: 100%;
-    position: relative;
-}
-
-/* ✅ PREMIUM FEATURED RIBBON — bigger, brighter, glowing */
+/* Ribbon */
 .post-card.business::before {
     content: "FEATURED BUSINESS";
     position: absolute;
-    top: 30px;          /* ✅ fully visible */
-    left: -30px;        /* ✅ perfect diagonal placement */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    /* ✅ Premium gradient */
+    top: 30px;
+    left: -30px;
+    width: 160px;
+    height: 38px;
     background: linear-gradient(135deg, #ff2f7d, #ff7eb3, #ffb3d6);
-
-    /* ✅ Glow effect */
     box-shadow: 0 4px 12px rgba(255, 80, 140, 0.45);
-
-    /* ✅ Text styling */
     color: #fff;
     font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 1px;
     text-transform: uppercase;
-
-    /* ✅ Bigger ribbon */
-    width: 160px;
-    height: 38px;
-
-    /* ✅ Clean diagonal */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transform: rotate(-45deg);
     z-index: 5;
+}
 
-    /* ✅ Smooth rendering */
-    -webkit-font-smoothing: antialiased;
+/* Business image */
+.post-card.business .post-image {
+    height: 200px;
 }
 
 /* Business body */
@@ -152,22 +193,30 @@
 }
 
 /* Business title */
-.post-card.business h3 {
+.post-card.business .post-title {
     font-size: 1.35rem;
     color: #ff2f7d;
 }
 
-/* Business description */
-.post-card.business p {
+/* Business teaser */
+.post-card.business .post-teaser {
     font-size: .95rem;
     -webkit-line-clamp: 3;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+}
+
+/* Business meta */
+.post-card.business .post-price {
+    font-size: 1.1rem;
+    color: #ff2f7d;
+}
+
+.post-card.business .post-category {
+    background: rgba(255,47,125,.12);
+    color: #ff2f7d;
 }
 
 /* =====================================================
-   DESKTOP LAYOUT
+   DESKTOP GRID
 ===================================================== */
 @media (min-width: 1024px) {
     .posts-grid {
@@ -184,5 +233,18 @@
 
     .post-card.business .post-image {
         height: 260px;
+    }
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+@media (max-width: 640px) {
+    .post-card {
+        height: auto;
+    }
+
+    .post-image {
+        height: 180px;
     }
 }
