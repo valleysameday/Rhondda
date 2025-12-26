@@ -13,8 +13,7 @@ import {
   addDoc,
   serverTimestamp,
   doc,
-  setDoc,
-  getDoc
+  setDoc
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
 import {
@@ -39,18 +38,28 @@ function initPostGate() {
 
   /* ---------- STEP FLOW ---------- */
   const steps = [...document.querySelectorAll('#posts-grid .post-step')];
+  const dots = [...document.querySelectorAll('.post-progress .dot')];
   let stepIndex = 0;
 
   function showStep(i) {
+    if (i < 0 || i >= steps.length) return;
+
     steps.forEach(s => s.classList.remove('active'));
-    steps[i]?.classList.add('active');
+    dots.forEach(d => d.classList.remove('active'));
+
+    steps[i].classList.add('active');
+    dots[i]?.classList.add('active');
+
     stepIndex = i;
   }
 
   showStep(0);
 
   document.querySelectorAll('.post-next').forEach(btn =>
-    btn.addEventListener('click', () => showStep(stepIndex + 1))
+    btn.addEventListener('click', () => {
+      if (btn.disabled) return;
+      showStep(stepIndex + 1);
+    })
   );
 
   document.querySelectorAll('.post-prev').forEach(btn =>
@@ -66,6 +75,24 @@ function initPostGate() {
       showStep(1);
     });
   });
+
+  /* ---------- STEP 2 VALIDATION ---------- */
+  const titleInput = document.getElementById('postTitle');
+  const descInput = document.getElementById('postDescription');
+  const step2NextBtn = document.querySelector(
+    '#posts-grid .post-step[data-step="2"] .post-next'
+  );
+
+  function validateStep2() {
+    const valid =
+      titleInput.value.trim().length > 3 &&
+      descInput.value.trim().length > 10;
+
+    step2NextBtn.disabled = !valid;
+  }
+
+  titleInput?.addEventListener('input', validateStep2);
+  descInput?.addEventListener('input', validateStep2);
 
   /* ---------- IMAGE PREVIEW ---------- */
   const imageInput = document.getElementById('postImages');
@@ -91,8 +118,8 @@ function initPostGate() {
   document.getElementById('postSubmitBtn')?.addEventListener('click', async e => {
     e.preventDefault();
 
-    const title = postTitle.value.trim();
-    const description = postDescription.value.trim();
+    const title = titleInput.value.trim();
+    const description = descInput.value.trim();
     const area = postArea.value.trim() || null;
     const price = postPrice.value ? Number(postPrice.value) : null;
 
@@ -113,8 +140,6 @@ function initPostGate() {
 
   /* ---------- AUTH ---------- */
   onAuthStateChanged(auth, async user => {
-    window.currentUser = user;
-
     if (user && postDraft) {
       await submitPost(postDraft, images);
       postDraft = null;
@@ -163,7 +188,10 @@ async function submitPost(data, images) {
   const imageUrls = [];
 
   for (const img of images) {
-    const storageRef = ref(storage, `posts/${auth.currentUser.uid}/${Date.now()}_${img.name}`);
+    const storageRef = ref(
+      storage,
+      `posts/${auth.currentUser.uid}/${Date.now()}_${img.name}`
+    );
     await uploadBytes(storageRef, img);
     imageUrls.push(await getDownloadURL(storageRef));
   }
