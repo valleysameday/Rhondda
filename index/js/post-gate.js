@@ -77,22 +77,7 @@ function initPostGate() {
   });
 
   /* ---------- STEP 2 VALIDATION ---------- */
-  const titleInput = document.getElementById('postTitle');
-  const descInput = document.getElementById('postDescription');
-  const step2NextBtn = document.querySelector(
-    '#posts-grid .post-step[data-step="2"] .post-next'
-  );
-
-  function validateStep2() {
-    const valid =
-      titleInput.value.trim().length > 3 &&
-      descInput.value.trim().length > 10;
-
-    step2NextBtn.disabled = !valid;
-  }
-
-  titleInput?.addEventListener('input', validateStep2);
-  descInput?.addEventListener('input', validateStep2);
+  
 
   /* ---------- IMAGE PREVIEW ---------- */
   const imageInput = document.getElementById('postImages');
@@ -138,7 +123,37 @@ function initPostGate() {
     await submitPost(postDraft, images);
   });
 
-  /* ---------- AUTH ---------- */
+  /* ---------- A/* ---------- STEP 2 VALIDATION (FIXED) ---------- */
+const step2 = document.querySelector('#posts-grid .post-step[data-step="2"]');
+
+const titleInput = step2.querySelector('#postTitle');
+const descInput  = step2.querySelector('#postDescription');
+const nextBtn    = step2.querySelector('.post-next');
+
+function validateStep2() {
+  const titleOk = titleInput.value.trim().length >= 3;
+  const descOk  = descInput.value.trim().length >= 10;
+
+  nextBtn.disabled = !(titleOk && descOk);
+}
+
+// Run on typing
+['input', 'keyup', 'change'].forEach(evt => {
+  titleInput.addEventListener(evt, validateStep2);
+  descInput.addEventListener(evt, validateStep2);
+});
+
+// Run once when step becomes visible
+const stepObserver = new MutationObserver(() => {
+  if (step2.classList.contains('active')) {
+    validateStep2();
+  }
+});
+
+stepObserver.observe(step2, {
+  attributes: true,
+  attributeFilter: ['class']
+});UTH ---------- */
   onAuthStateChanged(auth, async user => {
     if (user && postDraft) {
       await submitPost(postDraft, images);
