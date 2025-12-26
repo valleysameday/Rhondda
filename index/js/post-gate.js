@@ -50,7 +50,6 @@ postSubmitBtn?.addEventListener('click', async e => {
   const title = document.getElementById('postTitle')?.value.trim();
   const description = document.getElementById('postDescription')?.value.trim();
   const category = document.getElementById('postCategory')?.value;
-  const subcategory = document.getElementById('postSubcategory')?.value || null;
   const area = document.getElementById('postArea')?.value.trim() || null;
   const priceInput = document.getElementById('postPrice')?.value;
   const image = document.getElementById('postImage')?.files[0];
