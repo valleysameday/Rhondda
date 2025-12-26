@@ -1,20 +1,41 @@
+<!-- /views/view-post.html -->
 <div id="view-post" class="view-post-container">
-  <div class="view-post-card">
-    <div class="post-image">
-      <img id="viewImage" src="/images/post-placeholder.jpg" alt="Post Image">
+  
+  <!-- Left Column: Gallery & Details -->
+  <main class="main-content">
+    <div class="gallery-section">
+      <img id="viewImage" src="/images/post-placeholder.jpg" alt="Product Image">
     </div>
-    <div class="post-body">
-      <h2 id="viewTitle">Post Title</h2>
-      <p id="viewDescription">Description of the post goes here...</p>
-      <div class="post-meta">
-        <span id="viewPrice"></span>
-        <span id="viewArea"></span>
-        <span id="viewMeta"></span>
+
+    <section class="details-section" style="margin-top: 32px;">
+      <div class="badge-group">
+        <span id="viewCategory" class="badge"></span>
+        <span id="viewTime" class="badge"></span>
       </div>
-      <button id="reportPost" class="report-btn">⚑ Report</button>
+      <h1 id="viewTitle">Loading Post...</h1>
+      <p id="viewDescription" class="description-text"></p>
+      
+      <button id="reportPost" class="report-link">⚑ Report this listing</button>
+    </section>
+  </main>
+
+  <!-- Right Column: Buying Actions -->
+  <aside class="action-sidebar">
+    <div class="price-card">
+      <span id="viewPrice" class="price-tag"></span>
+      <div style="display: flex; align-items: center; gap: 8px; color: #64748b; margin-bottom: 20px;">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
+        <span id="viewArea"></span>
+      </div>
+      
+      <button id="messageSeller" class="contact-btn">Message Seller</button>
+      
+      <div style="margin-top: 16px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+        <small style="color: #94a3b8;">Safety Tip: Always meet in public places and never send money via bank transfer before seeing the item.</small>
+      </div>
     </div>
-  </div>
+  </aside>
+
 </div>
 
-<!-- Link CSS -->
 <link rel="stylesheet" href="/views/css/view-post.css">
