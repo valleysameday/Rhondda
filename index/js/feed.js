@@ -34,7 +34,7 @@ export async function initFeed({ db }) {
           categoryLabel: data.categoryLabel || data.category,
           price: data.price || null,
           area: data.area || "Rhondda",
-          image: data.imageUrl || "/images/post-placeholder.jpg",
+          image: data.images?.[0] || "/images/post-placeholder.jpg",
           type: data.isBusiness ? "business" : "standard",
           cta: data.cta || null
         };
