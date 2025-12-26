@@ -1,46 +1,60 @@
-<!-- /views/view-post.html -->
-<div id="view-post" class="view-post-container">
-  
-  <!-- Left Column: Gallery & Details -->
-  <main class="main-content">
-    <div class="gallery-section" id="galleryContainer">
-      <!-- Images will be injected here -->
-      <!-- Navigation arrows for desktop -->
-      <button class="gallery-nav left" id="galleryPrev">&#10094;</button>
-      <button class="gallery-nav right" id="galleryNext">&#10095;</button>
-      <!-- Swipe hint for mobile -->
-      <div class="swipe-hint">Swipe &larr;&rarr;</div>
+<div id="view-post" class="view-post-page">
+  <div class="view-post-container">
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="gallery-wrapper">
+        <div class="gallery-section" id="galleryContainer">
+          <!-- Images injected here -->
+          <button class="gallery-nav left" id="galleryPrev" aria-label="Previous">❮</button>
+          <button class="gallery-nav right" id="galleryNext" aria-label="Next">❯</button>
+          <div class="image-counter"><span id="currentImg">1</span> / <span id="totalImg">1</span></div>
+        </div>
+      </div>
+
+      <section class="details-section">
+        <div class="meta-header">
+          <span id="viewCategory" class="badge-pill"></span>
+          <span id="viewTime" class="time-ago"></span>
+        </div>
+        
+        <h1 id="viewTitle" class="post-title">Loading...</h1>
+        
+        <div class="mobile-price-row">
+          <span id="viewPriceMobile" class="price-tag"></span>
+          <div class="location-tag">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1118 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span id="viewArea"></span>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <h3>Description</h3>
+          <p id="viewDescription" class="description-text"></p>
+        </div>
+        
+        <button id="reportPost" class="report-link">Report Listing</button>
+      </section>
+    </main>
+
+    <!-- Desktop Sidebar -->
+    <aside class="action-sidebar">
+      <div class="sticky-card">
+        <span id="viewPrice" class="price-tag"></span>
+        <div class="location-box">
+          <span id="viewAreaDesk"></span>
+        </div>
+        <button id="messageSeller" class="primary-btn">Message Seller</button>
+        <p class="safety-note">Verified Seller • 100% Secure</p>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Mobile Floating Action Bar (2026 Trend) -->
+  <div class="mobile-action-bar">
+    <div class="price-group">
+      <small>Total Price</small>
+      <strong id="viewPriceFloating"></strong>
     </div>
-
-    <section class="details-section" style="margin-top: 32px;">
-      <div class="badge-group">
-        <span id="viewCategory" class="badge"></span>
-        <span id="viewTime" class="badge"></span>
-      </div>
-      <h1 id="viewTitle">Loading Post...</h1>
-      <p id="viewDescription" class="description-text"></p>
-      
-      <button id="reportPost" class="report-link">⚑ Report this listing</button>
-    </section>
-  </main>
-
-  <!-- Right Column: Buying Actions -->
-  <aside class="action-sidebar">
-    <div class="price-card">
-      <span id="viewPrice" class="price-tag"></span>
-      <div style="display: flex; align-items: center; gap: 8px; color: #64748b; margin-bottom: 20px;">
-        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
-        <span id="viewArea"></span>
-      </div>
-      
-      <button id="messageSeller" class="contact-btn">Message Seller</button>
-      
-      <div style="margin-top: 16px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
-        <small style="color: #94a3b8;">Safety Tip: Always meet in public places and never send money via bank transfer before seeing the item.</small>
-      </div>
-    </div>
-  </aside>
-
+    <button id="messageSellerMobile" class="primary-btn">Message</button>
+  </div>
 </div>
-
-<link rel="stylesheet" href="/views/css/view-post.css">
