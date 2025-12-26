@@ -26,10 +26,10 @@ export async function init({ db }) {
     document.getElementById("viewTime").textContent = post.posted || "Just now";
 
     const imgEl = document.getElementById("viewImage");
-    if (imgEl && post.imageUrl) {
-      imgEl.src = post.imageUrl;
-      imgEl.alt = post.title;
-    }
+if (imgEl && post.images?.length) {
+  imgEl.src = post.images[0];
+  imgEl.alt = post.title;
+}
 
     // Action Handlers
     document.getElementById("messageSeller").onclick = () => {
