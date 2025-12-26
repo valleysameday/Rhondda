@@ -30,43 +30,29 @@ getFirebase().then(fb => {
   initPostGate();
 });
 
-/* ================= POST GATE ================= */
 function initPostGate() {
-  /* ---------- STEP FLOW ---------- */
+
   const steps = [...document.querySelectorAll('#posts-grid .post-step')];
   const dots = [...document.querySelectorAll('.post-progress .dot')];
   let stepIndex = 0;
 
   function showStep(i) {
     if (i < 0 || i >= steps.length) return;
-
     steps.forEach(s => s.classList.remove('active'));
     dots.forEach(d => d.classList.remove('active'));
-
     steps[i].classList.add('active');
-    dots[i]?.classList.add('active');
-
+    dots[i].classList.add('active');
     stepIndex = i;
 
-    // Auto-focus title in step 2
-    if (i === 1) {
-      titleInput.focus();
-      validateStep2();
-    }
+    // Re-run step2 validation when shown
+    if (i === 1) validateStep2();
+    // Auto-focus title
+    if (i === 1) titleInput.focus();
   }
-
-  showStep(0);
 
   document.querySelectorAll('.post-next').forEach(btn =>
     btn.addEventListener('click', () => {
-      if (btn.disabled) {
-        // Shake animation for invalid step 2
-        if (stepIndex === 1) {
-          step2.classList.add('shake');
-          setTimeout(() => step2.classList.remove('shake'), 300);
-        }
-        return;
-      }
+      if (btn.disabled) return;
       showStep(stepIndex + 1);
     })
   );
@@ -90,42 +76,17 @@ function initPostGate() {
   const descInput = step2.querySelector('#postDescription');
   const nextBtn = step2.querySelector('.post-next');
 
-  // Add counters
-  const titleCounter = document.createElement('small');
-  titleCounter.style.fontSize = '12px';
-  titleCounter.style.color = '#666';
-  titleCounter.style.textAlign = 'right';
-  titleInput.after(titleCounter);
-
-  const descCounter = document.createElement('small');
-  descCounter.style.fontSize = '12px';
-  descCounter.style.color = '#666';
-  descCounter.style.textAlign = 'right';
-  descInput.after(descCounter);
-
   function validateStep2() {
-    const titleVal = titleInput.value.trim();
-    const descVal = descInput.value.trim();
-    const titleOk = titleVal.length >= 3;
-    const descOk = descVal.length >= 10;
-
-    // Update counters
-    titleCounter.textContent = `${titleVal.length}/70`;
-    descCounter.textContent = `${descVal.length}/500`;
-
+    const titleOk = titleInput.value.trim().length >= 3;
+    const descOk = descInput.value.trim().length >= 10;
     nextBtn.disabled = !(titleOk && descOk);
   }
 
+  // Run on typing
   ['input', 'keyup', 'change'].forEach(evt => {
     titleInput.addEventListener(evt, validateStep2);
     descInput.addEventListener(evt, validateStep2);
   });
-
-  // Observe class changes to revalidate step 2 when shown
-  const stepObserver = new MutationObserver(() => {
-    if (step2.classList.contains('active')) validateStep2();
-  });
-  stepObserver.observe(step2, { attributes: true, attributeFilter: ['class'] });
 
   /* ---------- IMAGE PREVIEW ---------- */
   const imageInput = document.getElementById('postImages');
@@ -183,24 +144,15 @@ function initPostGate() {
     }
   });
 
-  /* ---------- LOGIN ---------- */
+  /* ---------- LOGIN / SIGNUP / RESET ---------- */
   loginSubmit?.addEventListener('click', async () => {
-    await signInWithEmailAndPassword(
-      auth,
-      loginEmail.value.trim(),
-      loginPassword.value
-    );
+    await signInWithEmailAndPassword(auth, loginEmail.value.trim(), loginPassword.value);
     closeScreens();
   });
 
-  /* ---------- SIGNUP ---------- */
   signupSubmit?.addEventListener('click', async () => {
     const isBusiness = isBusinessAccount.checked;
-    await createUserWithEmailAndPassword(
-      auth,
-      signupEmail.value.trim(),
-      signupPassword.value
-    );
+    await createUserWithEmailAndPassword(auth, signupEmail.value.trim(), signupPassword.value);
     await setDoc(doc(db, 'users', auth.currentUser.uid), {
       email: auth.currentUser.email,
       isBusiness,
@@ -209,7 +161,6 @@ function initPostGate() {
     closeScreens();
   });
 
-  /* ---------- PASSWORD RESET ---------- */
   forgotSubmit?.addEventListener('click', async () => {
     await sendPasswordResetEmail(auth, forgotEmail.value.trim());
     openScreen('resetConfirm');
