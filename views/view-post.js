@@ -25,10 +25,21 @@ export async function init({ db }) {
     document.getElementById("viewCategory").textContent = post.category || "Misc";
     document.getElementById("viewTime").textContent = post.posted || "Just now";
 
-    const imgEl = document.getElementById("viewImage");
-if (imgEl && post.images?.length) {
-  imgEl.src = post.images[0];
-  imgEl.alt = post.title;
+    const galleryContainer = document.getElementById("galleryContainer");
+galleryContainer.innerHTML = ''; // clear any previous images
+
+if (post.images?.length) {
+  post.images.forEach(url => {
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = post.title;
+    galleryContainer.appendChild(img);
+  });
+} else {
+  const img = document.createElement('img');
+  img.src = '/images/post-placeholder.jpg';
+  img.alt = 'Placeholder';
+  galleryContainer.appendChild(img);
 }
 
     // Action Handlers
