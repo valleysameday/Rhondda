@@ -175,3 +175,141 @@ body.modal-open main {
   color: #666;
   margin-top: 4px;
 }
+
+/* ================= POST AD FLOW ONLY ================= */
+
+/* Scope everything to the post modal */
+#posts-grid .modal-content {
+  max-width: 440px;
+  padding-top: 20px;
+}
+
+/* Hide all steps by default */
+#posts-grid .post-step {
+  display: none;
+  animation: slideIn 0.25s ease;
+}
+
+/* Show active step only */
+#posts-grid .post-step.active {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Headings */
+#posts-grid h2 {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 6px;
+}
+
+/* ================= CATEGORY GRID ================= */
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.category-grid button {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 18px 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-grid button:hover {
+  border-color: #FF7EB3;
+  background: #fff0f5;
+}
+
+.category-grid button:active {
+  transform: scale(0.97);
+}
+
+/* ================= NAV BUTTONS ================= */
+
+.post-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+#posts-grid .primary-btn {
+  flex: 1;
+  background: linear-gradient(135deg, #FF7EB3, #FF758C);
+  color: #fff;
+}
+
+#posts-grid .ghost-btn {
+  flex: 1;
+}
+
+/* Disabled continue */
+#posts-grid button:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ================= PROGRESS DOTS ================= */
+
+.post-progress {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.post-progress .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  transition: background 0.2s ease;
+}
+
+.post-progress .dot.active {
+  background: #FF7EB3;
+}
+
+/* ================= IMAGE UPLOADER ================= */
+
+#posts-grid .photo-uploader {
+  margin-top: 8px;
+}
+
+#posts-grid .image-preview-grid img {
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+/* ================= FEEDBACK ================= */
+
+#posts-grid .feedback-text {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+/* ================= ANIMATIONS ================= */
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
