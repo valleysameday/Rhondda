@@ -1,198 +1,181 @@
 // post-gate.js
 import { getFirebase } from '/index/js/firebase/init.js';
 
-import { 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   onAuthStateChanged,
   sendPasswordResetEmail
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
-import { 
-  collection, 
-  addDoc, 
+import {
+  collection,
+  addDoc,
   serverTimestamp,
   doc,
   setDoc,
   getDoc
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
-import { 
-  ref, 
-  uploadBytes, 
-  getDownloadURL 
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js';
 
 let auth, db, storage;
+let postDraft = null;
 
-// ✅ Load Firebase FIRST
+/* ================= FIREBASE INIT ================= */
 getFirebase().then(fb => {
   auth = fb.auth;
   db = fb.db;
   storage = fb.storage;
+  initPostGate();
+});
 
-  console.log("✅ Firebase loaded");
+/* ================= POST GATE ================= */
+function initPostGate() {
 
-  function startPostGate() {
+  /* ---------- STEP FLOW ---------- */
+  const steps = [...document.querySelectorAll('#posts-grid .post-step')];
+  let stepIndex = 0;
 
-    const postSubmitBtn = document.getElementById('postSubmitBtn');
-    const loginSubmitBtn = document.getElementById('loginSubmit');
-    const signupSubmitBtn = document.getElementById('signupSubmit');
-    const forgotSubmit = document.getElementById('forgotSubmit');
-    const forgotEmail = document.getElementById('forgotEmail');
-
-    let postAttemptedData = null;
-
-/* ---------------- POST SUBMISSION ---------------- */
-postSubmitBtn?.addEventListener('click', async e => {
-  e.preventDefault();
-
-  const title = document.getElementById('postTitle')?.value.trim();
-  const description = document.getElementById('postDescription')?.value.trim();
-  const category = document.getElementById('postCategory')?.value;
-  const area = document.getElementById('postArea')?.value.trim() || null;
-  const priceInput = document.getElementById('postPrice')?.value;
-  const image = document.getElementById('postImage')?.files[0];
-
-  // Business toggle (checkbox or hidden input)
-  const isBusiness = document.getElementById('isBusinessPost')?.checked || false;
-
-  if (!title || !description || !category) {
-    alert('Please fill all required fields.');
-    return;
+  function showStep(i) {
+    steps.forEach(s => s.classList.remove('active'));
+    steps[i]?.classList.add('active');
+    stepIndex = i;
   }
 
-  if (!auth.currentUser) {
-    postAttemptedData = {
-      title,
-      description,
-      category,
-      subcategory,
-      area,
-      price: priceInput,
-      isBusiness
-    };
-    openScreen('login');
-    return;
+  showStep(0);
+
+  document.querySelectorAll('.post-next').forEach(btn =>
+    btn.addEventListener('click', () => showStep(stepIndex + 1))
+  );
+
+  document.querySelectorAll('.post-prev').forEach(btn =>
+    btn.addEventListener('click', () => showStep(stepIndex - 1))
+  );
+
+  /* ---------- CATEGORY SELECTION ---------- */
+  let selectedCategory = null;
+
+  document.querySelectorAll('[data-category]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedCategory = btn.dataset.category;
+      showStep(1);
+    });
+  });
+
+  /* ---------- IMAGE PREVIEW ---------- */
+  const imageInput = document.getElementById('postImages');
+  const previewGrid = document.getElementById('imagePreview');
+  let images = [];
+
+  document.getElementById('addPhotosBtn')?.addEventListener('click', () => {
+    imageInput.click();
+  });
+
+  imageInput?.addEventListener('change', () => {
+    previewGrid.innerHTML = '';
+    images = Array.from(imageInput.files).slice(0, 4);
+
+    images.forEach(file => {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      previewGrid.appendChild(img);
+    });
+  });
+
+  /* ---------- POST SUBMIT ---------- */
+  document.getElementById('postSubmitBtn')?.addEventListener('click', async e => {
+    e.preventDefault();
+
+    const title = postTitle.value.trim();
+    const description = postDescription.value.trim();
+    const area = postArea.value.trim() || null;
+    const price = postPrice.value ? Number(postPrice.value) : null;
+
+    if (!title || !description || !selectedCategory) {
+      alert('Please complete all required fields');
+      return;
+    }
+
+    postDraft = { title, description, area, price, category: selectedCategory };
+
+    if (!auth.currentUser) {
+      openScreen('login');
+      return;
+    }
+
+    await submitPost(postDraft, images);
+  });
+
+  /* ---------- AUTH ---------- */
+  onAuthStateChanged(auth, async user => {
+    window.currentUser = user;
+
+    if (user && postDraft) {
+      await submitPost(postDraft, images);
+      postDraft = null;
+    }
+  });
+
+  /* ---------- LOGIN ---------- */
+  loginSubmit?.addEventListener('click', async () => {
+    await signInWithEmailAndPassword(
+      auth,
+      loginEmail.value.trim(),
+      loginPassword.value
+    );
+    closeScreens();
+  });
+
+  /* ---------- SIGNUP ---------- */
+  signupSubmit?.addEventListener('click', async () => {
+    const isBusiness = isBusinessAccount.checked;
+
+    await createUserWithEmailAndPassword(
+      auth,
+      signupEmail.value.trim(),
+      signupPassword.value
+    );
+
+    await setDoc(doc(db, 'users', auth.currentUser.uid), {
+      email: auth.currentUser.email,
+      isBusiness,
+      createdAt: serverTimestamp()
+    });
+
+    closeScreens();
+  });
+
+  /* ---------- PASSWORD RESET ---------- */
+  forgotSubmit?.addEventListener('click', async () => {
+    await sendPasswordResetEmail(auth, forgotEmail.value.trim());
+    openScreen('resetConfirm');
+  });
+}
+
+/* ================= POST UPLOAD ================= */
+async function submitPost(data, images) {
+
+  const imageUrls = [];
+
+  for (const img of images) {
+    const storageRef = ref(storage, `posts/${auth.currentUser.uid}/${Date.now()}_${img.name}`);
+    await uploadBytes(storageRef, img);
+    imageUrls.push(await getDownloadURL(storageRef));
   }
 
-  /* ---------------- IMAGE UPLOAD ---------------- */
-  let imageUrl = null;
-  if (image) {
-    const storageRef = ref(storage, `posts/${Date.now()}_${image.name}`);
-    await uploadBytes(storageRef, image);
-    imageUrl = await getDownloadURL(storageRef);
-  }
-
-  /* ---------------- POST OBJECT ---------------- */
-  const postData = {
-    title,
-    teaser: description.slice(0, 140), // short preview text
-    description,
-    category,
-    subcategory,
-    area,
-    price: priceInput ? Number(priceInput) : null,
-    imageUrl,
-    type: isBusiness ? "business" : "standard",
+  await addDoc(collection(db, 'posts'), {
+    ...data,
+    images: imageUrls,
+    userId: auth.currentUser.uid,
     createdAt: serverTimestamp(),
-    userId: auth.currentUser.uid
-  };
+    status: 'live'
+  });
 
-  // Optional: auto-feature business posts (later make this paid)
-  if (isBusiness) {
-    postData.featured = true;
-    postData.categoryLabel = "Sponsored";
-  }
-
-  await addDoc(collection(db, 'posts'), postData);
-
-  alert(isBusiness ? 'Your business ad is live!' : 'Your ad has been posted!');
-  window.closeScreens();
-});
-    /* ---------------- LOGIN ---------------- */
-    loginSubmitBtn?.addEventListener('click', async e => {
-      e.preventDefault();
-
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
-
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-
-        const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
-
-        if (userDoc.exists()) {
-          window.firebaseUserDoc = userDoc.data();
-          navigateToDashboard();   // ✅ SPA navigation
-        }
-
-      } catch (err) {
-        alert(err.message);
-      }
-    });
-
-    /* ---------------- SIGNUP ---------------- */
-    signupSubmitBtn?.addEventListener('click', async e => {
-      e.preventDefault();
-
-      const email = document.getElementById('signupEmail').value.trim();
-      const password = document.getElementById('signupPassword').value;
-      const isBusiness = document.getElementById('isBusinessAccount').checked;
-
-      try {
-        await createUserWithEmailAndPassword(auth, email, password);
-
-        await setDoc(doc(db, "users", auth.currentUser.uid), {
-          email,
-          isBusiness,
-          createdAt: serverTimestamp()
-        });
-
-        window.firebaseUserDoc = { email, isBusiness };
-        navigateToDashboard();   // ✅ SPA navigation
-
-      } catch (err) {
-        alert(err.message);
-      }
-    });
-
-    /* ---------------- RESET PASSWORD ---------------- */
-    window.resetPassword = async function (email) {
-      try {
-        await sendPasswordResetEmail(auth, email);
-        openScreen('resetConfirm');
-      } catch (err) {
-        alert(err.message);
-      }
-    };
-
-    forgotSubmit?.addEventListener('click', () => {
-      const email = forgotEmail.value.trim();
-      if (!email) return alert("Please enter your email");
-      window.resetPassword(email);
-    });
-
-    /* ---------------- AUTH STATE ---------------- */
-    onAuthStateChanged(auth, async user => {
-      window.currentUser = user;
-
-      if (user) {
-        const snap = await getDoc(doc(db, "users", user.uid));
-        window.firebaseUserDoc = snap.exists() ? snap.data() : null;
-      } else {
-        window.firebaseUserDoc = null;
-      }
-
-      window.firebaseAuthReady = true;
-    });
-  }
-
-  // ✅ Ensure startPostGate ALWAYS runs
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", startPostGate);
-  } else {
-    startPostGate();
-  }
-
-});
+  alert('Your ad is live 🎉');
+  closeScreens();
+}
