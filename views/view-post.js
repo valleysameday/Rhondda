@@ -17,8 +17,8 @@ export async function init({ db }) {
     document.getElementById("viewDescription").textContent = post.description || post.teaser || "";
     document.getElementById("viewCategory").textContent = post.category || "General";
     document.getElementById("viewArea").textContent = post.area || "Rhondda";
-    
-    // Multi-price Mapping (Desktop + Mobile UI)
+
+    // Multi-price Mapping
     ["viewPrice", "viewPriceMobile", "viewPriceFloating"].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.textContent = priceText;
@@ -27,11 +27,12 @@ export async function init({ db }) {
     // Gallery Setup
     const gallery = document.getElementById("galleryContainer");
     gallery.querySelectorAll("img").forEach(i => i.remove());
-    
+
     const images = post.images?.length ? post.images : ["/images/post-placeholder.jpg"];
     images.forEach((url, i) => {
       const img = document.createElement("img");
       img.src = url;
+      img.alt = post.title;
       if (i === 0) img.classList.add("active");
       gallery.appendChild(img);
     });
@@ -47,7 +48,7 @@ export async function init({ db }) {
       currentCounter.textContent = idx + 1;
     };
 
-    // Controls
+    // Desktop Controls
     document.getElementById("galleryPrev").onclick = () => {
       currentIndex = (currentIndex - 1 + imgEls.length) % imgEls.length;
       updateGallery(currentIndex);
