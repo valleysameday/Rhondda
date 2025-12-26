@@ -28,6 +28,7 @@ export async function loadView(view) {
     target.dataset.loaded = "true";
 
     try {
+      // Pass Firebase context to view JS
       const mod = await import(`/views/${view}.js?cache=${Date.now()}`);
       mod.init?.({ db, auth, storage });
     } catch (err) {
@@ -73,6 +74,7 @@ getFirebase().then(fb => {
 
   console.log("✅ Firebase ready");
 
+  // Listen for auth changes
   auth.onAuthStateChanged(user => {
     window.currentUser = user || null;
 
