@@ -1,5 +1,5 @@
 :root {
-  --primary: #6366f1; /* Indigo 2026 trend */
+  --primary: #6366f1; 
   --surface: #ffffff;
   --bg: #f8fafc;
   --text-main: #0f172a;
@@ -27,20 +27,42 @@
   box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
 }
 
-.gallery-section { height: 100%; width: 100%; display: flex; align-items: center; }
+.gallery-section { height: 100%; width: 100%; display: flex; align-items: center; justify-content: center; position: relative; }
 
 .gallery-section img {
   display: none;
   width: 100%;
   height: 100%;
-  object-fit: contain; /* Keeps image integrity */
+  object-fit: contain;
+  border-radius: var(--radius);
+  transition: opacity 0.3s ease;
 }
 
 .gallery-section img.active { display: block; animation: fadeIn 0.4s ease; }
 
 @keyframes fadeIn { from { opacity: 0; transform: scale(1.02); } to { opacity: 1; transform: scale(1); } }
 
-/* Floating Image Counter */
+/* Navigation Arrows */
+.gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.4);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gallery-nav.left { left: 10px; }
+.gallery-nav.right { right: 10px; }
+
 .image-counter {
   position: absolute;
   bottom: 16px;
@@ -96,7 +118,7 @@
 }
 
 @media (min-width: 850px) {
-  .mobile-action-bar, .mobile-price-row { display: none; }
+  .mobile-action-bar { display: none; }
 }
 
 @media (max-width: 849px) {
@@ -104,5 +126,4 @@
   .gallery-wrapper { border-radius: 0; }
   .action-sidebar { display: none; }
   .details-section { padding: 24px; }
-  .post-title { font-size: 1.5rem; }
 }
