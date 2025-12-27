@@ -59,7 +59,7 @@ function initAccountButton() {
     loadView(
       window.firebaseUserDoc?.isBusiness
         ? "business-dashboard"
-        : "customer-dashboard"
+        : "general-dashboard"
     );
   });
 }
