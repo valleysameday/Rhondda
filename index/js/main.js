@@ -32,13 +32,24 @@ getFirebase().then(fb => {
 
     // SPA login/signup/forgot links
     document.querySelectorAll('[data-value="login"]').forEach(btn => {
-      btn.addEventListener("click", e => { e.preventDefault(); openLoginModal(); });
+      btn.addEventListener("click", e => { 
+        e.preventDefault(); 
+        openLoginModal(auth);  // pass initialized auth
+      });
     });
+
     document.querySelectorAll('[data-value="signup"]').forEach(btn => {
-      btn.addEventListener("click", e => { e.preventDefault(); openSignupModal(); });
+      btn.addEventListener("click", e => { 
+        e.preventDefault(); 
+        openSignupModal(auth);  // pass initialized auth
+      });
     });
+
     document.querySelectorAll('[data-value="forgot"]').forEach(btn => {
-      btn.addEventListener("click", e => { e.preventDefault(); openForgotModal(); });
+      btn.addEventListener("click", e => { 
+        e.preventDefault(); 
+        openForgotModal(auth);  // pass initialized auth
+      });
     });
 
     // Account button
@@ -48,7 +59,7 @@ getFirebase().then(fb => {
         e.preventDefault();
         const user = getCurrentUser();
         if (!user) {
-          openLoginModal();
+          openLoginModal(auth);
         } else {
           // Replace with your account view logic
           window.loadView(
