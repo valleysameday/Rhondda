@@ -26,7 +26,7 @@ export async function init({ auth: _auth, db: _db }) {
 
     document.getElementById("statAdsCount").textContent = stats.adsCount;
     document.getElementById("statTotalViews").textContent = stats.totalViews;
-    document.getElementById("statLeads").textContent = stats.totalLeads;
+    document.getElementById("statUnlocks").textContent = stats.totalLeads;
 
     // Logout
     document.getElementById("logoutBtn").addEventListener("click", () => {
