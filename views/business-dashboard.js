@@ -1,5 +1,4 @@
 // views/business-dashboard.js
-
 import { signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import {
   doc, getDoc, updateDoc,
@@ -14,58 +13,56 @@ import { loadView } from '/index/js/main.js';
 
 let auth, db, storage;
 
-export async function init({ auth: _auth, db: _db, storage: _storage }) {
-  auth = _auth;
-  db = _db;
-  storage = _storage;
+export async function init({ auth: a, db: d, storage: s }) {
+  auth = a; db = d; storage = s;
 
   const user = auth.currentUser;
   if (!user) return loadView("home");
 
-  const userRef = doc(db, "businesses", user.uid);
-  const snap = await getDoc(userRef);
-  const data = snap.exists() ? snap.data() : {};
+  const refDoc = doc(db, "businesses", user.uid);
+  const snap = await getDoc(refDoc);
+  if (!snap.exists()) return loadView("general-dashboard");
+
+  const data = snap.data();
 
   // Profile
-  document.getElementById("bizHeaderName").textContent = data.name || "Your Business";
-  document.getElementById("bizHeaderTagline").textContent =
-    data.name ? "Manage your ads, brand, and customers" : "Set up your business profile";
+  bizHeaderName.textContent = data.name || "Your Business";
+  bizHeaderTagline.textContent = data.name
+    ? "Manage your ads, brand, and customers"
+    : "Set up your business profile";
 
-  document.getElementById("bizViewName").textContent = data.name || "Add your business name";
-  document.getElementById("bizViewPhone").textContent = data.phone || "Add your phone";
-  document.getElementById("bizViewArea").textContent = data.area || "Add your area";
-  document.getElementById("bizViewWebsite").textContent = data.website || "Add your website";
-  document.getElementById("bizViewBio").textContent = data.bio || "Tell customers what you offer";
+  bizViewName.textContent = data.name || "Add your business name";
+  bizViewPhone.textContent = data.phone || "Add your phone";
+  bizViewArea.textContent = data.area || "Add your area";
+  bizViewWebsite.textContent = data.website || "Add your website";
+  bizViewBio.textContent = data.bio || "Tell customers what you offer";
 
-  // Avatar
-  const avatar = document.getElementById("bizDashboardAvatar");
-  if (data.avatarUrl) avatar.style.backgroundImage = `url('${data.avatarUrl}')`;
+  if (data.avatarUrl)
+    bizDashboardAvatar.style.backgroundImage = `url('${data.avatarUrl}')`;
 
-  document.getElementById("bizAvatarClickArea").onclick = () =>
-    document.getElementById("bizAvatarUploadInput").click();
-
-  document.getElementById("bizAvatarUploadInput").onchange = async e => {
+  bizAvatarClickArea.onclick = () => bizAvatarUploadInput.click();
+  bizAvatarUploadInput.onchange = async e => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const refPath = ref(storage, `avatars/${user.uid}.jpg`);
-    await uploadBytes(refPath, file);
-    const url = await getDownloadURL(refPath);
-    await updateDoc(userRef, { avatarUrl: url });
-    avatar.style.backgroundImage = `url('${url}')`;
+    const r = ref(storage, `avatars/${user.uid}.jpg`);
+    await uploadBytes(r, file);
+    const url = await getDownloadURL(r);
+    await updateDoc(refDoc, { avatarUrl: url });
+    bizDashboardAvatar.style.backgroundImage = `url('${url}')`;
   };
 
-  // Posts + stats
-  const snapPosts = await getDocs(
+  const postsSnap = await getDocs(
     query(collection(db, "posts"), where("businessId", "==", user.uid))
   );
 
   const stats = renderPostsAndStats(
     "bizPosts",
-    snapPosts,
+    postsSnap,
     id => openScreen("editPost"),
     async id => {
       if (!confirm("Delete this ad?")) return;
+
       const pSnap = await getDoc(doc(db, "posts", id));
       const post = pSnap.data();
 
@@ -80,30 +77,15 @@ export async function init({ auth: _auth, db: _db, storage: _storage }) {
     }
   );
 
-  document.getElementById("bizStatAdsCount").textContent = stats.adsCount;
-  document.getElementById("bizStatTotalViews").textContent = stats.totalViews;
-  document.getElementById("bizStatLeads").textContent = stats.totalLeads;
+  bizStatAdsCount.textContent = stats.adsCount;
+  bizStatTotalViews.textContent = stats.totalViews;
+  bizStatLeads.textContent = stats.totalLeads;
 
-  // Logout
-  document.getElementById("bizLogoutBtn").onclick = async () => {
-  try {
-    document.getElementById("bizLogoutOverlay").style.display = "flex";
-
-    // 1. Sign out from Firebase
+  bizLogoutBtn.onclick = async () => {
+    bizLogoutOverlay.style.display = "flex";
     await signOut(auth);
+    window.location.href = "/";
+  };
 
-    // 2. Clear any cached user data
-    sessionStorage.clear();
-    localStorage.removeItem("firebaseUserDoc");
-    localStorage.removeItem("rhonddaThanksShown");
-
-    // 3. Force a clean reload so no stale state survives
-    window.location.href = "/"; // or your home route
-  } catch (err) {
-    console.error("Logout failed:", err);
-    alert("Could not log out. Please try again.");
-  }
-};
-
-  document.getElementById("bizNewPostBtn").onclick = () => openScreen("post");
+  bizNewPostBtn.onclick = () => openScreen("post");
 }
