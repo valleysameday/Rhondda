@@ -1,92 +1,37 @@
 import { getFirebase } from '/index/js/firebase/init.js';
-import { 
-  onAuthStateChanged, 
-  signOut 
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-import { 
-  collection, 
-  query, 
-  where, 
-  getDocs,
-  doc,
-  deleteDoc
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { collection, query, where, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { renderPostsAndStats } from '/index/js/dashboard/posts.js';
+import { loadView } from '/index/js/main.js';
 
 let auth, db;
 
-getFirebase().then(fb => {
-  auth = fb.auth;
-  db = fb.db;
-
-  let authResolved = false;
+export async function init({ auth: _auth, db: _db }) {
+  auth = _auth; db = _db;
 
   onAuthStateChanged(auth, async user => {
-    authResolved = true;
+    if (!user) return loadView("home");
 
-    if (!user) {
-      loadView("home");   // ✅ SPA navigation
-      return;
-    }
-
-    // ✅ Load user's posts
     const q = query(collection(db, "posts"), where("userId", "==", user.uid));
     const snap = await getDocs(q);
 
-    const container = document.getElementById("userPosts");
-    container.innerHTML = "";
-
-    if (snap.empty) {
-      container.innerHTML = `<p class="empty-msg">You haven’t posted anything yet.</p>`;
-      return;
-    }
-
-    snap.forEach(docSnap => {
-      const p = docSnap.data();
-      const id = docSnap.id;
-
-      container.innerHTML += `
-        <div class="dash-card">
-          <img src="${p.images?.[0] || '/images/image-webholder.webp'}" class="dash-img">
-          <div class="dash-info">
-            <h3>${p.title}</h3>
-            <p>${p.description}</p>
-            <small>${p.category} ${p.subcategory ? "• " + p.subcategory : ""}</small>
-          </div>
-          <div class="dash-actions">
-            <button class="dash-btn dash-edit" data-id="${id}">Edit</button>
-            <button class="dash-btn dash-delete" data-id="${id}">Delete</button>
-          </div>
-        </div>
-      `;
-    });
-
-    // DELETE HANDLER
-    document.querySelectorAll(".dash-delete").forEach(btn => {
-      btn.addEventListener("click", async () => {
+    const stats = renderPostsAndStats("userPosts", snap,
+      id => openScreen("editPost"),
+      async id => {
         if (!confirm("Delete this ad?")) return;
-        await deleteDoc(doc(db, "posts", btn.dataset.id));
-        loadView("customer-dashboard");   // ✅ SPA reload
-      });
+        await deleteDoc(doc(db, "posts", id));
+        loadView("general-dashboard");
+      }
+    );
+
+    document.getElementById("statAdsCount").textContent = stats.adsCount;
+    document.getElementById("statTotalViews").textContent = stats.totalViews;
+    document.getElementById("statLeads").textContent = stats.totalLeads;
+
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      document.getElementById("logoutOverlay").style.display = "flex";
+      signOut(auth).then(() => setTimeout(() => loadView("home"), 2000));
     });
   });
-
-  // ✅ Safety timeout
-  setTimeout(() => {
-    if (!authResolved && !auth.currentUser) {
-      loadView("home");
-    }
-  }, 500);
-
-  /* ---------------- LOGOUT WITH OVERLAY ---------------- */
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    const overlay = document.getElementById("logoutOverlay");
-    overlay.style.display = "flex";
-
-    signOut(auth).then(() => {
-      setTimeout(() => {
-        loadView("home");   // ✅ SPA navigation
-      }, 3000);
-    });
-  });
-});
+}
