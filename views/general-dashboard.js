@@ -37,8 +37,22 @@ export async function init({ auth: _auth, db: _db }) {
   document.getElementById("statUnlocks").textContent = stats.totalLeads;
 
   document.getElementById("logoutBtn").onclick = async () => {
+  try {
     document.getElementById("logoutOverlay").style.display = "flex";
+
+    // 1. Sign out from Firebase
     await signOut(auth);
-    loadView("home");
-  };
+
+    // 2. Clear any cached user/session data
+    sessionStorage.clear();
+    localStorage.removeItem("firebaseUserDoc");
+    localStorage.removeItem("rhonddaThanksShown");
+
+    // 3. Hard redirect to fully reset the SPA
+    window.location.href = "/";
+  } catch (err) {
+    console.error("Logout failed:", err);
+    alert("Could not log out. Please try again.");
+  }
+};
 }
