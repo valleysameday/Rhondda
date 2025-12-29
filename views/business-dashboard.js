@@ -255,7 +255,7 @@ getFirebase().then(fb => {
 
       container.innerHTML += `
         <div class="biz-card">
-          <img src="${p.imageUrl || '/images/post-placeholder.jpg'}" class="biz-img">
+          <img src="${p.imageUrl || '/images/image-webholder.webp'}" class="biz-img">
           <div class="biz-info">
             <h3>${p.title}</h3>
             <p>${p.description}</p>
