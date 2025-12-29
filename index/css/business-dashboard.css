@@ -340,6 +340,7 @@ body {
 .biz-posts-grid {
   display: grid;
   gap: 0.9rem;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
 }
 
 .biz-card {
@@ -350,19 +351,29 @@ body {
   gap: 0.7rem;
   align-items: flex-start;
   box-shadow: 0 8px 22px rgba(0,0,0,0.04);
+  overflow: hidden;
 }
 
 .biz-img {
-  width: 86px;
+  width: 100%;
+  max-width: 86px;   /* keeps them small */
   height: 86px;
   object-fit: cover;
   border-radius: 8px;
   flex-shrink: 0;
 }
 
+.biz-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .biz-info h3 {
   margin: 0 0 0.25rem;
   font-size: 0.98rem;
+  word-break: break-word;
 }
 
 .biz-info p {
