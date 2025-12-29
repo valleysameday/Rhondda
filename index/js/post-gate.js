@@ -1,46 +1,60 @@
 // post-gate.js
+import { getFirebase } from '/index/js/firebase/init.js';
 
+let auth, db, storage;
 let selectedCategory = null;
-let propertyType = null;      // sale | rent
-let rentFrequency = null;     // pcm | weekly
+let propertyType = null;     // sale | rent
+let rentFrequency = null;
 
-document.addEventListener('DOMContentLoaded', () => {
+getFirebase().then(fb => {
+  auth = fb.auth;
+  db = fb.db;
+  storage = fb.storage;
+  initPostGate();
+});
 
-  const steps = document.querySelectorAll('.post-step');
-  const dots = document.querySelectorAll('.post-progress .dot');
+function initPostGate() {
+
+  /* ---------------- BASIC FLOW ---------------- */
+
+  const steps = [...document.querySelectorAll('#posts-grid .post-step')];
+  const dots = [...document.querySelectorAll('.post-progress .dot')];
   let stepIndex = 0;
 
-  const titleInput = document.getElementById('postTitle');
-  const descInput = document.getElementById('postDescription');
-  const priceInput = document.getElementById('postPrice');
-
-  const nextBtn = document.querySelector('.post-step[data-step="2"] .post-next');
-
-  const propertyButtons = document.querySelectorAll('[data-property-type]');
-  const rentButtons = document.querySelectorAll('[data-rent-frequency]');
-
-  /* ---------------- STEP CONTROL ---------------- */
-
   function showStep(i) {
+    if (i < 0 || i >= steps.length) return;
     steps.forEach(s => s.classList.remove('active'));
     dots.forEach(d => d.classList.remove('active'));
-
     steps[i].classList.add('active');
     dots[i].classList.add('active');
     stepIndex = i;
-
     validateStep2();
   }
 
-  document.querySelectorAll('.post-next').forEach(btn => {
+  document.querySelectorAll('.post-next').forEach(btn =>
     btn.addEventListener('click', () => {
       if (!btn.disabled) showStep(stepIndex + 1);
-    });
-  });
+    })
+  );
 
-  document.querySelectorAll('.post-prev').forEach(btn => {
-    btn.addEventListener('click', () => showStep(stepIndex - 1));
-  });
+  document.querySelectorAll('.post-prev').forEach(btn =>
+    btn.addEventListener('click', () => showStep(stepIndex - 1))
+  );
+
+  /* ---------------- ELEMENTS ---------------- */
+
+  const titleInput = document.getElementById('postTitle');
+  const descInput = document.getElementById('postDescription');
+  const nextBtn = document.querySelector(
+    '.post-step[data-step="2"] .post-next'
+  );
+
+  const propertyBox = document.querySelector('.property-options');
+  const propertyBtns = [...document.querySelectorAll('[data-property-type]')];
+  const rentBtns = [...document.querySelectorAll('[data-rent-frequency]')];
+
+  const priceInput = document.getElementById('postPrice');
+  const priceLabel = document.querySelector('label[for="postPrice"]');
 
   /* ---------------- CATEGORY ---------------- */
 
@@ -52,52 +66,48 @@ document.addEventListener('DOMContentLoaded', () => {
       propertyType = null;
       rentFrequency = null;
 
-      // hide all property controls by default
-      propertyButtons.forEach(b => b.style.display = 'none');
-      rentButtons.forEach(b => b.style.display = 'none');
+      // hide everything property-related
+      propertyBox.hidden = selectedCategory !== 'property';
+      rentBtns.forEach(b => b.style.display = 'none');
+      propertyBtns.forEach(b => b.classList.remove('active'));
+      rentBtns.forEach(b => b.classList.remove('active'));
 
-      // show property controls only if needed
-      if (selectedCategory === 'property') {
-        propertyButtons.forEach(b => b.style.display = 'inline-block');
-      }
-
-      updatePricePlaceholder();
+      updatePriceLabel();
       showStep(1);
     });
   });
 
   /* ---------------- PROPERTY TYPE ---------------- */
 
-  propertyButtons.forEach(btn => {
+  propertyBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       propertyType = btn.dataset.propertyType;
       rentFrequency = null;
 
-      // button active state
-      propertyButtons.forEach(b => b.classList.remove('active'));
+      propertyBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
-      // show rent frequency ONLY if rent
-      rentButtons.forEach(b => {
+      // show rent frequency only if rent
+      rentBtns.forEach(b => {
         b.style.display = propertyType === 'rent' ? 'inline-block' : 'none';
         b.classList.remove('active');
       });
 
-      updatePricePlaceholder();
+      updatePriceLabel();
       validateStep2();
     });
   });
 
   /* ---------------- RENT FREQUENCY ---------------- */
 
-  rentButtons.forEach(btn => {
+  rentBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       rentFrequency = btn.dataset.rentFrequency;
 
-      rentButtons.forEach(b => b.classList.remove('active'));
+      rentBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
-      updatePricePlaceholder();
+      updatePriceLabel();
       validateStep2();
     });
   });
@@ -120,31 +130,34 @@ document.addEventListener('DOMContentLoaded', () => {
     nextBtn.disabled = !(titleOk && descOk && propertyOk);
   }
 
-  ['input', 'keyup'].forEach(evt => {
+  ['input', 'keyup', 'change'].forEach(evt => {
     titleInput.addEventListener(evt, validateStep2);
     descInput.addEventListener(evt, validateStep2);
   });
 
-  /* ---------------- PRICE PLACEHOLDER ---------------- */
+  /* ---------------- PRICE LABEL ---------------- */
 
-  function updatePricePlaceholder() {
-    if (!priceInput) return;
+  function updatePriceLabel() {
+    if (!priceInput || !priceLabel) return;
 
     if (selectedCategory !== 'property') {
+      priceLabel.textContent = 'Price (£)';
       priceInput.placeholder = 'Price (optional)';
       return;
     }
 
     if (propertyType === 'sale') {
-      priceInput.placeholder = 'Sale price (£)';
+      priceLabel.textContent = 'Sale price (£)';
+      priceInput.placeholder = 'Sale price';
     } else if (propertyType === 'rent') {
-      priceInput.placeholder =
+      priceLabel.textContent =
         rentFrequency === 'weekly'
           ? 'Weekly rent (£)'
           : 'Monthly rent (PCM)';
+      priceInput.placeholder = priceLabel.textContent;
     } else {
+      priceLabel.textContent = 'Price (£)';
       priceInput.placeholder = 'Price';
     }
   }
-
-});
+}
