@@ -85,8 +85,8 @@ getFirebase().then(async fb => {
 
     try {
       console.log("🟡 Checking business status for:", user.uid);
-      const snap = await getDoc(doc(db, "businesses", user.uid));
-      window.isBusinessUser = snap.exists();
+      const snap = await getDoc(doc(db, "users", user.uid));
+window.isBusinessUser = snap.exists() && snap.data().isBusiness === true;
       console.log("🟢 Business status:", window.isBusinessUser);
     } catch (e) {
       console.warn("❌ Business lookup failed:", e);
