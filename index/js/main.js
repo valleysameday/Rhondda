@@ -58,8 +58,8 @@ function initAccountButton() {
 
     loadView(
       window.firebaseUserDoc?.isBusiness
-        ? "business-dashboard"
-        : "general-dashboard"
+        ? "views/business-dashboard"
+        : "views/general-dashboard"
     );
   });
 }
