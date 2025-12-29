@@ -27,8 +27,10 @@ export async function init({ auth: a, db: d, storage: s }) {
   const user = auth.currentUser;
   if (!user) return loadView("home");
 
-  const snap = await getDoc(doc(db, "businesses", user.uid));
-  if (!snap.exists()) return loadView("general-dashboard");
+  const snap = await getDoc(doc(db, "users", user.uid));
+if (!snap.exists() || !snap.data().isBusiness) {
+  return loadView("general-dashboard");
+}
 
   const data = snap.data();
 
