@@ -8,6 +8,11 @@ import { openLoginModal } from '/index/js/auth/loginModal.js';
 import { openSignupModal } from '/index/js/auth/signupModal.js';
 import { openForgotModal } from '/index/js/auth/forgotModal.js';
 
+import {
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
 let auth, db, storage;
 
 /* =====================================================
@@ -58,26 +63,29 @@ getFirebase().then(async fb => {
 
   auth.onAuthStateChanged(async user => {
     window.currentUser = user || null;
+    window.firebaseUserDoc = null;
 
     const label = document.querySelector("#openAccountModal .label-main");
     if (label) label.textContent = user ? "My Account" : "Login";
 
     if (!user) return;
 
-    // 🔍 Detect business vs general
-    const snap = await db
-      .collection("businesses")
-      .doc(user.uid)
-      .get()
-      .catch(() => null);
-
-    window.firebaseUserDoc = snap?.exists ? snap.data() : null;
+    // ✅ MODULAR Firestore check (FIXED)
+    try {
+      const ref = doc(db, "businesses", user.uid);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        window.firebaseUserDoc = snap.data();
+      }
+    } catch (err) {
+      console.warn("Business lookup failed:", err);
+    }
   });
 
   const start = () => {
     initUIRouter();
 
-    // Auth modals
+    // Auth buttons
     document.querySelectorAll('[data-value="login"]').forEach(btn =>
       btn.addEventListener("click", e => {
         e.preventDefault();
