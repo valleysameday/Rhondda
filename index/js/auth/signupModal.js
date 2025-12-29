@@ -1,9 +1,10 @@
 // index/js/auth/signupModal.js
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-const auth = getAuth();
-
-export function openSignupModal() {
+/**
+ * @param {import("firebase/auth").Auth} auth - Firebase auth instance
+ */
+export function openSignupModal(auth) {
   const modal = document.getElementById("signup");
   if (!modal) return;
   modal.style.display = "flex";
@@ -23,7 +24,11 @@ export function openSignupModal() {
 
   if (!signupBtn || !emailInput || !passInput) return;
 
-  signupBtn.addEventListener("click", async () => {
+  // Remove previous click listeners to avoid duplicates
+  signupBtn.replaceWith(signupBtn.cloneNode(true));
+  const newSignupBtn = modal.querySelector("#signupSubmit");
+
+  newSignupBtn.addEventListener("click", async () => {
     const email = emailInput.value.trim();
     const password = passInput.value.trim();
     feedback.textContent = "";
