@@ -46,12 +46,7 @@ export function openLoginModal(auth, db) {
   feedback.textContent = "Login successful!";
   closeModal();
 
-  // Route correctly
-  if (window.firebaseUserDoc) {
-    loadView("business-dashboard");
-  } else {
-    loadView("general-dashboard");
-  }
+  
 
 } catch (err) {
   feedback.textContent = err.message;
