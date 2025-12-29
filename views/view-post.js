@@ -13,10 +13,10 @@ export async function init({ db }) {
     const priceText = post.price ? `£${post.price}` : "Contact for price";
 
     // ====== TEXT INFO ======
-    document.getElementById("viewTitle")?.textContent = post.title;
-    document.getElementById("viewDescription")?.textContent = post.description || post.teaser || "";
-    document.getElementById("viewCategory")?.textContent = post.category || "General";
-    document.getElementById("viewArea")?.textContent = post.area || "Rhondda";
+    document.getElementById("viewTitle").textContent = post.title;
+    document.getElementById("viewDescription").textContent = post.description || post.teaser || "";
+    document.getElementById("viewCategory").textContent = post.category || "General";
+    document.getElementById("viewArea").textContent = post.area || "Rhondda";
     document.getElementById("viewTime")?.textContent = post.posted || "Just now";
     ["viewPriceMobile", "viewPrice"].forEach(id => {
       const el = document.getElementById(id);
@@ -30,7 +30,6 @@ export async function init({ db }) {
 
     const images = post.images?.length ? post.images : ["/images/post-placeholder.jpg"];
     const slides = [];
-    const dotsContainer = document.getElementById("galleryDots");
 
     images.forEach((url, i) => {
       const img = document.createElement("img");
@@ -45,25 +44,36 @@ export async function init({ db }) {
     });
 
     const total = slides.length;
-    document.getElementById("totalImg")?.textContent = total;
+    document.getElementById("totalImg").textContent = total;
 
+    // ====== SLIDE CONTROL ======
     let currentIndex = 0;
 
-    // ====== SLIDE FUNCTIONS ======
-    const updateSlide = idx => {
+    function updateSlide(idx) {
       currentIndex = (idx + total) % total;
       slides.forEach((img, i) => img.classList.toggle("active", i === currentIndex));
       galleryContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
       document.getElementById("currentImg")?.textContent = currentIndex + 1;
+
       if (dotsContainer) {
         const dots = dotsContainer.querySelectorAll(".gallery-dot");
         dots.forEach((dot, i) => dot.classList.toggle("active", i === currentIndex));
       }
-    };
 
-    const goToSlide = idx => updateSlide(idx);
+      // Update lightbox image if open
+      if (lightbox.classList.contains("active")) {
+        lightboxImg.src = slides[currentIndex].src;
+      }
+    }
 
-    // ====== CREATE DOTS ======
+    function goToSlide(idx) {
+      updateSlide(idx);
+    }
+
+    updateSlide(0);
+
+    // ====== DOTS ======
+    const dotsContainer = document.getElementById("galleryDots");
     if (dotsContainer) {
       dotsContainer.innerHTML = "";
       slides.forEach((_, i) => {
@@ -76,8 +86,6 @@ export async function init({ db }) {
       });
     }
 
-    updateSlide(0);
-
     // ====== NAV BUTTONS ======
     document.getElementById("galleryPrev")?.addEventListener("click", () => goToSlide(currentIndex - 1));
     document.getElementById("galleryNext")?.addEventListener("click", () => goToSlide(currentIndex + 1));
@@ -85,12 +93,7 @@ export async function init({ db }) {
     // ====== TOUCH / DRAG SUPPORT ======
     let startX = 0, currentX = 0, isDragging = false;
 
-    const startDrag = x => {
-      isDragging = true;
-      startX = x;
-      currentX = x;
-      galleryContainer.classList.add("dragging");
-    };
+    const startDrag = x => { isDragging = true; startX = x; currentX = x; galleryContainer.classList.add("dragging"); };
     const moveDrag = x => {
       if (!isDragging) return;
       currentX = x;
@@ -122,49 +125,44 @@ export async function init({ db }) {
     const lightboxImg = document.getElementById("lightboxImage");
     const lightboxClose = document.getElementById("lightboxClose");
 
-    if (lightbox && lightboxImg) {
-      slides.forEach(img => {
-        img.style.cursor = "zoom-in";
-        img.addEventListener("click", () => {
-          lightboxImg.src = img.src;
-          lightbox.classList.add("active");
-        });
+    slides.forEach(img => {
+      img.style.cursor = "zoom-in";
+      img.addEventListener("click", () => {
+        lightboxImg.src = img.src;
+        lightbox.classList.add("active");
       });
+    });
 
-      const closeLightbox = () => lightbox.classList.remove("active");
-      lightboxClose?.addEventListener("click", closeLightbox);
-      lightbox.addEventListener("click", e => { if (e.target === lightbox) closeLightbox(); });
+    const closeLightbox = () => lightbox.classList.remove("active");
+    lightboxClose?.addEventListener("click", closeLightbox);
+    lightbox.addEventListener("click", e => e.target === lightbox && closeLightbox());
 
-      // LIGHTBOX SWIPE
-      let lbStartX = 0;
-      let lbDragging = false;
+    // ====== LIGHTBOX SWIPE ======
+    let lbStartX = 0;
+    let lbDragging = false;
 
-      lightbox.addEventListener("touchstart", e => {
-        if (e.touches.length !== 1) return;
-        lbStartX = e.touches[0].clientX;
-        lbDragging = true;
-      });
-      lightbox.addEventListener("touchend", e => {
-        if (!lbDragging) return;
-        const delta = e.changedTouches[0].clientX - lbStartX;
-        if (Math.abs(delta) > 50) delta < 0 ? goToSlide(currentIndex + 1) : goToSlide(currentIndex - 1);
-        lightboxImg.src = slides[currentIndex].src;
-        lbDragging = false;
-      });
-      lightbox.addEventListener("mousedown", e => { lbStartX = e.clientX; lbDragging = true; });
-      window.addEventListener("mouseup", e => {
-        if (!lbDragging) return;
-        const delta = e.clientX - lbStartX;
-        if (Math.abs(delta) > 50) delta < 0 ? goToSlide(currentIndex + 1) : goToSlide(currentIndex - 1);
-        lightboxImg.src = slides[currentIndex].src;
-        lbDragging = false;
-      });
-    }
+    lightbox.addEventListener("touchstart", e => {
+      if (e.touches.length !== 1) return;
+      lbStartX = e.touches[0].clientX;
+      lbDragging = true;
+    });
+    lightbox.addEventListener("touchmove", e => {});
+    lightbox.addEventListener("touchend", e => {
+      if (!lbDragging) return;
+      const delta = e.changedTouches[0].clientX - lbStartX;
+      if (Math.abs(delta) > 50) delta < 0 ? goToSlide(currentIndex + 1) : goToSlide(currentIndex - 1);
+      lbDragging = false;
+    });
+    lightbox.addEventListener("mousedown", e => { lbStartX = e.clientX; lbDragging = true; });
+    window.addEventListener("mouseup", e => {
+      if (!lbDragging) return;
+      const delta = e.clientX - lbStartX;
+      if (Math.abs(delta) > 50) delta < 0 ? goToSlide(currentIndex + 1) : goToSlide(currentIndex - 1);
+      lbDragging = false;
+    });
 
     // ====== ACTION BUTTONS ======
-    document.getElementById("messageSeller")?.addEventListener("click", () => {
-      alert(`Chat with seller coming soon! Ref: ${post.userId}`);
-    });
+    document.getElementById("messageSeller")?.addEventListener("click", () => alert(`Chat with seller coming soon! Ref: ${post.userId}`));
     document.getElementById("reportPost")?.addEventListener("click", () => {
       if (confirm("Report this listing for review?")) alert("Thank you. This listing has been flagged.");
     });
