@@ -1,8 +1,10 @@
-// views/general-dashboard.js
-import { signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { signOut } from
+  "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
 import {
   collection, query, where, getDocs, doc, deleteDoc
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+} from
+  "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 import { renderPostsAndStats } from '/index/js/dashboard/posts.js';
 import { loadView } from '/index/js/main.js';
@@ -10,7 +12,10 @@ import { loadView } from '/index/js/main.js';
 let auth, db;
 
 export async function init({ auth: a, db: d }) {
-  auth = a; db = d;
+  auth = a;
+  db = d;
+
+  if (!auth || !db) return;
 
   const user = auth.currentUser;
   if (!user) return loadView("home");
@@ -30,12 +35,12 @@ export async function init({ auth: a, db: d }) {
     }
   );
 
-  statAdsCount.textContent = stats.adsCount;
-  statTotalViews.textContent = stats.totalViews;
-  statUnlocks.textContent = stats.totalLeads;
+  document.getElementById("statAdsCount").textContent = stats.adsCount;
+  document.getElementById("statTotalViews").textContent = stats.totalViews;
+  document.getElementById("statUnlocks").textContent = stats.totalLeads;
 
-  logoutBtn.onclick = async () => {
-    logoutOverlay.style.display = "flex";
+  document.getElementById("logoutBtn").onclick = async () => {
+    document.getElementById("logoutOverlay").style.display = "flex";
     await signOut(auth);
     window.location.href = "/";
   };
