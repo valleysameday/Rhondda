@@ -1,6 +1,12 @@
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { 
+  doc, 
+  getDoc, 
+  setDoc 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-export async function init({ db }) {
+import { loadView } from "/index/js/main.js";
+
+export async function init({ db, auth }) {
   const postId = sessionStorage.getItem("viewPostId");
   if (!postId) return;
 
@@ -49,7 +55,7 @@ export async function init({ db }) {
 
     const total = slides.length;
 
-    // ===== DOTS ONLY =====
+    // ===== DOTS =====
     const dotsContainer = document.getElementById("galleryDots");
     if (dotsContainer) {
       dotsContainer.innerHTML = "";
@@ -70,7 +76,7 @@ export async function init({ db }) {
       currentIndex = (idx + total) % total;
       slides.forEach((img, i) => {
         img.classList.toggle("active", i === currentIndex);
-        img.style.transform = "scale(1)"; // reset zoom on slide change
+        img.style.transform = "scale(1)";
       });
       galleryContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
 
@@ -88,17 +94,25 @@ export async function init({ db }) {
 
     updateSlide(0);
 
-    // ===== TOUCH / DRAG SUPPORT =====
+    // ===== DRAG / SWIPE =====
     let startX = 0, currentX = 0, isDragging = false;
 
-    const startDrag = x => { isDragging = true; startX = x; currentX = x; galleryContainer.classList.add("dragging"); };
+    const startDrag = x => { 
+      isDragging = true; 
+      startX = x; 
+      currentX = x; 
+      galleryContainer.classList.add("dragging"); 
+    };
+
     const moveDrag = x => {
       if (!isDragging) return;
       currentX = x;
       const delta = currentX - startX;
       const percent = (delta / galleryContainer.offsetWidth) * 100;
-      galleryContainer.style.transform = `translateX(calc(-${currentIndex * 100}% + ${percent}%)) scale(${zoomLevel})`;
+      galleryContainer.style.transform = 
+        `translateX(calc(-${currentIndex * 100}% + ${percent}%)) scale(${zoomLevel})`;
     };
+
     const endDrag = () => {
       if (!isDragging) return;
       isDragging = false;
@@ -111,14 +125,20 @@ export async function init({ db }) {
       }
     };
 
-    galleryContainer.addEventListener("touchstart", e => e.touches.length === 1 && startDrag(e.touches[0].clientX));
+    galleryContainer.addEventListener("touchstart", e => 
+      e.touches.length === 1 && startDrag(e.touches[0].clientX)
+    );
     galleryContainer.addEventListener("touchmove", e => moveDrag(e.touches[0].clientX));
     galleryContainer.addEventListener("touchend", endDrag);
-    galleryContainer.addEventListener("mousedown", e => { e.preventDefault(); startDrag(e.clientX); });
+
+    galleryContainer.addEventListener("mousedown", e => { 
+      e.preventDefault(); 
+      startDrag(e.clientX); 
+    });
     window.addEventListener("mousemove", e => moveDrag(e.clientX));
     window.addEventListener("mouseup", endDrag);
 
-    // ===== ZOOM SUPPORT =====
+    // ===== ZOOM =====
     galleryContainer.addEventListener("wheel", e => {
       e.preventDefault();
       zoomLevel += e.deltaY < 0 ? 0.1 : -0.1;
@@ -147,7 +167,9 @@ export async function init({ db }) {
     });
 
     galleryContainer.addEventListener("touchend", e => {
-      zoomLevel = parseFloat(slides[currentIndex].style.transform.replace("scale(", "").replace(")", "")) || 1;
+      zoomLevel = parseFloat(
+        slides[currentIndex].style.transform.replace("scale(", "").replace(")", "")
+      ) || 1;
     });
 
     // ===== LIGHTBOX =====
@@ -198,17 +220,55 @@ export async function init({ db }) {
       lbDragging = false;
     });
 
+    // ============================================================
+    // ⭐ REAL MESSAGING SYSTEM (Firebase Conversations)
+    // ============================================================
+
+    async function startConversation(post) {
+      const buyerId = auth.currentUser?.uid;
+      const sellerId = post.userId;
+
+      if (!buyerId) {
+        return openScreen("login");
+      }
+
+      if (buyerId === sellerId) {
+        alert("You cannot message yourself.");
+        return;
+      }
+
+      // Stable conversation ID
+      const convoId = [buyerId, sellerId].sort().join("_");
+
+      // Create or update conversation
+      await setDoc(doc(db, "conversations", convoId), {
+        participants: [buyerId, sellerId],
+        lastMessage: "",
+        updatedAt: Date.now()
+      }, { merge: true });
+
+      // Store active conversation
+      sessionStorage.setItem("activeConversationId", convoId);
+
+      // Load chat screen
+      loadView("chat");
+    }
+
     // ===== ACTION BUTTONS =====
     const messageBtn = document.getElementById("messageSeller");
     const reportBtn = document.getElementById("reportPost");
     const contactBtn = document.getElementById("contactSeller");
 
-    messageBtn?.addEventListener("click", () => alert(`Chat with seller coming soon! Ref: ${post.userId}`));
+    // Start conversation
+    messageBtn?.addEventListener("click", () => startConversation(post));
+
+    // Report
     reportBtn?.addEventListener("click", () => {
-      if (confirm("Report this listing for review?")) alert("Thank you. This listing has been flagged.");
+      if (confirm("Report this listing for review?")) 
+        alert("Thank you. This listing has been flagged.");
     });
 
-    // ===== CONTACT BUTTON (ONLY SHOW IF NUMBER EXISTS) =====
+    // Contact seller (phone)
     if (post.contactNumber) {
       contactBtn.style.display = "block";
       contactBtn.addEventListener("click", () => {
