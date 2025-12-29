@@ -4,8 +4,7 @@ export async function init({ db }) {
   const postId = sessionStorage.getItem("viewPostId");
   if (!postId) return;
 
-  // Wait a tick to ensure SPA DOM is ready
-  await new Promise(r => setTimeout(r, 50));
+  await new Promise(r => setTimeout(r, 50)); // ensure SPA DOM ready
 
   try {
     const postRef = doc(db, "posts", postId);
@@ -65,16 +64,22 @@ export async function init({ db }) {
 
     // ===== SLIDE FUNCTIONS =====
     let currentIndex = 0;
+    let zoomLevel = 1;
 
     function updateSlide(idx) {
       currentIndex = (idx + total) % total;
-      slides.forEach((img, i) => img.classList.toggle("active", i === currentIndex));
+      slides.forEach((img, i) => {
+        img.classList.toggle("active", i === currentIndex);
+        img.style.transform = "scale(1)"; // reset zoom on slide change
+      });
       galleryContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
 
       if (dotsContainer) {
         const dots = dotsContainer.querySelectorAll(".gallery-dot");
         dots.forEach((dot, i) => dot.classList.toggle("active", i === currentIndex));
       }
+
+      zoomLevel = 1;
     }
 
     function goToSlide(idx) {
@@ -92,7 +97,7 @@ export async function init({ db }) {
       currentX = x;
       const delta = currentX - startX;
       const percent = (delta / galleryContainer.offsetWidth) * 100;
-      galleryContainer.style.transform = `translateX(calc(-${currentIndex * 100}% + ${percent}%))`;
+      galleryContainer.style.transform = `translateX(calc(-${currentIndex * 100}% + ${percent}%)) scale(${zoomLevel})`;
     };
     const endDrag = () => {
       if (!isDragging) return;
@@ -112,6 +117,40 @@ export async function init({ db }) {
     galleryContainer.addEventListener("mousedown", e => { e.preventDefault(); startDrag(e.clientX); });
     window.addEventListener("mousemove", e => moveDrag(e.clientX));
     window.addEventListener("mouseup", endDrag);
+
+    // ===== ZOOM SUPPORT =====
+    // Mouse wheel zoom
+    galleryContainer.addEventListener("wheel", e => {
+      e.preventDefault();
+      zoomLevel += e.deltaY < 0 ? 0.1 : -0.1;
+      zoomLevel = Math.min(Math.max(zoomLevel, 1), 3); // clamp between 1 and 3
+      slides[currentIndex].style.transform = `scale(${zoomLevel})`;
+    });
+
+    // Pinch zoom (mobile)
+    let pinchStartDist = 0;
+    galleryContainer.addEventListener("touchstart", e => {
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        pinchStartDist = Math.hypot(dx, dy);
+      }
+    });
+
+    galleryContainer.addEventListener("touchmove", e => {
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const dist = Math.hypot(dx, dy);
+        let scale = (dist / pinchStartDist) * zoomLevel;
+        scale = Math.min(Math.max(scale, 1), 3);
+        slides[currentIndex].style.transform = `scale(${scale})`;
+      }
+    });
+
+    galleryContainer.addEventListener("touchend", e => {
+      zoomLevel = parseFloat(slides[currentIndex].style.transform.replace("scale(", "").replace(")", "")) || 1;
+    });
 
     // ===== LIGHTBOX =====
     const lightbox = document.getElementById("lightbox");
