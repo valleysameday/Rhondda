@@ -87,7 +87,7 @@ getFirebase().then(async fb => {
     document.querySelectorAll('[data-value="login"]').forEach(btn =>
       btn.onclick = e => {
         e.preventDefault();
-        openLoginModal(auth);
+        openLoginModal(auth, db);
       }
     );
 
@@ -109,7 +109,7 @@ getFirebase().then(async fb => {
       e.preventDefault();
 
       if (!window.currentUser) {
-        openLoginModal(auth);
+        openLoginModal(auth, db);
         return;
       }
 
