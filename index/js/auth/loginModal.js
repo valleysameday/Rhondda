@@ -37,25 +37,25 @@ export function openLoginModal(auth, db) {
     }
 
     try {
-      const cred = await signInWithEmailAndPassword(auth, email, password);
+  const cred = await signInWithEmailAndPassword(auth, email, password);
 
-      // Load user doc
-      const snap = await getDoc(doc(db, "users", cred.user.uid));
-      window.firebaseUserDoc = snap.exists() ? snap.data() : {};
+  // Load business doc
+  const snap = await getDoc(doc(db, "businesses", cred.user.uid));
+  window.firebaseUserDoc = snap.exists() ? snap.data() : null;
 
-      feedback.textContent = "Login successful!";
-      closeModal();
+  feedback.textContent = "Login successful!";
+  closeModal();
 
-      // Route correctly
-      if (window.firebaseUserDoc.isBusiness) {
-        loadView("business-dashboard");
-      } else {
-        loadView("general-dashboard");
-      }
+  // Route correctly
+  if (window.firebaseUserDoc) {
+    loadView("business-dashboard");
+  } else {
+    loadView("general-dashboard");
+  }
 
-    } catch (err) {
-      feedback.textContent = err.message;
-      console.error("Login error:", err);
+} catch (err) {
+  feedback.textContent = err.message;
+  console.error("Login error:", err);
     }
   });
 }
