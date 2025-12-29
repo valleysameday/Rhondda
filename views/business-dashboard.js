@@ -62,7 +62,7 @@ export async function init({ auth: a, db: d, storage: s }) {
     postsSnap,
     id => {
       window.editingPostId = id;
-      openScreen("editPost");
+      loadView("editPost");
     },
     async id => {
       if (!confirm("Delete this ad?")) return;
