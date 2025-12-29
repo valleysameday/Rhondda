@@ -12,161 +12,151 @@ export async function init({ db }) {
     const post = postSnap.data();
     const priceText = post.price ? `£${post.price}` : "Contact for price";
 
-    /* ================= TEXT ================= */
+    // ====== TEXT INFO ======
     document.getElementById("viewTitle").textContent = post.title;
-    document.getElementById("viewDescription").textContent =
-      post.description || post.teaser || "";
-    document.getElementById("viewCategory").textContent =
-      post.category || "General";
+    document.getElementById("viewDescription").textContent = post.description || post.teaser || "";
+    document.getElementById("viewCategory").textContent = post.category || "General";
     document.getElementById("viewArea").textContent = post.area || "Rhondda";
-
+    document.getElementById("viewTime")?.textContent = post.posted || "Just now";
     ["viewPriceMobile", "viewPrice"].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.textContent = priceText;
     });
 
-    /* ================= GALLERY ================= */
-    const track = document.getElementById("galleryContainer");
-    if (!track) return;
-    track.innerHTML = "";
+    // ====== GALLERY ======
+    const galleryContainer = document.getElementById("galleryContainer");
+    if (!galleryContainer) return;
+    galleryContainer.innerHTML = "";
 
-    const images = post.images?.length
-      ? post.images
-      : ["/images/post-placeholder.jpg"];
-
-    const lightbox = document.getElementById("imageLightbox");
-    const lightboxImg = document.getElementById("lightboxImage");
-    const lightboxClose = document.querySelector(".lightbox-close");
-
-    let slides = [];
-    let currentIndex = 0;
+    const images = post.images?.length ? post.images : ["/images/post-placeholder.jpg"];
+    const slides = [];
 
     images.forEach((url, i) => {
       const img = document.createElement("img");
       img.src = url;
       img.alt = post.title;
       img.loading = "lazy";
-      img.className = "gallery-image";
+      img.classList.add("gallery-image", "loading");
       if (i === 0) img.classList.add("active");
-
-      img.addEventListener("click", () => {
-        lightboxImg.src = url;
-        lightbox.hidden = false;
-        document.body.style.overflow = "hidden";
-      });
-
-      track.appendChild(img);
+      img.addEventListener("load", () => img.classList.remove("loading"));
+      galleryContainer.appendChild(img);
       slides.push(img);
     });
 
     const total = slides.length;
     document.getElementById("totalImg").textContent = total;
 
-    /* ================= LIGHTBOX CLOSE ================= */
-    const closeLightbox = () => {
-      lightbox.hidden = true;
-      lightboxImg.src = "";
-      document.body.style.overflow = "";
-    };
-
-    lightboxClose.addEventListener("click", closeLightbox);
-    lightbox.addEventListener("click", e => {
-      if (e.target === lightbox) closeLightbox();
-    });
-
-    window.addEventListener("keydown", e => {
-      if (e.key === "Escape" && !lightbox.hidden) closeLightbox();
-    });
-
-    /* ================= SLIDER ================= */
     const dotsContainer = document.getElementById("galleryDots");
     if (dotsContainer) {
       dotsContainer.innerHTML = "";
       slides.forEach((_, i) => {
         const dot = document.createElement("button");
+        dot.type = "button";
         dot.className = "gallery-dot" + (i === 0 ? " active" : "");
+        dot.setAttribute("aria-label", `Show image ${i + 1}`);
         dot.addEventListener("click", () => goToSlide(i));
         dotsContainer.appendChild(dot);
       });
     }
 
+    let currentIndex = 0;
+
     const updateSlide = idx => {
-      track.style.transform = `translateX(-${idx * 100}%)`;
-      slides.forEach((img, i) =>
-        img.classList.toggle("active", i === idx)
-      );
-
-      document.getElementById("currentImg").textContent = idx + 1;
-
+      currentIndex = (idx + total) % total;
+      slides.forEach((img, i) => img.classList.toggle("active", i === currentIndex));
+      galleryContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
+      document.getElementById("currentImg")?.textContent = currentIndex + 1;
       if (dotsContainer) {
-        dotsContainer
-          .querySelectorAll(".gallery-dot")
-          .forEach((dot, i) =>
-            dot.classList.toggle("active", i === idx)
-          );
+        const dots = dotsContainer.querySelectorAll(".gallery-dot");
+        dots.forEach((dot, i) => dot.classList.toggle("active", i === currentIndex));
       }
     };
 
-    const goToSlide = idx => {
-      currentIndex = (idx + total) % total;
-      updateSlide(currentIndex);
-    };
-
+    const goToSlide = idx => updateSlide(idx);
     updateSlide(0);
 
-    document
-      .getElementById("galleryPrev")
-      ?.addEventListener("click", () => goToSlide(currentIndex - 1));
-    document
-      .getElementById("galleryNext")
-      ?.addEventListener("click", () => goToSlide(currentIndex + 1));
+    // ====== NAV BUTTONS ======
+    document.getElementById("galleryPrev")?.addEventListener("click", () => goToSlide(currentIndex - 1));
+    document.getElementById("galleryNext")?.addEventListener("click", () => goToSlide(currentIndex + 1));
 
-    /* ================= TOUCH / DRAG ================= */
-    let startX = 0;
-    let isDragging = false;
+    // ====== TOUCH / DRAG SUPPORT ======
+    let startX = 0, currentX = 0, isDragging = false;
 
-    track.addEventListener("touchstart", e => {
-      startX = e.touches[0].clientX;
-      isDragging = true;
-    });
-
-    track.addEventListener("touchend", e => {
+    const startDrag = x => { isDragging = true; startX = x; currentX = x; galleryContainer.classList.add("dragging"); };
+    const moveDrag = x => {
       if (!isDragging) return;
-      const delta = e.changedTouches[0].clientX - startX;
-      if (Math.abs(delta) > 50) {
-        delta < 0 ? goToSlide(currentIndex + 1) : goToSlide(currentIndex - 1);
-      }
-      isDragging = false;
-    });
-
-    track.addEventListener("mousedown", e => {
-      startX = e.clientX;
-      isDragging = true;
-    });
-
-    window.addEventListener("mouseup", e => {
+      currentX = x;
+      const delta = currentX - startX;
+      const percent = (delta / galleryContainer.offsetWidth) * 100;
+      galleryContainer.style.transform = `translateX(calc(-${currentIndex * 100}% + ${percent}%))`;
+    };
+    const endDrag = () => {
       if (!isDragging) return;
-      const delta = e.clientX - startX;
-      if (Math.abs(delta) > 50) {
-        delta < 0 ? goToSlide(currentIndex + 1) : goToSlide(currentIndex - 1);
-      }
       isDragging = false;
-    });
+      galleryContainer.classList.remove("dragging");
+      const delta = currentX - startX;
+      if (Math.abs(delta) > galleryContainer.offsetWidth * 0.15) {
+        delta < 0 ? goToSlide(currentIndex + 1) : goToSlide(currentIndex - 1);
+      } else {
+        updateSlide(currentIndex);
+      }
+    };
 
-    /* ================= ACTIONS ================= */
-    document
-      .getElementById("messageSeller")
-      ?.addEventListener("click", () =>
-        alert("Messaging coming soon")
-      );
+    galleryContainer.addEventListener("touchstart", e => e.touches.length === 1 && startDrag(e.touches[0].clientX));
+    galleryContainer.addEventListener("touchmove", e => moveDrag(e.touches[0].clientX));
+    galleryContainer.addEventListener("touchend", endDrag);
+    galleryContainer.addEventListener("mousedown", e => { e.preventDefault(); startDrag(e.clientX); });
+    window.addEventListener("mousemove", e => moveDrag(e.clientX));
+    window.addEventListener("mouseup", endDrag);
 
-    document
-      .getElementById("reportPost")
-      ?.addEventListener("click", () => {
-        if (confirm("Report this post?")) {
-          alert("Post reported. Thank you.");
-        }
+    // ====== LIGHTBOX ======
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightboxImage");
+    const lightboxClose = document.getElementById("lightboxClose");
+
+    slides.forEach(img => {
+      img.style.cursor = "zoom-in";
+      img.addEventListener("click", () => {
+        lightboxImg.src = img.src;
+        lightbox.classList.add("active");
       });
+    });
+
+    const closeLightbox = () => lightbox.classList.remove("active");
+    lightboxClose?.addEventListener("click", closeLightbox);
+    lightbox.addEventListener("click", e => e.target === lightbox && closeLightbox());
+
+    // ====== LIGHTBOX SWIPE ======
+    let lbStartX = 0;
+    let lbDragging = false;
+
+    lightbox.addEventListener("touchstart", e => {
+      if (e.touches.length !== 1) return;
+      lbStartX = e.touches[0].clientX;
+      lbDragging = true;
+    });
+    lightbox.addEventListener("touchmove", e => {});
+    lightbox.addEventListener("touchend", e => {
+      if (!lbDragging) return;
+      const delta = e.changedTouches[0].clientX - lbStartX;
+      if (Math.abs(delta) > 50) delta < 0 ? goToSlide(currentIndex + 1) : goToSlide(currentIndex - 1);
+      lightboxImg.src = slides[currentIndex].src;
+      lbDragging = false;
+    });
+    lightbox.addEventListener("mousedown", e => { lbStartX = e.clientX; lbDragging = true; });
+    window.addEventListener("mouseup", e => {
+      if (!lbDragging) return;
+      const delta = e.clientX - lbStartX;
+      if (Math.abs(delta) > 50) delta < 0 ? goToSlide(currentIndex + 1) : goToSlide(currentIndex - 1);
+      lightboxImg.src = slides[currentIndex].src;
+      lbDragging = false;
+    });
+
+    // ====== ACTION BUTTONS ======
+    document.getElementById("messageSeller")?.addEventListener("click", () => alert(`Chat with seller coming soon! Ref: ${post.userId}`));
+    document.getElementById("reportPost")?.addEventListener("click", () => {
+      if (confirm("Report this listing for review?")) alert("Thank you. This listing has been flagged.");
+    });
 
   } catch (err) {
     console.error("View Post Error:", err);
