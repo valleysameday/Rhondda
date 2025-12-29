@@ -89,14 +89,14 @@ getFirebase().then(async fb => {
     document.querySelectorAll('[data-value="login"]').forEach(btn =>
       btn.addEventListener("click", e => {
         e.preventDefault();
-        openLoginModal(auth);
+        openLoginModal(auth, db);
       })
     );
 
     document.querySelectorAll('[data-value="signup"]').forEach(btn =>
       btn.addEventListener("click", e => {
         e.preventDefault();
-        openSignupModal(auth);
+        openSignupModal(auth, db);
       })
     );
 
@@ -112,7 +112,7 @@ getFirebase().then(async fb => {
       e.preventDefault();
 
       if (!window.currentUser) {
-        openLoginModal(auth);
+        openLoginModal(auth, db);
       } else {
         loadView(
           window.firebaseUserDoc
