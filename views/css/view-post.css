@@ -245,7 +245,7 @@
 .gallery-hint {
   text-align: center;
   font-size: 0.875rem;
-  color: #777;
-  margin: 6px 0 10px;
+  color: #555;
+  margin-top: 10px;  /* spacing below gallery */
   user-select: none;
 }
