@@ -86,10 +86,24 @@ export async function init({ auth: _auth, db: _db, storage: _storage }) {
 
   // Logout
   document.getElementById("bizLogoutBtn").onclick = async () => {
+  try {
     document.getElementById("bizLogoutOverlay").style.display = "flex";
+
+    // 1. Sign out from Firebase
     await signOut(auth);
-    loadView("home");
-  };
+
+    // 2. Clear any cached user data
+    sessionStorage.clear();
+    localStorage.removeItem("firebaseUserDoc");
+    localStorage.removeItem("rhonddaThanksShown");
+
+    // 3. Force a clean reload so no stale state survives
+    window.location.href = "/"; // or your home route
+  } catch (err) {
+    console.error("Logout failed:", err);
+    alert("Could not log out. Please try again.");
+  }
+};
 
   document.getElementById("bizNewPostBtn").onclick = () => openScreen("post");
 }
