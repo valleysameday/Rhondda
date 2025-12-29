@@ -1,5 +1,4 @@
 // index/js/main.js
-
 import { getFirebase } from '/index/js/firebase/init.js';
 import { initUIRouter } from '/index/js/ui-router.js';
 import '/index/js/post-gate.js';
@@ -8,12 +7,10 @@ import { openLoginModal } from '/index/js/auth/loginModal.js';
 import { openSignupModal } from '/index/js/auth/signupModal.js';
 import { openForgotModal } from '/index/js/auth/forgotModal.js';
 
-import {
-  doc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let auth, db, storage;
+let authResolved = false;
 
 /* =====================================================
    SPA VIEW LOADER
@@ -38,17 +35,12 @@ export async function loadView(view) {
     target.innerHTML = html;
     target.dataset.loaded = "true";
 
-    try {
-      const mod = await import(`/views/${view}.js?cache=${Date.now()}`);
-      mod.init?.({ auth, db, storage });
-    } catch (err) {
-      console.error("View JS error:", err);
-    }
+    const mod = await import(`/views/${view}.js?cache=${Date.now()}`);
+    mod.init?.({ auth, db, storage });
   }
 
   target.hidden = false;
 }
-
 window.loadView = loadView;
 
 /* =====================================================
@@ -59,24 +51,16 @@ getFirebase().then(async fb => {
   db = fb.db;
   storage = fb.storage;
 
-  console.log("✅ Firebase ready");
-
   auth.onAuthStateChanged(async user => {
+    authResolved = true;
     window.currentUser = user || null;
-    window.firebaseUserDoc = null;
-
-    const label = document.querySelector("#openAccountModal .label-main");
-    if (label) label.textContent = user ? "My Account" : "Login";
+    window.isBusinessUser = false;
 
     if (!user) return;
 
-    // ✅ MODULAR Firestore check (FIXED)
     try {
-      const ref = doc(db, "businesses", user.uid);
-      const snap = await getDoc(ref);
-      if (snap.exists()) {
-        window.firebaseUserDoc = snap.data();
-      }
+      const snap = await getDoc(doc(db, "businesses", user.uid));
+      if (snap.exists()) window.isBusinessUser = true;
     } catch (err) {
       console.warn("Business lookup failed:", err);
     }
@@ -87,38 +71,36 @@ getFirebase().then(async fb => {
 
     // Auth buttons
     document.querySelectorAll('[data-value="login"]').forEach(btn =>
-      btn.addEventListener("click", e => {
+      btn.onclick = e => {
         e.preventDefault();
-        openLoginModal(auth, db);
-      })
+        openLoginModal(auth);
+      }
     );
 
     document.querySelectorAll('[data-value="signup"]').forEach(btn =>
-      btn.addEventListener("click", e => {
+      btn.onclick = e => {
         e.preventDefault();
         openSignupModal(auth, db);
-      })
+      }
     );
 
     document.querySelectorAll('[data-value="forgot"]').forEach(btn =>
-      btn.addEventListener("click", e => {
+      btn.onclick = e => {
         e.preventDefault();
         openForgotModal(auth);
-      })
+      }
     );
 
     // Account button
-    document.getElementById("openAccountModal")?.addEventListener("click", e => {
+    document.getElementById("openAccountModal")?.addEventListener("click", async e => {
       e.preventDefault();
 
+      if (!authResolved) return;
+
       if (!window.currentUser) {
-        openLoginModal(auth, db);
+        openLoginModal(auth);
       } else {
-        loadView(
-          window.firebaseUserDoc
-            ? "business-dashboard"
-            : "general-dashboard"
-        );
+        loadView(window.isBusinessUser ? "business-dashboard" : "general-dashboard");
       }
     });
 
