@@ -1,9 +1,10 @@
 // index/js/auth/forgotModal.js
-import { getAuth, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-const auth = getAuth();
-
-export function openForgotModal() {
+/**
+ * @param {import("firebase/auth").Auth} auth - Firebase auth instance
+ */
+export function openForgotModal(auth) {
   const modal = document.getElementById("forgot");
   if (!modal) return;
   modal.style.display = "flex";
@@ -21,7 +22,11 @@ export function openForgotModal() {
 
   if (!sendBtn || !emailInput) return;
 
-  sendBtn.addEventListener("click", async () => {
+  // Remove previous click listeners to avoid duplicates
+  sendBtn.replaceWith(sendBtn.cloneNode(true));
+  const newSendBtn = modal.querySelector("#forgotSubmit");
+
+  newSendBtn.addEventListener("click", async () => {
     const email = emailInput.value.trim();
     if (!email) {
       alert("Enter your email");
@@ -31,9 +36,12 @@ export function openForgotModal() {
     try {
       await sendPasswordResetEmail(auth, email);
       closeModal();
+
       const confirmModal = document.getElementById("resetConfirm");
-      confirmModal.style.display = "flex";
-      document.body.classList.add("modal-open");
+      if (confirmModal) {
+        confirmModal.style.display = "flex";
+        document.body.classList.add("modal-open");
+      }
     } catch (err) {
       alert(err.message);
       console.error("Password reset error:", err);
