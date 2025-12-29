@@ -1,3 +1,6 @@
+/* ============================
+   GLOBAL STYLES
+============================ */
 body {
   font-family: system-ui, sans-serif;
   background: #f4f6f8;
@@ -340,7 +343,7 @@ body {
 .biz-posts-grid {
   display: grid;
   gap: 0.9rem;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 }
 
 .biz-card {
@@ -355,9 +358,8 @@ body {
 }
 
 .biz-img {
-  width: 100%;
-  max-width: 86px;   /* keeps them small */
-  height: 86px;
+  width: 86px;           /* fixed width */
+  height: 86px;          /* fixed height */
   object-fit: cover;
   border-radius: 8px;
   flex-shrink: 0;
@@ -441,4 +443,28 @@ body {
 
 .biz-logout-card p {
   margin: 0 0 0.2rem;
+}
+
+/* ============================
+   RESPONSIVE
+============================ */
+@media (max-width: 600px) {
+  .biz-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+
+  .biz-header-right {
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+
+  .biz-posts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .biz-card {
+    flex-direction: row;
+  }
 }
