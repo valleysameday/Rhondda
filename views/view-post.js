@@ -119,15 +119,13 @@ export async function init({ db }) {
     window.addEventListener("mouseup", endDrag);
 
     // ===== ZOOM SUPPORT =====
-    // Mouse wheel zoom
     galleryContainer.addEventListener("wheel", e => {
       e.preventDefault();
       zoomLevel += e.deltaY < 0 ? 0.1 : -0.1;
-      zoomLevel = Math.min(Math.max(zoomLevel, 1), 3); // clamp between 1 and 3
+      zoomLevel = Math.min(Math.max(zoomLevel, 1), 3);
       slides[currentIndex].style.transform = `scale(${zoomLevel})`;
     });
 
-    // Pinch zoom (mobile)
     let pinchStartDist = 0;
     galleryContainer.addEventListener("touchstart", e => {
       if (e.touches.length === 2) {
@@ -177,7 +175,6 @@ export async function init({ db }) {
       lightboxImg.src = slides[lbIndex].src;
     };
 
-    // Keyboard support
     window.addEventListener("keydown", e => {
       if (!lightbox.classList.contains("active")) return;
       if (e.key === "ArrowRight") goLightbox(1);
@@ -185,7 +182,6 @@ export async function init({ db }) {
       if (e.key === "Escape") closeLightbox();
     });
 
-    // Lightbox touch swipe
     let lbStartX = 0;
     let lbDragging = false;
 
@@ -203,10 +199,24 @@ export async function init({ db }) {
     });
 
     // ===== ACTION BUTTONS =====
-    document.getElementById("messageSeller")?.addEventListener("click", () => alert(`Chat with seller coming soon! Ref: ${post.userId}`));
-    document.getElementById("reportPost")?.addEventListener("click", () => {
+    const messageBtn = document.getElementById("messageSeller");
+    const reportBtn = document.getElementById("reportPost");
+    const contactBtn = document.getElementById("contactSeller");
+
+    messageBtn?.addEventListener("click", () => alert(`Chat with seller coming soon! Ref: ${post.userId}`));
+    reportBtn?.addEventListener("click", () => {
       if (confirm("Report this listing for review?")) alert("Thank you. This listing has been flagged.");
     });
+
+    // ===== CONTACT BUTTON (ONLY SHOW IF NUMBER EXISTS) =====
+    if (post.contactNumber) {
+      contactBtn.style.display = "block";
+      contactBtn.addEventListener("click", () => {
+        window.location.href = `tel:${post.contactNumber}`;
+      });
+    } else {
+      contactBtn.style.display = "none";
+    }
 
   } catch (err) {
     console.error("View Post Error:", err);
