@@ -4,6 +4,9 @@ export async function init({ db }) {
   const postId = sessionStorage.getItem("viewPostId");
   if (!postId) return;
 
+  // Wait a tick to ensure SPA DOM is ready
+  await new Promise(r => setTimeout(r, 50));
+
   try {
     const postRef = doc(db, "posts", postId);
     const postSnap = await getDoc(postRef);
@@ -12,18 +15,20 @@ export async function init({ db }) {
     const post = postSnap.data();
     const priceText = post.price ? `£${post.price}` : "Contact for price";
 
-    // ====== TEXT INFO ======
-    document.getElementById("viewTitle").textContent = post.title;
-    document.getElementById("viewDescription").textContent = post.description || post.teaser || "";
-    document.getElementById("viewCategory").textContent = post.category || "General";
-    document.getElementById("viewArea").textContent = post.area || "Rhondda";
-    document.getElementById("viewTime")?.textContent = post.posted || "Just now";
-    ["viewPriceMobile", "viewPrice"].forEach(id => {
+    // ===== TEXT INFO =====
+    const safeSetText = (id, text) => {
       const el = document.getElementById(id);
-      if (el) el.textContent = priceText;
-    });
+      if (el) el.textContent = text;
+    };
 
-    // ====== GALLERY ======
+    safeSetText("viewTitle", post.title);
+    safeSetText("viewDescription", post.description || post.teaser || "");
+    safeSetText("viewCategory", post.category || "General");
+    safeSetText("viewArea", post.area || "Rhondda");
+    safeSetText("viewTime", post.posted || "Just now");
+    ["viewPriceMobile", "viewPrice"].forEach(id => safeSetText(id, priceText));
+
+    // ===== GALLERY =====
     const galleryContainer = document.getElementById("galleryContainer");
     if (!galleryContainer) return;
     galleryContainer.innerHTML = "";
@@ -36,7 +41,7 @@ export async function init({ db }) {
       img.src = url;
       img.alt = post.title;
       img.loading = "lazy";
-      img.classList.add("gallery-image", "loading");
+      img.className = "gallery-image loading";
       if (i === 0) img.classList.add("active");
       img.addEventListener("load", () => img.classList.remove("loading"));
       galleryContainer.appendChild(img);
@@ -44,25 +49,32 @@ export async function init({ db }) {
     });
 
     const total = slides.length;
-    document.getElementById("totalImg").textContent = total;
+    safeSetText("totalImg", total);
 
-    // ====== SLIDE CONTROL ======
+    // Dots
+    const dotsContainer = document.getElementById("galleryDots");
+    if (dotsContainer) {
+      dotsContainer.innerHTML = "";
+      slides.forEach((_, i) => {
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = i === 0 ? "gallery-dot active" : "gallery-dot";
+        dot.addEventListener("click", () => goToSlide(i));
+        dotsContainer.appendChild(dot);
+      });
+    }
+
+    // ===== SLIDE FUNCTIONS =====
     let currentIndex = 0;
 
     function updateSlide(idx) {
       currentIndex = (idx + total) % total;
       slides.forEach((img, i) => img.classList.toggle("active", i === currentIndex));
       galleryContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
-      document.getElementById("currentImg")?.textContent = currentIndex + 1;
-
+      safeSetText("currentImg", currentIndex + 1);
       if (dotsContainer) {
         const dots = dotsContainer.querySelectorAll(".gallery-dot");
         dots.forEach((dot, i) => dot.classList.toggle("active", i === currentIndex));
-      }
-
-      // Update lightbox image if open
-      if (lightbox.classList.contains("active")) {
-        lightboxImg.src = slides[currentIndex].src;
       }
     }
 
@@ -72,25 +84,11 @@ export async function init({ db }) {
 
     updateSlide(0);
 
-    // ====== DOTS ======
-    const dotsContainer = document.getElementById("galleryDots");
-    if (dotsContainer) {
-      dotsContainer.innerHTML = "";
-      slides.forEach((_, i) => {
-        const dot = document.createElement("button");
-        dot.type = "button";
-        dot.className = "gallery-dot" + (i === 0 ? " active" : "");
-        dot.setAttribute("aria-label", `Show image ${i + 1}`);
-        dot.addEventListener("click", () => goToSlide(i));
-        dotsContainer.appendChild(dot);
-      });
-    }
-
-    // ====== NAV BUTTONS ======
+    // ===== NAV BUTTONS =====
     document.getElementById("galleryPrev")?.addEventListener("click", () => goToSlide(currentIndex - 1));
     document.getElementById("galleryNext")?.addEventListener("click", () => goToSlide(currentIndex + 1));
 
-    // ====== TOUCH / DRAG SUPPORT ======
+    // ===== TOUCH / DRAG =====
     let startX = 0, currentX = 0, isDragging = false;
 
     const startDrag = x => { isDragging = true; startX = x; currentX = x; galleryContainer.classList.add("dragging"); };
@@ -120,7 +118,7 @@ export async function init({ db }) {
     window.addEventListener("mousemove", e => moveDrag(e.clientX));
     window.addEventListener("mouseup", endDrag);
 
-    // ====== LIGHTBOX ======
+    // ===== LIGHTBOX =====
     const lightbox = document.getElementById("lightbox");
     const lightboxImg = document.getElementById("lightboxImage");
     const lightboxClose = document.getElementById("lightboxClose");
@@ -137,20 +135,19 @@ export async function init({ db }) {
     lightboxClose?.addEventListener("click", closeLightbox);
     lightbox.addEventListener("click", e => e.target === lightbox && closeLightbox());
 
-    // ====== LIGHTBOX SWIPE ======
-    let lbStartX = 0;
-    let lbDragging = false;
+    // LIGHTBOX SWIPE
+    let lbStartX = 0, lbDragging = false;
 
     lightbox.addEventListener("touchstart", e => {
       if (e.touches.length !== 1) return;
       lbStartX = e.touches[0].clientX;
       lbDragging = true;
     });
-    lightbox.addEventListener("touchmove", e => {});
     lightbox.addEventListener("touchend", e => {
       if (!lbDragging) return;
       const delta = e.changedTouches[0].clientX - lbStartX;
       if (Math.abs(delta) > 50) delta < 0 ? goToSlide(currentIndex + 1) : goToSlide(currentIndex - 1);
+      lightboxImg.src = slides[currentIndex].src;
       lbDragging = false;
     });
     lightbox.addEventListener("mousedown", e => { lbStartX = e.clientX; lbDragging = true; });
@@ -158,10 +155,11 @@ export async function init({ db }) {
       if (!lbDragging) return;
       const delta = e.clientX - lbStartX;
       if (Math.abs(delta) > 50) delta < 0 ? goToSlide(currentIndex + 1) : goToSlide(currentIndex - 1);
+      lightboxImg.src = slides[currentIndex].src;
       lbDragging = false;
     });
 
-    // ====== ACTION BUTTONS ======
+    // ===== ACTION BUTTONS =====
     document.getElementById("messageSeller")?.addEventListener("click", () => alert(`Chat with seller coming soon! Ref: ${post.userId}`));
     document.getElementById("reportPost")?.addEventListener("click", () => {
       if (confirm("Report this listing for review?")) alert("Thank you. This listing has been flagged.");
