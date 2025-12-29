@@ -49,9 +49,8 @@ export async function init({ db }) {
     });
 
     const total = slides.length;
-    safeSetText("totalImg", total);
 
-    // Dots
+    // ===== DOTS ONLY =====
     const dotsContainer = document.getElementById("galleryDots");
     if (dotsContainer) {
       dotsContainer.innerHTML = "";
@@ -71,7 +70,7 @@ export async function init({ db }) {
       currentIndex = (idx + total) % total;
       slides.forEach((img, i) => img.classList.toggle("active", i === currentIndex));
       galleryContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
-      safeSetText("currentImg", currentIndex + 1);
+
       if (dotsContainer) {
         const dots = dotsContainer.querySelectorAll(".gallery-dot");
         dots.forEach((dot, i) => dot.classList.toggle("active", i === currentIndex));
@@ -84,11 +83,7 @@ export async function init({ db }) {
 
     updateSlide(0);
 
-    // ===== NAV BUTTONS =====
-    document.getElementById("galleryPrev")?.addEventListener("click", () => goToSlide(currentIndex - 1));
-    document.getElementById("galleryNext")?.addEventListener("click", () => goToSlide(currentIndex + 1));
-
-    // ===== TOUCH / DRAG =====
+    // ===== TOUCH / DRAG SUPPORT =====
     let startX = 0, currentX = 0, isDragging = false;
 
     const startDrag = x => { isDragging = true; startX = x; currentX = x; galleryContainer.classList.add("dragging"); };
@@ -118,56 +113,55 @@ export async function init({ db }) {
     window.addEventListener("mousemove", e => moveDrag(e.clientX));
     window.addEventListener("mouseup", endDrag);
 
-// ===== LIGHTBOX =====
-const lightbox = document.getElementById("lightbox");
-const lightboxImg = document.getElementById("lightboxImage");
-const lightboxClose = document.getElementById("lightboxClose");
+    // ===== LIGHTBOX =====
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightboxImage");
+    const lightboxClose = document.getElementById("lightboxClose");
 
-let lbIndex = 0; // Track current lightbox image
+    let lbIndex = 0;
 
-slides.forEach((img, i) => {
-  img.style.cursor = "zoom-in";
-  img.addEventListener("click", () => {
-    lbIndex = i; // Set lightbox to clicked image
-    lightboxImg.src = slides[lbIndex].src;
-    lightbox.classList.add("active");
-  });
-});
+    slides.forEach((img, i) => {
+      img.style.cursor = "zoom-in";
+      img.addEventListener("click", () => {
+        lbIndex = i;
+        lightboxImg.src = slides[lbIndex].src;
+        lightbox.classList.add("active");
+      });
+    });
 
-const closeLightbox = () => lightbox.classList.remove("active");
-lightboxClose?.addEventListener("click", closeLightbox);
-lightbox.addEventListener("click", e => e.target === lightbox && closeLightbox());
+    const closeLightbox = () => lightbox.classList.remove("active");
+    lightboxClose?.addEventListener("click", closeLightbox);
+    lightbox.addEventListener("click", e => e.target === lightbox && closeLightbox());
 
-// ===== LIGHTBOX NAVIGATION =====
-const goLightbox = delta => {
-  lbIndex = (lbIndex + delta + slides.length) % slides.length;
-  lightboxImg.src = slides[lbIndex].src;
-};
+    const goLightbox = delta => {
+      lbIndex = (lbIndex + delta + slides.length) % slides.length;
+      lightboxImg.src = slides[lbIndex].src;
+    };
 
-// Keyboard support
-window.addEventListener("keydown", e => {
-  if (!lightbox.classList.contains("active")) return;
-  if (e.key === "ArrowRight") goLightbox(1);
-  if (e.key === "ArrowLeft") goLightbox(-1);
-  if (e.key === "Escape") closeLightbox();
-});
+    // Keyboard support
+    window.addEventListener("keydown", e => {
+      if (!lightbox.classList.contains("active")) return;
+      if (e.key === "ArrowRight") goLightbox(1);
+      if (e.key === "ArrowLeft") goLightbox(-1);
+      if (e.key === "Escape") closeLightbox();
+    });
 
-// Touch support inside lightbox
-let lbStartX = 0;
-let lbDragging = false;
+    // Lightbox touch swipe
+    let lbStartX = 0;
+    let lbDragging = false;
 
-lightbox.addEventListener("touchstart", e => {
-  if (e.touches.length !== 1) return;
-  lbStartX = e.touches[0].clientX;
-  lbDragging = true;
-});
+    lightbox.addEventListener("touchstart", e => {
+      if (e.touches.length !== 1) return;
+      lbStartX = e.touches[0].clientX;
+      lbDragging = true;
+    });
 
-lightbox.addEventListener("touchend", e => {
-  if (!lbDragging) return;
-  const delta = e.changedTouches[0].clientX - lbStartX;
-  if (Math.abs(delta) > 50) delta < 0 ? goLightbox(1) : goLightbox(-1);
-  lbDragging = false;
-});
+    lightbox.addEventListener("touchend", e => {
+      if (!lbDragging) return;
+      const delta = e.changedTouches[0].clientX - lbStartX;
+      if (Math.abs(delta) > 50) delta < 0 ? goLightbox(1) : goLightbox(-1);
+      lbDragging = false;
+    });
 
     // ===== ACTION BUTTONS =====
     document.getElementById("messageSeller")?.addEventListener("click", () => alert(`Chat with seller coming soon! Ref: ${post.userId}`));
