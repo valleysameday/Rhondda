@@ -32,34 +32,37 @@ export async function init({ auth: a, db: d }) {
     return;
   }
 
-  document.getElementById("savePostBtn").onclick = async () => {
-    const title = document.getElementById("editTitle").value.trim();
-    const description = document.getElementById("editDescription").value.trim();
-    const category = document.getElementById("editCategory").value.trim();
+document.getElementById("savePostBtn").onclick = async () => {
+  const title = document.getElementById("editTitle").value.trim();
+  const description = document.getElementById("editDescription").value.trim();
+  const category = document.getElementById("editCategory").value;
 
-    if (!title || !description) {
-      feedback.textContent = "Title and description are required.";
-      return;
-    }
+  if (!title || !description) {
+    feedback.textContent = "Title and description are required.";
+    return;
+  }
 
-    feedback.textContent = "Saving...";
+  if (!category) {
+    feedback.textContent = "Please select a category.";
+    return;
+  }
 
-    try {
-      await updateDoc(doc(db, "posts", id), {
-        title,
-        description,
-        category
-      });
+  feedback.textContent = "Saving...";
 
-      feedback.textContent = "Saved!";
-      setTimeout(() => {
-        loadView("business-dashboard");
-      }, 400);
+  try {
+    await updateDoc(doc(db, "posts", id), {
+      title,
+      description,
+      category
+    });
 
-    } catch (err) {
-      feedback.textContent = "Error saving changes.";
-    }
-  };
+    feedback.textContent = "Saved!";
+    setTimeout(() => loadView("business-dashboard"), 400);
+
+  } catch (err) {
+    feedback.textContent = "Error saving changes.";
+  }
+};
 
   document.getElementById("cancelEditBtn").onclick = () => {
     loadView("business-dashboard");
