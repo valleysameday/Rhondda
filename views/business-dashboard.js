@@ -60,7 +60,10 @@ if (!snap.exists() || !snap.data().isBusiness) {
   const stats = renderPostsAndStats(
     "bizPosts",
     postsSnap,
-    id => openScreen("editPost"),
+    id => {
+  window.editingPostId = id;
+  openScreen("editPost");
+    }
     async id => {
       if (!confirm("Delete this ad?")) return;
 
