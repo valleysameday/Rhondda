@@ -64,8 +64,8 @@ getFirebase().then(fb => {
           // Replace with your account view logic
           window.loadView(
             window.firebaseUserDoc?.isBusiness
-              ? "views/business-dashboard"
-              : "views/general-dashboard"
+              ? "business-dashboard"
+              : "general-dashboard"
           );
         }
       });
