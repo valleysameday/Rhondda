@@ -7,80 +7,8 @@ import '/index/js/post-gate.js';
 import { openLoginModal } from '/index/js/auth/loginModal.js';
 import { openSignupModal } from '/index/js/auth/signupModal.js';
 import { openForgotModal } from '/index/js/auth/forgotModal.js';
-import { initAuth, getCurrentUser, onAuthReady } from '/index/js/auth/state.js';
 
 let auth, db, storage;
-
-getFirebase().then(fb => {
-  auth = fb.auth;
-  db = fb.db;
-  storage = fb.storage;
-
-  console.log("✅ Firebase ready");
-
-  // Initialize auth state
-  initAuth(auth);
-
-  // Update account label dynamically
-  onAuthReady(user => {
-    const label = document.querySelector("#openAccountModal .label-main");
-    if (label) label.textContent = user ? "My Account" : "Login";
-  });
-
-  const start = () => {
-    initUIRouter();
-
-    // SPA login/signup/forgot links
-    document.querySelectorAll('[data-value="login"]').forEach(btn => {
-      btn.addEventListener("click", e => { 
-        e.preventDefault(); 
-        openLoginModal(auth);  // pass initialized auth
-      });
-    });
-
-    document.querySelectorAll('[data-value="signup"]').forEach(btn => {
-      btn.addEventListener("click", e => { 
-        e.preventDefault(); 
-        openSignupModal(auth);  // pass initialized auth
-      });
-    });
-
-    document.querySelectorAll('[data-value="forgot"]').forEach(btn => {
-      btn.addEventListener("click", e => { 
-        e.preventDefault(); 
-        openForgotModal(auth);  // pass initialized auth
-      });
-    });
-
-    // Account button
-    const accountBtn = document.getElementById("openAccountModal");
-    if (accountBtn) {
-      accountBtn.addEventListener("click", e => {
-        e.preventDefault();
-        const user = getCurrentUser();
-        if (!user) {
-          openLoginModal(auth);
-        } else {
-          // Replace with your account view logic
-          window.loadView(
-            window.firebaseUserDoc?.isBusiness
-              ? "business-dashboard"
-              : "general-dashboard"
-          );
-        }
-      });
-    }
-
-    // Load home view
-    loadView("home");
-  };
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", start);
-  } else {
-    start();
-  }
-});
 
 /* =====================================================
    SPA VIEW LOADER
@@ -107,7 +35,7 @@ export async function loadView(view) {
 
     try {
       const mod = await import(`/views/${view}.js?cache=${Date.now()}`);
-      mod.init?.({ db, auth, storage });
+      mod.init?.({ auth, db, storage });
     } catch (err) {
       console.error("View JS error:", err);
     }
@@ -117,3 +45,79 @@ export async function loadView(view) {
 }
 
 window.loadView = loadView;
+
+/* =====================================================
+   APP INIT
+===================================================== */
+getFirebase().then(async fb => {
+  auth = fb.auth;
+  db = fb.db;
+  storage = fb.storage;
+
+  console.log("✅ Firebase ready");
+
+  auth.onAuthStateChanged(async user => {
+    window.currentUser = user || null;
+
+    const label = document.querySelector("#openAccountModal .label-main");
+    if (label) label.textContent = user ? "My Account" : "Login";
+
+    if (!user) return;
+
+    // 🔍 Detect business vs general
+    const snap = await db
+      .collection("businesses")
+      .doc(user.uid)
+      .get()
+      .catch(() => null);
+
+    window.firebaseUserDoc = snap?.exists ? snap.data() : null;
+  });
+
+  const start = () => {
+    initUIRouter();
+
+    // Auth modals
+    document.querySelectorAll('[data-value="login"]').forEach(btn =>
+      btn.addEventListener("click", e => {
+        e.preventDefault();
+        openLoginModal(auth);
+      })
+    );
+
+    document.querySelectorAll('[data-value="signup"]').forEach(btn =>
+      btn.addEventListener("click", e => {
+        e.preventDefault();
+        openSignupModal(auth);
+      })
+    );
+
+    document.querySelectorAll('[data-value="forgot"]').forEach(btn =>
+      btn.addEventListener("click", e => {
+        e.preventDefault();
+        openForgotModal(auth);
+      })
+    );
+
+    // Account button
+    document.getElementById("openAccountModal")?.addEventListener("click", e => {
+      e.preventDefault();
+
+      if (!window.currentUser) {
+        openLoginModal(auth);
+      } else {
+        loadView(
+          window.firebaseUserDoc
+            ? "business-dashboard"
+            : "general-dashboard"
+        );
+      }
+    });
+
+    loadView("home");
+  };
+
+  document.readyState === "loading"
+    ? document.addEventListener("DOMContentLoaded", start)
+    : start();
+});
