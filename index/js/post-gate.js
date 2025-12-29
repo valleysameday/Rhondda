@@ -22,6 +22,10 @@ import {
 let auth, db, storage;
 let postDraft = null;
 
+/* ===== PROPERTY STATE (NEW) ===== */
+let propertyType = null;      // 'sale' | 'rent'
+let rentFrequency = null;     // 'pcm' | 'weekly'
+
 /* ================= FIREBASE INIT ================= */
 getFirebase().then(fb => {
   auth = fb.auth;
@@ -44,9 +48,7 @@ function initPostGate() {
     dots[i].classList.add('active');
     stepIndex = i;
 
-    // Re-run step2 validation when shown
     if (i === 1) validateStep2();
-    // Auto-focus title
     if (i === 1) titleInput.focus();
   }
 
@@ -66,6 +68,12 @@ function initPostGate() {
   document.querySelectorAll('[data-category]').forEach(btn => {
     btn.addEventListener('click', () => {
       selectedCategory = btn.dataset.category;
+
+      // reset property state when switching category
+      propertyType = null;
+      rentFrequency = null;
+      updatePriceLabel();
+
       showStep(1);
     });
   });
@@ -82,11 +90,48 @@ function initPostGate() {
     nextBtn.disabled = !(titleOk && descOk);
   }
 
-  // Run on typing
   ['input', 'keyup', 'change'].forEach(evt => {
     titleInput.addEventListener(evt, validateStep2);
     descInput.addEventListener(evt, validateStep2);
   });
+
+  /* ---------- PROPERTY OPTIONS (NEW) ---------- */
+  document.querySelectorAll('[data-property-type]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      propertyType = btn.dataset.propertyType;
+      if (propertyType === 'sale') {
+        rentFrequency = null;
+      }
+      updatePriceLabel();
+    });
+  });
+
+  document.querySelectorAll('[data-rent-frequency]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      rentFrequency = btn.dataset.rentFrequency;
+      updatePriceLabel();
+    });
+  });
+
+  function updatePriceLabel() {
+    const label = document.querySelector('label[for="postPrice"]');
+    if (!label) return;
+
+    if (selectedCategory === 'property') {
+      if (propertyType === 'sale') {
+        label.textContent = 'Sale price (£)';
+      } else if (propertyType === 'rent') {
+        label.textContent =
+          rentFrequency === 'weekly'
+            ? 'Weekly rent (£)'
+            : 'Monthly rent (PCM)';
+      } else {
+        label.textContent = 'Price (£)';
+      }
+    } else {
+      label.textContent = 'Price (£)';
+    }
+  }
 
   /* ---------- IMAGE PREVIEW ---------- */
   const imageInput = document.getElementById('postImages');
@@ -124,7 +169,23 @@ function initPostGate() {
       return;
     }
 
-    postDraft = { title, description, area, price, category: selectedCategory };
+    if (
+      selectedCategory === 'property' &&
+      (!propertyType || (propertyType === 'rent' && !rentFrequency))
+    ) {
+      alert('Please complete property details');
+      return;
+    }
+
+    postDraft = {
+      title,
+      description,
+      area,
+      price,
+      category: selectedCategory,
+      propertyType,
+      rentFrequency
+    };
 
     if (!auth.currentUser) {
       openScreen('login');
@@ -172,7 +233,10 @@ async function submitPost(data, images) {
   const imageUrls = [];
 
   for (const img of images) {
-    const storageRef = ref(storage, `posts/${auth.currentUser.uid}/${Date.now()}_${img.name}`);
+    const storageRef = ref(
+      storage,
+      `posts/${auth.currentUser.uid}/${Date.now()}_${img.name}`
+    );
     await uploadBytes(storageRef, img);
     imageUrls.push(await getDownloadURL(storageRef));
   }
@@ -190,7 +254,6 @@ async function submitPost(data, images) {
 }
 
 /* ================= CSS ADDITIONS ================= */
-/* Add to your CSS file or <style> */
 const style = document.createElement('style');
 style.textContent = `
   .shake {
