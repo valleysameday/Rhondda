@@ -27,7 +27,10 @@ export async function init({ auth: a, db: d }) {
   const stats = renderPostsAndStats(
     "userPosts",
     snap,
-    id => openScreen("editPost"),
+    id => {
+  window.editingPostId = id;
+  openScreen("editPost");
+    }
     async id => {
       if (!confirm("Delete this ad?")) return;
       await deleteDoc(doc(db, "posts", id));
