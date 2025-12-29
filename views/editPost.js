@@ -12,23 +12,53 @@ export async function init({ auth: a, db: d }) {
   const id = window.editingPostId;
   if (!id) return loadView("home");
 
-  const snap = await getDoc(doc(db, "posts", id));
-  if (!snap.exists()) return loadView("home");
+  const feedback = document.getElementById("editFeedback");
 
-  const p = snap.data();
+  try {
+    const snap = await getDoc(doc(db, "posts", id));
+    if (!snap.exists()) {
+      feedback.textContent = "Post not found.";
+      return;
+    }
 
-  document.getElementById("editTitle").value = p.title || "";
-  document.getElementById("editDescription").value = p.description || "";
-  document.getElementById("editCategory").value = p.category || "";
+    const p = snap.data();
+
+    document.getElementById("editTitle").value = p.title || "";
+    document.getElementById("editDescription").value = p.description || "";
+    document.getElementById("editCategory").value = p.category || "";
+
+  } catch (err) {
+    feedback.textContent = "Error loading post.";
+    return;
+  }
 
   document.getElementById("savePostBtn").onclick = async () => {
-    await updateDoc(doc(db, "posts", id), {
-      title: document.getElementById("editTitle").value,
-      description: document.getElementById("editDescription").value,
-      category: document.getElementById("editCategory").value
-    });
+    const title = document.getElementById("editTitle").value.trim();
+    const description = document.getElementById("editDescription").value.trim();
+    const category = document.getElementById("editCategory").value.trim();
 
-    loadView("business-dashboard"); // or general-dashboard depending on user
+    if (!title || !description) {
+      feedback.textContent = "Title and description are required.";
+      return;
+    }
+
+    feedback.textContent = "Saving...";
+
+    try {
+      await updateDoc(doc(db, "posts", id), {
+        title,
+        description,
+        category
+      });
+
+      feedback.textContent = "Saved!";
+      setTimeout(() => {
+        loadView("business-dashboard");
+      }, 400);
+
+    } catch (err) {
+      feedback.textContent = "Error saving changes.";
+    }
   };
 
   document.getElementById("cancelEditBtn").onclick = () => {
