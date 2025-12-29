@@ -313,14 +313,3 @@ body.modal-open main {
     transform: translateY(0);
   }
 }
-.property-options {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  border-radius: 12px;
-  background: #f6f7f9;
-}
-
-.property-options button {
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
-}
