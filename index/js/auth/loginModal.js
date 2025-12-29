@@ -1,10 +1,8 @@
-// index/js/auth/loginModal.js
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { loadView } from "/index/js/main.js";
 
-/**
- * @param {import("firebase/auth").Auth} auth - Firebase auth instance
- */
-export function openLoginModal(auth) {
+export function openLoginModal(auth, db) {
   const modal = document.getElementById("login");
   if (!modal) return;
   modal.style.display = "flex";
@@ -24,7 +22,7 @@ export function openLoginModal(auth) {
 
   if (!loginBtn || !emailInput || !passInput) return;
 
-  // Remove previous click listeners to avoid duplicates
+  // Remove previous click listeners
   loginBtn.replaceWith(loginBtn.cloneNode(true));
   const newLoginBtn = modal.querySelector("#loginSubmit");
 
@@ -39,9 +37,22 @@ export function openLoginModal(auth) {
     }
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+
+      // Load user doc
+      const snap = await getDoc(doc(db, "users", cred.user.uid));
+      window.firebaseUserDoc = snap.exists() ? snap.data() : {};
+
       feedback.textContent = "Login successful!";
       closeModal();
+
+      // Route correctly
+      if (window.firebaseUserDoc.isBusiness) {
+        loadView("business-dashboard");
+      } else {
+        loadView("general-dashboard");
+      }
+
     } catch (err) {
       feedback.textContent = err.message;
       console.error("Login error:", err);
