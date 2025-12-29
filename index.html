@@ -137,6 +137,7 @@
 <div id="posts-grid" class="modal">
   <div class="modal-content">
 
+    <!-- Close -->
     <button class="close"
             aria-label="Close"
             data-action="close-screens">&times;</button>
@@ -182,13 +183,34 @@
           placeholder="Add a description"
           required
         ></textarea>
-<!-- Property only -->
-<button data-property-type="sale">For Sale</button>
-<button data-property-type="rent">To Rent</button>
 
-<button data-rent-frequency="pcm">PCM</button>
-<button data-rent-frequency="weekly">Weekly</button>
-     
+        <!-- ===== PROPERTY OPTIONS (PROPERTY ONLY) ===== -->
+        <div class="property-options" hidden>
+
+          <h3>Property details</h3>
+
+          <!-- Sale / Rent -->
+          <div class="property-type">
+            <button type="button" data-property-type="sale">
+              For Sale
+            </button>
+            <button type="button" data-property-type="rent">
+              To Rent
+            </button>
+          </div>
+
+          <!-- Rent frequency -->
+          <div class="rent-frequency">
+            <button type="button" data-rent-frequency="pcm">
+              PCM
+            </button>
+            <button type="button" data-rent-frequency="weekly">
+              Weekly
+            </button>
+          </div>
+
+        </div>
+
         <div class="post-nav">
           <button type="button" class="post-prev ghost-btn">Back</button>
           <button type="button" class="post-next primary-btn" disabled>
@@ -201,6 +223,7 @@
       <div class="post-step" data-step="3">
         <h2>Optional details</h2>
 
+        <label for="postPrice">Price (£)</label>
         <input
           type="number"
           id="postPrice"
@@ -215,6 +238,7 @@
           placeholder="Area (optional)"
         >
 
+        <!-- Photos -->
         <div class="photo-uploader">
           <input
             type="file"
@@ -328,4 +352,4 @@
 <script type="module" src="/index/js/main.js"></script>
 
 </body>
-</html>
+      </html>
