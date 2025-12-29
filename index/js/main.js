@@ -1,5 +1,3 @@
-// index/js/main.js
-
 import { getFirebase } from '/index/js/firebase/init.js';
 import { initUIRouter } from '/index/js/ui-router.js';
 import '/index/js/post-gate.js';
@@ -8,8 +6,7 @@ import { openLoginModal } from '/index/js/auth/loginModal.js';
 import { openSignupModal } from '/index/js/auth/signupModal.js';
 import { openForgotModal } from '/index/js/auth/forgotModal.js';
 
-import { doc, getDoc } from
-  "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let auth, db, storage;
 
@@ -17,13 +14,19 @@ let auth, db, storage;
    SPA VIEW LOADER
 ===================================================== */
 export async function loadView(view) {
+  console.log("🔵 loadView() →", view);
+
   const app = document.getElementById("app");
-  if (!app) return;
+  if (!app) {
+    console.log("❌ #app container missing");
+    return;
+  }
 
   app.querySelectorAll(".view").forEach(v => v.hidden = true);
 
   let target = document.getElementById(`view-${view}`);
   if (!target) {
+    console.log("🟡 Creating new view container:", view);
     target = document.createElement("div");
     target.id = `view-${view}`;
     target.className = "view";
@@ -32,18 +35,22 @@ export async function loadView(view) {
   }
 
   if (!target.dataset.loaded) {
+    console.log("🟡 Loading HTML for:", view);
     const html = await fetch(`/views/${view}.html`).then(r => r.text());
     target.innerHTML = html;
     target.dataset.loaded = "true";
 
     try {
+      console.log("🟡 Importing JS for:", view);
       const mod = await import(`/views/${view}.js?cache=${Date.now()}`);
       mod.init?.({ auth, db, storage });
+      console.log("🟢 View JS init complete:", view);
     } catch (err) {
-      console.error("View JS error:", err);
+      console.error("❌ View JS error:", err);
     }
   }
 
+  console.log("🟢 Showing view:", view);
   target.hidden = false;
 }
 
@@ -53,6 +60,8 @@ window.loadView = loadView;
    APP INIT
 ===================================================== */
 getFirebase().then(async fb => {
+  console.log("🟢 Firebase ready");
+
   auth = fb.auth;
   db = fb.db;
   storage = fb.storage;
@@ -62,31 +71,39 @@ getFirebase().then(async fb => {
   window.authReady = false;
 
   auth.onAuthStateChanged(async user => {
+    console.log("🔵 AUTH STATE CHANGED:", user ? user.uid : "no user");
+
     window.currentUser = user || null;
     window.isBusinessUser = false;
     window.authReady = false;
 
     if (!user) {
+      console.log("🟡 No user logged in");
       window.authReady = true;
       return;
     }
 
     try {
+      console.log("🟡 Checking business status for:", user.uid);
       const snap = await getDoc(doc(db, "businesses", user.uid));
       window.isBusinessUser = snap.exists();
+      console.log("🟢 Business status:", window.isBusinessUser);
     } catch (e) {
-      console.warn("Business lookup failed:", e);
+      console.warn("❌ Business lookup failed:", e);
     }
 
     window.authReady = true;
+    console.log("🟢 authReady = true");
   });
 
   const start = () => {
+    console.log("🟢 App start()");
     initUIRouter();
 
     document.querySelectorAll('[data-value="login"]').forEach(btn =>
       btn.onclick = e => {
         e.preventDefault();
+        console.log("🔵 Login button clicked (main.js)");
         openLoginModal(auth, db);
       }
     );
@@ -94,6 +111,7 @@ getFirebase().then(async fb => {
     document.querySelectorAll('[data-value="signup"]').forEach(btn =>
       btn.onclick = e => {
         e.preventDefault();
+        console.log("🔵 Signup button clicked");
         openSignupModal(auth);
       }
     );
@@ -101,23 +119,30 @@ getFirebase().then(async fb => {
     document.querySelectorAll('[data-value="forgot"]').forEach(btn =>
       btn.onclick = e => {
         e.preventDefault();
+        console.log("🔵 Forgot password clicked");
         openForgotModal(auth);
       }
     );
 
     document.getElementById("openAccountModal")?.addEventListener("click", e => {
       e.preventDefault();
+      console.log("🔵 Account button clicked");
 
       if (!window.currentUser) {
+        console.log("🟡 No user → opening login modal");
         openLoginModal(auth, db);
         return;
       }
+
+      console.log("🟡 User logged in, waiting for role…");
 
       const waitForRole = () => {
         if (!window.authReady) {
           requestAnimationFrame(waitForRole);
           return;
         }
+
+        console.log("🟢 Role ready. isBusinessUser =", window.isBusinessUser);
 
         loadView(
           window.isBusinessUser
@@ -129,6 +154,7 @@ getFirebase().then(async fb => {
       waitForRole();
     });
 
+    console.log("🔵 Loading home view");
     loadView("home");
   };
 
