@@ -228,34 +228,25 @@
   .gallery-wrapper { border-radius: 0; }
   .details-section { padding-bottom: 20px; }
 }
-/* ===== Image Lightbox ===== */
-.lightbox {
+/* Basic lightbox */
+#lightbox {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.lightbox[hidden] {
+  background: rgba(0,0,0,0.85);
   display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  cursor: grab;
 }
-
-.lightbox img {
-  max-width: 95vw;
-  max-height: 90vh;
-  object-fit: contain;
-}
-
-.lightbox-close {
+#lightbox.active { display: flex; }
+#lightbox img { max-width: 90%; max-height: 90%; border-radius: 6px; }
+#lightboxClose {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  font-size: 32px;
-  background: none;
-  border: none;
+  top: 20px; right: 20px;
+  font-size: 2rem;
   color: #fff;
+  background: transparent;
+  border: none;
   cursor: pointer;
 }
