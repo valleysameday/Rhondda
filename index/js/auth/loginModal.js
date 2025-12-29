@@ -1,10 +1,10 @@
 // index/js/auth/loginModal.js
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { onAuthReady } from "./state.js";
+import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-const auth = getAuth();
-
-export function openLoginModal() {
+/**
+ * @param {import("firebase/auth").Auth} auth - Firebase auth instance
+ */
+export function openLoginModal(auth) {
   const modal = document.getElementById("login");
   if (!modal) return;
   modal.style.display = "flex";
@@ -24,7 +24,11 @@ export function openLoginModal() {
 
   if (!loginBtn || !emailInput || !passInput) return;
 
-  loginBtn.addEventListener("click", async () => {
+  // Remove previous click listeners to avoid duplicates
+  loginBtn.replaceWith(loginBtn.cloneNode(true));
+  const newLoginBtn = modal.querySelector("#loginSubmit");
+
+  newLoginBtn.addEventListener("click", async () => {
     const email = emailInput.value.trim();
     const password = passInput.value.trim();
     feedback.textContent = "";
