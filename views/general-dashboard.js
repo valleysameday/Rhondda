@@ -47,7 +47,7 @@ getFirebase().then(fb => {
 
       container.innerHTML += `
         <div class="dash-card">
-          <img src="${p.images?.[0] || '/images/post-placeholder.jpg'}" class="dash-img">
+          <img src="${p.images?.[0] || '/images/image-webholder.webp'}" class="dash-img">
           <div class="dash-info">
             <h3>${p.title}</h3>
             <p>${p.description}</p>
