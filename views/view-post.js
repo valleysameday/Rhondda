@@ -32,7 +32,7 @@ export async function init({ db }) {
     if (!galleryContainer) return;
     galleryContainer.innerHTML = "";
 
-    const images = post.images?.length ? post.images : ["/images/post-placeholder.jpg"];
+    const images = post.images?.length ? post.images : ["/images/image-webholder.webp"];
     const slides = [];
 
     images.forEach((url, i) => {
