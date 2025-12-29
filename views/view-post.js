@@ -12,120 +12,161 @@ export async function init({ db }) {
     const post = postSnap.data();
     const priceText = post.price ? `£${post.price}` : "Contact for price";
 
-    // ========== TEXT ==========
+    /* ================= TEXT ================= */
     document.getElementById("viewTitle").textContent = post.title;
-    document.getElementById("viewDescription").textContent = post.description || post.teaser || "";
-    document.getElementById("viewCategory").textContent = post.category || "General";
-
-    const areaText = post.area || "Rhondda";
-    document.getElementById("viewArea").textContent = areaText;
-
-    const timeEl = document.getElementById("viewTime");
-    if (timeEl) timeEl.textContent = post.posted || "Just now";
+    document.getElementById("viewDescription").textContent =
+      post.description || post.teaser || "";
+    document.getElementById("viewCategory").textContent =
+      post.category || "General";
+    document.getElementById("viewArea").textContent = post.area || "Rhondda";
 
     ["viewPriceMobile", "viewPrice"].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.textContent = priceText;
     });
 
-    // ========== GALLERY ==========
+    /* ================= GALLERY ================= */
     const track = document.getElementById("galleryContainer");
     if (!track) return;
     track.innerHTML = "";
 
-    const images = post.images?.length ? post.images : ["/images/post-placeholder.jpg"];
+    const images = post.images?.length
+      ? post.images
+      : ["/images/post-placeholder.jpg"];
+
+    const lightbox = document.getElementById("imageLightbox");
+    const lightboxImg = document.getElementById("lightboxImage");
+    const lightboxClose = document.querySelector(".lightbox-close");
+
+    let slides = [];
+    let currentIndex = 0;
 
     images.forEach((url, i) => {
       const img = document.createElement("img");
       img.src = url;
       img.alt = post.title;
       img.loading = "lazy";
-      img.classList.add("gallery-image", "loading");
+      img.className = "gallery-image";
       if (i === 0) img.classList.add("active");
-      img.addEventListener("load", () => img.classList.remove("loading"));
+
+      img.addEventListener("click", () => {
+        lightboxImg.src = url;
+        lightbox.hidden = false;
+        document.body.style.overflow = "hidden";
+      });
+
       track.appendChild(img);
+      slides.push(img);
     });
 
-    const slides = Array.from(track.querySelectorAll(".gallery-image"));
     const total = slides.length;
-
     document.getElementById("totalImg").textContent = total;
 
+    /* ================= LIGHTBOX CLOSE ================= */
+    const closeLightbox = () => {
+      lightbox.hidden = true;
+      lightboxImg.src = "";
+      document.body.style.overflow = "";
+    };
+
+    lightboxClose.addEventListener("click", closeLightbox);
+    lightbox.addEventListener("click", e => {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    window.addEventListener("keydown", e => {
+      if (e.key === "Escape" && !lightbox.hidden) closeLightbox();
+    });
+
+    /* ================= SLIDER ================= */
     const dotsContainer = document.getElementById("galleryDots");
     if (dotsContainer) {
       dotsContainer.innerHTML = "";
       slides.forEach((_, i) => {
         const dot = document.createElement("button");
-        dot.type = "button";
         dot.className = "gallery-dot" + (i === 0 ? " active" : "");
-        dot.setAttribute("aria-label", `Show image ${i + 1}`);
         dot.addEventListener("click", () => goToSlide(i));
         dotsContainer.appendChild(dot);
       });
     }
 
-    let currentIndex = 0;
-
-    const updateTrackTransform = idx => {
+    const updateSlide = idx => {
       track.style.transform = `translateX(-${idx * 100}%)`;
-      slides.forEach((img, i) => img.classList.toggle("active", i === idx));
+      slides.forEach((img, i) =>
+        img.classList.toggle("active", i === idx)
+      );
 
-      const currentCounter = document.getElementById("currentImg");
-      if (currentCounter) currentCounter.textContent = idx + 1;
+      document.getElementById("currentImg").textContent = idx + 1;
 
       if (dotsContainer) {
-        const dots = dotsContainer.querySelectorAll(".gallery-dot");
-        dots.forEach((dot, i) => dot.classList.toggle("active", i === idx));
+        dotsContainer
+          .querySelectorAll(".gallery-dot")
+          .forEach((dot, i) =>
+            dot.classList.toggle("active", i === idx)
+          );
       }
     };
 
     const goToSlide = idx => {
-      if (!total) return;
       currentIndex = (idx + total) % total;
-      updateTrackTransform(currentIndex);
+      updateSlide(currentIndex);
     };
 
-    updateTrackTransform(0);
+    updateSlide(0);
 
-    // Gallery nav buttons
-    document.getElementById("galleryPrev")?.addEventListener("click", () => goToSlide(currentIndex - 1));
-    document.getElementById("galleryNext")?.addEventListener("click", () => goToSlide(currentIndex + 1));
+    document
+      .getElementById("galleryPrev")
+      ?.addEventListener("click", () => goToSlide(currentIndex - 1));
+    document
+      .getElementById("galleryNext")
+      ?.addEventListener("click", () => goToSlide(currentIndex + 1));
 
-    // Touch / drag support
-    let touchStartX = 0, touchCurrentX = 0, isDragging = false;
+    /* ================= TOUCH / DRAG ================= */
+    let startX = 0;
+    let isDragging = false;
 
-    const startDrag = x => { isDragging = true; touchStartX = x; touchCurrentX = x; track.classList.add("dragging"); };
-    const moveDrag = x => {
-      if (!isDragging) return;
-      touchCurrentX = x;
-      const delta = touchCurrentX - touchStartX;
-      const percent = (delta / track.offsetWidth) * 100;
-      track.style.transform = `translateX(calc(-${currentIndex * 100}% + ${percent}%))`;
-    };
-    const endDrag = () => {
-      if (!isDragging) return;
-      isDragging = false;
-      track.classList.remove("dragging");
-      const delta = touchCurrentX - touchStartX;
-      const threshold = track.offsetWidth * 0.15;
-      if (Math.abs(delta) > threshold) delta < 0 ? goToSlide(currentIndex + 1) : goToSlide(currentIndex - 1);
-      else updateTrackTransform(currentIndex);
-    };
-
-    track.addEventListener("touchstart", e => e.touches.length === 1 && startDrag(e.touches[0].clientX));
-    track.addEventListener("touchmove", e => moveDrag(e.touches[0].clientX));
-    track.addEventListener("touchend", endDrag);
-    track.addEventListener("mousedown", e => { e.preventDefault(); startDrag(e.clientX); });
-    window.addEventListener("mousemove", e => moveDrag(e.clientX));
-    window.addEventListener("mouseup", endDrag);
-
-    // Actions
-    const handleContact = () => alert(`Chat with seller coming soon! Ref: ${post.userId}`);
-    document.getElementById("messageSeller")?.addEventListener("click", handleContact);
-
-    document.getElementById("reportPost")?.addEventListener("click", () => {
-      if (confirm("Report this listing for review?")) alert("Thank you. This listing has been flagged for review.");
+    track.addEventListener("touchstart", e => {
+      startX = e.touches[0].clientX;
+      isDragging = true;
     });
+
+    track.addEventListener("touchend", e => {
+      if (!isDragging) return;
+      const delta = e.changedTouches[0].clientX - startX;
+      if (Math.abs(delta) > 50) {
+        delta < 0 ? goToSlide(currentIndex + 1) : goToSlide(currentIndex - 1);
+      }
+      isDragging = false;
+    });
+
+    track.addEventListener("mousedown", e => {
+      startX = e.clientX;
+      isDragging = true;
+    });
+
+    window.addEventListener("mouseup", e => {
+      if (!isDragging) return;
+      const delta = e.clientX - startX;
+      if (Math.abs(delta) > 50) {
+        delta < 0 ? goToSlide(currentIndex + 1) : goToSlide(currentIndex - 1);
+      }
+      isDragging = false;
+    });
+
+    /* ================= ACTIONS ================= */
+    document
+      .getElementById("messageSeller")
+      ?.addEventListener("click", () =>
+        alert("Messaging coming soon")
+      );
+
+    document
+      .getElementById("reportPost")
+      ?.addEventListener("click", () => {
+        if (confirm("Report this post?")) {
+          alert("Post reported. Thank you.");
+        }
+      });
 
   } catch (err) {
     console.error("View Post Error:", err);
