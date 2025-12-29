@@ -1,17 +1,29 @@
-<div class="edit-post">
-  <h2>Edit Post</h2>
+<link rel="stylesheet" href="/index/css/edit-post.css">
 
-  <label>Title</label>
-  <input id="editTitle" type="text">
+<div class="edit-post-container">
+  <div class="edit-post-card">
+    <h2>Edit Your Ad</h2>
 
-  <label>Description</label>
-  <textarea id="editDescription"></textarea>
+    <div class="edit-row">
+      <label>Title</label>
+      <input id="editTitle" type="text" placeholder="Enter a title">
+    </div>
 
-  <label>Category</label>
-  <input id="editCategory" type="text">
+    <div class="edit-row">
+      <label>Description</label>
+      <textarea id="editDescription" placeholder="Describe your ad"></textarea>
+    </div>
 
-  <button id="savePostBtn">Save Changes</button>
-  <button id="cancelEditBtn">Cancel</button>
+    <div class="edit-row">
+      <label>Category</label>
+      <input id="editCategory" type="text" placeholder="e.g. Services, For Sale">
+    </div>
 
-  <p id="editFeedback"></p>
+    <p id="editFeedback" class="edit-feedback"></p>
+
+    <div class="edit-actions">
+      <button id="savePostBtn" class="edit-save">Save Changes</button>
+      <button id="cancelEditBtn" class="edit-cancel">Cancel</button>
+    </div>
+  </div>
 </div>
