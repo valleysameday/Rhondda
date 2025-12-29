@@ -57,15 +57,10 @@ export function openLoginModal(auth, db) {
       const cred = await signInWithEmailAndPassword(auth, email, password);
       console.log("🟢 Firebase login success:", cred.user.uid);
 
-      console.log("🟡 Checking business doc for:", cred.user.uid);
-      const snap = await getDoc(doc(db, "businesses", cred.user.uid));
+      
 
-      console.log("🟡 Business doc exists:", snap.exists());
-      if (snap.exists()) {
-        console.log("🟢 Business data:", snap.data());
-      }
-
-      window.firebaseUserDoc = snap.exists() ? snap.data() : null;
+      const snap = await getDoc(doc(db, "users", cred.user.uid));
+window.firebaseUserDoc = snap.exists() ? snap.data() : null;
 
       feedback.textContent = "Login successful!";
       closeModal();
