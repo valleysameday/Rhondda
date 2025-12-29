@@ -28,9 +28,9 @@ export async function init({ auth: a, db: d }) {
     "userPosts",
     snap,
     id => {
-  window.editingPostId = id;
-  openScreen("editPost");
-    }
+      window.editingPostId = id;
+      openScreen("editPost");
+    },
     async id => {
       if (!confirm("Delete this ad?")) return;
       await deleteDoc(doc(db, "posts", id));
