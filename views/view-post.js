@@ -118,46 +118,56 @@ export async function init({ db }) {
     window.addEventListener("mousemove", e => moveDrag(e.clientX));
     window.addEventListener("mouseup", endDrag);
 
-    // ===== LIGHTBOX =====
-    const lightbox = document.getElementById("lightbox");
-    const lightboxImg = document.getElementById("lightboxImage");
-    const lightboxClose = document.getElementById("lightboxClose");
+// ===== LIGHTBOX =====
+const lightbox = document.getElementById("lightbox");
+const lightboxImg = document.getElementById("lightboxImage");
+const lightboxClose = document.getElementById("lightboxClose");
 
-    slides.forEach(img => {
-      img.style.cursor = "zoom-in";
-      img.addEventListener("click", () => {
-        lightboxImg.src = img.src;
-        lightbox.classList.add("active");
-      });
-    });
+let lbIndex = 0; // Track current lightbox image
 
-    const closeLightbox = () => lightbox.classList.remove("active");
-    lightboxClose?.addEventListener("click", closeLightbox);
-    lightbox.addEventListener("click", e => e.target === lightbox && closeLightbox());
+slides.forEach((img, i) => {
+  img.style.cursor = "zoom-in";
+  img.addEventListener("click", () => {
+    lbIndex = i; // Set lightbox to clicked image
+    lightboxImg.src = slides[lbIndex].src;
+    lightbox.classList.add("active");
+  });
+});
 
-    // LIGHTBOX SWIPE
-    let lbStartX = 0, lbDragging = false;
+const closeLightbox = () => lightbox.classList.remove("active");
+lightboxClose?.addEventListener("click", closeLightbox);
+lightbox.addEventListener("click", e => e.target === lightbox && closeLightbox());
 
-    lightbox.addEventListener("touchstart", e => {
-      if (e.touches.length !== 1) return;
-      lbStartX = e.touches[0].clientX;
-      lbDragging = true;
-    });
-    lightbox.addEventListener("touchend", e => {
-      if (!lbDragging) return;
-      const delta = e.changedTouches[0].clientX - lbStartX;
-      if (Math.abs(delta) > 50) delta < 0 ? goToSlide(currentIndex + 1) : goToSlide(currentIndex - 1);
-      lightboxImg.src = slides[currentIndex].src;
-      lbDragging = false;
-    });
-    lightbox.addEventListener("mousedown", e => { lbStartX = e.clientX; lbDragging = true; });
-    window.addEventListener("mouseup", e => {
-      if (!lbDragging) return;
-      const delta = e.clientX - lbStartX;
-      if (Math.abs(delta) > 50) delta < 0 ? goToSlide(currentIndex + 1) : goToSlide(currentIndex - 1);
-      lightboxImg.src = slides[currentIndex].src;
-      lbDragging = false;
-    });
+// ===== LIGHTBOX NAVIGATION =====
+const goLightbox = delta => {
+  lbIndex = (lbIndex + delta + slides.length) % slides.length;
+  lightboxImg.src = slides[lbIndex].src;
+};
+
+// Keyboard support
+window.addEventListener("keydown", e => {
+  if (!lightbox.classList.contains("active")) return;
+  if (e.key === "ArrowRight") goLightbox(1);
+  if (e.key === "ArrowLeft") goLightbox(-1);
+  if (e.key === "Escape") closeLightbox();
+});
+
+// Touch support inside lightbox
+let lbStartX = 0;
+let lbDragging = false;
+
+lightbox.addEventListener("touchstart", e => {
+  if (e.touches.length !== 1) return;
+  lbStartX = e.touches[0].clientX;
+  lbDragging = true;
+});
+
+lightbox.addEventListener("touchend", e => {
+  if (!lbDragging) return;
+  const delta = e.changedTouches[0].clientX - lbStartX;
+  if (Math.abs(delta) > 50) delta < 0 ? goLightbox(1) : goLightbox(-1);
+  lbDragging = false;
+});
 
     // ===== ACTION BUTTONS =====
     document.getElementById("messageSeller")?.addEventListener("click", () => alert(`Chat with seller coming soon! Ref: ${post.userId}`));
