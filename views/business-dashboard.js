@@ -28,9 +28,9 @@ export async function init({ auth: a, db: d, storage: s }) {
   if (!user) return loadView("home");
 
   const snap = await getDoc(doc(db, "users", user.uid));
-if (!snap.exists() || !snap.data().isBusiness) {
-  return loadView("general-dashboard");
-}
+  if (!snap.exists() || !snap.data().isBusiness) {
+    return loadView("general-dashboard");
+  }
 
   const data = snap.data();
 
@@ -61,9 +61,9 @@ if (!snap.exists() || !snap.data().isBusiness) {
     "bizPosts",
     postsSnap,
     id => {
-  window.editingPostId = id;
-  openScreen("editPost");
-    }
+      window.editingPostId = id;
+      openScreen("editPost");
+    },
     async id => {
       if (!confirm("Delete this ad?")) return;
 
