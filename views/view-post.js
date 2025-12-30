@@ -105,32 +105,56 @@ ${url}
     }
   });
 }
-    /* ============================================================
-       MESSAGE SELLER
-    ============================================================ */
-    document.getElementById("messageSeller")?.addEventListener("click", async () => {
-      const buyerId = auth.currentUser?.uid;
-      const sellerId = post.userId;
-      if (!buyerId) return loadView("login");
-      if (buyerId === sellerId) return;
+/* ============================================================
+   MESSAGE SELLER
+============================================================ */
+document.getElementById("messageSeller")?.addEventListener("click", async () => {
+  const buyerId = auth.currentUser?.uid;
+  const sellerId = post.userId;
+  if (!buyerId) return loadView("login");
+  if (buyerId === sellerId) return;
 
-      const convoId = `${buyerId}_${sellerId}_${postId}`;
-      await setDoc(
-        doc(db, "conversations", convoId),
-        {
-          participants: [buyerId, sellerId],
-          postId,
-          lastMessage: "",
-          lastMessageSender: "",
-          updatedAt: Date.now()
-        },
-        { merge: true }
-      );
+  const convoId = `${buyerId}_${sellerId}_${postId}`;
 
-      sessionStorage.setItem("activeConversationId", convoId);
-      loadView("chat", { forceInit: true });
-    });
+  await setDoc(
+    doc(db, "conversations", convoId),
+    {
+      participants: [buyerId, sellerId],
+      postId,
+      lastMessage: "",
+      lastMessageSender: "",
+      updatedAt: Date.now()
+    },
+    { merge: true }
+  );
 
+  /* ============================================================
+     SEND EMAIL NOTIFICATION TO SELLER (Netlify Function)
+  ============================================================ */
+
+  try {
+    // Get seller email from Firestore
+    const sellerSnap = await getDoc(doc(db, "users", sellerId));
+    const sellerEmail = sellerSnap.data()?.email;
+
+    if (sellerEmail) {
+      await fetch("/.netlify/functions/sendMessageEmail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sellerEmail: sellerEmail,
+          messageText: "You have a new message waiting for you.",
+          postTitle: post.title
+        })
+      });
+    }
+  } catch (err) {
+    console.error("Email notification error:", err);
+  }
+
+  sessionStorage.setItem("activeConversationId", convoId);
+  loadView("chat", { forceInit: true });
+});
     /* ============================================================
        BACK BUTTON
     ============================================================ */
