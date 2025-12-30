@@ -1,99 +1,173 @@
 /* =========================
-   FEED GRID
+   FEED GRID LAYOUT
 ========================= */
 
-.posts-grid {
+#feed {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 14px;
 }
 
-/* =========================
-   CARD
-========================= */
-
-.post-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: box-shadow .15s ease;
+/* Desktop = single column */
+@media (min-width: 900px) {
+  #feed {
+    grid-template-columns: 1fr;
+  }
 }
 
-.post-card:hover {
-  box-shadow: 0 6px 16px rgba(0,0,0,.12);
+/* =========================
+   BASE CARD
+========================= */
+
+.feed-card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.feed-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
 }
 
 /* =========================
    IMAGE
 ========================= */
 
-.post-image {
+.feed-image {
   width: 100%;
-  height: 180px;
-  background: #f3f4f6;
+  aspect-ratio: 4 / 3;
+  background: #000;
+  overflow: hidden;
 }
 
-.post-image img {
+.feed-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
 /* =========================
-   BODY
+   CONTENT
 ========================= */
 
-.post-body {
-  padding: 10px 12px;
+.feed-content {
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
 }
 
-/* PRICE (MOST IMPORTANT) */
-.post-price {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-/* TITLE */
-.post-title {
-  font-size: .92rem;
-  font-weight: 500;
+.feed-title {
+  font-size: .95rem;
+  font-weight: 600;
   color: #111827;
-  line-height: 1.3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-/* AREA */
-.post-area {
-  font-size: .78rem;
+.feed-teaser {
+  font-size: .85rem;
+  color: #4b5563;
+  line-height: 1.4;
+}
+
+.feed-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: .75rem;
   color: #6b7280;
 }
 
 /* =========================
-   BUSINESS (SUBTLE)
+   BUSINESS / PAID ADS
 ========================= */
 
-.post-card.business {
-  border-color: #ff4f8b;
+/* Take up BOTH columns on mobile */
+.feed-card.business {
+  grid-column: span 2;
+  border: 1px solid rgba(37,99,235,0.25);
+  box-shadow: 0 8px 26px rgba(37,99,235,0.18);
 }
 
-.post-card.business .post-price {
-  color: #ff2f7d;
+/* Sponsored badge */
+.feed-card.business::before {
+  content: "Sponsored";
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #2563eb;
+  color: #fff;
+  font-size: .7rem;
+  padding: 3px 8px;
+  border-radius: 999px;
+  z-index: 2;
+}
+
+/* CTA button */
+.feed-card.business .cta-btn {
+  margin-top: 8px;
+  align-self: flex-start;
+  padding: 8px 14px;
+  background: #2563eb;
+  color: #fff;
+  border-radius: 999px;
+  border: none;
+  font-size: .75rem;
+  font-weight: 700;
 }
 
 /* =========================
-   MOBILE
+   DESKTOP LAYOUT
 ========================= */
 
-@media (max-width: 640px) {
-  .post-image {
-    height: 160px;
+@media (min-width: 900px) {
+
+  .feed-card {
+    flex-direction: row;
+    align-items: stretch;
+    min-height: 140px;
   }
+
+  .feed-image {
+    width: 200px;
+    aspect-ratio: auto;
+    height: 100%;
+  }
+
+  .feed-content {
+    padding: 16px;
+  }
+
+  /* Business ads look premium on desktop */
+  .feed-card.business {
+    background: linear-gradient(
+      90deg,
+      rgba(37,99,235,0.06),
+      #fff 35%
+    );
+  }
+}
+
+/* =========================
+   REPORT BUTTON
+========================= */
+
+.report-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  color: #9ca3af;
+  cursor: pointer;
+}
+
+.report-btn:hover {
+  color: #dc2626;
 }
