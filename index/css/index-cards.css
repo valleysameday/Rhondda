@@ -22,8 +22,8 @@
 .feed-card {
   display: flex;
   flex-direction: column;
-  background: #dbd3d3;
-  border-radius: 10px;
+  background: #fcfafa;
+  border-radius: 14px;
   overflow: hidden;
   position: relative;
   cursor: pointer;
@@ -58,10 +58,10 @@
 ========================= */
 
 .feed-content {
-  padding: 12px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .feed-title {
