@@ -114,7 +114,7 @@ window.isBusinessUser = snap.exists() && snap.data().isBusiness === true;
   const user = auth.currentUser;
 
   if (!user) {
-    loadView("login");
+    openScreen("login");
     return;
   }
 
