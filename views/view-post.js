@@ -204,6 +204,10 @@ export async function init({ db, auth }) {
       .getElementById("messageSeller")
       ?.addEventListener("click", () => startConversation(post));
 
+document.getElementById("backToFeed").addEventListener("click", () => {
+  loadView("home");
+});
+    
     document
       .getElementById("reportPost")
       ?.addEventListener("click", () => {
