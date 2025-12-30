@@ -141,7 +141,7 @@
   gap: 6px;
 }
 
-.message-btn .primary-btn {
+.message-btn {
   max-width: 320px;
   width: 100%;
   padding: 14px;
@@ -155,7 +155,7 @@
   transition: all 0.2s;
 }
 
-.message-btn .primary-btn:hover {
+.message-btn:hover {
   filter: brightness(1.08);
   transform: translateY(-1px);
   box-shadow: 0 8px 16px -8px rgba(37,99,235,0.55);
