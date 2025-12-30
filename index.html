@@ -238,6 +238,98 @@
           placeholder="Area (optional)"
         >
 
+   <!-- UNIVERSAL FIELDS -->
+<div class="universal-fields">
+  <label for="postContact">Contact number</label>
+  <input type="tel" id="postContact" placeholder="Your phone number">
+
+  <label for="postLocation">Location</label>
+  <input type="text" id="postLocation" placeholder="e.g. Treorchy, Tonypandy">
+</div>
+
+<!-- FOR SALE -->
+<div class="forsale-options" hidden>
+  <h3>Item details</h3>
+
+  <label>Condition</label>
+  <select id="postCondition">
+    <option value="">Select condition</option>
+    <option value="new">New</option>
+    <option value="likenew">Like New</option>
+    <option value="used">Used</option>
+    <option value="needswork">Needs TLC</option>
+  </select>
+
+  <label>Delivery available?</label>
+  <select id="postDelivery">
+    <option value="">Select</option>
+    <option value="yes">Yes</option>
+    <option value="no">No</option>
+  </select>
+</div>
+
+<!-- JOBS & SERVICES -->
+<div class="jobs-options" hidden>
+  <h3>Job / Service details</h3>
+
+  <label>Job type</label>
+  <select id="jobType">
+    <option value="">Select</option>
+    <option value="fulltime">Full‑time</option>
+    <option value="parttime">Part‑time</option>
+    <option value="temp">Temporary</option>
+    <option value="selfemployed">Self‑employed / Service</option>
+  </select>
+
+  <label>Salary / Rate</label>
+  <input type="text" id="jobSalary" placeholder="e.g. £12/hr or £24k/year">
+
+  <label>Experience required?</label>
+  <select id="jobExperience">
+    <option value="">Select</option>
+    <option value="none">No experience needed</option>
+    <option value="some">Some experience</option>
+    <option value="experienced">Experienced only</option>
+  </select>
+</div>
+
+<!-- EVENTS -->
+<div class="events-options" hidden>
+  <h3>Event details</h3>
+
+  <label>Date</label>
+  <input type="date" id="eventDate">
+
+  <label>Start time</label>
+  <input type="time" id="eventStart">
+
+  <label>End time</label>
+  <input type="time" id="eventEnd">
+
+  <label>Venue</label>
+  <input type="text" id="eventVenue" placeholder="Where is it happening?">
+</div>
+
+<!-- COMMUNITY -->
+<div class="community-options" hidden>
+  <h3>Community post type</h3>
+
+  <select id="communityType">
+    <option value="">Select</option>
+    <option value="lost">Lost & Found</option>
+    <option value="help">Local Help Needed</option>
+    <option value="announcement">Announcement</option>
+    <option value="volunteer">Volunteers Wanted</option>
+  </select>
+
+  <div id="lostFoundExtra" hidden>
+    <label>Last seen location</label>
+    <input type="text" id="lostLocation" placeholder="Where was it last seen?">
+
+    <label>Reward offered?</label>
+    <input type="text" id="lostReward" placeholder="Optional">
+  </div>
+</div>
         <!-- Photos -->
         <div class="photo-uploader">
           <input
