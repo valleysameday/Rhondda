@@ -270,10 +270,10 @@ async function startConversation(post) {
     });
 
     // Contact seller (phone)
-    if (post.contactNumber) {
+    if (post.contact) {
       contactBtn.style.display = "block";
       contactBtn.addEventListener("click", () => {
-        window.location.href = `tel:${post.contactNumber}`;
+        window.location.href = `tel:${post.contact}`;
       });
     } else {
       contactBtn.style.display = "none";
