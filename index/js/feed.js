@@ -140,7 +140,7 @@ export async function initFeed({ db }) {
 
         <div class="feed-content">
           <h3 class="feed-title">${post.title}</h3>
-          <p class="feed-teaser">${post.teaser}</p>
+          
 
           <div class="feed-meta">
             ${buildMeta(post)}
