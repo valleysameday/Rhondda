@@ -6,8 +6,7 @@ import {
   onSnapshot,
   query,
   orderBy,
-  setDoc,
-  updateDoc
+  setDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 import { loadView } from "/index/js/main.js";
@@ -27,8 +26,14 @@ export async function init({ auth: a, db: d }) {
   const backBtn = document.getElementById("chatBackBtn");
   const headerName = document.getElementById("chatHeaderName");
 
-  // Extract buyer, seller, postId
-  const [userA, userB, postId] = convoId.split("_");
+  // convoId format: buyer_seller_postId
+  const parts = convoId.split("_");
+  if (parts.length !== 3) {
+    console.error("Invalid conversation ID:", convoId);
+    return loadView("chat-list");
+  }
+
+  const [userA, userB, postId] = parts;
   const otherUserId = auth.currentUser.uid === userA ? userB : userA;
 
   // Load other user's name
@@ -71,7 +76,7 @@ export async function init({ auth: a, db: d }) {
           ? "chat-bubble me"
           : "chat-bubble them";
 
-      // Bubble text
+      // Message text
       const text = document.createElement("p");
       text.className = "bubble-text";
       text.textContent = msg.text;
