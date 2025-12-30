@@ -26,6 +26,11 @@ export async function init({ auth: a, db: d }) {
   const backBtn = document.getElementById("chatBackBtn");
   const headerName = document.getElementById("chatHeaderName");
 
+  const adPreview = document.getElementById("chatAdPreview");
+  const adImage = document.getElementById("chatAdImage");
+  const adTitle = document.getElementById("chatAdTitle");
+  const adPrice = document.getElementById("chatAdPrice");
+
   // convoId format: buyer_seller_postId
   const parts = convoId.split("_");
   if (parts.length !== 3) return loadView("chat-list");
@@ -41,14 +46,18 @@ export async function init({ auth: a, db: d }) {
   const postSnap = await getDoc(doc(db, "posts", postId));
   if (postSnap.exists()) {
     const post = postSnap.data();
-    document.getElementById("chatAdImage").src = post.images?.[0] || "/images/image-webholder.webp";
-    document.getElementById("chatAdTitle").textContent = post.title;
-    document.getElementById("chatAdPrice").textContent = post.price ? `£${post.price}` : "No price";
 
-    document.getElementById("chatAdPreview").onclick = () => {
+    adImage.src = post.images?.[0] || "/images/image-webholder.webp";
+    adTitle.textContent = post.title || "Item";
+    adPrice.textContent = post.price ? `£${post.price}` : "No price";
+
+    // click on ad preview goes to view-post
+    adPreview.onclick = () => {
       sessionStorage.setItem("viewPostId", postId);
       loadView("view-post");
     };
+  } else {
+    adPreview.style.display = "none";
   }
 
   // Real-time messages
@@ -100,11 +109,11 @@ export async function init({ auth: a, db: d }) {
     chatInput.value = "";
   };
 
-  // Back button
+  // Back button goes to chat list
   backBtn.onclick = () => loadView("chat-list");
 }
 
-// Time ago formatter
+// Format time ago
 function timeAgo(timestamp) {
   const seconds = Math.floor((Date.now() - timestamp) / 1000);
   if (seconds < 60) return "Just now";
