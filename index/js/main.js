@@ -67,6 +67,17 @@ getFirebase().then(async fb => {
   storage = fb.storage;
 
   window.currentUser = null;
+   // ⭐ Account Status Dot
+const statusDot = document.getElementById("accountStatusDot");
+if (statusDot) {
+  if (!user) {
+    statusDot.style.background = "red";
+    statusDot.classList.add("logged-out");
+  } else {
+    statusDot.style.background = "green";
+    statusDot.classList.remove("logged-out");
+  }
+}
   window.isBusinessUser = false;
   window.authReady = false;
 
