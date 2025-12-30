@@ -24,15 +24,15 @@ export default async (req) => {
 
     const data = await response.json();
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ success: true, data })
-    };
+    return new Response(
+      JSON.stringify({ success: true, data }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
 
   } catch (err) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message })
-    };
+    return new Response(
+      JSON.stringify({ error: err.message }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 };
