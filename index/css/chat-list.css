@@ -125,3 +125,7 @@
   padding: 2rem 0;
   font-size: 0.95rem;
 }
+.chatlist-info p strong {
+  color: #111827;
+  font-weight: 600;
+}
