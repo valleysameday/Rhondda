@@ -79,6 +79,10 @@ export async function init({ auth: a, db: d }) {
         loadView("chat", { forceInit: true });
       };
 
+ document.getElementById("backToDashboard")?.addEventListener("click", () => {
+  loadView("home", { forceInit: true });
+});
+      
       chatList.appendChild(item);
     }
   });
