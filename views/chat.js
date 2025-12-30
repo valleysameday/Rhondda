@@ -35,7 +35,6 @@ export async function init({ auth: a, db: d }) {
   const adTitle = document.getElementById("chatAdTitle");
   const adPrice = document.getElementById("chatAdPrice");
 
-  // Reset UI
   chatMessages.innerHTML = "";
   chatInput.value = "";
   adPreview.style.display = "none";
@@ -49,11 +48,9 @@ export async function init({ auth: a, db: d }) {
   const [userA, userB, postId] = parts;
   const otherUserId = user.uid === userA ? userB : userA;
 
-  // Load other user name
   const otherSnap = await getDoc(doc(db, "users", otherUserId));
   headerName.textContent = otherSnap.exists() ? (otherSnap.data().name || "Chat") : "Chat";
 
-  // Load ad snippet
   try {
     const postSnap = await getDoc(doc(db, "posts", postId));
     if (postSnap.exists()) {
@@ -66,15 +63,11 @@ export async function init({ auth: a, db: d }) {
         sessionStorage.setItem("viewPostId", postId);
         loadView("view-post", { forceInit: true });
       };
-    } else {
-      adPreview.style.display = "none";
     }
   } catch (err) {
     console.error("Error loading post preview:", err);
-    adPreview.style.display = "none";
   }
 
-  // Clean up previous listener
   if (unsubscribeMessages) unsubscribeMessages();
 
   const messagesRef = collection(db, "conversations", convoId, "messages");
@@ -128,10 +121,11 @@ export async function init({ auth: a, db: d }) {
   };
 
   backBtn.onclick = () => {
-  if (unsubscribeMessages) unsubscribeMessages();
-  loadView("chat-list", { forceInit: true });
-};
-  
+    if (unsubscribeMessages) unsubscribeMessages();
+    loadView("chat-list", { forceInit: true });
+  };
+}   // ← FIXED: closes init()
+
 function timeAgo(timestamp) {
   if (!timestamp) return "";
   const seconds = Math.floor((Date.now() - timestamp) / 1000);
