@@ -35,6 +35,11 @@ export function initUIRouter() {
     openScreen('post');
   });
 
+document.getElementById("openChatList")?.addEventListener("click", e => {
+  e.preventDefault();
+  loadView("chat-list");
+});
+  
   document.getElementById('openChatView')?.addEventListener('click', e => {
   e.preventDefault();
   loadView("chat");
