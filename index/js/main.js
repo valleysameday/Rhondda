@@ -67,26 +67,30 @@ getFirebase().then(async fb => {
   storage = fb.storage;
 
   window.currentUser = null;
-   // ⭐ Account Status Dot
-const statusDot = document.getElementById("accountStatusDot");
-if (statusDot) {
-  if (!user) {
-    statusDot.style.background = "red";
-    statusDot.classList.add("logged-out");
-  } else {
-    statusDot.style.background = "green";
-    statusDot.classList.remove("logged-out");
-  }
-}
   window.isBusinessUser = false;
   window.authReady = false;
 
+  /* =====================================================
+     AUTH STATE LISTENER
+  ===================================================== */
   auth.onAuthStateChanged(async user => {
     console.log("🔵 AUTH STATE CHANGED:", user ? user.uid : "no user");
 
     window.currentUser = user || null;
     window.isBusinessUser = false;
     window.authReady = false;
+
+    // ⭐ Account Status Dot
+    const statusDot = document.getElementById("accountStatusDot");
+    if (statusDot) {
+      if (!user) {
+        statusDot.style.background = "red";
+        statusDot.classList.add("logged-out");
+      } else {
+        statusDot.style.background = "green";
+        statusDot.classList.remove("logged-out");
+      }
+    }
 
     if (!user) {
       console.log("🟡 No user logged in");
@@ -97,7 +101,7 @@ if (statusDot) {
     try {
       console.log("🟡 Checking business status for:", user.uid);
       const snap = await getDoc(doc(db, "users", user.uid));
-window.isBusinessUser = snap.exists() && snap.data().isBusiness === true;
+      window.isBusinessUser = snap.exists() && snap.data().isBusiness === true;
       console.log("🟢 Business status:", window.isBusinessUser);
     } catch (e) {
       console.warn("❌ Business lookup failed:", e);
@@ -107,10 +111,14 @@ window.isBusinessUser = snap.exists() && snap.data().isBusiness === true;
     console.log("🟢 authReady = true");
   });
 
+  /* =====================================================
+     START APP
+  ===================================================== */
   const start = () => {
     console.log("🟢 App start()");
     initUIRouter();
 
+    /* LOGIN BUTTONS */
     document.querySelectorAll('[data-value="login"]').forEach(btn =>
       btn.onclick = e => {
         e.preventDefault();
@@ -119,18 +127,20 @@ window.isBusinessUser = snap.exists() && snap.data().isBusiness === true;
       }
     );
 
-     document.getElementById("openChatList")?.addEventListener("click", e => {
-  e.preventDefault();
+    /* MESSAGES BUTTON */
+    document.getElementById("openChatList")?.addEventListener("click", e => {
+      e.preventDefault();
 
-  if (!auth.currentUser) {
-    sessionStorage.setItem("redirectAfterLogin", "chat-list");  // ⭐ remember intent
-    openScreen("login");
-    return;
-  }
+      if (!auth.currentUser) {
+        sessionStorage.setItem("redirectAfterLogin", "chat-list");
+        openScreen("login");
+        return;
+      }
 
-  loadView("chat-list");
-});
-     
+      loadView("chat-list");
+    });
+
+    /* SIGNUP BUTTONS */
     document.querySelectorAll('[data-value="signup"]').forEach(btn =>
       btn.onclick = e => {
         e.preventDefault();
@@ -139,6 +149,7 @@ window.isBusinessUser = snap.exists() && snap.data().isBusiness === true;
       }
     );
 
+    /* FORGOT PASSWORD BUTTONS */
     document.querySelectorAll('[data-value="forgot"]').forEach(btn =>
       btn.onclick = e => {
         e.preventDefault();
@@ -147,6 +158,7 @@ window.isBusinessUser = snap.exists() && snap.data().isBusiness === true;
       }
     );
 
+    /* ACCOUNT BUTTON */
     document.getElementById("openAccountModal")?.addEventListener("click", e => {
       e.preventDefault();
       console.log("🔵 Account button clicked");
