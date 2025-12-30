@@ -138,13 +138,12 @@
   <div class="modal-content">
 
     <!-- Close -->
-    <button class="close"
-            aria-label="Close"
-            data-action="close-screens">&times;</button>
+    <button class="close" aria-label="Close" data-action="close-screens">&times;</button>
 
     <!-- Progress dots -->
     <div class="post-progress">
       <span class="dot active"></span>
+      <span class="dot"></span>
       <span class="dot"></span>
       <span class="dot"></span>
     </div>
@@ -169,176 +168,144 @@
       <div class="post-step" data-step="2">
         <h2>Tell people about it</h2>
 
-        <input
-          type="text"
-          id="postTitle"
-          placeholder="Ad title"
-          maxlength="70"
-          required
-        >
+        <input type="text" id="postTitle" placeholder="Ad title" maxlength="70" required>
 
-        <textarea
-          id="postDescription"
-          rows="5"
-          placeholder="Add a description"
-          required
-        ></textarea>
+        <textarea id="postDescription" rows="5" placeholder="Add a description" required></textarea>
 
-        <!-- ===== PROPERTY OPTIONS (PROPERTY ONLY) ===== -->
+        <!-- PROPERTY ONLY -->
         <div class="property-options" hidden>
-
           <h3>Property details</h3>
 
-          <!-- Sale / Rent -->
           <div class="property-type">
-            <button type="button" data-property-type="sale">
-              For Sale
-            </button>
-            <button type="button" data-property-type="rent">
-              To Rent
-            </button>
+            <button type="button" data-property-type="sale">For Sale</button>
+            <button type="button" data-property-type="rent">To Rent</button>
           </div>
 
-          <!-- Rent frequency -->
           <div class="rent-frequency">
-            <button type="button" data-rent-frequency="pcm">
-              PCM
-            </button>
-            <button type="button" data-rent-frequency="weekly">
-              Weekly
-            </button>
+            <button type="button" data-rent-frequency="pcm">PCM</button>
+            <button type="button" data-rent-frequency="weekly">Weekly</button>
           </div>
-
         </div>
 
         <div class="post-nav">
           <button type="button" class="post-prev ghost-btn">Back</button>
-          <button type="button" class="post-next primary-btn" disabled>
-            Continue
-          </button>
+          <button type="button" class="post-next primary-btn" disabled>Continue</button>
         </div>
       </div>
 
-      <!-- ========== STEP 3: OPTIONAL DETAILS ========== -->
+      <!-- ========== STEP 3: CONTACT & LOCATION ========== -->
       <div class="post-step" data-step="3">
+        <h2>How can people reach you?</h2>
+
+        <label for="postContact">Contact number</label>
+        <input type="tel" id="postContact" placeholder="Your phone number">
+
+        <label for="postLocation">Location</label>
+        <input type="text" id="postLocation" placeholder="e.g. Treorchy, Tonypandy">
+
+        <div class="post-nav">
+          <button type="button" class="post-prev ghost-btn">Back</button>
+          <button type="button" class="post-next primary-btn">Continue</button>
+        </div>
+      </div>
+
+      <!-- ========== STEP 4: CATEGORY-SPECIFIC DETAILS ========== -->
+      <div class="post-step" data-step="4">
         <h2>Optional details</h2>
 
+        <!-- PRICE -->
         <label for="postPrice">Price (£)</label>
-        <input
-          type="number"
-          id="postPrice"
-          placeholder="Price (optional)"
-          min="0"
-          step="0.01"
-        >
+        <input type="number" id="postPrice" placeholder="Price (optional)" min="0" step="0.01">
 
-        <input
-          type="text"
-          id="postArea"
-          placeholder="Area (optional)"
-        >
+        <input type="text" id="postArea" placeholder="Area (optional)">
 
-   <!-- UNIVERSAL FIELDS -->
-<div class="universal-fields">
-  <label for="postContact">Contact number</label>
-  <input type="tel" id="postContact" placeholder="Your phone number">
+        <!-- FOR SALE -->
+        <div class="forsale-options" hidden>
+          <h3>Item details</h3>
 
-  <label for="postLocation">Location</label>
-  <input type="text" id="postLocation" placeholder="e.g. Treorchy, Tonypandy">
-</div>
+          <label>Condition</label>
+          <select id="postCondition">
+            <option value="">Select condition</option>
+            <option value="new">New</option>
+            <option value="likenew">Like New</option>
+            <option value="used">Used</option>
+            <option value="needswork">Needs TLC</option>
+          </select>
 
-<!-- FOR SALE -->
-<div class="forsale-options" hidden>
-  <h3>Item details</h3>
+          <label>Delivery available?</label>
+          <select id="postDelivery">
+            <option value="">Select</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
 
-  <label>Condition</label>
-  <select id="postCondition">
-    <option value="">Select condition</option>
-    <option value="new">New</option>
-    <option value="likenew">Like New</option>
-    <option value="used">Used</option>
-    <option value="needswork">Needs TLC</option>
-  </select>
+        <!-- JOBS -->
+        <div class="jobs-options" hidden>
+          <h3>Job / Service details</h3>
 
-  <label>Delivery available?</label>
-  <select id="postDelivery">
-    <option value="">Select</option>
-    <option value="yes">Yes</option>
-    <option value="no">No</option>
-  </select>
-</div>
+          <label>Job type</label>
+          <select id="jobType">
+            <option value="">Select</option>
+            <option value="fulltime">Full‑time</option>
+            <option value="parttime">Part‑time</option>
+            <option value="temp">Temporary</option>
+            <option value="selfemployed">Self‑employed / Service</option>
+          </select>
 
-<!-- JOBS & SERVICES -->
-<div class="jobs-options" hidden>
-  <h3>Job / Service details</h3>
+          <label>Salary / Rate</label>
+          <input type="text" id="jobSalary" placeholder="e.g. £12/hr or £24k/year">
 
-  <label>Job type</label>
-  <select id="jobType">
-    <option value="">Select</option>
-    <option value="fulltime">Full‑time</option>
-    <option value="parttime">Part‑time</option>
-    <option value="temp">Temporary</option>
-    <option value="selfemployed">Self‑employed / Service</option>
-  </select>
+          <label>Experience required?</label>
+          <select id="jobExperience">
+            <option value="">Select</option>
+            <option value="none">No experience needed</option>
+            <option value="some">Some experience</option>
+            <option value="experienced">Experienced only</option>
+          </select>
+        </div>
 
-  <label>Salary / Rate</label>
-  <input type="text" id="jobSalary" placeholder="e.g. £12/hr or £24k/year">
+        <!-- EVENTS -->
+        <div class="events-options" hidden>
+          <h3>Event details</h3>
 
-  <label>Experience required?</label>
-  <select id="jobExperience">
-    <option value="">Select</option>
-    <option value="none">No experience needed</option>
-    <option value="some">Some experience</option>
-    <option value="experienced">Experienced only</option>
-  </select>
-</div>
+          <label>Date</label>
+          <input type="date" id="eventDate">
 
-<!-- EVENTS -->
-<div class="events-options" hidden>
-  <h3>Event details</h3>
+          <label>Start time</label>
+          <input type="time" id="eventStart">
 
-  <label>Date</label>
-  <input type="date" id="eventDate">
+          <label>End time</label>
+          <input type="time" id="eventEnd">
 
-  <label>Start time</label>
-  <input type="time" id="eventStart">
+          <label>Venue</label>
+          <input type="text" id="eventVenue" placeholder="Where is it happening?">
+        </div>
 
-  <label>End time</label>
-  <input type="time" id="eventEnd">
+        <!-- COMMUNITY -->
+        <div class="community-options" hidden>
+          <h3>Community post type</h3>
 
-  <label>Venue</label>
-  <input type="text" id="eventVenue" placeholder="Where is it happening?">
-</div>
+          <select id="communityType">
+            <option value="">Select</option>
+            <option value="lost">Lost & Found</option>
+            <option value="help">Local Help Needed</option>
+            <option value="announcement">Announcement</option>
+            <option value="volunteer">Volunteers Wanted</option>
+          </select>
 
-<!-- COMMUNITY -->
-<div class="community-options" hidden>
-  <h3>Community post type</h3>
+          <div id="lostFoundExtra" hidden>
+            <label>Last seen location</label>
+            <input type="text" id="lostLocation" placeholder="Where was it last seen?">
 
-  <select id="communityType">
-    <option value="">Select</option>
-    <option value="lost">Lost & Found</option>
-    <option value="help">Local Help Needed</option>
-    <option value="announcement">Announcement</option>
-    <option value="volunteer">Volunteers Wanted</option>
-  </select>
+            <label>Reward offered?</label>
+            <input type="text" id="lostReward" placeholder="Optional">
+          </div>
+        </div>
 
-  <div id="lostFoundExtra" hidden>
-    <label>Last seen location</label>
-    <input type="text" id="lostLocation" placeholder="Where was it last seen?">
-
-    <label>Reward offered?</label>
-    <input type="text" id="lostReward" placeholder="Optional">
-  </div>
-</div>
         <!-- Photos -->
         <div class="photo-uploader">
-          <input
-            type="file"
-            id="postImages"
-            accept="image/*"
-            multiple
-            hidden
-          >
+          <input type="file" id="postImages" accept="image/*" multiple hidden>
 
           <button type="button" id="addPhotosBtn" class="ghost-btn">
             + Add photos
@@ -353,9 +320,7 @@
 
         <div class="post-nav">
           <button type="button" class="post-prev ghost-btn">Back</button>
-          <button type="button" id="postSubmitBtn" class="primary-btn">
-            Post ad
-          </button>
+          <button type="button" id="postSubmitBtn" class="primary-btn">Post ad</button>
         </div>
       </div>
 
@@ -458,4 +423,4 @@
 <script type="module" src="/index/js/main.js"></script>
 
 </body>
-      </html>
+</html>
