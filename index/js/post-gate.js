@@ -1,12 +1,14 @@
 import { getFirebase } from '/index/js/firebase/init.js';
-import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import {
+  collection, addDoc, doc, getDoc
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let auth, db, storage;
 
 // State
 let selectedCategory = null;
-let propertyType = null;     // "sale" | "rent"
-let rentFrequency = null;    // "pcm" | "weekly"
+let propertyType = null;
+let rentFrequency = null;
 
 getFirebase().then(fb => {
   auth = fb.auth;
@@ -24,11 +26,6 @@ function initPostGate() {
   const dots = [...document.querySelectorAll('.post-progress .dot')];
   let stepIndex = 0;
 
-  if (!steps.length) {
-    console.warn("post-gate: No steps found, aborting init");
-    return;
-  }
-
   function showStep(i) {
     if (i < 0 || i >= steps.length) return;
 
@@ -36,10 +33,9 @@ function initPostGate() {
     dots.forEach(d => d.classList.remove('active'));
 
     steps[i].classList.add('active');
-    if (dots[i]) dots[i].classList.add('active');
+    dots[i].classList.add('active');
 
     stepIndex = i;
-
     if (i === 1) validateStep2();
   }
 
@@ -54,21 +50,21 @@ function initPostGate() {
   );
 
   /* =====================================================
-     ELEMENT REFERENCES
+     ELEMENTS
   ===================================================== */
   const titleInput = document.getElementById('postTitle');
   const descInput = document.getElementById('postDescription');
   const nextBtn = document.querySelector('.post-step[data-step="2"] .post-next');
-
-  const propertyBox = document.querySelector('.property-options');
-  const propertyBtns = [...document.querySelectorAll('[data-property-type]')];
-  const rentBtns = [...document.querySelectorAll('[data-rent-frequency]')];
 
   const priceInput = document.getElementById('postPrice');
   const priceLabel = document.querySelector('label[for="postPrice"]');
 
   const contactInput = document.getElementById('postContact');
   const locationInput = document.getElementById('postLocation');
+
+  const propertyBox = document.querySelector('.property-options');
+  const propertyBtns = [...document.querySelectorAll('[data-property-type]')];
+  const rentBtns = [...document.querySelectorAll('[data-rent-frequency]')];
 
   const forsaleBox = document.querySelector('.forsale-options');
   const jobsBox = document.querySelector('.jobs-options');
@@ -91,11 +87,11 @@ function initPostGate() {
       propertyType = null;
       rentFrequency = null;
 
-      if (propertyBox) propertyBox.hidden = selectedCategory !== 'property';
-      if (forsaleBox) forsaleBox.hidden = selectedCategory !== 'forsale';
-      if (jobsBox) jobsBox.hidden = selectedCategory !== 'jobs';
-      if (eventsBox) eventsBox.hidden = selectedCategory !== 'events';
-      if (communityBox) communityBox.hidden = selectedCategory !== 'community';
+      propertyBox.hidden = selectedCategory !== 'property';
+      forsaleBox.hidden = selectedCategory !== 'forsale';
+      jobsBox.hidden = selectedCategory !== 'jobs';
+      eventsBox.hidden = selectedCategory !== 'events';
+      communityBox.hidden = selectedCategory !== 'community';
 
       if (communityTypeSelect) communityTypeSelect.value = "";
       if (lostFoundExtra) lostFoundExtra.hidden = true;
@@ -150,9 +146,7 @@ function initPostGate() {
   ===================================================== */
   if (communityTypeSelect) {
     communityTypeSelect.addEventListener('change', e => {
-      if (lostFoundExtra) {
-        lostFoundExtra.hidden = e.target.value !== 'lost';
-      }
+      lostFoundExtra.hidden = e.target.value !== 'lost';
     });
   }
 
@@ -160,8 +154,6 @@ function initPostGate() {
      VALIDATION FOR STEP 2
   ===================================================== */
   function validateStep2() {
-    if (!titleInput || !descInput || !nextBtn) return;
-
     const titleOk = titleInput.value.trim().length >= 3;
     const descOk = descInput.value.trim().length >= 10;
 
@@ -178,16 +170,14 @@ function initPostGate() {
   }
 
   ['input', 'keyup', 'change'].forEach(evt => {
-    titleInput?.addEventListener(evt, validateStep2);
-    descInput?.addEventListener(evt, validateStep2);
+    titleInput.addEventListener(evt, validateStep2);
+    descInput.addEventListener(evt, validateStep2);
   });
 
   /* =====================================================
      PRICE LABEL LOGIC
   ===================================================== */
   function updatePriceLabel() {
-    if (!priceInput || !priceLabel) return;
-
     if (selectedCategory !== 'property') {
       priceLabel.textContent = 'Price (£)';
       priceInput.placeholder = 'Price (optional)';
@@ -203,9 +193,6 @@ function initPostGate() {
           ? 'Weekly rent (£)'
           : 'Monthly rent (PCM)';
       priceInput.placeholder = priceLabel.textContent;
-    } else {
-      priceLabel.textContent = 'Price (£)';
-      priceInput.placeholder = 'Price';
     }
   }
 
@@ -229,18 +216,16 @@ function initPostGate() {
     }
 
     const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
     toast.textContent = message;
     toast.style.padding = '10px 14px';
     toast.style.borderRadius = '999px';
     toast.style.fontSize = '.9rem';
     toast.style.color = '#fff';
     toast.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
-    toast.style.background = type === 'error'
-      ? '#ef4444'
-      : type === 'success'
-      ? '#16a34a'
-      : '#4b5563';
+    toast.style.background =
+      type === 'error' ? '#ef4444' :
+      type === 'success' ? '#16a34a' :
+      '#4b5563';
 
     container.appendChild(toast);
 
@@ -278,15 +263,11 @@ function initPostGate() {
           ctx.drawImage(img, 0, 0, width, height);
 
           canvas.toBlob(
-            blob => {
-              if (!blob) return reject(new Error("Compression failed"));
-              resolve(blob);
-            },
+            blob => blob ? resolve(blob) : reject("Compression failed"),
             'image/jpeg',
             quality
           );
         };
-        img.onerror = reject;
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
@@ -296,35 +277,34 @@ function initPostGate() {
   /* =====================================================
      SUBMIT POST
   ===================================================== */
-  submitBtn?.addEventListener('click', submitPost);
+  submitBtn.addEventListener('click', submitPost);
 
   async function submitPost() {
     try {
-      console.log("🔵 Submit button clicked");
-
-      // Must be logged in
       if (!auth.currentUser) {
-        console.log("🟡 Not logged in → redirecting to login");
         showToast("Please log in to post an ad.", "error");
-
-        document.querySelector('[data-action="close-screens"]')?.click();
-        sessionStorage.setItem("redirectAfterLogin", "new-post");
-        window.openScreen?.("login");
         return;
       }
 
-      // Build post object
+      // ⭐ Check if user is business
+      const userSnap = await getDoc(doc(db, "users", auth.currentUser.uid));
+      const isBusiness = userSnap.exists() && userSnap.data().isBusiness === true;
+
+      // ⭐ Build post object
       const post = {
         userId: auth.currentUser.uid,
-        title: document.getElementById("postTitle")?.value.trim() || "",
-        description: document.getElementById("postDescription")?.value.trim() || "",
+        businessId: isBusiness ? auth.currentUser.uid : null,
+        isBusiness: isBusiness,
+
+        title: titleInput.value.trim(),
+        description: descInput.value.trim(),
         category: selectedCategory,
         createdAt: Date.now(),
 
-        contact: contactInput?.value.trim() || "",
-        location: locationInput?.value.trim() || "",
+        contact: contactInput.value.trim(),
+        location: locationInput.value.trim(),
 
-        price: Number(document.getElementById("postPrice")?.value) || null,
+        price: Number(priceInput.value) || null,
         area: document.getElementById("postArea")?.value.trim() || "Rhondda",
 
         propertyType,
@@ -349,46 +329,29 @@ function initPostGate() {
         images: []
       };
 
-      if (!post.title || !post.description || !post.category) {
-        showToast("Please complete the required fields.", "error");
-        return;
-      }
-
-      console.log("🟢 Post object built:", post);
-
-      // Upload & compress images
-      if (imagesInput && imagesInput.files && imagesInput.files.length > 0) {
-        console.log("🟡 Uploading images…");
+      // ⭐ Upload images
+      if (imagesInput.files.length > 0) {
         for (let file of imagesInput.files) {
-          try {
-            const compressed = await compressImage(file);
-            const path = `posts/${auth.currentUser.uid}/${Date.now()}-${file.name}`;
-            const ref = storage.ref(path);
-            await ref.put(compressed);
-            const url = await ref.getDownloadURL();
-            post.images.push(url);
-          } catch (err) {
-            console.warn("Image upload failed for one file:", err);
-          }
+          const compressed = await compressImage(file);
+          const path = `posts/${auth.currentUser.uid}/${Date.now()}-${file.name}`;
+          const ref = storage.ref(path);
+          await ref.put(compressed);
+          const url = await ref.getDownloadURL();
+          post.images.push(url);
         }
       }
 
-      // Save to Firestore (modular API)
+      // ⭐ Save to Firestore
       await addDoc(collection(db, "posts"), post);
-      console.log("🟢 Post saved!");
 
-      showToast("Your ad is live on the board!", "success");
+      showToast("Your ad is live!", "success");
 
-      document.querySelector('[data-action="close-screens"]')?.click();
-      window.loadView?.("home");
+      document.querySelector('[data-action="close-screens"]').click();
+      loadView("home");
 
     } catch (err) {
-      console.error("❌ Failed to submit post:", err);
+      console.error(err);
       showToast("Something went wrong posting your ad.", "error");
     }
   }
-
-  /* =====================================================
-     DONE — POST GATE READY
-  ===================================================== */
 }
