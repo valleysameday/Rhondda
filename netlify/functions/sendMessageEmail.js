@@ -1,23 +1,30 @@
-import { Resend } from "resend";
-
 export default async (req, res) => {
   try {
     const { sellerEmail, messageText, postTitle } = JSON.parse(req.body);
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const apiKey = process.env.RESEND_API_KEY;
 
-    await resend.emails.send({
-      from: "Rhondda Noticeboard <noreply@rnb.wales>",
-      to: sellerEmail,
-      subject: `New message about: ${postTitle}`,
-      html: `
-        <p>You have a new message on Rhondda Noticeboard:</p>
-        <p><strong>${messageText}</strong></p>
-        <p>Open your inbox to reply.</p>
-      `
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        from: "Rhondda Noticeboard <noreply@rnb.wales>",
+        to: sellerEmail,
+        subject: `New message about: ${postTitle}`,
+        html: `
+          <p>You have a new message on Rhondda Noticeboard:</p>
+          <p><strong>${messageText}</strong></p>
+          <p>Open your inbox to reply.</p>
+        `
+      })
     });
 
-    return res.status(200).json({ success: true });
+    const data = await response.json();
+
+    return res.status(200).json({ success: true, data });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
