@@ -17,7 +17,7 @@ getFirebase().then(fb => {
 function initPostGate() {
 
   /* =====================================================
-     STEP FLOW
+     STEP FLOW (NOW 4 STEPS)
   ===================================================== */
   const steps = [...document.querySelectorAll('#posts-grid .post-step')];
   const dots = [...document.querySelectorAll('.post-progress .dot')];
@@ -33,7 +33,9 @@ function initPostGate() {
     dots[i].classList.add('active');
 
     stepIndex = i;
-    validateStep2();
+
+    // Only Step 2 needs validation
+    if (i === 1) validateStep2();
   }
 
   document.querySelectorAll('.post-next').forEach(btn =>
@@ -84,7 +86,7 @@ function initPostGate() {
       propertyType = null;
       rentFrequency = null;
 
-      // Show/hide category-specific blocks
+      // Show/hide category-specific blocks (Step 4)
       propertyBox.hidden = selectedCategory !== 'property';
       forsaleBox.hidden = selectedCategory !== 'forsale';
       jobsBox.hidden = selectedCategory !== 'jobs';
