@@ -5,7 +5,6 @@
   background: #fff;
 }
 
-/* HEADER */
 .chat-header {
   display: flex;
   align-items: center;
@@ -23,37 +22,6 @@
   cursor: pointer;
 }
 
-/* AD PREVIEW */
-.chat-ad-preview {
-  display: flex;
-  gap: 12px;
-  padding: 12px;
-  background: #fff;
-  border-bottom: 1px solid #e5e7eb;
-  align-items: center;
-  cursor: pointer;
-}
-
-.chat-ad-img {
-  width: 60px;
-  height: 60px;
-  border-radius: 8px;
-  object-fit: cover;
-}
-
-.chat-ad-info h4 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.chat-ad-info p {
-  margin: 2px 0 0;
-  color: #6b7280;
-  font-size: 0.85rem;
-}
-
-/* MESSAGES */
 .chat-messages {
   flex: 1;
   overflow-y: auto;
@@ -64,11 +32,10 @@
 .chat-bubble {
   max-width: 75%;
   padding: .7rem 1rem;
-  margin-bottom: .7rem;
+  margin-bottom: .5rem;
   border-radius: 14px;
   font-size: .95rem;
   line-height: 1.3;
-  position: relative;
 }
 
 .chat-bubble.me {
@@ -83,18 +50,6 @@
   margin-right: auto;
 }
 
-.bubble-text {
-  margin: 0;
-}
-
-.bubble-time {
-  display: block;
-  font-size: 0.75rem;
-  opacity: 0.7;
-  margin-top: 4px;
-}
-
-/* INPUT BAR */
 .chat-input-bar {
   display: flex;
   padding: .7rem;
