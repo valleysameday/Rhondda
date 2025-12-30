@@ -17,7 +17,9 @@ export async function initFeed({ db }) {
     });
   }
 
-  // ------------------- FIREBASE POSTS -------------------
+  /* =====================================================
+     FETCH POSTS
+  ===================================================== */
   async function fetchPosts() {
     try {
       const postsCol = collection(db, 'posts');
@@ -26,17 +28,41 @@ export async function initFeed({ db }) {
 
       const posts = snapshot.docs.map(doc => {
         const data = doc.data();
+
         return {
           id: doc.id,
           title: data.title,
-          teaser: data.description || data.teaser || "",
+          teaser: data.description || "",
           category: data.category || "misc",
           categoryLabel: data.categoryLabel || data.category,
           price: data.price || null,
           area: data.area || "Rhondda",
           image: data.images?.[0] || "/images/image-webholder.webp",
           type: data.isBusiness ? "business" : "standard",
-          cta: data.cta || null
+          cta: data.cta || null,
+
+          // ⭐ NEW FIELDS
+          rentFrequency: data.rentFrequency || null,
+          propertyType: data.propertyType || null,
+          bedrooms: data.bedrooms || null,
+          bathrooms: data.bathrooms || null,
+          furnished: data.furnished || null,
+          petsAllowed: data.petsAllowed || null,
+
+          condition: data.condition || null,
+          delivery: data.delivery || null,
+
+          jobType: data.jobType || null,
+          jobSalary: data.jobSalary || null,
+          jobExperience: data.jobExperience || null,
+
+          eventDate: data.eventDate || null,
+          eventStart: data.eventStart || null,
+          eventVenue: data.eventVenue || null,
+
+          communityType: data.communityType || null,
+          lostLocation: data.lostLocation || null,
+          lostReward: data.lostReward || null
         };
       });
 
@@ -62,7 +88,70 @@ export async function initFeed({ db }) {
     }
   }
 
-  // ------------------- RENDER POSTS -------------------
+  /* =====================================================
+     SMART META BUILDER
+  ===================================================== */
+  function buildMeta(post) {
+    let meta = "";
+
+    // PRICE + RENT FREQUENCY
+    if (post.price) {
+      const freq = post.rentFrequency ? ` ${post.rentFrequency.toUpperCase()}` : "";
+      meta += `<span class="post-price">£${post.price}${freq}</span>`;
+    }
+
+    // PROPERTY
+    if (post.category === "property") {
+      meta += `
+        <span class="post-prop">
+          ${post.propertyType === "rent" ? "🏠 For Rent" : "🏠 For Sale"}
+          ${post.bedrooms ? ` · 🛏 ${post.bedrooms}` : ""}
+          ${post.bathrooms ? ` · 🛁 ${post.bathrooms}` : ""}
+        </span>
+      `;
+    }
+
+    // FOR SALE
+    if (post.category === "forsale" && post.condition) {
+      meta += `<span class="post-condition">⭐ ${post.condition}</span>`;
+    }
+    if (post.category === "forsale" && post.delivery === "yes") {
+      meta += `<span class="post-delivery">🚚 Delivery Available</span>`;
+    }
+
+    // JOBS
+    if (post.category === "jobs" && post.jobSalary) {
+      meta += `<span class="post-salary">💷 ${post.jobSalary}</span>`;
+    }
+    if (post.category === "jobs" && post.jobType) {
+      meta += `<span class="post-jobtype">${post.jobType.replace("-", " ")}</span>`;
+    }
+
+    // EVENTS
+    if (post.category === "events" && post.eventDate) {
+      meta += `<span class="post-event">📅 ${post.eventDate}</span>`;
+    }
+    if (post.category === "events" && post.eventStart) {
+      meta += `<span class="post-event-time">🕒 ${post.eventStart}</span>`;
+    }
+
+    // COMMUNITY
+    if (post.category === "community" && post.communityType === "lost") {
+      meta += `<span class="post-lost">🐾 Lost · ${post.lostLocation || ""}</span>`;
+      if (post.lostReward) {
+        meta += `<span class="post-reward">💷 Reward Offered</span>`;
+      }
+    }
+
+    // AREA
+    meta += `<span class="post-area">📍 ${post.area}</span>`;
+
+    return meta;
+  }
+
+  /* =====================================================
+     RENDER POSTS
+  ===================================================== */
   function loadPosts(category = 'all', posts = []) {
     postsContainer.innerHTML = '';
     const filtered = category === 'all' ? posts : posts.filter(p => p.category === category);
@@ -73,22 +162,23 @@ export async function initFeed({ db }) {
       card.className = `post-card ${post.type || ''}`;
 
       const imgSrc = post.image || '/images/post-placeholder.jpg';
-      const area = post.area || "Rhondda";
 
       card.innerHTML = `
         <div class="post-image">
           <img src="${imgSrc}" alt="${post.title}">
         </div>
+
         <div class="post-body">
           <h3 class="post-title">${post.title}</h3>
           <p class="post-teaser">${post.teaser}</p>
+
           <div class="post-meta">
-            ${post.price ? `<span class="post-price">£${post.price}</span>` : ''}
-            <span class="post-area">📍 ${area}</span>
-            <span class="post-category">${post.categoryLabel || post.category}</span>
+            ${buildMeta(post)}
           </div>
+
           ${post.type === "business" && post.cta ? `<button class="cta-btn">${post.cta}</button>` : ''}
         </div>
+
         <button class="report-btn" title="Report this post" data-post-id="${post.id}">⚑</button>
       `;
 
@@ -102,7 +192,9 @@ export async function initFeed({ db }) {
     });
   }
 
-  // ------------------- CATEGORY FILTER -------------------
+  /* =====================================================
+     CATEGORY FILTER
+  ===================================================== */
   categoryBtns.forEach(btn => btn.addEventListener('click', async () => {
     categoryBtns.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
@@ -110,7 +202,9 @@ export async function initFeed({ db }) {
     loadPosts(btn.dataset.category, posts);
   }));
 
-  // ------------------- REPORT POST -------------------
+  /* =====================================================
+     REPORT POST
+  ===================================================== */
   document.addEventListener('click', e => {
     if (!e.target.classList.contains('report-btn')) return;
     const postId = e.target.dataset.postId;
@@ -122,7 +216,9 @@ export async function initFeed({ db }) {
     alert("Thanks — this post has been flagged for review.");
   });
 
-  // ------------------- WEATHER -------------------
+  /* =====================================================
+     WEATHER
+  ===================================================== */
   async function loadWeather() {
     const emojiEl = document.querySelector(".weather-emoji");
     const textEl = document.querySelector(".weather-text");
@@ -155,7 +251,9 @@ export async function initFeed({ db }) {
     }
   }
 
-  // ------------------- GREETING -------------------
+  /* =====================================================
+     GREETING
+  ===================================================== */
   function loadGreeting() {
     const welshEl = document.querySelector(".greeting-welsh");
     const englishEl = document.querySelector(".greeting-english");
@@ -169,7 +267,9 @@ export async function initFeed({ db }) {
       : "Welcome to Rhondda Noticeboard";
   }
 
-  // ------------------- INITIAL LOAD -------------------
+  /* =====================================================
+     INITIAL LOAD
+  ===================================================== */
   const posts = await fetchPosts();
   loadPosts('all', posts);
   loadGreeting();
