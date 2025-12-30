@@ -2,10 +2,15 @@ import { signOut } from
   "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 import {
-  collection, query, where, getDocs, doc, deleteDoc, onSnapshot
-} from
-  "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
+  collection,
+  query,
+  where,
+  getDocs,
+  getDoc,
+  doc,
+  deleteDoc,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { renderPostsAndStats } from '/index/js/dashboard/posts.js';
 import { loadView } from '/index/js/main.js';
 
