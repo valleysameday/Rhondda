@@ -205,6 +205,95 @@ function initPostGate() {
   }
 
   /* =====================================================
+   SUBMIT POST
+===================================================== */
+
+const submitBtn = document.getElementById("postSubmitBtn");
+if (submitBtn) {
+  submitBtn.addEventListener("click", submitPost);
+}
+
+async function submitPost() {
+  console.log("🔵 Submit button clicked");
+
+  // 1️⃣ Must be logged in
+  if (!auth.currentUser) {
+    console.log("🟡 Not logged in → opening login modal");
+    openLoginModal(auth, db);
+    return;
+  }
+
+  // 2️⃣ Build post object
+  const post = {
+    userId: auth.currentUser.uid,
+    title: document.getElementById("postTitle").value.trim(),
+    description: document.getElementById("postDescription").value.trim(),
+    category: selectedCategory,
+    createdAt: Date.now(),
+
+    // Universal
+    contact: document.getElementById("postContact").value.trim(),
+    location: document.getElementById("postLocation").value.trim(),
+
+    // Price + area
+    price: Number(document.getElementById("postPrice").value) || null,
+    area: document.getElementById("postArea").value.trim() || "Rhondda",
+
+    // Property
+    propertyType,
+    rentFrequency,
+    bedrooms: null,
+    bathrooms: null,
+
+    // For sale
+    condition: document.getElementById("postCondition")?.value || null,
+    delivery: document.getElementById("postDelivery")?.value || null,
+
+    // Jobs
+    jobType: document.getElementById("jobType")?.value || null,
+    jobSalary: document.getElementById("jobSalary")?.value || null,
+    jobExperience: document.getElementById("jobExperience")?.value || null,
+
+    // Events
+    eventDate: document.getElementById("eventDate")?.value || null,
+    eventStart: document.getElementById("eventStart")?.value || null,
+    eventEnd: document.getElementById("eventEnd")?.value || null,
+    eventVenue: document.getElementById("eventVenue")?.value || null,
+
+    // Community
+    communityType: document.getElementById("communityType")?.value || null,
+    lostLocation: document.getElementById("lostLocation")?.value || null,
+    lostReward: document.getElementById("lostReward")?.value || null,
+
+    images: []
+  };
+
+  console.log("🟢 Post object built:", post);
+
+  // 3️⃣ Upload images (if any)
+  const files = document.getElementById("postImages").files;
+  if (files.length > 0) {
+    console.log("🟡 Uploading images…");
+
+    for (let file of files) {
+      const path = `posts/${auth.currentUser.uid}/${Date.now()}-${file.name}`;
+      const ref = storage.ref(path);
+      await ref.put(file);
+      const url = await ref.getDownloadURL();
+      post.images.push(url);
+    }
+  }
+
+  // 4️⃣ Save to Firestore
+  await db.collection("posts").add(post);
+
+  console.log("🟢 Post saved!");
+
+  // 5️⃣ Close modal + refresh feed
+  document.querySelector('[data-action="close-screens"]').click();
+  loadView("home");
+}
+  /* =====================================================
      DONE — POST GATE READY
   ===================================================== */
 }
