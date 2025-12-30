@@ -40,24 +40,40 @@ export async function init({ auth: a, db: d }) {
       const convo = docSnap.data();
       const convoId = docSnap.id;
 
-      const [u1, u2] = convo.participants;
+      const [u1, u2, postId] = convoId.split("_");
       const otherId = user.uid === u1 ? u2 : u1;
 
+      // Load other user
       const otherSnap = await getDoc(doc(db, "users", otherId));
       const other = otherSnap.exists() ? otherSnap.data() : { name: "User" };
 
-      const isUnread = convo.lastMessageSender && convo.lastMessageSender !== user.uid;
+      // Load post title
+      let postTitle = "";
+      try {
+        const postSnap = await getDoc(doc(db, "posts", postId));
+        if (postSnap.exists()) {
+          postTitle = postSnap.data().title || "";
+        }
+      } catch (err) {
+        console.error("Error loading post for chat list:", err);
+      }
 
-      const initials = other.name ? other.name.split(' ').map(n => n[0]).join('').toUpperCase() : "U";
+      const isUnread =
+        convo.lastMessageSender && convo.lastMessageSender !== user.uid;
+
+      const initials = other.name
+        ? other.name.split(" ").map(n => n[0]).join("").toUpperCase()
+        : "U";
 
       const item = document.createElement("div");
       item.className = "chatlist-item";
-      item.title = convo.lastMessage || ""; // tooltip for full message
+      item.title = convo.lastMessage || "";
+
       item.innerHTML = `
         <div class="chatlist-avatar">${initials}</div>
         <div class="chatlist-info">
           <h3>${other.name || "User"}</h3>
-          <p>${convo.lastMessage || ""}</p>
+          <p><strong>${postTitle}</strong> — ${convo.lastMessage || ""}</p>
         </div>
         ${isUnread ? `<span class="chatlist-unread"></span>` : ""}
       `;
