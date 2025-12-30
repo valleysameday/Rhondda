@@ -1,4 +1,4 @@
-export default async (req, res) => {
+export default async (req) => {
   try {
     const { sellerEmail, messageText, postTitle } = JSON.parse(req.body);
 
@@ -24,8 +24,15 @@ export default async (req, res) => {
 
     const data = await response.json();
 
-    return res.status(200).json({ success: true, data });
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ success: true, data })
+    };
+
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message })
+    };
   }
 };
