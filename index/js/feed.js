@@ -8,7 +8,7 @@ import {
 import { initFeaturedAds } from "/index/js/featured-ads.js";
 import { loadView } from "/index/js/main.js";
 
-export async function initFeed({ db }) {
+export async function initFeed({ db }, options = {}) {
   const postsContainer = document.getElementById('feed');
   const categoryBtns = document.querySelectorAll('.category-btn');
   const businessCheckbox = document.getElementById('isBusinessAccount');
@@ -16,13 +16,18 @@ export async function initFeed({ db }) {
 
   if (!postsContainer) return console.warn("Feed container not found");
 
-  // Business checkbox toggle
+  /* ============================================================
+     BUSINESS CHECKBOX TOGGLE
+  ============================================================ */
   if (businessCheckbox && businessBenefits) {
     businessCheckbox.addEventListener('change', () => {
       businessBenefits.style.display = businessCheckbox.checked ? 'block' : 'none';
     });
   }
 
+  /* ============================================================
+     SKELETON LOADING
+  ============================================================ */
   function showSkeletons(count = 6) {
     postsContainer.innerHTML = "";
     for (let i = 0; i < count; i++) {
@@ -40,10 +45,14 @@ export async function initFeed({ db }) {
     }
   }
 
+  /* ============================================================
+     FETCH POSTS
+  ============================================================ */
   async function fetchPosts() {
     try {
       const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
       const snap = await getDocs(q);
+
       const posts = snap.docs.map(doc => {
         const d = doc.data();
         return {
@@ -73,7 +82,7 @@ export async function initFeed({ db }) {
         };
       });
 
-      // Prepend a featured business
+      // ⭐ Add featured business at top
       posts.unshift({
         id: "featured-biz",
         title: "Rhondda Pro Cleaning Services",
@@ -93,6 +102,9 @@ export async function initFeed({ db }) {
     }
   }
 
+  /* ============================================================
+     META BUILDER
+  ============================================================ */
   function buildMeta(p) {
     let html = "";
     if (p.price) {
@@ -106,9 +118,16 @@ export async function initFeed({ db }) {
     return html;
   }
 
+  /* ============================================================
+     RENDER POSTS
+  ============================================================ */
   function renderPosts(posts, category = 'all') {
     postsContainer.innerHTML = '';
-    const filtered = category === 'all' ? posts : posts.filter(p => p.category === category);
+
+    const filtered = category === 'all'
+      ? posts
+      : posts.filter(p => p.category === category);
+
     if (!filtered.length) {
       postsContainer.innerHTML = `<p class="empty-feed">No posts yet</p>`;
       return;
@@ -132,14 +151,17 @@ export async function initFeed({ db }) {
         <button class="report-btn" data-id="${post.id}" title="Report">⚑</button>
       `;
 
+      /* ⭐ OPEN POST + SAVE SCROLL POSITION */
       card.addEventListener('click', e => {
         if (e.target.closest('.report-btn') || e.target.closest('.cta-btn')) return;
 
-        // Clear previous postId
-        sessionStorage.removeItem("viewPostId");
+        sessionStorage.setItem("feedScroll", window.scrollY);
+
+        const activeBtn = document.querySelector('.category-btn.active');
+        sessionStorage.setItem("feedCategory", activeBtn?.dataset.category || "all");
+
         sessionStorage.setItem("viewPostId", post.id);
 
-        // Load view fresh
         loadView("view-post", { forceInit: true });
       });
 
@@ -147,6 +169,9 @@ export async function initFeed({ db }) {
     });
   }
 
+  /* ============================================================
+     WEATHER
+  ============================================================ */
   async function loadWeather() {
     const emojiEl = document.querySelector(".weather-emoji");
     const textEl = document.querySelector(".weather-text");
@@ -182,26 +207,36 @@ export async function initFeed({ db }) {
     }
   }
 
+  /* ============================================================
+     GREETING
+  ============================================================ */
   function loadGreeting() {
     const w = document.querySelector(".greeting-welsh");
     const e = document.querySelector(".greeting-english");
     if (!w || !e) return;
     w.textContent = "Shwmae";
-    e.textContent = window.currentUser?.displayName ? `${window.currentUser.displayName}, welcome back` : "Welcome to Rhondda Noticeboard";
+    e.textContent = window.currentUser?.displayName
+      ? `${window.currentUser.displayName}, welcome back`
+      : "Welcome to Rhondda Noticeboard";
   }
 
-  // Filter buttons
+  /* ============================================================
+     CATEGORY FILTER BUTTONS
+  ============================================================ */
   categoryBtns.forEach(btn => {
     btn.addEventListener('click', async () => {
       categoryBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+
       showSkeletons();
       const posts = await fetchPosts();
       renderPosts(posts, btn.dataset.category);
     });
   });
 
-  // Report post handler
+  /* ============================================================
+     REPORT BUTTON
+  ============================================================ */
   document.addEventListener('click', e => {
     if (!e.target.classList.contains('report-btn')) return;
     const reason = prompt("Why are you reporting this post?");
@@ -209,11 +244,36 @@ export async function initFeed({ db }) {
     alert("Thanks — we’ll review this shortly.");
   });
 
-  // Initial load
+  /* ============================================================
+     INITIAL LOAD
+  ============================================================ */
   showSkeletons();
   const posts = await fetchPosts();
-  renderPosts(posts);
+
+  // ⭐ Restore category
+  const savedCategory = sessionStorage.getItem("feedCategory");
+  if (savedCategory) {
+    const btn = document.querySelector(`.category-btn[data-category="${savedCategory}"]`);
+    if (btn) {
+      categoryBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderPosts(posts, savedCategory);
+    } else {
+      renderPosts(posts);
+    }
+  } else {
+    renderPosts(posts);
+  }
+
   loadGreeting();
   loadWeather();
   initFeaturedAds();
+
+  // ⭐ Restore scroll
+  const savedScroll = sessionStorage.getItem("feedScroll");
+  if (savedScroll) {
+    setTimeout(() => {
+      window.scrollTo(0, parseInt(savedScroll));
+    }, 50);
+  }
 }
