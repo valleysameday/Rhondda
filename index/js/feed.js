@@ -191,26 +191,54 @@ export async function initFeed({ db }) {
     alert("Thanks — we’ll review this shortly.");
   });
 
-  /* =====================================================
-     WEATHER
-  ===================================================== */
-  async function loadWeather() {
-    const emoji = document.querySelector(".weather-emoji");
-    const text = document.querySelector(".weather-text");
-    if (!emoji || !text) return;
+/* =====================================================
+   WEATHER
+===================================================== */
+async function loadWeather() {
+  const emojiEl = document.querySelector(".weather-emoji");
+  const textEl = document.querySelector(".weather-text");
+  if (!emojiEl || !textEl) return;
 
-    try {
-      const r = await fetch(
-        "https://api.open-meteo.com/v1/forecast?latitude=51.65&longitude=-3.45&current_weather=true&timezone=auto"
-      );
-      const d = await r.json();
-      emoji.textContent = "🌤️";
-      text.textContent = `Rhondda · ${Math.round(d.current_weather.temperature)}°C`;
-    } catch {
-      text.textContent = "Local updates available";
+  try {
+    const res = await fetch(
+      "https://api.open-meteo.com/v1/forecast?latitude=51.65&longitude=-3.45&current_weather=true&daily=sunrise,sunset&timezone=auto"
+    );
+
+    const data = await res.json();
+    const weather = data.current_weather;
+    const temp = Math.round(weather.temperature);
+    const code = weather.weathercode;
+
+    const sunrise = new Date(data.daily.sunrise[0]);
+    const sunset = new Date(data.daily.sunset[0]);
+    const now = new Date(weather.time);
+    const isDay = now >= sunrise && now <= sunset;
+
+    let emoji = isDay ? "🌤️" : "🌙";
+    let message = isDay
+      ? "Another tidy day in the Rhondda"
+      : "Evening in the valley — cosy vibes";
+
+    // Rain / showers
+    if ([51, 61, 63, 65, 80, 81, 82].includes(code)) {
+      emoji = "🌧️";
+      message = "Bit wet out there — brolly weather";
     }
-  }
 
+    // Snow
+    if ([71, 73, 75].includes(code)) {
+      emoji = "❄️";
+      message = "Cold snap in the valleys";
+    }
+
+    emojiEl.textContent = emoji;
+    textEl.textContent = `${message} · ${temp}°C`;
+
+  } catch (err) {
+    emojiEl.textContent = "📍";
+    textEl.textContent = "Rhondda — local updates available";
+  }
+}
   /* =====================================================
      GREETING
   ===================================================== */
