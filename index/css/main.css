@@ -344,3 +344,19 @@ header img.logo {
   display: block;
   color: #000;
 }
+.icon-status-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.account-status-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: red; /* default */
+  border: 2px solid #fff;
+  display: block;
+}
