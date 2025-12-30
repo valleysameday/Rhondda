@@ -13,14 +13,11 @@ let auth, db, storage;
 /* =====================================================
    SPA VIEW LOADER
 ===================================================== */
-export async function loadView(view) {
+export async function loadView(view, options = {}) {
   console.log("🔵 loadView() →", view);
 
   const app = document.getElementById("app");
-  if (!app) {
-    console.log("❌ #app container missing");
-    return;
-  }
+  if (!app) return console.log("❌ #app container missing");
 
   app.querySelectorAll(".view").forEach(v => v.hidden = true);
 
@@ -34,7 +31,10 @@ export async function loadView(view) {
     app.appendChild(target);
   }
 
-  if (!target.dataset.loaded) {
+  // Always reload HTML if forceReload is true
+  const shouldReload = options.forceInit || !target.dataset.loaded;
+
+  if (shouldReload) {
     console.log("🟡 Loading HTML for:", view);
     const html = await fetch(`/views/${view}.html`).then(r => r.text());
     target.innerHTML = html;
@@ -53,9 +53,6 @@ export async function loadView(view) {
   console.log("🟢 Showing view:", view);
   target.hidden = false;
 }
-
-window.loadView = loadView;
-
 /* =====================================================
    APP INIT
 ===================================================== */
