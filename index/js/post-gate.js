@@ -285,7 +285,9 @@ async function submitPost() {
   }
 
   // 4️⃣ Save to Firestore
-  await db.collection("posts").add(post);
+  import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+await addDoc(collection(db, "posts"), post);
 
   console.log("🟢 Post saved!");
 
