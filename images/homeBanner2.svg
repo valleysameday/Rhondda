@@ -1,0 +1,31 @@
+<svg class="banner-badge" viewBox="0 0 400 120" xmlns="www.w3.org">
+    <!-- CSS Styles -->
+    <style>
+      .local-text { font-family: sans-serif; text-anchor: middle; fill: #4361ee; }
+      .built-for { font-size: 16px; font-weight: bold; letter-spacing: 1px; }
+      .locals-main { font-size: 48px; font-weight: 900; }
+      
+      /* Flat Radar Animation */
+      @keyframes radar {
+        0% { stroke-width: 1; opacity: 1; r: 10; }
+        100% { stroke-width: 10; opacity: 0; r: 80; }
+      }
+      .ring { fill: none; stroke: #4361ee; transform-origin: center; animation: radar 3s infinite cubic-bezier(0.2, 0.5, 0.2, 1); }
+    </style>
+    
+    <!-- Flat Background -->
+    <rect width="100%" height="120" fill="#ffea00" rx="15"/>
+
+    <!-- Animated Radar Ring (Flat Style) -->
+    <circle cx="320" cy="60" r="40" class="ring"/>
+    
+    <!-- Text Elements - Shifted for Landscape Layout -->
+    <g transform="translate(140, 0)">
+      <text x="0" y="40" class="local-text built-for">BUILT FOR RHONDDA</text>
+      <text x="0" y="65" class="local-text" font-size="14" font-style="italic">Powered by</text>
+      <text x="0" y="105" class="local-text locals-main">LOCALS</text>
+    </g>
+    
+    <!-- Accent Line -->
+    <rect x="20" y="20" width="4" height="80" fill="#4361ee" rx="2" />
+</svg>
