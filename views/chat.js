@@ -128,12 +128,10 @@ export async function init({ auth: a, db: d }) {
   };
 
   backBtn.onclick = () => {
-    // Reset and load fresh chat list
-    if (unsubscribeMessages) unsubscribeMessages();
-    loadView("chat-list", { forceInit: true });
-  };
-}
-
+  if (unsubscribeMessages) unsubscribeMessages();
+  loadView("chat-list", { forceInit: true });
+};
+  
 function timeAgo(timestamp) {
   if (!timestamp) return "";
   const seconds = Math.floor((Date.now() - timestamp) / 1000);
