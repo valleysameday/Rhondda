@@ -54,7 +54,7 @@ export async function init({ auth: a, db: d, storage: s }) {
   }
 
   const postsSnap = await getDocs(
-    query(collection(db, "posts"), where("businessId", "==", user.uid))
+    query(collection(db, "posts"), where("userId", "==", user.uid))
   );
 
   const stats = renderPostsAndStats(
