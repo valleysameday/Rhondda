@@ -1,4 +1,7 @@
-/* PAGE LAYOUT */
+/* =========================
+   PAGE LAYOUT
+========================= */
+
 .view-post-page {
   background: var(--bg);
   min-height: 100vh;
@@ -15,58 +18,130 @@
   padding: 0 20px;
 }
 
-/* FULL-WIDTH GALLERY */
+/* =========================
+   FULL WIDTH GALLERY (FIXED)
+========================= */
+
 .gallery-wrapper {
-  position: relative;
   width: 100%;
-  height: auto;           /* remove locked aspect ratio */
-  overflow: hidden;
   background: #000;
-  border-radius: 0;       /* full-width on desktop */
+  overflow: hidden;
+  position: relative;
   box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);
 }
 
+/* Keeps height stable */
+.gallery-section {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Sliding track */
 .gallery-track {
   display: flex;
   width: 100%;
-  transition: transform 0.35s cubic-bezier(0.22,0.61,0.36,1);
+  touch-action: pan-y;
+  transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
   will-change: transform;
 }
 
-.gallery-track.dragging { transition: none; }
-
-.gallery-image {
-  flex: 0 0 100%;
-  
-  height: auto;       /* maintain natural height */
-  object-fit: cover;  /* fills width while cropping height slightly */
-  display: block;
-  background: #000;
+.gallery-track.dragging {
+  transition: none;
 }
-/* DOTS */
+
+/* IMAGES */
+.gallery-image {
+  width: 100%;
+  flex: 0 0 100%;
+  height: auto;
+  max-height: 80vh;
+  object-fit: contain; /* 🔥 NO CROPPING */
+  background: #000;
+  display: block;
+}
+
+/* =========================
+   DOTS
+========================= */
 
 .gallery-dots {
   position: absolute;
-  bottom: 16px;
-  right: 16px;
+  bottom: 14px;
+  right: 14px;
   display: flex;
   gap: 6px;
+  z-index: 10;
 }
 
 .gallery-dot {
   width: 7px;
   height: 7px;
   border-radius: 999px;
+  background: rgba(255,255,255,0.4);
   border: none;
   padding: 0;
   cursor: pointer;
-  background: rgba(255,255,255,0.35);
-  transition: width 0.2s, background 0.2s;
+  transition: all 0.2s ease;
 }
 
-.gallery-dot.active { width: 16px; background: #fff; }
+.gallery-dot.active {
+  width: 18px;
+  background: #fff;
+}
 
-/* DETAILS SECTION */
+/* =========================
+   GALLERY HINT
+========================= */
+
+.gallery-hint {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #6b7280;
+  user-select: none;
+}
+
+/* =========================
+   LIGHTBOX (FIXED)
+========================= */
+
+#lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+#lightbox.active {
+  display: flex;
+}
+
+#lightbox img {
+  max-width: 92vw;
+  max-height: 92vh;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+#lightboxClose {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  font-size: 2rem;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* =========================
+   DETAILS SECTION
+========================= */
+
 .details-section {
   display: flex;
   flex-direction: column;
@@ -106,7 +181,6 @@
 .price-tag {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text-main);
 }
 
 .location-tag {
@@ -120,30 +194,14 @@
   font-size: 0.85rem;
 }
 
-/* DESCRIPTION CARD */
-.content-card {
-  padding: 0;
-  background: none;
-  border: none;
-  box-shadow: none;
-}
+/* =========================
+   DESCRIPTION (NON BOXY)
+========================= */
 
-.content-card h3 {
-  margin: 0 0 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #0f172a;
-  letter-spacing: -0.01em;
-}
-
-.description-text {
-  margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.7;
-  color: #475569;
-}
 .content-card {
   padding-top: 6px;
+  background: none;
+  border: none;
 }
 
 .content-card::before {
@@ -156,23 +214,30 @@
   border-radius: 2px;
 }
 
-/* MESSAGE SELLER */
-.message-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 12px;
-  gap: 6px;
+.content-card h3 {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
+.description-text {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #475569;
+}
+
+/* =========================
+   MESSAGE SELLER
+========================= */
+
 .message-btn {
-  max-width: 320px;
   width: 100%;
+  max-width: 320px;
+  margin: 12px auto;
   padding: 14px;
   background: var(--primary);
   color: #fff;
   font-weight: 700;
-  font-size: 1rem;
   border: none;
   border-radius: 14px;
   cursor: pointer;
@@ -185,123 +250,38 @@
   box-shadow: 0 8px 16px -8px rgba(37,99,235,0.55);
 }
 
-.safety-note {
-  font-size: 0.85rem;
-  color: #6b7280;
-  text-align: center;
-}
+/* =========================
+   CONTACT BOX
+========================= */
 
-/* REPORT LINK */
-.report-link {
-  border: none;
-  background: none;
-  color: #9b1c1c;
-  font-size: 0.85rem;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-/* RESPONSIVE */
-@media (max-width:849px) {
-  .gallery-wrapper { border-radius: 0; }
-  .details-section { padding-bottom: 20px; }
-}
-/* Basic lightbox */
-#lightbox {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  cursor: grab;
-}
-#lightbox.active { display: flex; }
-#lightbox img { max-width: 90%; max-height: 90%; border-radius: 6px; }
-#lightboxClose {
-  position: absolute;
-  top: 20px; right: 20px;
-  font-size: 2rem;
-  color: #fff;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
-.gallery-hint {
-  text-align: center;
-  font-size: 0.875rem;
-  color: #555;
-  margin-top: 10px;  /* spacing below gallery */
-  user-select: none;
-}
-/* Contact Seller Box */
 .contact-box {
   margin-top: 20px;
   padding: 16px;
-  background: #ffffff;
+  background: #fff;
   border-radius: 14px;
   box-shadow: 0 4px 14px rgba(0,0,0,0.08);
   border: 1px solid #e5e7eb;
 }
 
-.contact-box h3 {
-  margin: 0 0 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #111827;
+/* =========================
+   MOBILE TWEAKS
+========================= */
+
+@media (max-width: 768px) {
+  .gallery-image {
+    max-height: 70vh;
+  }
+
+  .gallery-dots {
+    bottom: 10px;
+    right: 10px;
+  }
 }
 
-.contact-box p {
-  margin: 0 0 12px;
-  font-size: .85rem;
-  color: #6b7280;
-}
+/* =========================
+   ANIMATION
+========================= */
 
-/* Reveal Button */
-.reveal-btn {
-  width: 100%;
-  padding: 12px;
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .2s;
-}
-
-.reveal-btn:hover {
-  background: #1d4ed8;
-}
-
-/* The revealed number */
-.revealed-number {
-  margin-top: 12px;
-  padding: 12px;
-  background: #f3f4f6;
-  border-radius: 10px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  text-align: center;
-  letter-spacing: 1px;
-  display: none;
-  animation: fadeIn .25s ease-out;
-}
-.message-btn {
-  width: 100%;
-  margin-bottom: 12px;
-}
-
-.contact-disclaimer {
-  margin: 0 0 12px;
-  font-size: .85rem;
-  color: #6b7280;
-  line-height: 1.4;
-}
-
-/* Fade animation */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
