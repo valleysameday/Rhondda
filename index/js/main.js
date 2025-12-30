@@ -108,6 +108,19 @@ window.isBusinessUser = snap.exists() && snap.data().isBusiness === true;
       }
     );
 
+     document.getElementById("openChatList")?.addEventListener("click", e => {
+  e.preventDefault();
+
+  const user = auth.currentUser;
+
+  if (!user) {
+    loadView("login");
+    return;
+  }
+
+  loadView("chat-list");
+});
+     
     document.querySelectorAll('[data-value="signup"]').forEach(btn =>
       btn.onclick = e => {
         e.preventDefault();
