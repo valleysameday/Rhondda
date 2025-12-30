@@ -44,24 +44,30 @@
       </div>
 
       <!-- Message seller button with tip -->
-    <div class="message-btn-wrapper">
-  <button id="messageSeller" class="primary-btn">Message Me</button>
-    
-<div class="contact-box">
-  <h3>Contact Seller</h3>
-  <p>This number is only to be used to contact the seller regarding this ad.</p>
+ <div class="contact-box">
 
+  <!-- Message Seller -->
+  <button id="messageSeller" class="primary-btn message-btn">
+    Message Seller 📨
+  </button>
+
+  <!-- Disclaimer -->
+  <p class="contact-disclaimer">
+    This number is only to be used to contact the seller regarding this ad.
+  </p>
+
+  <!-- Reveal Number -->
   <button id="revealNumberBtn" class="reveal-btn">
     Reveal Phone Number
   </button>
 
+  <!-- Revealed Number -->
   <div id="revealedNumber" class="revealed-number"></div>
-</div>
-      <button id="reportPost" class="report-link">Report</button>
-    </section>
-  <p class="safety-note">Never pay before seeing the item</p>
-  </div>
+
 </div>
 
+<!-- Report + Safety -->
+<button id="reportPost" class="report-link">Report</button>
+<p class="safety-note">Never pay before seeing the item</p>
 <link rel="stylesheet" href="/views/css/view-post.css" />
 <script type="module" src="/views/view-post.js"></script>
