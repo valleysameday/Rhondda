@@ -78,6 +78,7 @@ export async function init({ db, auth }) {
        SHARE BUTTON
     ============================================================ */
     shareBtn.addEventListener("click", async () => {
+       const shareBtn = document.getElementById("sharePostBtn");
   const url = window.location.href;
 
   const shareText = `
