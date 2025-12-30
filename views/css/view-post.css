@@ -12,7 +12,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding: 0 20px;
+  padding: 0;
 }
 
 /* FULL-WIDTH GALLERY */
@@ -128,7 +128,9 @@
   border: 1px solid rgba(15,23,42,0.06);
   box-shadow: 0 1px 3px rgba(15,23,42,0.06);
 }
-
+.content-card {
+  margin: 0 16px;   /* NEW — gives breathing room */
+}
 .content-card h3 { margin:0 0 8px; font-size:1rem; font-weight:600; color:#111827; }
 .description-text { margin:0; color:#4b5563; line-height:1.5; font-size:0.95rem; }
 
