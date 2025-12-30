@@ -48,10 +48,13 @@ export async function init({ auth: a, db: d }) {
 
       const isUnread = convo.lastMessageSender && convo.lastMessageSender !== user.uid;
 
+      const initials = other.name ? other.name.split(' ').map(n => n[0]).join('').toUpperCase() : "U";
+
       const item = document.createElement("div");
       item.className = "chatlist-item";
+      item.title = convo.lastMessage || ""; // tooltip for full message
       item.innerHTML = `
-        <div class="chatlist-avatar"></div>
+        <div class="chatlist-avatar">${initials}</div>
         <div class="chatlist-info">
           <h3>${other.name || "User"}</h3>
           <p>${convo.lastMessage || ""}</p>
