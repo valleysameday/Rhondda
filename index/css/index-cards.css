@@ -1,4 +1,21 @@
 /* =====================================================
+   GRID CONTAINER (Edge-to-Edge Breakout)
+===================================================== */
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 columns mobile */
+    gap: 12px;
+    padding: 12px;
+    /* This breaks out of standard containers to hit screen edges */
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+}
+
+/* =====================================================
    BASE CARD
 ===================================================== */
 .post-card {
@@ -11,7 +28,7 @@
     border: 1px solid #e5e7eb;
     box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     transition: transform .18s ease, box-shadow .18s ease;
-    height: 340px;
+    height: 380px; /* Uniform height */
 }
 
 .post-card:hover {
@@ -24,7 +41,7 @@
 ===================================================== */
 .post-image {
     width: 100%;
-    height: 170px;
+    height: 180px;
     background: #f1f1f1;
     position: relative;
 }
@@ -39,39 +56,35 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      to bottom,
-      rgba(0,0,0,0) 55%,
-      rgba(0,0,0,0.25)
-    );
+    background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.3));
 }
 
 /* =====================================================
    BODY
 ===================================================== */
 .post-body {
-    padding: 12px 14px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
     flex: 1;
 }
 
-/* Title */
 .post-title {
-    font-size: 1.05rem;
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: 700;
     color: #0f172a;
     margin-bottom: 4px;
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1.2;
 }
 
-/* Teaser text */
 .post-teaser {
-    font-size: .9rem;
-    color: #374151;
-    line-height: 1.35;
+    font-size: .85rem;
+    color: #4b5563;
+    line-height: 1.4;
     margin-bottom: 8px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -80,264 +93,137 @@
 }
 
 /* =====================================================
-   META ROW (PRICE · AREA · CATEGORY)
+   META & BADGES
 ===================================================== */
 .post-meta {
     margin-top: auto;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
-    font-size: .78rem;
-    color: #6b7280;
 }
 
-.post-meta span {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-
-/* Price */
 .post-price {
-    font-size: .95rem;
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 800;
     color: #16a34a;
+    width: 100%; /* Price on its own line for tidiness */
+    margin-bottom: 4px;
 }
 
-/* Area */
 .post-area {
-    font-weight: 500;
-    color: #374151;
-}
-
-/* Category pill */
-.post-category {
-    background: #f1f5f9;
-    color: #334155;
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-size: .72rem;
+    font-size: 0.75rem;
     font-weight: 600;
+    color: #64748b;
 }
 
-/* =====================================================
-   NEW BADGES FOR SMART META
-===================================================== */
-
-/* Property badge */
-.post-prop {
-    background: #eef6ff;
-    color: #1d4ed8;
-    padding: 2px 8px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: .72rem;
-}
-
-/* Condition badge */
-.post-condition {
-    background: #fff7ed;
-    color: #c2410c;
-    padding: 2px 8px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: .72rem;
-}
-
-/* Delivery badge */
-.post-delivery {
-    background: #ecfdf5;
-    color: #047857;
-    padding: 2px 8px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: .72rem;
-}
-
-/* Job salary */
-.post-salary {
-    background: #f0f9ff;
-    color: #0369a1;
-    padding: 2px 8px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: .72rem;
-}
-
-/* Job type */
-.post-jobtype {
-    background: #fdf4ff;
-    color: #a21caf;
-    padding: 2px 8px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: .72rem;
-}
-
-/* Event date */
-.post-event {
-    background: #fef9c3;
-    color: #854d0e;
-    padding: 2px 8px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: .72rem;
-}
-
-/* Event time */
-.post-event-time {
-    background: #fefce8;
-    color: #713f12;
-    padding: 2px 8px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: .72rem;
-}
-
-/* Lost & Found */
-.post-lost {
-    background: #fff1f2;
-    color: #be123c;
-    padding: 2px 8px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: .72rem;
-}
-
-.post-reward {
-    background: #fef2c7;
-    color: #b45309;
-    padding: 2px 8px;
-    border-radius: 8px;
+.post-category, .post-prop, .post-condition, .post-delivery, 
+.post-salary, .post-jobtype, .post-event, .post-event-time, 
+.post-lost, .post-reward {
+    padding: 3px 8px;
+    border-radius: 6px;
     font-weight: 700;
-    font-size: .72rem;
+    font-size: .65rem;
+    text-transform: uppercase;
 }
 
+.post-category { background: #f1f5f9; color: #334155; }
+.post-prop { background: #eef6ff; color: #1d4ed8; }
+.post-condition { background: #fff7ed; color: #c2410c; }
+.post-delivery { background: #ecfdf5; color: #047857; }
+.post-salary { background: #f0f9ff; color: #0369a1; }
+.post-jobtype { background: #fdf4ff; color: #a21caf; }
+.post-event { background: #fef9c3; color: #854d0e; }
+.post-lost { background: #fff1f2; color: #be123c; }
+
 /* =====================================================
-   FLAG / REPORT BUTTON
+   REPORT BUTTON
 ===================================================== */
 .report-btn {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(255,255,255,0.85);
-    border: none;
+    top: 8px;
+    right: 8px;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(4px);
     border-radius: 50%;
     width: 32px;
     height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background .15s ease, transform .15s ease;
     z-index: 10;
-}
-
-.report-btn:hover {
-    background: #fee2e2;
-    transform: scale(1.1);
+    border: 1px solid rgba(0,0,0,0.05);
 }
 
 /* =====================================================
-   BUSINESS / FEATURED CARDS
+   FEATURED / BUSINESS (2 WIDTHS)
 ===================================================== */
 .post-card.business {
-    grid-column: span 2;
-    height: 360px;
-    border-radius: 16px;
+    grid-column: span 2; /* Force 2-column width everywhere */
+    height: 420px;
     border: 2px solid #ff4f8b;
     background: linear-gradient(180deg, #fff7fb, #ffffff);
-    position: relative;
-    overflow: hidden;
 }
 
-/* Ribbon */
 .post-card.business::before {
-    content: "FEATURED BUSINESS";
+    content: "FEATURED";
     position: absolute;
-    top: 30px;
-    left: -30px;
-    width: 160px;
-    height: 38px;
-    background: linear-gradient(135deg, #ff2f7d, #ff7eb3, #ffb3d6);
-    box-shadow: 0 4px 12px rgba(255, 80, 140, 0.45);
+    top: 15px;
+    left: -35px;
+    width: 130px;
+    background: #ff2f7d;
     color: #fff;
-    font-size: 0.75rem;
-    font-weight: 800;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 900;
+    text-align: center;
     transform: rotate(-45deg);
     z-index: 5;
+    box-shadow: 0 2px 10px rgba(255, 47, 125, 0.4);
 }
 
-/* Business image */
 .post-card.business .post-image {
-    height: 200px;
+    height: 240px;
 }
 
-/* Business body */
-.post-card.business .post-body {
-    padding: 18px 20px;
-}
-
-/* Business title */
 .post-card.business .post-title {
-    font-size: 1.35rem;
-    color: #ff2f7d;
-}
-
-/* Business teaser */
-.post-card.business .post-teaser {
-    font-size: .95rem;
-    -webkit-line-clamp: 3;
-}
-
-/* Business meta */
-.post-card.business .post-price {
-    font-size: 1.1rem;
-    color: #ff2f7d;
-}
-
-.post-card.business .post-category {
-    background: rgba(255,47,125,.12);
+    font-size: 1.3rem;
     color: #ff2f7d;
 }
 
 /* =====================================================
-   DESKTOP GRID
+   DESKTOP ADJUSTMENTS
 ===================================================== */
 @media (min-width: 1024px) {
     .posts-grid {
         grid-template-columns: repeat(4, 1fr);
+        width: 100%; /* Return to normal container width on desktop */
+        margin: 0 auto;
+        left: auto;
+        right: auto;
     }
-
-    .post-card {
-        height: 340px;
-    }
-
-    .post-card.business {
-        height: 420px;
-    }
-
-    .post-card.business .post-image {
-        height: 260px;
-    }
+    
+    .post-card { height: 360px; }
 }
 
 /* =====================================================
-   MOBILE
+   MOBILE TIDY-UP
 ===================================================== */
 @media (max-width: 640px) {
+    .posts-grid {
+        gap: 8px;
+        padding: 8px;
+    }
+    
     .post-card {
-        height: auto;
+        height: 340px; /* Slightly shorter for 2-column mobile view */
     }
 
     .post-image {
-        height: 180px;
+        height: 140px;
+    }
+
+    .post-card.business {
+        height: 380px;
     }
 }
+
