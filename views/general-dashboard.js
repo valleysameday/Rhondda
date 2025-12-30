@@ -46,6 +46,11 @@ export async function init({ auth: a, db: d }) {
   document.getElementById("statUnlocks").textContent = stats.totalLeads;
 
   // ============================
+  // ⭐ LOAD SAVED ADS
+  // ============================
+  await loadSavedPosts(user.uid);
+
+  // ============================
   // LOGOUT
   // ============================
   document.getElementById("logoutBtn").onclick = async () => {
@@ -58,7 +63,6 @@ export async function init({ auth: a, db: d }) {
   // ⭐ UNREAD MESSAGE BADGE LISTENER
   // ============================
   initUnreadMessageListener();
-  
 
   // ============================
   // FUNCTION: UNREAD LISTENER
@@ -85,4 +89,56 @@ export async function init({ auth: a, db: d }) {
       badge.style.display = hasUnread ? "block" : "none";
     });
   }
+}
+
+/* ============================================================
+   ⭐ LOAD SAVED POSTS FUNCTION
+============================================================ */
+async function loadSavedPosts(uid) {
+  const savedContainer = document.getElementById("savedPosts");
+  if (!savedContainer) return;
+
+  savedContainer.innerHTML = `<p style="opacity:0.6;">Loading saved ads...</p>`;
+
+  const savedRef = collection(db, "users", uid, "savedPosts");
+  const savedSnap = await getDocs(savedRef);
+
+  const posts = [];
+
+  for (let saved of savedSnap.docs) {
+    const postId = saved.id;
+    const postSnap = await getDoc(doc(db, "posts", postId));
+
+    // Auto-remove if sold or deleted
+    if (!postSnap.exists() || postSnap.data().isSold === true) {
+      await deleteDoc(doc(db, "users", uid, "savedPosts", postId));
+      continue;
+    }
+
+    posts.push({ id: postId, ...postSnap.data() });
+  }
+
+  if (posts.length === 0) {
+    savedContainer.innerHTML = `<p style="opacity:0.6;">No saved ads yet.</p>`;
+    return;
+  }
+
+  savedContainer.innerHTML = "";
+
+  posts.forEach(post => {
+    const card = document.createElement("div");
+    card.className = "dash-post-card";
+    card.innerHTML = `
+      <img src="${post.images?.[0] || '/images/image-webholder.webp'}" class="dash-post-img">
+      <div class="dash-post-info">
+        <h3>${post.title}</h3>
+        <p>${post.price ? "£" + post.price : "Contact for price"}</p>
+      </div>
+    `;
+    card.onclick = () => {
+      sessionStorage.setItem("viewPostId", post.id);
+      loadView("view-post", { forceInit: true });
+    };
+    savedContainer.appendChild(card);
+  });
 }
