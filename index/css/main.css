@@ -281,22 +281,27 @@ header img.logo {
 
 /* ===== FEATURED ADS ===== */
 .featured-ads {
-  margin: 12px 0 6px;
-  overflow: hidden;
+  margin: 16px 0 8px;
+  background: #f8f9fa; /* Light contrast from the main background */
+  padding: 10px 0;
 }
 
 .featured-track {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  padding: 6px 12px;
+  padding: 0 16px 12px; /* Extra bottom padding for card shadows */
+  
+  /* Hide scrollbar for Chrome/Safari */
+  scrollbar-width: none; 
 }
 
 .featured-track::-webkit-scrollbar {
-  display: none;
+  display: none; /* Hide scrollbar for IE/Edge */
 }
+
 
 .featured-card {
   min-width: 80%;
