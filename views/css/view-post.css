@@ -251,6 +251,30 @@
 }
 
 /* =========================
+   REVEAL BUTTON
+========================= */
+
+.reveal-btn {
+  width: 100%;
+  max-width: 320px;
+  margin: 12px auto;
+  padding: 14px;
+  background: #f3f4f6; /* light neutral background */
+  color: #111827;       /* dark text */
+  font-weight: 700;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reveal-btn:hover {
+  background: #e5e7eb; /* slightly darker on hover */
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px -8px rgba(37, 99, 235, 0.35); /* subtle pop like message-btn */
+}
+
+/* =========================
    CONTACT BOX
 ========================= */
 
