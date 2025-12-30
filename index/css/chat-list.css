@@ -54,6 +54,22 @@
   box-shadow: 0 6px 14px rgba(0,0,0,0.08);
 }
 
+.chat-back-btn {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 10px;
+  color: #1e293b;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.chat-back-btn:hover {
+  background: #f1f5f9;
+}
 /* =========================
    AVATAR
 ========================= */
