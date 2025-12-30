@@ -137,7 +137,63 @@
   color: #fff;
   cursor: pointer;
 }
+.post-action-bar {
+  display: flex;
+  gap: 12px;
+  background: #ffffff;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 1.5px solid #f0f0f0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  width: fit-content;
+  margin: 12px auto;
+}
 
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.action-btn .icon {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  fill: none;
+}
+
+/* Save button */
+.save-btn {
+  background: #fff5f5;
+  border: 1px solid #ffebeb;
+  color: #ff4d4d;
+}
+
+.save-btn.saved {
+  background: #ffe4ef;
+  border-color: #ff7eb3;
+  color: #b83265;
+}
+
+/* Share button */
+.share-btn {
+  background: #007aff;
+  color: #ffffff;
+}
+
+/* Hover effects */
+.action-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
 /* =========================
    DETAILS SECTION
 ========================= */
