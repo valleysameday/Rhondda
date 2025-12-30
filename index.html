@@ -150,7 +150,7 @@
 
     <div id="postFlow">
 
-      <!-- ========== STEP 1: CATEGORY ========== -->
+      <!-- STEP 1: CATEGORY -->
       <div class="post-step active" data-step="1">
         <h2>What are you posting?</h2>
 
@@ -164,12 +164,11 @@
         </div>
       </div>
 
-      <!-- ========== STEP 2: CORE DETAILS ========== -->
+      <!-- STEP 2: CORE DETAILS -->
       <div class="post-step" data-step="2">
         <h2>Tell people about it</h2>
 
         <input type="text" id="postTitle" placeholder="Ad title" maxlength="70" required>
-
         <textarea id="postDescription" rows="5" placeholder="Add a description" required></textarea>
 
         <!-- PROPERTY ONLY -->
@@ -193,7 +192,7 @@
         </div>
       </div>
 
-      <!-- ========== STEP 3: CONTACT & LOCATION ========== -->
+      <!-- STEP 3: CONTACT -->
       <div class="post-step" data-step="3">
         <h2>How can people reach you?</h2>
 
@@ -209,7 +208,7 @@
         </div>
       </div>
 
-      <!-- ========== STEP 4: CATEGORY-SPECIFIC DETAILS ========== -->
+      <!-- STEP 4: OPTIONAL DETAILS -->
       <div class="post-step" data-step="4">
         <h2>Optional details</h2>
 
@@ -238,6 +237,55 @@
             <option value="yes">Yes</option>
             <option value="no">No</option>
           </select>
+        </div>
+
+        <!-- PROPERTY FEATURES -->
+        <div class="property-features" hidden>
+          <h3>Property features</h3>
+
+          <div class="feature-grid">
+
+            <label class="feature-item">
+              <input type="checkbox" data-feature="garden">
+              🌿 Garden access
+            </label>
+
+            <label class="feature-item">
+              <input type="checkbox" data-feature="southfacing">
+              🌞 South-facing
+            </label>
+
+            <label class="feature-item">
+              <input type="checkbox" data-feature="parking">
+              🚗 Off-road parking
+            </label>
+
+            <label class="feature-item">
+              <input type="checkbox" data-feature="offers">
+              💬 Open to offers
+            </label>
+
+            <label class="feature-item">
+              <input type="checkbox" data-feature="pets">
+              🐾 Pet friendly
+            </label>
+
+            <label class="feature-item">
+              <input type="checkbox" data-feature="renovated">
+              🛠 Newly renovated
+            </label>
+
+            <label class="feature-item">
+              <input type="checkbox" data-feature="furnished">
+              🛋 Furnished
+            </label>
+
+            <label class="feature-item">
+              <input type="checkbox" data-feature="unfurnished">
+              🏡 Unfurnished
+            </label>
+
+          </div>
         </div>
 
         <!-- JOBS -->
