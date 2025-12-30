@@ -14,15 +14,28 @@ import { loadView } from "/index/js/main.js";
 let auth, db;
 
 export async function init({ auth: a, db: d }) {
+  console.log("🔥 chat.js init() STARTED");
+
   auth = a;
   db = d;
 
   const user = auth.currentUser;
-  if (!user) return loadView("home");
+  console.log("👤 Current user:", user);
+
+  if (!user) {
+    console.warn("❌ No user logged in — redirecting to home");
+    return loadView("home");
+  }
 
   const convoId = sessionStorage.getItem("activeConversationId");
-  if (!convoId) return loadView("chat-list");
+  console.log("💬 Loaded convoId:", convoId);
 
+  if (!convoId) {
+    console.warn("❌ No convoId found — redirecting to chat-list");
+    return loadView("chat-list");
+  }
+
+  // DOM elements
   const chatMessages = document.getElementById("chatMessages");
   const chatInput = document.getElementById("chatInput");
   const sendBtn = document.getElementById("chatSendBtn");
@@ -34,12 +47,21 @@ export async function init({ auth: a, db: d }) {
   const adTitle = document.getElementById("chatAdTitle");
   const adPrice = document.getElementById("chatAdPrice");
 
-  // ConvoId format MUST be: buyer_seller_postId
-  const parts = convoId.split("_");
+  console.log("📦 DOM Elements:", {
+    chatMessages,
+    chatInput,
+    sendBtn,
+    backBtn,
+    headerName,
+    adPreview
+  });
 
-  // If convoId is not in the new format, clear it and send them back
+  // Validate convoId format
+  const parts = convoId.split("_");
+  console.log("🔍 convoId parts:", parts);
+
   if (parts.length !== 3) {
-    console.warn("Invalid conversation ID format, resetting:", convoId);
+    console.warn("❌ Invalid convoId format — resetting:", convoId);
     sessionStorage.removeItem("activeConversationId");
     return loadView("chat-list");
   }
@@ -47,41 +69,59 @@ export async function init({ auth: a, db: d }) {
   const [userA, userB, postId] = parts;
   const otherUserId = user.uid === userA ? userB : userA;
 
+  console.log("👥 Chat participants:", { userA, userB, postId, otherUserId });
+
   // Load other user's info
   const otherSnap = await getDoc(doc(db, "users", otherUserId));
-  headerName.textContent = otherSnap.exists() ? (otherSnap.data().name || "Chat") : "Chat";
+  console.log("📄 Other user snapshot:", otherSnap.exists());
 
-  // Load ad snippet
+  headerName.textContent = otherSnap.exists()
+    ? (otherSnap.data().name || "Chat")
+    : "Chat";
+
+  // Load ad preview
+  console.log("📦 Loading ad preview for postId:", postId);
+
   try {
     const postSnap = await getDoc(doc(db, "posts", postId));
+    console.log("📄 Post snapshot exists:", postSnap.exists());
+
     if (postSnap.exists()) {
       const post = postSnap.data();
+      console.log("🖼 Ad data:", post);
 
       adImage.src = post.images?.[0] || "/images/image-webholder.webp";
       adTitle.textContent = post.title || "Item";
       adPrice.textContent = post.price ? `£${post.price}` : "No price";
 
       adPreview.onclick = () => {
+        console.log("🖼 Ad preview clicked — opening post:", postId);
         sessionStorage.setItem("viewPostId", postId);
         loadView("view-post");
       };
     } else {
+      console.warn("⚠ No post found — hiding preview");
       adPreview.style.display = "none";
     }
   } catch (err) {
-    console.error("Error loading ad for chat:", err);
+    console.error("❌ Error loading ad:", err);
     adPreview.style.display = "none";
   }
 
   // Real-time messages
+  console.log("📡 Setting up message listener…");
+
   const messagesRef = collection(db, "conversations", convoId, "messages");
   const messagesQuery = query(messagesRef, orderBy("createdAt"));
 
   onSnapshot(messagesQuery, (snap) => {
+    console.log("📨 Messages snapshot received:", snap.size);
+
     chatMessages.innerHTML = "";
 
     snap.forEach(docSnap => {
       const msg = docSnap.data();
+      console.log("💬 Message:", msg);
 
       const bubble = document.createElement("div");
       bubble.className = msg.senderId === user.uid
@@ -106,8 +146,15 @@ export async function init({ auth: a, db: d }) {
 
   // Send message
   sendBtn.onclick = async () => {
+    console.log("📤 Send button clicked");
+
     const text = chatInput.value.trim();
-    if (!text) return;
+    console.log("📝 Message text:", text);
+
+    if (!text) {
+      console.warn("⚠ Empty message — ignoring");
+      return;
+    }
 
     const now = Date.now();
 
@@ -117,6 +164,8 @@ export async function init({ auth: a, db: d }) {
       createdAt: now,
       seen: false
     });
+
+    console.log("📨 Message saved");
 
     await setDoc(
       doc(db, "conversations", convoId),
@@ -128,13 +177,20 @@ export async function init({ auth: a, db: d }) {
       { merge: true }
     );
 
+    console.log("🗂 Conversation metadata updated");
+
     chatInput.value = "";
   };
 
-  // Back button
+  // BACK BUTTON
+  console.log("🔙 Setting up back button…", backBtn);
+
   backBtn.onclick = () => {
+    console.log("🔙 Back button clicked — loading chat-list");
     loadView("chat-list");
   };
+
+  console.log("✅ chat.js init() FINISHED");
 }
 
 // Time ago formatter
