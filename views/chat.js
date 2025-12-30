@@ -62,10 +62,17 @@ export async function init({ auth: a, db: d }) {
     if (!text) return;
 
     await addDoc(messagesRef, {
-      senderId: auth.currentUser.uid,
-      text,
-      createdAt: Date.now()
-    });
+  senderId: auth.currentUser.uid,
+  text,
+  createdAt: Date.now()
+});
+
+// Update conversation metadata
+await setDoc(doc(db, "conversations", convoId), {
+  lastMessage: text,
+  lastMessageSender: auth.currentUser.uid,
+  updatedAt: Date.now()
+}, { merge: true });
 
     chatInput.value = "";
   };
