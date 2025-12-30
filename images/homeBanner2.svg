@@ -1,29 +1,21 @@
-<svg class="banner-badge" width="400" height="120" viewBox="0 0 400 120" xmlns="www.w3.org">
-    <style>
-      .local-text { font-family: sans-serif; text-anchor: middle; fill: #4361ee; }
-      .built-for { font-size: 14px; font-weight: bold; letter-spacing: 1px; }
-      .locals-main { font-size: 42px; font-weight: 900; }
-      
-      @keyframes radar {
-        0% { stroke-width: 1; opacity: 1; r: 5; }
-        100% { stroke-width: 8; opacity: 0; r: 50; }
-      }
-      .ring { fill: none; stroke: #4361ee; transform-origin: center; animation: radar 3s infinite cubic-bezier(0.2, 0.5, 0.2, 1); }
-    </style>
-    
-    <!-- Flat Background -->
-    <rect width="100%" height="120" fill="#ffea00" rx="15"/>
+<svg width="400" height="120" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+    <!-- Clean Flat Background -->
+    <rect width="100%" height="100%" fill="#ffea00" rx="15"/>
 
-    <!-- Animated Radar Ring - Centered behind text -->
-    <circle cx="200" cy="60" r="40" class="ring"/>
+    <!-- Animated Radar Pulse (using inline animation tags for better compatibility) -->
+    <circle cx="200" cy="60" r="40" fill="none" stroke="#4361ee" stroke-width="2">
+        <animate attributeName="r" from="10" to="80" dur="3s" repeatCount="indefinite" />
+        <animate attributeName="opacity" from="1" to="0" dur="3s" repeatCount="indefinite" />
+        <animate attributeName="stroke-width" from="1" to="10" dur="3s" repeatCount="indefinite" />
+    </circle>
     
-    <!-- Central Text Group -->
-    <g transform="translate(200, 0)">
-      <text x="0" y="35" class="local-text built-for">BUILT FOR RHONDDA</text>
-      <text x="0" y="58" class="local-text" font-size="12" font-style="italic">Powered by</text>
-      <text x="0" y="100" class="local-text locals-main">LOCALS</text>
+    <!-- Central Text Content -->
+    <g font-family="sans-serif" text-anchor="middle" font-weight="bold">
+        <text x="200" y="40" font-size="14" fill="#4361ee" style="letter-spacing:1px;">BUILT FOR RHONDDA</text>
+        <text x="200" y="62" font-size="12" fill="#4361ee" font-weight="normal" font-style="italic" opacity="0.8">Powered by</text>
+        <text x="200" y="100" font-size="42" fill="#4361ee" font-weight="900">LOCALS</text>
     </g>
     
-    <!-- Centered Bottom Accent Bar -->
+    <!-- Flat Bottom Accent -->
     <rect x="175" y="110" width="50" height="4" fill="#4361ee" rx="2" />
 </svg>
