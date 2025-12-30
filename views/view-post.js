@@ -50,10 +50,10 @@ export async function init({ db, auth }) {
       loadView("chat", { forceInit: true });
     });
 
-    document.getElementById("backToFeed")?.addEventListener("click", () => {
-      sessionStorage.removeItem("viewPostId");
-      loadView("home", { forceInit: true });
-    });
+    document.getElementById("backToFeed").addEventListener("click", () => {
+  sessionStorage.removeItem("viewPostId");
+  loadView("home", { forceInit: true });
+});
 
     document.getElementById("reportPost")?.addEventListener("click", () => {
       if (confirm("Report this listing for review?")) {
