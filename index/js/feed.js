@@ -154,7 +154,10 @@ export async function initFeed({ db }) {
         <button class="report-btn" data-id="${post.id}" title="Report">⚑</button>
       `;
 
-      card.addEventListener('click', e => {
+      const cleanCard = card.cloneNode(true);
+card.replaceWith(cleanCard);
+
+cleanCard.addEventListener('click', e => {
         if (
           e.target.closest('.report-btn') ||
           e.target.closest('.cta-btn')
