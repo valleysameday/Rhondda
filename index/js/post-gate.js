@@ -14,6 +14,10 @@ getFirebase().then(fb => {
 });
 
 function initPostGate() {
+
+  /* ------------------------------
+     STEP NAVIGATION
+  ------------------------------ */
   const steps = [...document.querySelectorAll('#posts-grid .post-step')];
   const dots = [...document.querySelectorAll('.post-progress .dot')];
   let stepIndex = 0;
@@ -38,17 +42,27 @@ function initPostGate() {
     btn.addEventListener('click', () => showStep(stepIndex - 1))
   );
 
+  /* ------------------------------
+     INPUTS
+  ------------------------------ */
   const titleInput = document.getElementById('postTitle');
   const descInput = document.getElementById('postDescription');
   const nextBtn = document.querySelector('.post-step[data-step="2"] .post-next');
+
+  const priceBox = document.querySelector('.price-box');
   const priceInput = document.getElementById('postPrice');
   const priceLabel = document.querySelector('label[for="postPrice"]');
+
+  const areaBox = document.querySelector('.area-box');
+
   const contactInput = document.getElementById('postContact');
   const locationInput = document.getElementById('postLocation');
 
   const propertyBox = document.querySelector('.property-options');
   const propertyBtns = [...document.querySelectorAll('[data-property-type]')];
   const rentBtns = [...document.querySelectorAll('[data-rent-frequency]')];
+
+  const propertyFeaturesBox = document.querySelector('.property-features');
 
   const forsaleBox = document.querySelector('.forsale-options');
   const jobsBox = document.querySelector('.jobs-options');
@@ -61,32 +75,44 @@ function initPostGate() {
   const submitBtn = document.getElementById('postSubmitBtn');
   const imagesInput = document.getElementById('postImages');
 
-  // CATEGORY SELECT
+  /* ------------------------------
+     CATEGORY SELECTION
+  ------------------------------ */
   document.querySelectorAll('[data-category]').forEach(btn => {
     btn.addEventListener('click', () => {
+
       selectedCategory = btn.dataset.category;
       propertyType = null;
       rentFrequency = null;
 
+      // Show/hide category-specific blocks
       propertyBox.hidden = selectedCategory !== 'property';
+      propertyFeaturesBox.hidden = selectedCategory !== 'property';
       forsaleBox.hidden = selectedCategory !== 'forsale';
       jobsBox.hidden = selectedCategory !== 'jobs';
       eventsBox.hidden = selectedCategory !== 'events';
       communityBox.hidden = selectedCategory !== 'community';
 
+      // Reset community extras
       if (communityTypeSelect) communityTypeSelect.value = "";
       if (lostFoundExtra) lostFoundExtra.hidden = true;
 
+      // Reset property buttons
       rentBtns.forEach(b => b.style.display = 'none');
       propertyBtns.forEach(b => b.classList.remove('active'));
       rentBtns.forEach(b => b.classList.remove('active'));
 
+      updatePriceVisibility();
+      updateAreaVisibility();
       updatePriceLabel();
+
       showStep(1);
     });
   });
 
-  // PROPERTY TYPE
+  /* ------------------------------
+     PROPERTY TYPE
+  ------------------------------ */
   propertyBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       propertyType = btn.dataset.propertyType;
@@ -105,7 +131,9 @@ function initPostGate() {
     });
   });
 
-  // RENT FREQUENCY
+  /* ------------------------------
+     RENT FREQUENCY
+  ------------------------------ */
   rentBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       rentFrequency = btn.dataset.rentFrequency;
@@ -116,14 +144,18 @@ function initPostGate() {
     });
   });
 
-  // COMMUNITY EXTRA
+  /* ------------------------------
+     COMMUNITY EXTRA
+  ------------------------------ */
   if (communityTypeSelect) {
     communityTypeSelect.addEventListener('change', e => {
       lostFoundExtra.hidden = e.target.value !== 'lost';
     });
   }
 
-  // VALIDATION
+  /* ------------------------------
+     VALIDATION
+  ------------------------------ */
   function validateStep2() {
     const titleOk = titleInput.value.trim().length >= 3;
     const descOk = descInput.value.trim().length >= 10;
@@ -142,6 +174,9 @@ function initPostGate() {
     descInput.addEventListener(evt, validateStep2);
   });
 
+  /* ------------------------------
+     PRICE LABEL LOGIC
+  ------------------------------ */
   function updatePriceLabel() {
     if (selectedCategory !== 'property') {
       priceLabel.textContent = 'Price (£)';
@@ -161,7 +196,27 @@ function initPostGate() {
     }
   }
 
-  // SUBMIT POST
+  /* ------------------------------
+     PRICE VISIBILITY
+  ------------------------------ */
+  function updatePriceVisibility() {
+    if (selectedCategory === 'forsale' || selectedCategory === 'property') {
+      priceBox.hidden = false;
+    } else {
+      priceBox.hidden = true;
+    }
+  }
+
+  /* ------------------------------
+     AREA VISIBILITY
+  ------------------------------ */
+  function updateAreaVisibility() {
+    areaBox.hidden = selectedCategory !== 'property';
+  }
+
+  /* ------------------------------
+     SUBMIT POST
+  ------------------------------ */
   submitBtn.addEventListener('click', submitPost);
 
   async function submitPost() {
@@ -192,7 +247,7 @@ function initPostGate() {
         location: locationInput.value.trim(),
 
         price: Number(priceInput.value) || null,
-        area: document.getElementById("postArea")?.value.trim() || "Rhondda",
+        area: document.getElementById("postArea")?.value.trim() || null,
 
         propertyType,
         rentFrequency,
@@ -217,7 +272,9 @@ function initPostGate() {
         images: []
       };
 
-      // IMAGES
+      /* ------------------------------
+         IMAGE UPLOAD
+      ------------------------------ */
       if (imagesInput.files.length > 0) {
         for (let file of imagesInput.files) {
           const compressed = await compressImage(file);
@@ -239,5 +296,83 @@ function initPostGate() {
       console.error(err);
       showToast("Something went wrong posting your ad.", "error");
     }
+  }
+
+  /* ------------------------------
+     IMAGE COMPRESSION
+  ------------------------------ */
+  function compressImage(file, maxSize = 1280, quality = 0.72) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+
+          if (width > height && width > maxSize) {
+            height = Math.round((height * maxSize) / width);
+            width = maxSize;
+          } else if (height > width && height > maxSize) {
+            width = Math.round((width * maxSize) / height);
+            height = maxSize;
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob(
+            blob => blob ? resolve(blob) : reject("Compression failed"),
+            'image/jpeg',
+            quality
+          );
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /* ------------------------------
+     TOAST
+  ------------------------------ */
+  function showToast(message, type = "info") {
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.className = 'toast-container';
+      container.style.position = 'fixed';
+      container.style.bottom = '16px';
+      container.style.left = '50%';
+      container.style.transform = 'translateX(-50%)';
+      container.style.zIndex = '99999';
+      container.style.display = 'flex';
+      container.style.flexDirection = 'column';
+      container.style.gap = '8px';
+      document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.padding = '10px 14px';
+    toast.style.borderRadius = '999px';
+    toast.style.fontSize = '.9rem';
+    toast.style.color = '#fff';
+    toast.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
+    toast.style.background =
+      type === 'error' ? '#ef4444' :
+      type === 'success' ? '#16a34a' :
+      '#4b5563';
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transition = 'opacity 0.2s ease';
+      setTimeout(() => toast.remove(), 200);
+    }, 2600);
   }
 }
