@@ -1,6 +1,12 @@
-import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { initFeaturedAds } from '/index/js/featured-ads.js';
-import { loadView } from '/index/js/main.js';
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+import { initFeaturedAds } from "/index/js/featured-ads.js";
+import { loadView } from "/index/js/main.js";
 
 export async function initFeed({ db }) {
   const postsContainer = document.getElementById('feed');
@@ -10,25 +16,18 @@ export async function initFeed({ db }) {
 
   if (!postsContainer) return console.warn("Feed container not found");
 
-  /* =====================================================
-     BUSINESS TOGGLE
-  ===================================================== */
+  // Business checkbox toggle
   if (businessCheckbox && businessBenefits) {
     businessCheckbox.addEventListener('change', () => {
       businessBenefits.style.display = businessCheckbox.checked ? 'block' : 'none';
     });
   }
 
-  /* =====================================================
-     SKELETON LOADER
-  ===================================================== */
   function showSkeletons(count = 6) {
     postsContainer.innerHTML = "";
-
     for (let i = 0; i < count; i++) {
       const skel = document.createElement("div");
       skel.className = "feed-card skeleton-card";
-
       skel.innerHTML = `
         <div class="skeleton-img"></div>
         <div class="skeleton-content">
@@ -37,23 +36,14 @@ export async function initFeed({ db }) {
           <div class="skeleton-line"></div>
         </div>
       `;
-
       postsContainer.appendChild(skel);
     }
   }
 
-  /* =====================================================
-     FETCH POSTS
-  ===================================================== */
   async function fetchPosts() {
     try {
-      const q = query(
-        collection(db, 'posts'),
-        orderBy('createdAt', 'desc')
-      );
-
+      const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
       const snap = await getDocs(q);
-
       const posts = snap.docs.map(doc => {
         const d = doc.data();
         return {
@@ -67,29 +57,23 @@ export async function initFeed({ db }) {
           image: d.images?.[0] || "/images/image-webholder.webp",
           type: d.isBusiness ? "business" : "standard",
           cta: d.cta || null,
-
           rentFrequency: d.rentFrequency || null,
-          propertyType: d.propertyType || null,
           bedrooms: d.bedrooms || null,
           bathrooms: d.bathrooms || null,
           furnished: d.furnished || null,
-
           condition: d.condition || null,
           delivery: d.delivery || null,
-
           jobType: d.jobType || null,
           jobSalary: d.jobSalary || null,
-
           eventDate: d.eventDate || null,
           eventStart: d.eventStart || null,
-
           communityType: d.communityType || null,
           lostLocation: d.lostLocation || null,
           lostReward: d.lostReward || null
         };
       });
 
-      // Featured business ad
+      // Prepend a featured business
       posts.unshift({
         id: "featured-biz",
         title: "Rhondda Pro Cleaning Services",
@@ -109,43 +93,22 @@ export async function initFeed({ db }) {
     }
   }
 
-  /* =====================================================
-     META BUILDER
-  ===================================================== */
   function buildMeta(p) {
-    let html = '';
-
+    let html = "";
     if (p.price) {
       const freq = p.rentFrequency ? ` ${p.rentFrequency.toUpperCase()}` : '';
       html += `<span class="post-price">£${p.price}${freq}</span>`;
     }
-
-    if (p.category === "property") {
-      html += `<span>🏠 ${p.bedrooms || "?"} bed</span>`;
-    }
-
-    if (p.category === "jobs" && p.jobSalary) {
-      html += `<span>💷 ${p.jobSalary}</span>`;
-    }
-
-    if (p.category === "events" && p.eventDate) {
-      html += `<span>📅 ${p.eventDate}</span>`;
-    }
-
+    if (p.category === "property") html += `<span>🏠 ${p.bedrooms || "?"} bed</span>`;
+    if (p.category === "jobs" && p.jobSalary) html += `<span>💷 ${p.jobSalary}</span>`;
+    if (p.category === "events" && p.eventDate) html += `<span>📅 ${p.eventDate}</span>`;
     html += `<span>📍 ${p.area}</span>`;
     return html;
   }
 
-  /* =====================================================
-     RENDER (GUMTREE STYLE)
-  ===================================================== */
   function renderPosts(posts, category = 'all') {
     postsContainer.innerHTML = '';
-
-    const filtered = category === 'all'
-      ? posts
-      : posts.filter(p => p.category === category);
-
+    const filtered = category === 'all' ? posts : posts.filter(p => p.category === category);
     if (!filtered.length) {
       postsContainer.innerHTML = `<p class="empty-feed">No posts yet</p>`;
       return;
@@ -154,7 +117,6 @@ export async function initFeed({ db }) {
     filtered.forEach(post => {
       const card = document.createElement('article');
       card.className = `feed-card ${post.type}`;
-
       card.innerHTML = `
         <div class="feed-image">
           <img src="${post.image}" alt="${post.title}">
@@ -163,45 +125,35 @@ export async function initFeed({ db }) {
 
         <div class="feed-content">
           <h3 class="feed-title">${post.title}</h3>
-          <div class="feed-meta">
-            ${buildMeta(post)}
-          </div>
-
-          ${post.type === "business" && post.cta
-            ? `<button class="cta-btn">${post.cta}</button>`
-            : ''}
+          <div class="feed-meta">${buildMeta(post)}</div>
+          ${post.type === "business" && post.cta ? `<button class="cta-btn">${post.cta}</button>` : ''}
         </div>
 
         <button class="report-btn" data-id="${post.id}" title="Report">⚑</button>
       `;
 
       card.addEventListener('click', e => {
-        if (
-          e.target.closest('.report-btn') ||
-          e.target.closest('.cta-btn')
-        ) return;
+        if (e.target.closest('.report-btn') || e.target.closest('.cta-btn')) return;
 
+        // Clear previous postId
+        sessionStorage.removeItem("viewPostId");
         sessionStorage.setItem("viewPostId", post.id);
-        loadView("view-post");
+
+        // Load view fresh
+        loadView("view-post", { forceInit: true });
       });
 
       postsContainer.appendChild(card);
     });
   }
 
-  /* =====================================================
-     WEATHER
-  ===================================================== */
   async function loadWeather() {
     const emojiEl = document.querySelector(".weather-emoji");
     const textEl = document.querySelector(".weather-text");
     if (!emojiEl || !textEl) return;
 
     try {
-      const res = await fetch(
-        "https://api.open-meteo.com/v1/forecast?latitude=51.65&longitude=-3.45&current_weather=true&daily=sunrise,sunset&timezone=auto"
-      );
-
+      const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=51.65&longitude=-3.45&current_weather=true&daily=sunrise,sunset&timezone=auto");
       const data = await res.json();
       const weather = data.current_weather;
       const temp = Math.round(weather.temperature);
@@ -213,20 +165,13 @@ export async function initFeed({ db }) {
       const isDay = now >= sunrise && now <= sunset;
 
       let emoji = isDay ? "🌤️" : "🌙";
-      let message = isDay
-        ? "Another tidy day in the Rhondda"
-        : "Evening in the valley — cosy vibes";
+      let message = isDay ? "Another tidy day in the Rhondda" : "Evening in the valley — cosy vibes";
 
-      // Rain / showers
       if ([51, 61, 63, 65, 80, 81, 82].includes(code)) {
-        emoji = "🌧️";
-        message = "Bit wet out there — brolly weather";
+        emoji = "🌧️"; message = "Bit wet out there — brolly weather";
       }
-
-      // Snow
       if ([71, 73, 75].includes(code)) {
-        emoji = "❄️";
-        message = "Cold snap in the valleys";
+        emoji = "❄️"; message = "Cold snap in the valleys";
       }
 
       emojiEl.textContent = emoji;
@@ -237,37 +182,26 @@ export async function initFeed({ db }) {
     }
   }
 
-  /* =====================================================
-     GREETING
-  ===================================================== */
   function loadGreeting() {
     const w = document.querySelector(".greeting-welsh");
     const e = document.querySelector(".greeting-english");
     if (!w || !e) return;
-
     w.textContent = "Shwmae";
-    e.textContent = window.currentUser?.displayName
-      ? `${window.currentUser.displayName}, welcome back`
-      : "Welcome to Rhondda Noticeboard";
+    e.textContent = window.currentUser?.displayName ? `${window.currentUser.displayName}, welcome back` : "Welcome to Rhondda Noticeboard";
   }
 
-  /* =====================================================
-     CATEGORY FILTER
-  ===================================================== */
+  // Filter buttons
   categoryBtns.forEach(btn => {
     btn.addEventListener('click', async () => {
       categoryBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-
       showSkeletons();
       const posts = await fetchPosts();
       renderPosts(posts, btn.dataset.category);
     });
   });
 
-  /* =====================================================
-     REPORT
-  ===================================================== */
+  // Report post handler
   document.addEventListener('click', e => {
     if (!e.target.classList.contains('report-btn')) return;
     const reason = prompt("Why are you reporting this post?");
@@ -275,9 +209,7 @@ export async function initFeed({ db }) {
     alert("Thanks — we’ll review this shortly.");
   });
 
-  /* =====================================================
-     INIT
-  ===================================================== */
+  // Initial load
   showSkeletons();
   const posts = await fetchPosts();
   renderPosts(posts);
