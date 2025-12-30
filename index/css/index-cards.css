@@ -231,3 +231,39 @@
 .report-btn:hover {
   color: #dc2626;
 }
+.skeleton-card {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 12px;
+  animation: pulse 1.4s infinite ease-in-out;
+}
+
+.skeleton-img {
+  width: 120px;
+  height: 90px;
+  background: #e5e7eb;
+  border-radius: 8px;
+}
+
+.skeleton-content {
+  flex: 1;
+}
+
+.skeleton-line {
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.skeleton-line.short {
+  width: 50%;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
