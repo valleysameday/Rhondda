@@ -17,8 +17,11 @@ export async function init({ auth: a, db: d }) {
   auth = a;
   db = d;
 
+  const user = auth.currentUser;
+  if (!user) return loadView("home");
+
   const convoId = sessionStorage.getItem("activeConversationId");
-  if (!convoId) return loadView("home");
+  if (!convoId) return loadView("chat-list");
 
   const chatMessages = document.getElementById("chatMessages");
   const chatInput = document.getElementById("chatInput");
@@ -31,27 +34,25 @@ export async function init({ auth: a, db: d }) {
   const adTitle = document.getElementById("chatAdTitle");
   const adPrice = document.getElementById("chatAdPrice");
 
-  // convoId format: buyer_seller_postId
+  // ConvoId format: buyer_seller_postId
   const parts = convoId.split("_");
   if (parts.length !== 3) return loadView("chat-list");
 
   const [userA, userB, postId] = parts;
-  const otherUserId = auth.currentUser.uid === userA ? userB : userA;
+  const otherUserId = user.uid === userA ? userB : userA;
 
-  // Load other user's name
+  // Load other user's info
   const otherSnap = await getDoc(doc(db, "users", otherUserId));
   headerName.textContent = otherSnap.exists() ? otherSnap.data().name : "Chat";
 
-  // Load ad preview
+  // Load ad snippet
   const postSnap = await getDoc(doc(db, "posts", postId));
   if (postSnap.exists()) {
     const post = postSnap.data();
-
     adImage.src = post.images?.[0] || "/images/image-webholder.webp";
     adTitle.textContent = post.title || "Item";
     adPrice.textContent = post.price ? `£${post.price}` : "No price";
 
-    // click on ad preview goes to view-post
     adPreview.onclick = () => {
       sessionStorage.setItem("viewPostId", postId);
       loadView("view-post");
@@ -69,7 +70,7 @@ export async function init({ auth: a, db: d }) {
     snap.forEach(docSnap => {
       const msg = docSnap.data();
       const bubble = document.createElement("div");
-      bubble.className = msg.senderId === auth.currentUser.uid ? "chat-bubble me" : "chat-bubble them";
+      bubble.className = msg.senderId === user.uid ? "chat-bubble me" : "chat-bubble them";
 
       const text = document.createElement("p");
       text.className = "bubble-text";
@@ -94,26 +95,26 @@ export async function init({ auth: a, db: d }) {
     const now = Date.now();
 
     await addDoc(messagesRef, {
-      senderId: auth.currentUser.uid,
+      senderId: user.uid,
       text,
       createdAt: now,
       seen: false
     });
 
+    // Update convo
     await setDoc(doc(db, "conversations", convoId), {
       lastMessage: text,
-      lastMessageSender: auth.currentUser.uid,
+      lastMessageSender: user.uid,
       updatedAt: now
     }, { merge: true });
 
     chatInput.value = "";
   };
 
-  // Back button goes to chat list
+  // Back button works
   backBtn.onclick = () => loadView("chat-list");
 }
 
-// Format time ago
 function timeAgo(timestamp) {
   const seconds = Math.floor((Date.now() - timestamp) / 1000);
   if (seconds < 60) return "Just now";
