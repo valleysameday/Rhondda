@@ -220,39 +220,40 @@ export async function init({ db, auth }) {
       lbDragging = false;
     });
 
-    // ============================================================
-    // ⭐ REAL MESSAGING SYSTEM (Firebase Conversations)
-    // ============================================================
+// ============================================================
+// ⭐ REAL MESSAGING SYSTEM (Firebase Conversations)
+// ============================================================
 
-    async function startConversation(post) {
-      const buyerId = auth.currentUser?.uid;
-      const sellerId = post.userId;
+async function startConversation(post) {
+  const buyerId = auth.currentUser?.uid;
+  const sellerId = post.userId;
 
-      if (!buyerId) {
-        return openScreen("login");
-      }
+  if (!buyerId) {
+    return openScreen("login");
+  }
 
-      if (buyerId === sellerId) {
-        alert("You cannot message yourself.");
-        return;
-      }
+  if (buyerId === sellerId) {
+    alert("You cannot message yourself.");
+    return;
+  }
 
-      // Stable conversation ID
-      const convoId = [buyerId, sellerId].sort().join("_");
+  // Stable conversation ID
+  const convoId = [buyerId, sellerId].sort().join("_");
 
-      // Create or update conversation
-      await setDoc(doc(db, "conversations", convoId), {
-        participants: [buyerId, sellerId],
-        lastMessage: "",
-        updatedAt: Date.now()
-      }, { merge: true });
+  // Create or update conversation
+  await setDoc(doc(db, "conversations", convoId), {
+    participants: [buyerId, sellerId],
+    lastMessage: "",
+    lastMessageSender: "",   // ⭐ REQUIRED
+    updatedAt: Date.now()
+  }, { merge: true });
 
-      // Store active conversation
-      sessionStorage.setItem("activeConversationId", convoId);
+  // Store active conversation
+  sessionStorage.setItem("activeConversationId", convoId);
 
-      // Load chat screen
-      loadView("chat");
-    }
+  // Load chat screen
+  loadView("chat");
+}
 
     // ===== ACTION BUTTONS =====
     const messageBtn = document.getElementById("messageSeller");
