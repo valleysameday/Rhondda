@@ -86,6 +86,24 @@ body.modal-open main {
     transition: all 0.25s ease;
     border: none;
 }
+
+
+.property-type button.active,
+.rent-frequency button.active,
+.category-grid button.active {
+    background: #ffe4ef;                 /* soft pink fill */
+    border-color: #ff7eb3;               /* brand border */
+    color: #b83265;                      /* deeper pink text */
+    box-shadow: 0 0 0 3px rgba(255,126,179,0.25); /* glow */
+    transform: translateY(-1px);         /* subtle lift */
+}
+
+/* Smooth transitions */
+.property-type button,
+.rent-frequency button,
+.category-grid button {
+    transition: all 0.25s ease;
+}
 .modal-content button:hover {
     transform: translateY(-2px);
     opacity: 0.95;
