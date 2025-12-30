@@ -1,0 +1,23 @@
+<svg viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg" style="background:#4361ee">
+  <style>
+    @keyframes wave { 0%, 100% { d: path('M0,160 C200,140 400,180 600,150 C750,130 800,160 800,160 L800,220 L0,220 Z'); } 50% { d: path('M0,150 C200,170 400,140 600,170 C750,190 800,150 800,150 L800,220 L0,220 Z'); } }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    @keyframes pulse { 0%, 100% { fill: #ffea00; } 50% { fill: #fff; } }
+    text { font-family: sans-serif; font-weight: bold; text-anchor: middle; }
+    .welsh { font-size: 45px; fill: #ffea00; animation: float 3s infinite ease-in-out; }
+    .english { font-size: 24px; fill: #fff; }
+    .cta { font-size: 28px; animation: pulse 5s infinite ease-in-out; }
+  </style>
+
+  <!-- Wave Background -->
+  <path fill="rgba(255,255,255,0.2)">
+    <animate attributeName="d" dur="8s" repeatCount="indefinite" values="M0,160 C200,140 400,180 600,150 C750,130 800,160 800,160 L800,220 L0,220 Z; M0,150 C200,170 400,140 600,170 C750,190 800,150 800,150 L800,220 L0,220 Z; M0,160 C200,140 400,180 600,150 C750,130 800,160 800,160 L800,220 L0,220 Z" />
+  </path>
+
+  <!-- Bilingual Welcome -->
+  <text x="50%" y="70" class="welsh">Croeso</text>
+  <text x="50%" y="105" class="english">Welcome to Rhondda Noticeboard</text>
+  
+  <!-- Site Actions -->
+  <text x="50%" y="160" class="cta">Browse • Post • Sell</text>
+</svg>
