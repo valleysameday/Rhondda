@@ -1,20 +1,29 @@
-<svg class="banner-badge" width="400" height="120" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+<svg class="banner-badge" width="400" height="120" viewBox="0 0 400 120" xmlns="www.w3.org">
     <style>
       .local-text { font-family: sans-serif; text-anchor: middle; fill: #4361ee; }
-      .built-for { font-size: 16px; font-weight: bold; letter-spacing: 1px; }
-      .locals-main { font-size: 48px; font-weight: 900; }
+      .built-for { font-size: 14px; font-weight: bold; letter-spacing: 1px; }
+      .locals-main { font-size: 42px; font-weight: 900; }
+      
       @keyframes radar {
-        0% { stroke-width: 1; opacity: 1; r: 10; }
-        100% { stroke-width: 10; opacity: 0; r: 80; }
+        0% { stroke-width: 1; opacity: 1; r: 5; }
+        100% { stroke-width: 8; opacity: 0; r: 50; }
       }
       .ring { fill: none; stroke: #4361ee; transform-origin: center; animation: radar 3s infinite cubic-bezier(0.2, 0.5, 0.2, 1); }
     </style>
+    
+    <!-- Flat Background -->
     <rect width="100%" height="120" fill="#ffea00" rx="15"/>
-    <circle cx="320" cy="60" r="40" class="ring"/>
-    <g transform="translate(140, 0)">
-      <text x="0" y="40" class="local-text built-for">BUILT FOR RHONDDA</text>
-      <text x="0" y="65" class="local-text" font-size="14" font-style="italic">Powered by</text>
-      <text x="0" y="105" class="local-text locals-main">LOCALS</text>
+
+    <!-- Animated Radar Ring - Centered behind text -->
+    <circle cx="200" cy="60" r="40" class="ring"/>
+    
+    <!-- Central Text Group -->
+    <g transform="translate(200, 0)">
+      <text x="0" y="35" class="local-text built-for">BUILT FOR RHONDDA</text>
+      <text x="0" y="58" class="local-text" font-size="12" font-style="italic">Powered by</text>
+      <text x="0" y="100" class="local-text locals-main">LOCALS</text>
     </g>
-    <rect x="20" y="20" width="4" height="80" fill="#4361ee" rx="2" />
+    
+    <!-- Centered Bottom Accent Bar -->
+    <rect x="175" y="110" width="50" height="4" fill="#4361ee" rx="2" />
 </svg>
