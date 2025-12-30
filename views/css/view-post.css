@@ -265,6 +265,17 @@
   display: none;
   animation: fadeIn .25s ease-out;
 }
+.message-btn {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.contact-disclaimer {
+  margin: 0 0 12px;
+  font-size: .85rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
 
 /* Fade animation */
 @keyframes fadeIn {
