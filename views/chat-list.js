@@ -11,6 +11,7 @@ import {
 import { loadView } from "/index/js/main.js";
 
 let auth, db;
+let unsubscribeConversations = null; // store snapshot unsubscribe
 
 export async function init({ auth: a, db: d }) {
   auth = a;
@@ -20,6 +21,10 @@ export async function init({ auth: a, db: d }) {
   if (!user) return loadView("home");
 
   const chatList = document.getElementById("chatList");
+  if (!chatList) return console.warn("Chat list container not found");
+
+  // Clean up any previous listener
+  if (unsubscribeConversations) unsubscribeConversations();
 
   const convosRef = collection(db, "conversations");
   const q = query(
@@ -28,7 +33,7 @@ export async function init({ auth: a, db: d }) {
     orderBy("updatedAt", "desc")
   );
 
-  onSnapshot(q, async (snap) => {
+  unsubscribeConversations = onSnapshot(q, async (snap) => {
     chatList.innerHTML = "";
 
     if (snap.empty) {
@@ -39,36 +44,26 @@ export async function init({ auth: a, db: d }) {
     for (const docSnap of snap.docs) {
       const convo = docSnap.data();
       const convoId = docSnap.id;
-
       const [u1, u2, postId] = convoId.split("_");
-      const otherId = user.uid === u1 ? u2 : u1;
 
-      // Load other user
+      const otherId = user.uid === u1 ? u2 : u1;
       const otherSnap = await getDoc(doc(db, "users", otherId));
       const other = otherSnap.exists() ? otherSnap.data() : { name: "User" };
 
-      // Load post title
       let postTitle = "";
       try {
         const postSnap = await getDoc(doc(db, "posts", postId));
-        if (postSnap.exists()) {
-          postTitle = postSnap.data().title || "";
-        }
+        if (postSnap.exists()) postTitle = postSnap.data().title || "";
       } catch (err) {
         console.error("Error loading post for chat list:", err);
       }
 
-      const isUnread =
-        convo.lastMessageSender && convo.lastMessageSender !== user.uid;
-
-      const initials = other.name
-        ? other.name.split(" ").map(n => n[0]).join("").toUpperCase()
-        : "U";
+      const isUnread = convo.lastMessageSender && convo.lastMessageSender !== user.uid;
+      const initials = other.name ? other.name.split(" ").map(n => n[0]).join("").toUpperCase() : "U";
 
       const item = document.createElement("div");
       item.className = "chatlist-item";
       item.title = convo.lastMessage || "";
-
       item.innerHTML = `
         <div class="chatlist-avatar">${initials}</div>
         <div class="chatlist-info">
@@ -79,8 +74,9 @@ export async function init({ auth: a, db: d }) {
       `;
 
       item.onclick = () => {
+        // Set active conversation and force fresh init
         sessionStorage.setItem("activeConversationId", convoId);
-        loadView("chat");
+        loadView("chat", { forceInit: true });
       };
 
       chatList.appendChild(item);
