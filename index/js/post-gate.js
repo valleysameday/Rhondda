@@ -1,7 +1,8 @@
-// post-gate.js
 import { getFirebase } from '/index/js/firebase/init.js';
 
 let auth, db, storage;
+
+// State
 let selectedCategory = null;
 let propertyType = null;     // sale | rent
 let rentFrequency = null;
@@ -15,18 +16,22 @@ getFirebase().then(fb => {
 
 function initPostGate() {
 
-  /* ---------------- BASIC FLOW ---------------- */
-
+  /* =====================================================
+     STEP FLOW
+  ===================================================== */
   const steps = [...document.querySelectorAll('#posts-grid .post-step')];
   const dots = [...document.querySelectorAll('.post-progress .dot')];
   let stepIndex = 0;
 
   function showStep(i) {
     if (i < 0 || i >= steps.length) return;
+
     steps.forEach(s => s.classList.remove('active'));
     dots.forEach(d => d.classList.remove('active'));
+
     steps[i].classList.add('active');
     dots[i].classList.add('active');
+
     stepIndex = i;
     validateStep2();
   }
@@ -41,13 +46,12 @@ function initPostGate() {
     btn.addEventListener('click', () => showStep(stepIndex - 1))
   );
 
-  /* ---------------- ELEMENTS ---------------- */
-
+  /* =====================================================
+     ELEMENTS
+  ===================================================== */
   const titleInput = document.getElementById('postTitle');
   const descInput = document.getElementById('postDescription');
-  const nextBtn = document.querySelector(
-    '.post-step[data-step="2"] .post-next'
-  );
+  const nextBtn = document.querySelector('.post-step[data-step="2"] .post-next');
 
   const propertyBox = document.querySelector('.property-options');
   const propertyBtns = [...document.querySelectorAll('[data-property-type]')];
@@ -56,18 +60,42 @@ function initPostGate() {
   const priceInput = document.getElementById('postPrice');
   const priceLabel = document.querySelector('label[for="postPrice"]');
 
-  /* ---------------- CATEGORY ---------------- */
+  // Universal fields
+  const contactInput = document.getElementById('postContact');
+  const locationInput = document.getElementById('postLocation');
 
+  // Category-specific blocks
+  const forsaleBox = document.querySelector('.forsale-options');
+  const jobsBox = document.querySelector('.jobs-options');
+  const eventsBox = document.querySelector('.events-options');
+  const communityBox = document.querySelector('.community-options');
+
+  const communityTypeSelect = document.getElementById('communityType');
+  const lostFoundExtra = document.getElementById('lostFoundExtra');
+
+  /* =====================================================
+     CATEGORY SELECTION
+  ===================================================== */
   document.querySelectorAll('[data-category]').forEach(btn => {
     btn.addEventListener('click', () => {
       selectedCategory = btn.dataset.category;
 
-      // reset property state
+      // Reset property state
       propertyType = null;
       rentFrequency = null;
 
-      // hide everything property-related
+      // Show/hide category-specific blocks
       propertyBox.hidden = selectedCategory !== 'property';
+      forsaleBox.hidden = selectedCategory !== 'forsale';
+      jobsBox.hidden = selectedCategory !== 'jobs';
+      eventsBox.hidden = selectedCategory !== 'events';
+      communityBox.hidden = selectedCategory !== 'community';
+
+      // Reset community extras
+      if (communityTypeSelect) communityTypeSelect.value = "";
+      if (lostFoundExtra) lostFoundExtra.hidden = true;
+
+      // Hide rent frequency until needed
       rentBtns.forEach(b => b.style.display = 'none');
       propertyBtns.forEach(b => b.classList.remove('active'));
       rentBtns.forEach(b => b.classList.remove('active'));
@@ -77,8 +105,9 @@ function initPostGate() {
     });
   });
 
-  /* ---------------- PROPERTY TYPE ---------------- */
-
+  /* =====================================================
+     PROPERTY TYPE
+  ===================================================== */
   propertyBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       propertyType = btn.dataset.propertyType;
@@ -87,7 +116,7 @@ function initPostGate() {
       propertyBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
-      // show rent frequency only if rent
+      // Show rent frequency only if renting
       rentBtns.forEach(b => {
         b.style.display = propertyType === 'rent' ? 'inline-block' : 'none';
         b.classList.remove('active');
@@ -98,8 +127,9 @@ function initPostGate() {
     });
   });
 
-  /* ---------------- RENT FREQUENCY ---------------- */
-
+  /* =====================================================
+     RENT FREQUENCY
+  ===================================================== */
   rentBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       rentFrequency = btn.dataset.rentFrequency;
@@ -112,8 +142,18 @@ function initPostGate() {
     });
   });
 
-  /* ---------------- VALIDATION ---------------- */
+  /* =====================================================
+     COMMUNITY TYPE
+  ===================================================== */
+  if (communityTypeSelect) {
+    communityTypeSelect.addEventListener('change', e => {
+      lostFoundExtra.hidden = e.target.value !== 'lost';
+    });
+  }
 
+  /* =====================================================
+     VALIDATION FOR STEP 2
+  ===================================================== */
   function validateStep2() {
     const titleOk = titleInput.value.trim().length >= 3;
     const descOk = descInput.value.trim().length >= 10;
@@ -135,8 +175,9 @@ function initPostGate() {
     descInput.addEventListener(evt, validateStep2);
   });
 
-  /* ---------------- PRICE LABEL ---------------- */
-
+  /* =====================================================
+     PRICE LABEL LOGIC
+  ===================================================== */
   function updatePriceLabel() {
     if (!priceInput || !priceLabel) return;
 
@@ -160,4 +201,8 @@ function initPostGate() {
       priceInput.placeholder = 'Price';
     }
   }
+
+  /* =====================================================
+     DONE — POST GATE READY
+  ===================================================== */
 }
