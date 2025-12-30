@@ -332,3 +332,24 @@
 .back-btn:active {
   transform: translateX(0);
 }
+/* Universal feature styling */
+.feature-tags {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.feature-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  color: #0f172a;
+  font-weight: 500;
+}
