@@ -77,24 +77,30 @@ export async function init({ db, auth }) {
     /* ============================================================
        SHARE BUTTON
     ============================================================ */
-    const shareBtn = document.getElementById("sharePostBtn");
-    if (shareBtn) {
-      shareBtn.addEventListener("click", async () => {
-        const url = window.location.href;
+    shareBtn.addEventListener("click", async () => {
+  const url = window.location.href;
 
-        if (navigator.share) {
-          await navigator.share({
-            title: post.title,
-            text: "Check out this ad on Rhondda Noticeboard",
-            url
-          });
-        } else {
-          navigator.clipboard.writeText(url);
-          showToast("Link copied!", "success");
-        }
-      });
-    }
+  const shareText = `
+🏷️ ${post.title}
+💷 ${post.price ? "£" + post.price : "Contact for price"}
+📍 ${post.location || "Rhondda"}
+📁 ${post.category || "General"}
 
+View on Rhondda Noticeboard:
+${url}
+  `.trim();
+
+  if (navigator.share) {
+    await navigator.share({
+      title: post.title,
+      text: shareText,
+      url
+    });
+  } else {
+    navigator.clipboard.writeText(shareText);
+    showToast("Share text copied!", "success");
+  }
+});
     /* ============================================================
        MESSAGE SELLER
     ============================================================ */
