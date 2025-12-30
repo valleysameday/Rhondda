@@ -1,6 +1,31 @@
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { loadView } from "/index/js/main.js";
+import { doc, setDoc, deleteDoc, getDoc } from "firebase/firestore";
 
+async function toggleSave(postId) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return showToast("Please log in to save ads", "error");
+
+  const ref = doc(db, "users", uid, "savedPosts", postId);
+  const snap = await getDoc(ref);
+
+  const btn = document.getElementById("savePostBtn");
+
+  if (snap.exists()) {
+    await deleteDoc(ref);
+    btn.classList.remove("saved");
+    btn.querySelector("span").textContent = "Save";
+    showToast("Removed from saved ads", "info");
+  } else {
+    await setDoc(ref, {
+      postId,
+      savedAt: Date.now()
+    });
+    btn.classList.add("saved");
+    btn.querySelector("span").textContent = "Saved";
+    showToast("Saved!", "success");
+  }
+}
 export async function init({ db, auth }) {
   const postId = sessionStorage.getItem("viewPostId");
   if (!postId) return loadView("home");
