@@ -66,7 +66,11 @@ export async function init({ auth: a, db: d }) {
   text,
   createdAt: Date.now()
 });
-
+await setDoc(doc(db, "conversations", convoId), {
+  lastMessage: text,
+  lastMessageSender: auth.currentUser.uid,
+  updatedAt: Date.now()
+}, { merge: true });
 // Update conversation metadata
 await setDoc(doc(db, "conversations", convoId), {
   lastMessage: text,
