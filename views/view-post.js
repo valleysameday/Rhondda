@@ -1,8 +1,10 @@
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { loadView } from "/index/js/main.js";
-import { doc, setDoc, deleteDoc, getDoc } from "firebase/firestore";
 
-async function toggleSave(postId) {
+/* ============================================================
+   SAVE / UNSAVE BUTTON
+============================================================ */
+async function toggleSave(postId, db, auth) {
   const uid = auth.currentUser?.uid;
   if (!uid) return showToast("Please log in to save ads", "error");
 
@@ -26,6 +28,10 @@ async function toggleSave(postId) {
     showToast("Saved!", "success");
   }
 }
+
+/* ============================================================
+   VIEW POST INITIALISATION
+============================================================ */
 export async function init({ db, auth }) {
   const postId = sessionStorage.getItem("viewPostId");
   if (!postId) return loadView("home");
@@ -51,7 +57,47 @@ export async function init({ db, auth }) {
     safeSetText("viewTime", post.posted || "Just now");
     ["viewPrice", "viewPriceMobile"].forEach(id => safeSetText(id, priceText));
 
-    // Messaging button
+    /* ============================================================
+       SAVE BUTTON — CHECK IF ALREADY SAVED
+    ============================================================ */
+    const saveBtn = document.getElementById("savePostBtn");
+    if (saveBtn && auth.currentUser) {
+      const uid = auth.currentUser.uid;
+      const savedRef = doc(db, "users", uid, "savedPosts", postId);
+      const savedSnap = await getDoc(savedRef);
+
+      if (savedSnap.exists()) {
+        saveBtn.classList.add("saved");
+        saveBtn.querySelector("span").textContent = "Saved";
+      }
+
+      saveBtn.addEventListener("click", () => toggleSave(postId, db, auth));
+    }
+
+    /* ============================================================
+       SHARE BUTTON
+    ============================================================ */
+    const shareBtn = document.getElementById("sharePostBtn");
+    if (shareBtn) {
+      shareBtn.addEventListener("click", async () => {
+        const url = window.location.href;
+
+        if (navigator.share) {
+          await navigator.share({
+            title: post.title,
+            text: "Check out this ad on Rhondda Noticeboard",
+            url
+          });
+        } else {
+          navigator.clipboard.writeText(url);
+          showToast("Link copied!", "success");
+        }
+      });
+    }
+
+    /* ============================================================
+       MESSAGE SELLER
+    ============================================================ */
     document.getElementById("messageSeller")?.addEventListener("click", async () => {
       const buyerId = auth.currentUser?.uid;
       const sellerId = post.userId;
@@ -75,18 +121,26 @@ export async function init({ db, auth }) {
       loadView("chat", { forceInit: true });
     });
 
+    /* ============================================================
+       BACK BUTTON
+    ============================================================ */
     document.getElementById("backToFeed").addEventListener("click", () => {
-  sessionStorage.removeItem("viewPostId");
-  loadView("home", { forceInit: true });
-});
+      sessionStorage.removeItem("viewPostId");
+      loadView("home", { forceInit: true });
+    });
 
+    /* ============================================================
+       REPORT BUTTON
+    ============================================================ */
     document.getElementById("reportPost")?.addEventListener("click", () => {
       if (confirm("Report this listing for review?")) {
         alert("Thank you. This listing has been flagged.");
       }
     });
 
-    // Gallery setup
+    /* ============================================================
+       GALLERY + LIGHTBOX (unchanged)
+    ============================================================ */
     const gallery = document.getElementById("galleryContainer");
     const dotsContainer = document.getElementById("galleryDots");
     if (!gallery) return;
@@ -129,7 +183,6 @@ export async function init({ db, auth }) {
     };
     updateSlide(0);
 
-    // Drag/zoom
     let startX = 0, dragging = false;
     gallery.addEventListener("touchstart", e => { if (e.touches.length === 1) { startX = e.touches[0].clientX; dragging = true; } });
     gallery.addEventListener("touchend", e => {
@@ -145,7 +198,6 @@ export async function init({ db, auth }) {
       slides[currentIndex].style.transform = `scale(${zoomLevel})`;
     });
 
-    // Lightbox
     const lightbox = document.getElementById("lightbox");
     const lightboxImg = document.getElementById("lightboxImage");
     const lightboxClose = document.getElementById("lightboxClose");
