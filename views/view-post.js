@@ -75,13 +75,15 @@ export async function init({ db, auth }) {
     }
 
     /* ============================================================
-       SHARE BUTTON
-    ============================================================ */
-    shareBtn.addEventListener("click", async () => {
-       const shareBtn = document.getElementById("sharePostBtn");
-  const url = window.location.href;
+   SHARE BUTTON
+============================================================ */
+const shareBtn = document.getElementById("sharePostBtn");
 
-  const shareText = `
+if (shareBtn) {
+  shareBtn.addEventListener("click", async () => {
+    const url = window.location.href;
+
+    const shareText = `
 🏷️ ${post.title}
 💷 ${post.price ? "£" + post.price : "Contact for price"}
 📍 ${post.location || "Rhondda"}
@@ -89,19 +91,20 @@ export async function init({ db, auth }) {
 
 View on Rhondda Noticeboard:
 ${url}
-  `.trim();
+    `.trim();
 
-  if (navigator.share) {
-    await navigator.share({
-      title: post.title,
-      text: shareText,
-      url
-    });
-  } else {
-    navigator.clipboard.writeText(shareText);
-    showToast("Share text copied!", "success");
-  }
-});
+    if (navigator.share) {
+      await navigator.share({
+        title: post.title,
+        text: shareText,
+        url
+      });
+    } else {
+      navigator.clipboard.writeText(shareText);
+      showToast("Share text copied!", "success");
+    }
+  });
+}
     /* ============================================================
        MESSAGE SELLER
     ============================================================ */
