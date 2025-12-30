@@ -174,27 +174,30 @@ export async function init({ db, auth }) {
     // REAL MESSAGING SYSTEM
     // ===============================
     async function startConversation(post) {
-      const buyerId = auth.currentUser?.uid;
-      const sellerId = post.userId;
+  const buyerId = auth.currentUser?.uid;
+  const sellerId = post.userId;
+  const postId = sessionStorage.getItem("viewPostId");
 
-      if (!buyerId) return loadView("login");
-      if (buyerId === sellerId) return;
+  if (!buyerId) return loadView("login");
+  if (buyerId === sellerId) return;
 
-      const convoId = [buyerId, sellerId].sort().join("_");
+  // NEW FORMAT: buyer_seller_postId
+  const convoId = `${buyerId}_${sellerId}_${postId}`;
 
-      await setDoc(
-        doc(db, "conversations", convoId),
-        {
-          participants: [buyerId, sellerId],
-          lastMessage: "",
-          lastMessageSender: "",
-          updatedAt: Date.now()
-        },
-        { merge: true }
-      );
+  await setDoc(
+    doc(db, "conversations", convoId),
+    {
+      participants: [buyerId, sellerId],
+      postId,
+      lastMessage: "",
+      lastMessageSender: "",
+      updatedAt: Date.now()
+    },
+    { merge: true }
+  );
 
-      sessionStorage.setItem("activeConversationId", convoId);
-      loadView("chat");
+  sessionStorage.setItem("activeConversationId", convoId);
+  loadView("chat");
     }
 
     // ===============================
