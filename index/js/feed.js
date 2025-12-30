@@ -1,4 +1,4 @@
-import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebase-firestore.js";
 import { initFeaturedAds } from '/index/js/featured-ads.js';
 import { loadView } from '/index/js/main.js';
 
@@ -17,6 +17,29 @@ export async function initFeed({ db }) {
     businessCheckbox.addEventListener('change', () => {
       businessBenefits.style.display = businessCheckbox.checked ? 'block' : 'none';
     });
+  }
+
+  /* =====================================================
+     SKELETON LOADER
+  ===================================================== */
+  function showSkeletons(count = 6) {
+    postsContainer.innerHTML = "";
+
+    for (let i = 0; i < count; i++) {
+      const skel = document.createElement("div");
+      skel.className = "feed-card skeleton-card";
+
+      skel.innerHTML = `
+        <div class="skeleton-img"></div>
+        <div class="skeleton-content">
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line"></div>
+        </div>
+      `;
+
+      postsContainer.appendChild(skel);
+    }
   }
 
   /* =====================================================
@@ -140,8 +163,6 @@ export async function initFeed({ db }) {
 
         <div class="feed-content">
           <h3 class="feed-title">${post.title}</h3>
-          
-
           <div class="feed-meta">
             ${buildMeta(post)}
           </div>
@@ -154,10 +175,7 @@ export async function initFeed({ db }) {
         <button class="report-btn" data-id="${post.id}" title="Report">⚑</button>
       `;
 
-      const cleanCard = card.cloneNode(true);
-card.replaceWith(cleanCard);
-
-cleanCard.addEventListener('click', e => {
+      card.addEventListener('click', e => {
         if (
           e.target.closest('.report-btn') ||
           e.target.closest('.cta-btn')
@@ -172,76 +190,53 @@ cleanCard.addEventListener('click', e => {
   }
 
   /* =====================================================
-     CATEGORY FILTER
+     WEATHER
   ===================================================== */
-  categoryBtns.forEach(btn => {
-    btn.addEventListener('click', async () => {
-      categoryBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+  async function loadWeather() {
+    const emojiEl = document.querySelector(".weather-emoji");
+    const textEl = document.querySelector(".weather-text");
+    if (!emojiEl || !textEl) return;
 
-      const posts = await fetchPosts();
-      renderPosts(posts, btn.dataset.category);
-    });
-  });
+    try {
+      const res = await fetch(
+        "https://api.open-meteo.com/v1/forecast?latitude=51.65&longitude=-3.45&current_weather=true&daily=sunrise,sunset&timezone=auto"
+      );
 
-  /* =====================================================
-     REPORT
-  ===================================================== */
-  document.addEventListener('click', e => {
-    if (!e.target.classList.contains('report-btn')) return;
-    const reason = prompt("Why are you reporting this post?");
-    if (!reason) return;
-    alert("Thanks — we’ll review this shortly.");
-  });
+      const data = await res.json();
+      const weather = data.current_weather;
+      const temp = Math.round(weather.temperature);
+      const code = weather.weathercode;
 
-/* =====================================================
-   WEATHER
-===================================================== */
-async function loadWeather() {
-  const emojiEl = document.querySelector(".weather-emoji");
-  const textEl = document.querySelector(".weather-text");
-  if (!emojiEl || !textEl) return;
+      const sunrise = new Date(data.daily.sunrise[0]);
+      const sunset = new Date(data.daily.sunset[0]);
+      const now = new Date(weather.time);
+      const isDay = now >= sunrise && now <= sunset;
 
-  try {
-    const res = await fetch(
-      "https://api.open-meteo.com/v1/forecast?latitude=51.65&longitude=-3.45&current_weather=true&daily=sunrise,sunset&timezone=auto"
-    );
+      let emoji = isDay ? "🌤️" : "🌙";
+      let message = isDay
+        ? "Another tidy day in the Rhondda"
+        : "Evening in the valley — cosy vibes";
 
-    const data = await res.json();
-    const weather = data.current_weather;
-    const temp = Math.round(weather.temperature);
-    const code = weather.weathercode;
+      // Rain / showers
+      if ([51, 61, 63, 65, 80, 81, 82].includes(code)) {
+        emoji = "🌧️";
+        message = "Bit wet out there — brolly weather";
+      }
 
-    const sunrise = new Date(data.daily.sunrise[0]);
-    const sunset = new Date(data.daily.sunset[0]);
-    const now = new Date(weather.time);
-    const isDay = now >= sunrise && now <= sunset;
+      // Snow
+      if ([71, 73, 75].includes(code)) {
+        emoji = "❄️";
+        message = "Cold snap in the valleys";
+      }
 
-    let emoji = isDay ? "🌤️" : "🌙";
-    let message = isDay
-      ? "Another tidy day in the Rhondda"
-      : "Evening in the valley — cosy vibes";
-
-    // Rain / showers
-    if ([51, 61, 63, 65, 80, 81, 82].includes(code)) {
-      emoji = "🌧️";
-      message = "Bit wet out there — brolly weather";
+      emojiEl.textContent = emoji;
+      textEl.textContent = `${message} · ${temp}°C`;
+    } catch (err) {
+      emojiEl.textContent = "📍";
+      textEl.textContent = "Rhondda — local updates available";
     }
-
-    // Snow
-    if ([71, 73, 75].includes(code)) {
-      emoji = "❄️";
-      message = "Cold snap in the valleys";
-    }
-
-    emojiEl.textContent = emoji;
-    textEl.textContent = `${message} · ${temp}°C`;
-
-  } catch (err) {
-    emojiEl.textContent = "📍";
-    textEl.textContent = "Rhondda — local updates available";
   }
-}
+
   /* =====================================================
      GREETING
   ===================================================== */
@@ -257,8 +252,33 @@ async function loadWeather() {
   }
 
   /* =====================================================
+     CATEGORY FILTER
+  ===================================================== */
+  categoryBtns.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      categoryBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      showSkeletons();
+      const posts = await fetchPosts();
+      renderPosts(posts, btn.dataset.category);
+    });
+  });
+
+  /* =====================================================
+     REPORT
+  ===================================================== */
+  document.addEventListener('click', e => {
+    if (!e.target.classList.contains('report-btn')) return;
+    const reason = prompt("Why are you reporting this post?");
+    if (!reason) return;
+    alert("Thanks — we’ll review this shortly.");
+  });
+
+  /* =====================================================
      INIT
   ===================================================== */
+  showSkeletons();
   const posts = await fetchPosts();
   renderPosts(posts);
   loadGreeting();
