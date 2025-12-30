@@ -124,6 +124,75 @@ body {
   border: 1px solid rgba(253,58,132,0.25);
 }
 
+/* ============================
+   SAVED ADS SECTION
+============================ */
+
+#savedPosts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+}
+
+/* Saved ad card */
+.dash-post-card {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.dash-post-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+}
+
+/* Image */
+.dash-post-card .dash-post-img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  background: #f3f4f6;
+}
+
+/* Info */
+.dash-post-card .dash-post-info {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dash-post-card .dash-post-info h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.2;
+  max-height: 2.4em;
+  overflow: hidden;
+}
+
+.dash-post-card .dash-post-info p {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+/* Empty state */
+#savedPosts p {
+  text-align: center;
+  width: 100%;
+  padding: 20px 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
 .stat-number {
   font-weight: 700;
   font-size: 1.05rem;
