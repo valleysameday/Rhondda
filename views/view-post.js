@@ -20,6 +20,39 @@ export async function init({ db, auth }) {
     const post = postSnap.data();
     const priceText = post.price ? `£${post.price}` : "Contact for price";
 
+// ===============================
+// CONTACT NUMBER REVEAL LOGIC
+// ===============================
+
+const revealBtn = document.getElementById("revealNumberBtn");
+const revealedBox = document.getElementById("revealedNumber");
+
+// Only show the reveal button if the post has a number
+if (post.contact) {
+  revealBtn.style.display = "block";
+} else {
+  revealBtn.style.display = "none";
+}
+
+revealBtn.addEventListener("click", () => {
+  const ok = confirm(
+    "This phone number is only to be used to contact the seller about this ad. Do you agree?"
+  );
+
+  if (!ok) return;
+
+  // Reveal number
+  revealedBox.textContent = post.contact;
+  revealedBox.style.display = "block";
+
+  // Change button text
+  revealBtn.textContent = "Call Seller";
+
+  // Make button dial the number
+  revealBtn.onclick = () => {
+    window.location.href = `tel:${post.contact}`;
+  };
+});
     // ===== TEXT INFO =====
     const safeSetText = (id, text) => {
       const el = document.getElementById(id);
