@@ -1,11 +1,7 @@
 import { getFirebase } from '/index/js/firebase/init.js';
-import {
-  collection, addDoc, doc, getDoc
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, addDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let auth, db, storage;
-
-// State
 let selectedCategory = null;
 let propertyType = null;
 let rentFrequency = null;
@@ -18,23 +14,16 @@ getFirebase().then(fb => {
 });
 
 function initPostGate() {
-
-  /* =====================================================
-     STEP FLOW (4 STEPS)
-  ===================================================== */
   const steps = [...document.querySelectorAll('#posts-grid .post-step')];
   const dots = [...document.querySelectorAll('.post-progress .dot')];
   let stepIndex = 0;
 
   function showStep(i) {
     if (i < 0 || i >= steps.length) return;
-
     steps.forEach(s => s.classList.remove('active'));
     dots.forEach(d => d.classList.remove('active'));
-
     steps[i].classList.add('active');
     dots[i].classList.add('active');
-
     stepIndex = i;
     if (i === 1) validateStep2();
   }
@@ -49,16 +38,11 @@ function initPostGate() {
     btn.addEventListener('click', () => showStep(stepIndex - 1))
   );
 
-  /* =====================================================
-     ELEMENTS
-  ===================================================== */
   const titleInput = document.getElementById('postTitle');
   const descInput = document.getElementById('postDescription');
   const nextBtn = document.querySelector('.post-step[data-step="2"] .post-next');
-
   const priceInput = document.getElementById('postPrice');
   const priceLabel = document.querySelector('label[for="postPrice"]');
-
   const contactInput = document.getElementById('postContact');
   const locationInput = document.getElementById('postLocation');
 
@@ -77,13 +61,10 @@ function initPostGate() {
   const submitBtn = document.getElementById('postSubmitBtn');
   const imagesInput = document.getElementById('postImages');
 
-  /* =====================================================
-     CATEGORY SELECTION
-  ===================================================== */
+  // CATEGORY SELECT
   document.querySelectorAll('[data-category]').forEach(btn => {
     btn.addEventListener('click', () => {
       selectedCategory = btn.dataset.category;
-
       propertyType = null;
       rentFrequency = null;
 
@@ -105,9 +86,7 @@ function initPostGate() {
     });
   });
 
-  /* =====================================================
-     PROPERTY TYPE
-  ===================================================== */
+  // PROPERTY TYPE
   propertyBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       propertyType = btn.dataset.propertyType;
@@ -126,44 +105,33 @@ function initPostGate() {
     });
   });
 
-  /* =====================================================
-     RENT FREQUENCY
-  ===================================================== */
+  // RENT FREQUENCY
   rentBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       rentFrequency = btn.dataset.rentFrequency;
-
       rentBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-
       updatePriceLabel();
       validateStep2();
     });
   });
 
-  /* =====================================================
-     COMMUNITY TYPE
-  ===================================================== */
+  // COMMUNITY EXTRA
   if (communityTypeSelect) {
     communityTypeSelect.addEventListener('change', e => {
       lostFoundExtra.hidden = e.target.value !== 'lost';
     });
   }
 
-  /* =====================================================
-     VALIDATION FOR STEP 2
-  ===================================================== */
+  // VALIDATION
   function validateStep2() {
     const titleOk = titleInput.value.trim().length >= 3;
     const descOk = descInput.value.trim().length >= 10;
 
     let propertyOk = true;
-
     if (selectedCategory === 'property') {
       propertyOk = !!propertyType;
-      if (propertyType === 'rent') {
-        propertyOk = !!rentFrequency;
-      }
+      if (propertyType === 'rent') propertyOk = !!rentFrequency;
     }
 
     nextBtn.disabled = !(titleOk && descOk && propertyOk);
@@ -174,9 +142,6 @@ function initPostGate() {
     descInput.addEventListener(evt, validateStep2);
   });
 
-  /* =====================================================
-     PRICE LABEL LOGIC
-  ===================================================== */
   function updatePriceLabel() {
     if (selectedCategory !== 'property') {
       priceLabel.textContent = 'Price (£)';
@@ -196,87 +161,7 @@ function initPostGate() {
     }
   }
 
-  /* =====================================================
-     TOASTS
-  ===================================================== */
-  function showToast(message, type = "info") {
-    let container = document.querySelector('.toast-container');
-    if (!container) {
-      container = document.createElement('div');
-      container.className = 'toast-container';
-      container.style.position = 'fixed';
-      container.style.bottom = '16px';
-      container.style.left = '50%';
-      container.style.transform = 'translateX(-50%)';
-      container.style.zIndex = '99999';
-      container.style.display = 'flex';
-      container.style.flexDirection = 'column';
-      container.style.gap = '8px';
-      document.body.appendChild(container);
-    }
-
-    const toast = document.createElement('div');
-    toast.textContent = message;
-    toast.style.padding = '10px 14px';
-    toast.style.borderRadius = '999px';
-    toast.style.fontSize = '.9rem';
-    toast.style.color = '#fff';
-    toast.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
-    toast.style.background =
-      type === 'error' ? '#ef4444' :
-      type === 'success' ? '#16a34a' :
-      '#4b5563';
-
-    container.appendChild(toast);
-
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transition = 'opacity 0.2s ease';
-      setTimeout(() => toast.remove(), 200);
-    }, 2600);
-  }
-
-  /* =====================================================
-     IMAGE COMPRESSION
-  ===================================================== */
-  function compressImage(file, maxSize = 1280, quality = 0.72) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onerror = reject;
-      reader.onload = e => {
-        const img = new Image();
-        img.onload = () => {
-          let { width, height } = img;
-
-          if (width > height && width > maxSize) {
-            height = Math.round((height * maxSize) / width);
-            width = maxSize;
-          } else if (height > width && height > maxSize) {
-            width = Math.round((width * maxSize) / height);
-            height = maxSize;
-          }
-
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-
-          canvas.toBlob(
-            blob => blob ? resolve(blob) : reject("Compression failed"),
-            'image/jpeg',
-            quality
-          );
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-
-  /* =====================================================
-     SUBMIT POST
-  ===================================================== */
+  // SUBMIT POST
   submitBtn.addEventListener('click', submitPost);
 
   async function submitPost() {
@@ -286,11 +171,13 @@ function initPostGate() {
         return;
       }
 
-      // ⭐ Check if user is business
       const userSnap = await getDoc(doc(db, "users", auth.currentUser.uid));
       const isBusiness = userSnap.exists() && userSnap.data().isBusiness === true;
 
-      // ⭐ Build post object
+      // ⭐ COLLECT PROPERTY FEATURES
+      const featureInputs = document.querySelectorAll('.property-features input:checked');
+      const propertyFeatures = [...featureInputs].map(i => i.dataset.feature);
+
       const post = {
         userId: auth.currentUser.uid,
         businessId: isBusiness ? auth.currentUser.uid : null,
@@ -309,6 +196,7 @@ function initPostGate() {
 
         propertyType,
         rentFrequency,
+        propertyFeatures, // ⭐ ADDED
 
         condition: document.getElementById("postCondition")?.value || null,
         delivery: document.getElementById("postDelivery")?.value || null,
@@ -329,7 +217,7 @@ function initPostGate() {
         images: []
       };
 
-      // ⭐ Upload images
+      // IMAGES
       if (imagesInput.files.length > 0) {
         for (let file of imagesInput.files) {
           const compressed = await compressImage(file);
@@ -341,11 +229,9 @@ function initPostGate() {
         }
       }
 
-      // ⭐ Save to Firestore
       await addDoc(collection(db, "posts"), post);
 
       showToast("Your ad is live!", "success");
-
       document.querySelector('[data-action="close-screens"]').click();
       loadView("home");
 
