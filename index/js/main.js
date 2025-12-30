@@ -111,9 +111,8 @@ window.isBusinessUser = snap.exists() && snap.data().isBusiness === true;
      document.getElementById("openChatList")?.addEventListener("click", e => {
   e.preventDefault();
 
-  const user = auth.currentUser;
-
-  if (!user) {
+  if (!auth.currentUser) {
+    sessionStorage.setItem("redirectAfterLogin", "chat-list");  // ⭐ remember intent
     openScreen("login");
     return;
   }
