@@ -35,27 +35,7 @@ export function initUIRouter() {
     openScreen('post');
   });
 
-document.getElementById("openChatList")?.addEventListener("click", e => {
-  e.preventDefault();
-  loadView("chat-list");
-});
-  
-  document.getElementById('openChatView')?.addEventListener('click', e => {
-  e.preventDefault();
-  loadView("chat");
-});
-  document.getElementById("openChatList")?.addEventListener("click", e => {
-  e.preventDefault();
 
-  const user = auth.currentUser;
-
-  if (!user) {
-    loadView("login");
-    return;
-  }
-
-  loadView("chat-list");
-});
   /* -------------------- LOGIN LINKS -------------------- */
   document.getElementById('openLoginModal')?.addEventListener('click', e => {
     e.preventDefault();
