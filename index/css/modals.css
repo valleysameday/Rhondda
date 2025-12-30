@@ -1,196 +1,116 @@
-/* ================= MODAL FUN & MODERN ================= */
-body.modal-open {
-    overflow: hidden;
-}
-body.modal-open main {
-    filter: blur(3px);
-    opacity: 0.35;
-    pointer-events: none;
-}
+/* =====================================================
+   POST MODAL — CORE LAYOUT
+===================================================== */
 
-.modal {
-    position: fixed;
-    inset: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0,0,0,0.45);
-    backdrop-filter: blur(4px);
-    z-index: 9999;
-}
-.modal.active {
-    display: flex;
-}
-
-.modal-content {
-    background: #fff;
-    width: 90%;
-    max-width: 420px;
-    padding: 28px;
-    border-radius: 20px;
-    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
-    position: relative;
-    animation: popIn 0.25s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.modal .close {
-    position: absolute;
-    top: 16px;
-    right: 18px;
-    font-size: 24px;
-    cursor: pointer;
-    opacity: 0.6;
-    transition: opacity 0.2s ease;
-}
-.modal .close:hover { opacity: 1; }
-
-.modal-content input,
-.modal-content textarea,
-.modal-content select {
-    width: 100%;
-    padding: 16px 14px;
-    border-radius: 16px;
-    border: 1px solid #ddd;
-    font-size: 16px;
-    background: #f9f9f9;
-    box-shadow: inset 0 3px 8px rgba(0,0,0,0.06);
-    transition: all 0.25s ease;
-}
-.modal-content input:focus,
-.modal-content textarea:focus,
-.modal-content select:focus {
-    outline: none;
-    border-color: #FF7EB3;
-    box-shadow: 0 0 0 3px rgba(255,126,179,0.15);
-}
-
-.modal-content button {
-    padding: 14px 0;
-    border-radius: 24px;
-    font-size: 16px;
-    font-weight: 600;
-    background: linear-gradient(135deg, #FF7EB3, #FF758C);
-    color: #fff;
-    cursor: pointer;
-    box-shadow: 0 6px 18px rgba(255,126,179,0.3);
-    transition: all 0.25s ease;
-    border: none;
-}
-.modal-content button:hover {
-    transform: translateY(-2px);
-    opacity: 0.95;
-    box-shadow: 0 10px 25px rgba(255,126,179,0.35);
-}
-
-.modal-switch {
-    margin-top: 14px;
-    font-size: 13px;
-    text-align: center;
-}
-.modal-switch span {
-    color: #FF7EB3;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    font-size: 0.95rem;
-    margin-bottom: 12px;
-    gap: 8px;
-}
-
-@keyframes popIn {
-    from { transform: scale(0.95); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-.business-benefits {
-    display: none;                 /* hidden by default */
-    background: #fff0f5;           /* soft pink background */
-    border: 1px solid #ff7eb3;     /* accent border */
-    border-radius: 12px;
-    padding: 14px 16px;
-    margin-top: 12px;
-    box-shadow: 0 6px 18px rgba(255,126,179,0.25);
-    font-size: 0.9rem;
-    color: #333;
-    animation: fadeSlide 0.3s ease forwards;
-}
-
-.business-benefits h4 {
-    font-size: 1rem;
-    margin-bottom: 6px;
-    color: #ff4f8b;
-}
-
-.business-benefits ul {
-    list-style: disc;
-    margin-left: 18px;
-}
-
-@keyframes fadeSlide {
-    0% { opacity: 0; transform: translateY(-8px); }
-    100% { opacity: 1; transform: translateY(0); }
-}
-.subcategory-wrapper,
-.price-wrapper {
+#posts-grid.modal {
+  position: fixed;
+  inset: 0;
   display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
 }
 
-
-.photo-uploader {
-  margin-top: 12px;
+#posts-grid.modal.active {
+  display: flex;
 }
 
-.image-preview-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: 8px;
-  margin-top: 10px;
+#posts-grid .modal-content {
+  background: #fff;
+  width: 90%;
+  max-width: 440px;
+  padding: 28px 20px 24px;
+  border-radius: 20px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+  position: relative;
+  animation: popIn 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.image-preview-grid img {
+/* Close button */
+#posts-grid .close {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  font-size: 24px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+#posts-grid .close:hover {
+  opacity: 1;
+}
+
+/* =====================================================
+   FORM ELEMENTS
+===================================================== */
+
+#posts-grid input,
+#posts-grid textarea,
+#posts-grid select {
   width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  border-radius: 8px;
+  padding: 16px 14px;
+  border-radius: 16px;
   border: 1px solid #ddd;
+  font-size: 16px;
+  background: #f9f9f9;
+  box-shadow: inset 0 3px 8px rgba(0,0,0,0.06);
+  transition: all 0.25s ease;
 }
 
-.ghost-btn {
+#posts-grid input:focus,
+#posts-grid textarea:focus,
+#posts-grid select:focus {
+  outline: none;
+  border-color: #FF7EB3;
+  box-shadow: 0 0 0 3px rgba(255,126,179,0.15);
+}
+
+/* Buttons */
+#posts-grid button {
+  padding: 14px 0;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #FF7EB3, #FF758C);
+  color: #fff;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 6px 18px rgba(255,126,179,0.3);
+  transition: all 0.25s ease;
+}
+
+#posts-grid button:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+  box-shadow: 0 10px 25px rgba(255,126,179,0.35);
+}
+
+#posts-grid button:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Ghost button */
+#posts-grid .ghost-btn {
   background: #f5f5f5;
   border: 1px dashed #bbb;
-  padding: 10px;
-  border-radius: 10px;
-  cursor: pointer;
+  color: #333;
 }
 
-.hint-text {
-  display: block;
-  font-size: 12px;
-  color: #666;
-  margin-top: 4px;
-}
+/* =====================================================
+   STEP SYSTEM
+===================================================== */
 
-/* ================= POST AD FLOW ONLY ================= */
-
-/* Scope everything to the post modal */
-#posts-grid .modal-content {
-  max-width: 440px;
-  padding-top: 20px;
-}
-
-/* Hide all steps by default */
 #posts-grid .post-step {
   display: none;
   animation: slideIn 0.25s ease;
 }
 
-/* Show active step only */
 #posts-grid .post-step.active {
   display: flex;
   flex-direction: column;
@@ -206,7 +126,40 @@ body.modal-open main {
   margin-bottom: 6px;
 }
 
-/* ================= CATEGORY GRID ================= */
+/* Navigation buttons */
+.post-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+/* =====================================================
+   PROGRESS DOTS
+===================================================== */
+
+.post-progress {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.post-progress .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  transition: background 0.2s ease;
+}
+
+.post-progress .dot.active {
+  background: #FF7EB3;
+}
+
+/* =====================================================
+   CATEGORY GRID
+===================================================== */
 
 .category-grid {
   display: grid;
@@ -236,64 +189,57 @@ body.modal-open main {
   transform: scale(0.97);
 }
 
-/* ================= NAV BUTTONS ================= */
+/* =====================================================
+   CATEGORY-SPECIFIC BLOCKS
+===================================================== */
 
-.post-nav {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
+.forsale-options,
+.jobs-options,
+.events-options,
+.community-options,
+.property-options {
+  display: none;
+  margin-top: 6px;
+}
+
+#lostFoundExtra {
+  display: none;
+}
+
+/* =====================================================
+   IMAGE UPLOADER
+===================================================== */
+
+.photo-uploader {
+  margin-top: 12px;
+}
+
+.image-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
   margin-top: 10px;
 }
 
-#posts-grid .primary-btn {
-  flex: 1;
-  background: linear-gradient(135deg, #FF7EB3, #FF758C);
-  color: #fff;
-}
-
-#posts-grid .ghost-btn {
-  flex: 1;
-}
-
-/* Disabled continue */
-#posts-grid button:disabled {
-  opacity: 0.4;
-  pointer-events: none;
-}
-
-/* ================= PROGRESS DOTS ================= */
-
-.post-progress {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.post-progress .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #e2e8f0;
-  transition: background 0.2s ease;
-}
-
-.post-progress .dot.active {
-  background: #FF7EB3;
-}
-
-/* ================= IMAGE UPLOADER ================= */
-
-#posts-grid .photo-uploader {
-  margin-top: 8px;
-}
-
-#posts-grid .image-preview-grid img {
+.image-preview-grid img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
 }
 
-/* ================= FEEDBACK ================= */
+/* Hint text */
+.hint-text {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* =====================================================
+   FEEDBACK
+===================================================== */
 
 #posts-grid .feedback-text {
   text-align: center;
@@ -301,15 +247,16 @@ body.modal-open main {
   color: #475569;
 }
 
-/* ================= ANIMATIONS ================= */
+/* =====================================================
+   ANIMATIONS
+===================================================== */
+
+@keyframes popIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
 
 @keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
