@@ -208,6 +208,7 @@ export async function init({ db, auth }) {
       ?.addEventListener("click", () => startConversation(post));
 
 document.getElementById("backToFeed").addEventListener("click", () => {
+  sessionStorage.removeItem("viewPostId");   // ⭐ FIX
   loadView("home");
 });
     
