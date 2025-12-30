@@ -57,15 +57,24 @@ export function openLoginModal(auth, db) {
       const cred = await signInWithEmailAndPassword(auth, email, password);
       console.log("🟢 Firebase login success:", cred.user.uid);
 
-      
-
       const snap = await getDoc(doc(db, "users", cred.user.uid));
-window.firebaseUserDoc = snap.exists() ? snap.data() : null;
+      window.firebaseUserDoc = snap.exists() ? snap.data() : null;
 
       feedback.textContent = "Login successful!";
       closeModal();
 
-      console.log("🟡 Triggering account modal click for routing");
+      // ⭐ REDIRECT LOGIC
+      const redirect = sessionStorage.getItem("redirectAfterLogin");
+
+      if (redirect === "chat-list") {
+        console.log("🔵 Redirecting to chat-list after login");
+        sessionStorage.removeItem("redirectAfterLogin");
+        loadView("chat-list");
+        return;
+      }
+
+      // Default behaviour → go to Account
+      console.log("🟢 Opening account modal after login");
       document.getElementById("openAccountModal").click();
 
     } catch (err) {
