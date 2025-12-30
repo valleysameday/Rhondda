@@ -34,30 +34,42 @@ export async function init({ auth: a, db: d }) {
   const adTitle = document.getElementById("chatAdTitle");
   const adPrice = document.getElementById("chatAdPrice");
 
-  // ConvoId format: buyer_seller_postId
+  // ConvoId format MUST be: buyer_seller_postId
   const parts = convoId.split("_");
-  if (parts.length !== 3) return loadView("chat-list");
+
+  // If convoId is not in the new format, clear it and send them back
+  if (parts.length !== 3) {
+    console.warn("Invalid conversation ID format, resetting:", convoId);
+    sessionStorage.removeItem("activeConversationId");
+    return loadView("chat-list");
+  }
 
   const [userA, userB, postId] = parts;
   const otherUserId = user.uid === userA ? userB : userA;
 
   // Load other user's info
   const otherSnap = await getDoc(doc(db, "users", otherUserId));
-  headerName.textContent = otherSnap.exists() ? otherSnap.data().name : "Chat";
+  headerName.textContent = otherSnap.exists() ? (otherSnap.data().name || "Chat") : "Chat";
 
   // Load ad snippet
-  const postSnap = await getDoc(doc(db, "posts", postId));
-  if (postSnap.exists()) {
-    const post = postSnap.data();
-    adImage.src = post.images?.[0] || "/images/image-webholder.webp";
-    adTitle.textContent = post.title || "Item";
-    adPrice.textContent = post.price ? `£${post.price}` : "No price";
+  try {
+    const postSnap = await getDoc(doc(db, "posts", postId));
+    if (postSnap.exists()) {
+      const post = postSnap.data();
 
-    adPreview.onclick = () => {
-      sessionStorage.setItem("viewPostId", postId);
-      loadView("view-post");
-    };
-  } else {
+      adImage.src = post.images?.[0] || "/images/image-webholder.webp";
+      adTitle.textContent = post.title || "Item";
+      adPrice.textContent = post.price ? `£${post.price}` : "No price";
+
+      adPreview.onclick = () => {
+        sessionStorage.setItem("viewPostId", postId);
+        loadView("view-post");
+      };
+    } else {
+      adPreview.style.display = "none";
+    }
+  } catch (err) {
+    console.error("Error loading ad for chat:", err);
     adPreview.style.display = "none";
   }
 
@@ -67,10 +79,14 @@ export async function init({ auth: a, db: d }) {
 
   onSnapshot(messagesQuery, (snap) => {
     chatMessages.innerHTML = "";
+
     snap.forEach(docSnap => {
       const msg = docSnap.data();
+
       const bubble = document.createElement("div");
-      bubble.className = msg.senderId === user.uid ? "chat-bubble me" : "chat-bubble them";
+      bubble.className = msg.senderId === user.uid
+        ? "chat-bubble me"
+        : "chat-bubble them";
 
       const text = document.createElement("p");
       text.className = "bubble-text";
@@ -84,6 +100,7 @@ export async function init({ auth: a, db: d }) {
       bubble.appendChild(time);
       chatMessages.appendChild(bubble);
     });
+
     chatMessages.scrollTop = chatMessages.scrollHeight;
   });
 
@@ -101,22 +118,30 @@ export async function init({ auth: a, db: d }) {
       seen: false
     });
 
-    // Update convo
-    await setDoc(doc(db, "conversations", convoId), {
-      lastMessage: text,
-      lastMessageSender: user.uid,
-      updatedAt: now
-    }, { merge: true });
+    await setDoc(
+      doc(db, "conversations", convoId),
+      {
+        lastMessage: text,
+        lastMessageSender: user.uid,
+        updatedAt: now
+      },
+      { merge: true }
+    );
 
     chatInput.value = "";
   };
 
-  // Back button works
-  backBtn.onclick = () => loadView("chat-list");
+  // Back button
+  backBtn.onclick = () => {
+    loadView("chat-list");
+  };
 }
 
+// Time ago formatter
 function timeAgo(timestamp) {
+  if (!timestamp) return "";
   const seconds = Math.floor((Date.now() - timestamp) / 1000);
+
   if (seconds < 60) return "Just now";
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
   if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
