@@ -70,11 +70,11 @@ export async function init({ auth: a, db: d }) {
     chatInput.value = "";
   };
 
-  // Back button
-  backBtn.onclick = () => {
-    const user = auth.currentUser;
-    if (!user) return loadView("home");
+// Back button
+backBtn.onclick = () => {
+  const user = auth.currentUser;
+  if (!user) return loadView("home");
 
-    loadView("general-dashboard");
-  };
+  loadView("chat-list");
+};
 }
