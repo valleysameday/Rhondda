@@ -219,12 +219,12 @@
   transform: scale(0.97);
 }
 
-.follow-btn.following {
+.follow-btn.followers {
   background: #1cc88a; /* Green when following */
 }
 
 /* FOLLOWING COUNT */
-.seller-following {
+.seller-followers {
   background: #fff;
   padding: 14px;
   border-radius: 12px;
