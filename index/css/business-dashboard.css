@@ -474,3 +474,27 @@ body {
   font-size: 13px;
   color: #666;
 }
+.follower-mini-card {
+  width: 180px;
+  margin: 0 auto 20px auto; /* centres it */
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 14px;
+  text-align: center;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+  border: 1px solid #e6e6e6;
+}
+
+.follower-mini-card h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+}
+
+.follower-mini-card p {
+  margin: 8px 0 0 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: #4e73df; /* matches your blue theme */
+}
