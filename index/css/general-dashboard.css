@@ -529,3 +529,20 @@ body {
 .logout-card p {
   margin: 0 0 0.2rem;
 }
+.follow-update-card {
+  display: flex;
+  gap: 12px;
+  background: #fff;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  border: 1px solid #e6e6e6;
+}
+
+.follow-update-card img {
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  object-fit: cover;
+}
