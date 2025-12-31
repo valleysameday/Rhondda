@@ -44,8 +44,12 @@ export async function init({ db, auth }) {
 
     const post = postSnap.data();
     const priceText = post.price ? `£${post.price}` : "Contact for price";
-
-    const safeSetText = (id, text) => {
+document.getElementById("viewSellerProfileBtn").onclick = () => {
+  sessionStorage.setItem("profileUserId", post.userId);
+  loadView("seller-profile", { forceInit: true });
+};
+ 
+     const safeSetText = (id, text) => {
       const el = document.getElementById(id);
       if (el) el.textContent = text;
     };
