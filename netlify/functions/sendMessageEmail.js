@@ -16,7 +16,7 @@ export default async (req) => {
     console.log("API KEY PRESENT:", !!apiKey);
 
     const payload = {
-      from: "Rhondda Noticeboard <noreply@rnb.wales>",
+      from: "Rhondda Noticeboard <onboarding@resend.dev>",
       to: sellerEmail,
       subject: `New message about: ${postTitle}`,
       html: `
