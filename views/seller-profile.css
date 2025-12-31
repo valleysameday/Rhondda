@@ -194,4 +194,8 @@
 .post-desc {
   font-size: 13px;
   color: #666;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* show only 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
