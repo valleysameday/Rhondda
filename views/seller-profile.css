@@ -1,85 +1,105 @@
+/* PAGE WRAPPER */
 .seller-profile-page {
-  padding: 15px;
+  padding: 18px;
   max-width: 600px;
   margin: auto;
+  background: #f2f3f7;
 }
 
+/* BACK BUTTON */
 .back-btn {
   background: none;
   border: none;
-  font-size: 18px;
-  margin-bottom: 10px;
+  font-size: 20px;
+  margin-bottom: 12px;
   cursor: pointer;
+  font-weight: 600;
 }
 
+/* BANNER */
 .seller-banner {
-  height: 120px;
+  height: 140px;
   background: linear-gradient(135deg, #4e73df, #1cc88a);
-  border-radius: 10px;
+  border-radius: 14px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
+/* AVATAR */
 .seller-avatar-wrapper {
   display: flex;
   justify-content: center;
-  margin-top: -40px;
+  margin-top: -50px;
 }
 
 .seller-avatar {
-  width: 80px;
-  height: 80px;
+  width: 95px;
+  height: 95px;
   border-radius: 50%;
   background: #ddd;
-  border: 4px solid white;
+  border: 5px solid white;
   background-size: cover;
   background-position: center;
-  font-size: 32px;
+  font-size: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
+/* BUSINESS RIBBON */
 .business-ribbon {
   display: none;
   background: #1A73E8;
   color: white;
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
   text-align: center;
-  margin: 10px auto;
+  margin: 14px auto;
   width: fit-content;
+  font-weight: 600;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
 }
 
+/* NAME + RELIABILITY */
 .seller-header {
   text-align: center;
-  margin-top: 10px;
+  margin-top: 14px;
+}
+
+.seller-header h2 {
+  font-size: 22px;
+  font-weight: 700;
 }
 
 .seller-reliability {
-  color: #666;
-  font-size: 14px;
+  color: #555;
+  font-size: 15px;
+  margin-top: 4px;
 }
 
+/* BADGES */
 .badge-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin: 15px 0;
+  gap: 10px;
+  margin: 18px 0;
   justify-content: center;
 }
 
 .badge-pill {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   background: #fff;
-  padding: 6px 10px;
-  border-radius: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 8px 12px;
+  border-radius: 22px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  border: 1px solid #e6e6e6;
 }
 
 .badge-pill svg {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
 }
 
 .badge-label {
@@ -87,67 +107,88 @@
   font-weight: 600;
 }
 
+/* STATS CARD */
 .seller-stats {
-  margin: 15px 0;
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  margin: 18px 0;
   text-align: center;
-  font-size: 15px;
-  color: #444;
+  font-size: 16px;
+  color: #333;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+  border: 1px solid #e6e6e6;
 }
 
+/* BIO CARD */
 .seller-bio {
-  background: #f7f7f7;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 15px;
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 18px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+  border: 1px solid #e6e6e6;
+  font-size: 15px;
+  line-height: 1.4;
 }
 
+/* BUSINESS INFO CARD */
 .business-info {
-  background: #f5f7ff;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 15px;
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 18px;
   display: none;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+  border: 1px solid #e6e6e6;
 }
 
+/* CONTACT BUTTON */
 .primary-btn {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   background: #1cc88a;
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  margin-bottom: 20px;
+  border-radius: 10px;
+  font-size: 17px;
+  margin-bottom: 22px;
   cursor: pointer;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
+/* OTHER ADS GRID */
 .posts-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 14px;
 }
 
 .post-card {
   background: white;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+  border: 1px solid #e6e6e6;
 }
 
 .post-image img {
   width: 100%;
-  height: 110px;
+  height: 120px;
   object-fit: cover;
 }
 
 .post-body {
-  padding: 8px;
+  padding: 10px;
 }
 
 .post-body h3 {
   font-size: 15px;
   margin: 0;
+  font-weight: 600;
 }
 
 .post-desc {
