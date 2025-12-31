@@ -25,32 +25,45 @@ export async function init({ auth: a, db: d }) {
 
   const user = profileSnap.data();
 
+  /* ---------------- SAFE NAME ---------------- */
+  const safeName =
+    user.name ||
+    user.displayName ||
+    user.fullName ||
+    "User";
+
   /* ---------------- Avatar ---------------- */
   const avatar = document.getElementById("sellerAvatar");
+
   if (user.avatarUrl) {
     avatar.style.backgroundImage = `url(${user.avatarUrl})`;
   } else {
-    const initials = user.name
+    const initials = safeName
       .split(" ")
       .map(n => n[0])
       .join("")
       .toUpperCase();
+
     avatar.textContent = initials;
   }
 
   /* ---------------- Name ---------------- */
-  document.getElementById("sellerName").textContent = user.name;
+  document.getElementById("sellerName").textContent = safeName;
 
   /* ---------------- Reliability ---------------- */
+  const joinedDate = user.joined
+    ? new Date(user.joined).toLocaleDateString()
+    : "Unknown";
+
   document.getElementById("sellerReliability").textContent =
-    `Member since ${new Date(user.joined).toLocaleDateString()}`;
+    `Member since ${joinedDate}`;
 
   /* ---------------- Stats ---------------- */
   const stats = {
     completedJobs: user.completedJobs || 0,
     avgReplyTime: user.avgReplyTime || 999,
     communityEvents: user.communityEvents || 0,
-    lastActiveHour: user.lastActiveHour || 12,
+    lastActiveHour: user.lastActiveHour ?? 12,
     loginStreak: user.loginStreak || 0,
     freebieClicks: user.freebieClicks || 0,
     firstInCategory: user.firstInCategory || false,
@@ -84,7 +97,10 @@ export async function init({ auth: a, db: d }) {
 
   /* ---------------- Contact Seller ---------------- */
   document.getElementById("contactSellerBtn").onclick = () => {
-    sessionStorage.setItem("activeConversationId", `${auth.currentUser.uid}_${userId}`);
+    sessionStorage.setItem(
+      "activeConversationId",
+      `${auth.currentUser.uid}_${userId}`
+    );
     loadView("chat", { forceInit: true });
   };
 
