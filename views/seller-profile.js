@@ -120,6 +120,16 @@ export async function init({ auth: a, db: d }) {
   };
 }
 
+function showFollowToast(message) {
+  const toast = document.getElementById("followToast");
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3500);
+}
+
 /* ---------------- FOLLOW SYSTEM ---------------- */
 async function setupFollowButton(sellerId) {
   const btn = document.getElementById("followSellerBtn");
@@ -141,21 +151,50 @@ async function setupFollowButton(sellerId) {
   btn.textContent = isFollowing ? "Following ✓" : "Follow Seller";
 
   btn.onclick = async () => {
-if (isFollowing) {
-  await deleteDoc(followingRef);
-  await deleteDoc(followerRef);
-  btn.textContent = "Follow Seller";
-  btn.classList.remove("following");
-  isFollowing = false;
-} else {
-  await setDoc(followingRef, { followedAt: Date.now() });
-  await setDoc(followerRef, { followedAt: Date.now() });
-  btn.textContent = "Following ✓";
-  btn.classList.add("following");
-  isFollowing = true;
-}
-    
-  };
+  if (isFollowing) {
+    // UNFOLLOW
+    await deleteDoc(followingRef);
+    await deleteDoc(followerRef);
+
+    btn.textContent = "Follow Seller";
+    btn.classList.remove("following");
+    isFollowing = false;
+
+    showFollowToast(`You’ve unfollowed ${safeName}.`);
+  } else {
+    // FOLLOW
+    await setDoc(followingRef, { followedAt: Date.now() });
+    await setDoc(followerRef, { followedAt: Date.now() });
+
+    btn.textContent = "Following ✓";
+    btn.classList.add("following");
+    isFollowing = true;
+
+    showFollowToast(`You’re now following ${safeName}. Updates will appear in your dashboard.`);
+  }
+};btn.onclick = async () => {
+  if (isFollowing) {
+    // UNFOLLOW
+    await deleteDoc(followingRef);
+    await deleteDoc(followerRef);
+
+    btn.textContent = "Follow Seller";
+    btn.classList.remove("following");
+    isFollowing = false;
+
+    showFollowToast(`You’ve unfollowed ${safeName}.`);
+  } else {
+    // FOLLOW
+    await setDoc(followingRef, { followedAt: Date.now() });
+    await setDoc(followerRef, { followedAt: Date.now() });
+
+    btn.textContent = "Following ✓";
+    btn.classList.add("following");
+    isFollowing = true;
+
+    showFollowToast(`You’re now following ${safeName}. Updates will appear in your dashboard.`);
+  }
+};
 }
 
 async function loadSellerFollowing(sellerId) {
