@@ -76,6 +76,8 @@ export async function init({ auth: a, db: d }) {
   document.getElementById("sellerStats").textContent =
     `${stats.completedJobs} completed jobs • ${stats.loginStreak} day streak`;
 
+ loadSellerFollowing(userId);
+  
   /* ---------------- Badges ---------------- */
   const badgeObject = computeBadges(user, stats);
   document.getElementById("sellerBadges").innerHTML = renderBadges(badgeObject);
@@ -153,6 +155,25 @@ async function setupFollowButton(sellerId) {
       isFollowing = true;
     }
   };
+}
+
+async function loadSellerFollowing(sellerId) {
+  const container = document.getElementById("sellerFollowing");
+
+  const q = collection(db, "users", sellerId, "following");
+  const snap = await getDocs(q);
+
+  const count = snap.size;
+
+  if (count === 0) {
+    container.textContent = "Following: 0";
+    return;
+  }
+
+  // If you want just the count:
+  container.textContent = `Following: ${count}`;
+
+  // If you want to show names later, we can expand this.
 }
 
 /* ---------------- Load Seller Ads ---------------- */
