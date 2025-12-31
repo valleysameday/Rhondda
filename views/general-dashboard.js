@@ -9,8 +9,10 @@ import {
   getDoc,
   doc,
   deleteDoc,
-  onSnapshot
+  onSnapshot,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
 import { renderPostsAndStats } from '/index/js/dashboard/posts.js';
 import { loadView } from '/index/js/main.js';
 
@@ -51,9 +53,86 @@ export async function init({ auth: a, db: d }) {
   document.getElementById("statUnlocks").textContent = stats.totalLeads;
 
   // ============================
+  // ⭐ LOAD FOLLOWERS COUNT
+  // ============================
+  loadMyFollowers(user.uid);
+
+  async function loadMyFollowers(uid) {
+    const snap = await getDocs(collection(db, "users", uid, "followers"));
+    const count = snap.size;
+
+    const el = document.getElementById("statFollowers");
+    if (el) el.textContent = count;
+  }
+
+  // ============================
   // ⭐ LOAD SAVED ADS
   // ============================
   await loadSavedPosts(user.uid);
+
+  // ============================
+  // ⭐ LOAD FOLLOW FEED (Option C)
+  // ============================
+  await loadFollowFeed(user.uid);
+
+  async function loadFollowFeed(uid) {
+    const container = document.getElementById("followFeed");
+    if (!container) return;
+
+    container.innerHTML = `<p style="opacity:0.6;">Loading updates...</p>`;
+
+    // 1. Get sellers the user follows
+    const followingSnap = await getDocs(collection(db, "users", uid, "following"));
+    const sellerIds = followingSnap.docs.map(doc => doc.id);
+
+    if (sellerIds.length === 0) {
+      container.innerHTML = `<p style="opacity:0.6;">You’re not following any sellers yet.</p>`;
+      return;
+    }
+
+    // 2. Load posts from those sellers
+    let posts = [];
+
+    for (const sellerId of sellerIds) {
+      const q = query(
+        collection(db, "posts"),
+        where("userId", "==", sellerId),
+        orderBy("createdAt", "desc")
+      );
+
+      const snap = await getDocs(q);
+      snap.forEach(docSnap => {
+        posts.push({ id: docSnap.id, ...docSnap.data() });
+      });
+    }
+
+    if (posts.length === 0) {
+      container.innerHTML = `<p style="opacity:0.6;">No new posts from sellers you follow.</p>`;
+      return;
+    }
+
+    // 3. Sort newest first
+    posts.sort((a, b) => b.createdAt - a.createdAt);
+
+    // 4. Render
+    container.innerHTML = posts.map(post => `
+      <div class="follow-update-card">
+        <img src="${post.imageUrl || post.imageUrls?.[0] || '/images/image-webholder.webp'}">
+        <div>
+          <h4>${post.title}</h4>
+          <p>${new Date(post.createdAt).toLocaleDateString()}</p>
+        </div>
+      </div>
+    `).join("");
+
+    // 5. Click to view
+    container.querySelectorAll(".follow-update-card").forEach((card, i) => {
+      card.onclick = () => {
+        sessionStorage.setItem("viewPostId", posts[i].id);
+        loadView("view-post", { forceInit: true });
+      };
+    });
+  }
 
   // ============================
   // LOGOUT
@@ -69,9 +148,6 @@ export async function init({ auth: a, db: d }) {
   // ============================
   initUnreadMessageListener();
 
-  // ============================
-  // FUNCTION: UNREAD LISTENER
-  // ============================
   function initUnreadMessageListener() {
     const badge = document.getElementById("messageBadge");
     if (!badge) return;
@@ -85,7 +161,6 @@ export async function init({ auth: a, db: d }) {
       snap.forEach(docSnap => {
         const convo = docSnap.data();
 
-        // If last message exists AND was sent by the other user → unread
         if (convo.lastMessageSender && convo.lastMessageSender !== user.uid) {
           hasUnread = true;
         }
@@ -114,7 +189,6 @@ async function loadSavedPosts(uid) {
     const postId = saved.id;
     const postSnap = await getDoc(doc(db, "posts", postId));
 
-    // Auto-remove if sold or deleted
     if (!postSnap.exists() || postSnap.data().isSold === true) {
       await deleteDoc(doc(db, "users", uid, "savedPosts", postId));
       continue;
