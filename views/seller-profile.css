@@ -236,3 +236,25 @@
   box-shadow: 0 3px 10px rgba(0,0,0,0.12);
   border: 1px solid #e6e6e6;
 }
+.follow-toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1A73E8;
+  color: white;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 9999;
+}
+
+.follow-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-6px);
+}
