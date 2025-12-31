@@ -1,6 +1,8 @@
 import {
   doc,
   getDoc,
+  setDoc,
+  deleteDoc,
   collection,
   query,
   where,
@@ -95,6 +97,9 @@ export async function init({ auth: a, db: d }) {
     `;
   }
 
+  /* ---------------- FOLLOW BUTTON ---------------- */
+  setupFollowButton(userId);
+
   /* ---------------- Contact Seller ---------------- */
   document.getElementById("contactSellerBtn").onclick = () => {
     sessionStorage.setItem(
@@ -110,6 +115,43 @@ export async function init({ auth: a, db: d }) {
   /* ---------------- Back Button ---------------- */
   document.getElementById("backToPost").onclick = () => {
     loadView("view-post", { forceInit: true });
+  };
+}
+
+/* ---------------- FOLLOW SYSTEM ---------------- */
+async function setupFollowButton(sellerId) {
+  const btn = document.getElementById("followSellerBtn");
+
+  if (!auth.currentUser) {
+    btn.textContent = "Follow Seller";
+    btn.onclick = () => loadView("login");
+    return;
+  }
+
+  const currentUserId = auth.currentUser.uid;
+
+  const followingRef = doc(db, "users", currentUserId, "following", sellerId);
+  const followerRef = doc(db, "users", sellerId, "followers", currentUserId);
+
+  const snap = await getDoc(followingRef);
+  let isFollowing = snap.exists();
+
+  btn.textContent = isFollowing ? "Following ✓" : "Follow Seller";
+
+  btn.onclick = async () => {
+    if (isFollowing) {
+      // UNFOLLOW
+      await deleteDoc(followingRef);
+      await deleteDoc(followerRef);
+      btn.textContent = "Follow Seller";
+      isFollowing = false;
+    } else {
+      // FOLLOW
+      await setDoc(followingRef, { followedAt: Date.now() });
+      await setDoc(followerRef, { followedAt: Date.now() });
+      btn.textContent = "Following ✓";
+      isFollowing = true;
+    }
   };
 }
 
@@ -165,12 +207,8 @@ async function loadSellerAds(sellerId) {
     const h3 = document.createElement("h3");
     h3.textContent = post.title || "Untitled";
 
-    const desc = document.createElement("p");
-    desc.className = "post-desc";
-    desc.textContent = post.description || "";
-
+    
     postBody.appendChild(h3);
-    postBody.appendChild(desc);
 
     card.appendChild(postImageDiv);
     card.appendChild(postBody);
