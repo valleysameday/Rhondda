@@ -86,8 +86,8 @@ export async function init({ auth: a, db: d }) {
     const sellerIds = followingSnap.docs.map(doc => doc.id);
 
     if (sellerIds.length === 0) {
-      container.innerHTML = `<p style="opacity:0.6;">You’re not following any sellers yet.</p>`;
-      return;
+  container.innerHTML = `<p style="opacity:0.6;">Follow the sellers and businesses you’re interested in to see their new posts here.</p>`;
+  return;
     }
 
     // 2. Load posts from those sellers
