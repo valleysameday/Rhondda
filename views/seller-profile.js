@@ -100,7 +100,7 @@ export async function init({ auth: a, db: d }) {
 /* ---------------- Load Seller Ads ---------------- */
 async function loadSellerAds(sellerId) {
   const container = document.getElementById("sellerAdsContainer");
-  const PLACEHOLDER = "/images/post-placeholder.jpg";
+  const PLACEHOLDER = "/images/image-webholder.webp";
 
   const q = query(
     collection(db, "posts"),
