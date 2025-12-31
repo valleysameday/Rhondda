@@ -1,10 +1,12 @@
 export default async (req) => {
   console.log("FUNCTION HIT");
-  console.log("RAW BODY:", req.body);
 
   try {
-    // Parse incoming JSON
-    const { sellerEmail, messageText, postTitle } = JSON.parse(req.body || "{}");
+    // Read body as text (because it's a ReadableStream)
+    const rawBody = await req.text();
+    console.log("RAW BODY TEXT:", rawBody);
+
+    const { sellerEmail, messageText, postTitle } = JSON.parse(rawBody || "{}");
 
     console.log("Parsed sellerEmail:", sellerEmail);
     console.log("Parsed postTitle:", postTitle);
@@ -13,7 +15,6 @@ export default async (req) => {
     const apiKey = process.env.RESEND_API_KEY;
     console.log("API KEY PRESENT:", !!apiKey);
 
-    // Build payload
     const payload = {
       from: "Rhondda Noticeboard <noreply@rnb.wales>",
       to: sellerEmail,
@@ -27,7 +28,6 @@ export default async (req) => {
 
     console.log("PAYLOAD:", payload);
 
-    // Send to Resend
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -40,15 +40,8 @@ export default async (req) => {
     const rawText = await response.text();
     console.log("RESEND RAW RESPONSE:", rawText);
 
-    let data;
-    try {
-      data = JSON.parse(rawText);
-    } catch {
-      data = rawText;
-    }
-
     return new Response(
-      JSON.stringify({ success: true, data }),
+      JSON.stringify({ success: true, raw: rawText }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
 
