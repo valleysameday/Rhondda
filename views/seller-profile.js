@@ -76,8 +76,9 @@ export async function init({ auth: a, db: d }) {
   document.getElementById("sellerStats").textContent =
     `${stats.completedJobs} completed jobs • ${stats.loginStreak} day streak`;
 
- loadSellerFollowing(userId);
-  
+  /* ---------------- Followers Count ---------------- */
+  loadSellerFollowers(userId);
+
   /* ---------------- Badges ---------------- */
   const badgeObject = computeBadges(user, stats);
   document.getElementById("sellerBadges").innerHTML = renderBadges(badgeObject);
@@ -100,7 +101,7 @@ export async function init({ auth: a, db: d }) {
   }
 
   /* ---------------- FOLLOW BUTTON ---------------- */
-  setupFollowButton(userId);
+  setupFollowButton(userId, safeName);
 
   /* ---------------- Contact Seller ---------------- */
   document.getElementById("contactSellerBtn").onclick = () => {
@@ -120,6 +121,7 @@ export async function init({ auth: a, db: d }) {
   };
 }
 
+/* ---------------- TOAST POPUP ---------------- */
 function showFollowToast(message) {
   const toast = document.getElementById("followToast");
   toast.textContent = message;
@@ -127,11 +129,11 @@ function showFollowToast(message) {
 
   setTimeout(() => {
     toast.classList.remove("show");
-  }, 3500);
+  }, 2500);
 }
 
 /* ---------------- FOLLOW SYSTEM ---------------- */
-async function setupFollowButton(sellerId) {
+async function setupFollowButton(sellerId, safeName) {
   const btn = document.getElementById("followSellerBtn");
 
   if (!auth.currentUser) {
@@ -149,71 +151,40 @@ async function setupFollowButton(sellerId) {
   let isFollowing = snap.exists();
 
   btn.textContent = isFollowing ? "Following ✓" : "Follow Seller";
+  if (isFollowing) btn.classList.add("following");
 
   btn.onclick = async () => {
-  if (isFollowing) {
-    // UNFOLLOW
-    await deleteDoc(followingRef);
-    await deleteDoc(followerRef);
+    if (isFollowing) {
+      // UNFOLLOW
+      await deleteDoc(followingRef);
+      await deleteDoc(followerRef);
 
-    btn.textContent = "Follow Seller";
-    btn.classList.remove("following");
-    isFollowing = false;
+      btn.textContent = "Follow Seller";
+      btn.classList.remove("following");
+      isFollowing = false;
 
-    showFollowToast(`You’ve unfollowed ${safeName}.`);
-  } else {
-    // FOLLOW
-    await setDoc(followingRef, { followedAt: Date.now() });
-    await setDoc(followerRef, { followedAt: Date.now() });
+      showFollowToast(`You’ve unfollowed ${safeName}.`);
+      loadSellerFollowers(sellerId); // update count
+    } else {
+      // FOLLOW
+      await setDoc(followingRef, { followedAt: Date.now() });
+      await setDoc(followerRef, { followedAt: Date.now() });
 
-    btn.textContent = "Following ✓";
-    btn.classList.add("following");
-    isFollowing = true;
+      btn.textContent = "Following ✓";
+      btn.classList.add("following");
+      isFollowing = true;
 
-    showFollowToast(`You’re now following ${safeName}. Updates will appear in your dashboard.`);
-  }
-};btn.onclick = async () => {
-  if (isFollowing) {
-    // UNFOLLOW
-    await deleteDoc(followingRef);
-    await deleteDoc(followerRef);
-
-    btn.textContent = "Follow Seller";
-    btn.classList.remove("following");
-    isFollowing = false;
-
-    showFollowToast(`You’ve unfollowed ${safeName}.`);
-  } else {
-    // FOLLOW
-    await setDoc(followingRef, { followedAt: Date.now() });
-    await setDoc(followerRef, { followedAt: Date.now() });
-
-    btn.textContent = "Following ✓";
-    btn.classList.add("following");
-    isFollowing = true;
-
-    showFollowToast(`You’re now following ${safeName}. Updates will appear in your dashboard.`);
-  }
-};
+      showFollowToast(`You’re now following ${safeName}. Updates will appear in your dashboard.`);
+      loadSellerFollowers(sellerId); // update count
+    }
+  };
 }
 
-async function loadSellerFollowing(sellerId) {
-  const container = document.getElementById("sellerFollowing");
-
-  const q = collection(db, "users", sellerId, "following");
-  const snap = await getDocs(q);
-
-  const count = snap.size;
-
-  if (count === 0) {
-    container.textContent = "Following: 0";
-    return;
-  }
-
-  // If you want just the count:
-  container.textContent = `Following: ${count}`;
-
-  // If you want to show names later, we can expand this.
+/* ---------------- FOLLOWERS COUNT ---------------- */
+async function loadSellerFollowers(sellerId) {
+  const container = document.getElementById("sellerFollowers");
+  const snap = await getDocs(collection(db, "users", sellerId, "followers"));
+  container.textContent = `Followers: ${snap.size}`;
 }
 
 /* ---------------- Load Seller Ads ---------------- */
@@ -268,7 +239,6 @@ async function loadSellerAds(sellerId) {
     const h3 = document.createElement("h3");
     h3.textContent = post.title || "Untitled";
 
-    
     postBody.appendChild(h3);
 
     card.appendChild(postImageDiv);
