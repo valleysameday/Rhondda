@@ -1,0 +1,156 @@
+.seller-profile-page {
+  padding: 15px;
+  max-width: 600px;
+  margin: auto;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.seller-banner {
+  height: 120px;
+  background: linear-gradient(135deg, #4e73df, #1cc88a);
+  border-radius: 10px;
+}
+
+.seller-avatar-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: -40px;
+}
+
+.seller-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #ddd;
+  border: 4px solid white;
+  background-size: cover;
+  background-position: center;
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.business-ribbon {
+  display: none;
+  background: #1A73E8;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-align: center;
+  margin: 10px auto;
+  width: fit-content;
+}
+
+.seller-header {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.seller-reliability {
+  color: #666;
+  font-size: 14px;
+}
+
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 15px 0;
+  justify-content: center;
+}
+
+.badge-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  padding: 6px 10px;
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.badge-pill svg {
+  width: 20px;
+  height: 20px;
+}
+
+.badge-label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.seller-stats {
+  margin: 15px 0;
+  text-align: center;
+  font-size: 15px;
+  color: #444;
+}
+
+.seller-bio {
+  background: #f7f7f7;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.business-info {
+  background: #f5f7ff;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  display: none;
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 12px;
+  background: #1cc88a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.posts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.post-card {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.post-image img {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+}
+
+.post-body {
+  padding: 8px;
+}
+
+.post-body h3 {
+  font-size: 15px;
+  margin: 0;
+}
+
+.post-desc {
+  font-size: 13px;
+  color: #666;
+}
