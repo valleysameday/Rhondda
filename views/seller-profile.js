@@ -141,19 +141,20 @@ async function setupFollowButton(sellerId) {
   btn.textContent = isFollowing ? "Following ✓" : "Follow Seller";
 
   btn.onclick = async () => {
-    if (isFollowing) {
-      // UNFOLLOW
-      await deleteDoc(followingRef);
-      await deleteDoc(followerRef);
-      btn.textContent = "Follow Seller";
-      isFollowing = false;
-    } else {
-      // FOLLOW
-      await setDoc(followingRef, { followedAt: Date.now() });
-      await setDoc(followerRef, { followedAt: Date.now() });
-      btn.textContent = "Following ✓";
-      isFollowing = true;
-    }
+if (isFollowing) {
+  await deleteDoc(followingRef);
+  await deleteDoc(followerRef);
+  btn.textContent = "Follow Seller";
+  btn.classList.remove("following");
+  isFollowing = false;
+} else {
+  await setDoc(followingRef, { followedAt: Date.now() });
+  await setDoc(followerRef, { followedAt: Date.now() });
+  btn.textContent = "Following ✓";
+  btn.classList.add("following");
+  isFollowing = true;
+}
+    
   };
 }
 
