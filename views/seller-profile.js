@@ -8,7 +8,7 @@ import {
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-import { BADGE_SVGS, computeBadges, renderBadges } from "/seller/badges.js";
+import { BADGE_SVGS, computeBadges, renderBadges } from "/views/profile-badges.js";
 import { loadView } from "/index/js/main.js";
 
 let auth, db;
