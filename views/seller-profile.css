@@ -1,7 +1,7 @@
-/* PAGE WRAPPER */
+  /* PAGE WRAPPER */
 .seller-profile-page {
-  padding: 18px;
-  max-width: 600px;
+  font-weight: 12px;
+  max-width: auto;
   margin: auto;
   background: #f2f3f7;
 }
