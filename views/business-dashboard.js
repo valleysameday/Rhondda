@@ -85,6 +85,22 @@ export async function init({ auth: a, db: d, storage: s }) {
   document.getElementById("bizStatTotalViews").textContent = stats.totalViews;
   document.getElementById("bizStatLeads").textContent = stats.totalLeads;
 
+  // ============================================================
+  // ⭐ LOAD FOLLOWERS COUNT
+  // ============================================================
+  loadMyFollowers(user.uid);
+
+  async function loadMyFollowers(userId) {
+    const snap = await getDocs(collection(db, "users", userId, "followers"));
+    const count = snap.size;
+
+    const el = document.getElementById("bizStatFollowers");
+    if (el) el.textContent = count;
+  }
+
+  // ============================================================
+  // LOGOUT
+  // ============================================================
   document.getElementById("bizLogoutBtn").onclick = async () => {
     document.getElementById("bizLogoutOverlay").style.display = "flex";
     await signOut(auth);
@@ -99,10 +115,6 @@ export async function init({ auth: a, db: d, storage: s }) {
   // ============================================================
   initUnreadMessageListener();
 
-
-  // ============================================================
-  // FUNCTION: UNREAD LISTENER
-  // ============================================================
   function initUnreadMessageListener() {
     const badge = document.getElementById("messageBadge");
     if (!badge) return;
@@ -116,7 +128,6 @@ export async function init({ auth: a, db: d, storage: s }) {
       snap.forEach(docSnap => {
         const convo = docSnap.data();
 
-        // If last message exists AND was sent by the other user → unread
         if (convo.lastMessageSender && convo.lastMessageSender !== user.uid) {
           hasUnread = true;
         }
