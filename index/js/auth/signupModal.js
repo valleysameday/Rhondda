@@ -19,7 +19,7 @@ export function openSignupModal(auth) {
   const signupBtn = modal.querySelector("#signupSubmit");
   const emailInput = modal.querySelector("#signupEmail");
   const passInput = modal.querySelector("#signupPassword");
-  const businessCheckbox = modal.querySelector("#isBusiness");
+  const businessCheckbox = modal.querySelector("#isBusinessAccount");
   const feedback = modal.querySelector("#signupFeedback");
 
   signupBtn.replaceWith(signupBtn.cloneNode(true));
