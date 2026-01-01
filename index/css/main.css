@@ -412,3 +412,10 @@ header img.logo {
 .skeleton-line.short {
   width: 40%;
 }
+
+.loading-text {
+  text-align: center;
+  color: #777;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
