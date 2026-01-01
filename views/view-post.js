@@ -195,7 +195,7 @@ export async function init({ db, auth }) {
       if (!buyerId) return loadView("login");
       if (buyerId === post.userId) return showToast("This is your own ad", "info");
 
-      const convoId = [buyerId, post.userId, postId].sort().join("_");
+      const convoId = `${buyerId}_${post.userId}_${postId}`;
       await setDoc(doc(db, "conversations", convoId), {
         participants: [buyerId, post.userId],
         postId,
