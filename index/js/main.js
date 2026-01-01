@@ -31,7 +31,6 @@ export async function loadView(view, options = {}) {
     app.appendChild(target);
   }
 
-  // Always reload HTML if forceReload is true
   const shouldReload = options.forceInit || !target.dataset.loaded;
 
   if (shouldReload) {
@@ -42,6 +41,15 @@ export async function loadView(view, options = {}) {
 
     try {
       console.log("🟡 Importing JS for:", view);
+
+      // ⭐ ADMIN ROUTE HANDLING
+      if (view === "admin-dashboard") {
+        if (!window.currentUserData?.isAdmin) {
+          console.warn("❌ Not an admin, redirecting");
+          return loadView("home");
+        }
+      }
+
       const mod = await import(`/views/${view}.js?cache=${Date.now()}`);
       mod.init?.({ auth, db, storage });
       console.log("🟢 View JS init complete:", view);
@@ -53,6 +61,7 @@ export async function loadView(view, options = {}) {
   console.log("🟢 Showing view:", view);
   target.hidden = false;
 }
+
 /* =====================================================
    APP INIT
 ===================================================== */
@@ -64,6 +73,7 @@ getFirebase().then(async fb => {
   storage = fb.storage;
 
   window.currentUser = null;
+  window.currentUserData = null;
   window.isBusinessUser = false;
   window.authReady = false;
 
@@ -74,10 +84,10 @@ getFirebase().then(async fb => {
     console.log("🔵 AUTH STATE CHANGED:", user ? user.uid : "no user");
 
     window.currentUser = user || null;
+    window.currentUserData = null;
     window.isBusinessUser = false;
     window.authReady = false;
 
-    // ⭐ Account Status Dot
     const statusDot = document.getElementById("accountStatusDot");
     if (statusDot) {
       if (!user) {
@@ -90,22 +100,23 @@ getFirebase().then(async fb => {
     }
 
     if (!user) {
-      console.log("🟡 No user logged in");
       window.authReady = true;
       return;
     }
 
     try {
-      console.log("🟡 Checking business status for:", user.uid);
       const snap = await getDoc(doc(db, "users", user.uid));
+
+      window.currentUserData = snap.exists() ? snap.data() : null;
       window.isBusinessUser = snap.exists() && snap.data().isBusiness === true;
+
       console.log("🟢 Business status:", window.isBusinessUser);
+      console.log("🟢 Admin status:", window.currentUserData?.isAdmin);
     } catch (e) {
-      console.warn("❌ Business lookup failed:", e);
+      console.warn("❌ User lookup failed:", e);
     }
 
     window.authReady = true;
-    console.log("🟢 authReady = true");
   });
 
   /* =====================================================
@@ -115,16 +126,13 @@ getFirebase().then(async fb => {
     console.log("🟢 App start()");
     initUIRouter();
 
-    /* LOGIN BUTTONS */
     document.querySelectorAll('[data-value="login"]').forEach(btn =>
       btn.onclick = e => {
         e.preventDefault();
-        console.log("🔵 Login button clicked (main.js)");
         openLoginModal(auth, db);
       }
     );
 
-    /* MESSAGES BUTTON */
     document.getElementById("openChatList")?.addEventListener("click", e => {
       e.preventDefault();
 
@@ -137,36 +145,27 @@ getFirebase().then(async fb => {
       loadView("chat-list");
     });
 
-    /* SIGNUP BUTTONS */
     document.querySelectorAll('[data-value="signup"]').forEach(btn =>
       btn.onclick = e => {
         e.preventDefault();
-        console.log("🔵 Signup button clicked");
         openSignupModal(auth);
       }
     );
 
-    /* FORGOT PASSWORD BUTTONS */
     document.querySelectorAll('[data-value="forgot"]').forEach(btn =>
       btn.onclick = e => {
         e.preventDefault();
-        console.log("🔵 Forgot password clicked");
         openForgotModal(auth);
       }
     );
 
-    /* ACCOUNT BUTTON */
     document.getElementById("openAccountModal")?.addEventListener("click", e => {
       e.preventDefault();
-      console.log("🔵 Account button clicked");
 
       if (!window.currentUser) {
-        console.log("🟡 No user → opening login modal");
         openLoginModal(auth, db);
         return;
       }
-
-      console.log("🟡 User logged in, waiting for role…");
 
       const waitForRole = () => {
         if (!window.authReady) {
@@ -174,7 +173,10 @@ getFirebase().then(async fb => {
           return;
         }
 
-        console.log("🟢 Role ready. isBusinessUser =", window.isBusinessUser);
+        // ⭐ If admin → go straight to admin dashboard
+        if (window.currentUserData?.isAdmin) {
+          return loadView("admin-dashboard");
+        }
 
         loadView(
           window.isBusinessUser
