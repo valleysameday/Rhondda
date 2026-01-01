@@ -198,8 +198,8 @@ document.getElementById("messageSeller")?.addEventListener("click", async () => 
     alert("Please log in to view messages");
 
     setTimeout(() => {
-      openAccountModal();
-    }, 3000);
+  openLoginModal(auth, db);
+}, 3000);
 
     return;
   }
