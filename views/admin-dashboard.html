@@ -10,6 +10,7 @@
       <button class="admin-nav-btn" data-section="posts">Posts & Reports</button>
       <button class="admin-nav-btn" data-section="payments">Payments & Subscriptions</button>
       <button class="admin-nav-btn" data-section="settings">Settings</button>
+<button class="admin-nav-btn" data-section="users">Users & Accounts</button>
     </nav>
   </aside>
 
@@ -123,6 +124,27 @@
         </div>
       </div>
     </section>
+<section class="admin-section" id="admin-section-users" style="display:none;">
+  <h2>Users & Accounts</h2>
+  <div class="admin-card">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Type</th>
+          <th>Plan</th>
+          <th>Area</th>
+          <th>Followers</th>
+          <th>Ads</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="adminUsersTable"></tbody>
+    </table>
+  </div>
+</section>
 
     <!-- PAYMENTS -->
     <section class="admin-section" id="admin-section-payments" style="display:none;">
