@@ -141,7 +141,7 @@ export async function initFeed({ db }, options = {}) {
       card.innerHTML = `
         <div class="feed-image">
           <img src="${post.image}" alt="${post.title}">
-          ${post.isBusiness && post.type !== "featured" ? `<span class="biz-badge">Business Account</span>` : ''}
+          ${post.isBusiness && post.type !== "featured" ? `<span class="biz-badge">Business</span>` : ''}
         </div>
 
         <div class="feed-content">
