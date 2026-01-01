@@ -77,6 +77,7 @@ export async function initFeed({ db }, options = {}) {
         const d = doc.data();
         return {
           id: doc.id,
+          userId: d.userId,
           title: d.title,
           teaser: d.description || "",
           category: d.category || "misc",
