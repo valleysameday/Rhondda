@@ -1,515 +1,281 @@
-/* =========================
-   PAGE LAYOUT
-========================= */
+/* 2025-2026 View Post Standard */
+:root {
+    --primary: #2563eb;
+    --bg: #f8fafc;
+    --glass: rgba(255, 255, 255, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --shadow-premium: 0 10px 30px -5px rgba(0, 0, 0, 0.1), 0 4px 12px -4px rgba(0, 0, 0, 0.05);
+}
 
 .view-post-page {
-  background: var(--bg);
-  min-height: 100vh;
-  padding-bottom: 50px;
+    background: var(--bg);
+    min-height: 100vh;
+    padding-bottom: 60px;
+    font-family: system-ui, -apple-system, sans-serif;
 }
 
 .view-post-container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding: 0 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 0 20px;
 }
 
-/* =========================
-   FULL WIDTH GALLERY (FIXED)
-========================= */
-
+/* Full Width Gallery Breakthrough */
 .gallery-wrapper {
-  width: 100%;
-  background: #000;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    background: #000;
+    overflow: hidden;
+    line-height: 0;
 }
-
-/* Keeps height stable */
-.gallery-section {
-  width: 100%;
-  overflow: hidden;
-  position: relative;
-}
-
-/* Sliding track */
-.gallery-track {
-  display: flex;
-  width: 100%;
-  touch-action: pan-y;
-  transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
-  will-change: transform;
-}
-
-.gallery-track.dragging {
-  transition: none;
-}
-
-/* IMAGES */
-.gallery-image {
-  width: 100%;
-  flex: 0 0 100%;
-  height: auto;
-  max-height: 80vh;
-  object-fit: contain; /* 🔥 NO CROPPING */
-  background: #000;
-  display: block;
-}
-
-/* =========================
-   DOTS
-========================= */
-
-.gallery-dots {
-  position: absolute;
-  bottom: 14px;
-  right: 14px;
-  display: flex;
-  gap: 6px;
-  z-index: 10;
-}
-
-.gallery-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.4);
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.gallery-dot.active {
-  width: 18px;
-  background: #fff;
-}
-
-/* =========================
-   GALLERY HINT
-========================= */
-
-.gallery-hint {
-  margin-top: 10px;
-  text-align: center;
-  font-size: 0.85rem;
-  color: #6b7280;
-  user-select: none;
-}
-
-/* =========================
-   LIGHTBOX (FIXED)
-========================= */
-
-#lightbox {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.9);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-#lightbox.active {
-  display: flex;
-}
-
-#lightbox img {
-  max-width: 92vw;
-  max-height: 92vh;
-  object-fit: contain;
-  border-radius: 6px;
-}
-
-#lightboxClose {
-  position: absolute;
-  top: 16px;
-  right: 18px;
-  font-size: 2rem;
-  background: none;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-}
-.post-action-bar {
-  display: flex;
-  gap: 12px;
-  background: #ffffff;
-  padding: 10px 18px;
-  border-radius: 12px;
-  border: 1.5px solid #f0f0f0;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-  width: fit-content;
-  margin: 12px auto;
-}
-
-.action-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  border: none;
-  transition: all 0.2s ease;
-}
-
-.action-btn .icon {
-  width: 20px;
-  height: 20px;
-  stroke: currentColor;
-  stroke-width: 2.5;
-  fill: none;
-}
-
-/* Save button */
-.save-btn {
-  background: #fff5f5;
-  border: 1px solid #ffebeb;
-  color: #ff4d4d;
-}
-
-.save-btn.saved {
-  background: #ffe4ef;
-  border-color: #ff7eb3;
-  color: #b83265;
-}
-
-/* Share button */
-.share-btn {
-  background: #007aff;
-  color: #ffffff;
-}
-
-/* Hover effects */
-.action-btn:hover {
-  transform: translateY(-2px);
-  opacity: 0.9;
-}
-/* =========================
-   DETAILS SECTION
-========================= */
-
-.details-section {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.meta-header {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  color: #6b7280;
-}
-
-.badge-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(99,102,241,0.08);
-  color: #4f46e5;
-  font-weight: 600;
-}
-
-.post-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-.price-group {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-
-.price-tag {
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.location-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: #e5e7eb;
-  color: #374151;
-  font-size: 0.85rem;
-}
-
-/* =========================
-   DESCRIPTION (NON BOXY)
-========================= */
-
-.content-card {
-  padding-top: 6px;
-  background: none;
-  border: none;
-}
-
-.content-card::before {
-  content: "";
-  display: block;
-  width: 42px;
-  height: 2px;
-  background: linear-gradient(90deg, #2563eb, transparent);
-  margin-bottom: 10px;
-  border-radius: 2px;
-}
-
-.content-card h3 {
-  margin: 0 0 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.description-text {
-  font-size: 0.95rem;
-  line-height: 1.7;
-  color: #475569;
-}
-
-/* =========================
-   MESSAGE SELLER
-========================= */
-
-.message-btn {
-  width: 100%;
-  max-width: 320px;
-  margin: 12px auto;
-  padding: 14px;
-  background: var(--primary);
-  color: #fff;
-  font-weight: 700;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.message-btn:hover {
-  filter: brightness(1.08);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 16px -8px rgba(37,99,235,0.55);
-}
-
-/* =========================
-   REVEAL BUTTON
-========================= */
-
-.reveal-btn {
-  width: 100%;
-  max-width: 320px;
-  margin: 12px auto;
-  padding: 14px;
-  background: #f3f4f6; /* light neutral background */
-  color: #111827;       /* dark text */
-  font-weight: 700;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.reveal-btn:hover {
-  background: #e5e7eb; /* slightly darker on hover */
-  transform: translateY(-1px);
-  box-shadow: 0 8px 16px -8px rgba(37, 99, 235, 0.35); /* subtle pop like message-btn */
-}
-
-/* =========================
-   CONTACT BOX
-========================= */
-
-.contact-box {
-  margin-top: 20px;
-  padding: 16px;
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-  border: 1px solid #e5e7eb;
-}
-
-/* =========================
-   MOBILE TWEAKS
-========================= */
-
-@media (max-width: 768px) {
-  .gallery-image {
-    max-height: 70vh;
-  }
-
-  .gallery-dots {
-    bottom: 10px;
-    right: 10px;
-  }
-}
-
-/* =========================
-   ANIMATION
-========================= */
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.back-btn {
-  margin: 12px 0 0 0;
-  padding: 10px 14px;
-  background: #f3f4f6;
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #374151;
-  cursor: pointer;
-  width: fit-content;
-  transition: background 0.2s, transform 0.15s;
-}
-
-.back-btn:hover {
-  background: #e5e7eb;
-  transform: translateX(-2px);
-}
-
-.back-btn:active {
-  transform: translateX(0);
-}
-/* Universal feature styling */
-.feature-tags {
-  margin-top: 14px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.feature-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #ffffff;
-  padding: 6px 12px;
-  border-radius: 10px;
-  font-size: 0.9rem;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  color: #0f172a;
-  font-weight: 500;
-}
-
-/* =========================
-   GALLERY PREVIEW (3 IMAGES)
-========================= */
 
 .gallery-preview {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 4px;
-  height: 360px;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 4px;
+    height: 500px; /* Cinematic height for 2026 */
 }
 
 .gallery-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  cursor: pointer;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.gallery-preview img:hover {
+    opacity: 0.9;
 }
 
 .gallery-preview img.main {
-  grid-row: span 2;
+    grid-row: span 2;
 }
 
-/* Image count badge */
 .image-count {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  background: rgba(0,0,0,0.65);
-  color: #fff;
-  font-size: 0.85rem;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-weight: 600;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: 0.85rem;
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* =========================
-   LIGHTBOX (SWIPE)
-========================= */
+/* Action Buttons (Save/Share) - Modern Pill Style */
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 100px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-premium);
+}
 
+.save-btn { background: #fff; color: #ff4d4d; border: 1px solid #ffebeb; }
+.save-btn.saved { background: #ff4d4d; color: #fff; }
+.share-btn { background: var(--primary); color: #fff; }
+
+.action-btn:active { transform: scale(0.96); }
+
+/* Details Section */
+.details-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.post-title {
+    font-size: clamp(1.5rem, 5vw, 2.2rem);
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.price-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price-tag {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.location-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 100px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Contact Card & Buttons */
+.contact-box {
+    background: #fff;
+    padding: 24px;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    box-shadow: var(--shadow-premium);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.safety-note {
+    font-size: 0.8rem;
+    color: #e11d48;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+.message-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--primary);
+    color: #fff;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.reveal-btn {
+    width: 100%;
+    padding: 14px;
+    background: #f1f5f9;
+    color: #1e293b;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+/* 2026 Lightbox Standard */
 #lightbox {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.95);
-  display: none;
-  flex-direction: column;
-  z-index: 1000;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    display: none;
+    flex-direction: column;
+    z-index: 1000;
 }
 
-#lightbox.active {
-  display: flex;
-}
+#lightbox.active { display: flex; }
 
 .lightbox-track {
-  flex: 1;
-  display: flex;
-  overflow: hidden;
-  touch-action: pan-y;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .lightbox-track img {
-  flex: 0 0 100%;
-  max-width: 100%;
-  max-height: 90vh;
-  object-fit: contain;
+    max-width: 100%;
+    max-height: 85vh;
+    object-fit: contain;
 }
-
-/* Close button */
-#lightboxClose {
-  position: absolute;
-  top: 16px;
-  right: 18px;
-  font-size: 2.2rem;
-  background: none;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-}
-
-/* =========================
-   LIGHTBOX AD SLOT
-========================= */
 
 .lightbox-ad {
-  height: 60px;
-  background: #111;
-  color: #aaa;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.85rem;
-  border-top: 1px solid rgba(255,255,255,0.1);
+    height: 70px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* =========================
-   MOBILE
-========================= */
+#lightboxClose {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 2.5rem;
+    color: #fff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1010;
+}
 
+/* Mobile Overrides */
 @media (max-width: 768px) {
-  .gallery-preview {
-    height: 260px;
-  }
+    .view-post-container { padding: 0 16px; }
+    .gallery-preview {
+        height: 350px;
+        grid-template-columns: 1fr;
+    }
+    .gallery-preview img:not(.main) { display: none; } /* Show only main on mobile preview */
+    
+    .post-title { font-size: 1.6rem; }
+    
+    .back-btn {
+        margin: 10px 0;
+        background: var(--glass);
+        backdrop-filter: blur(10px);
+        border-radius: 100px;
+    }
+}
+
+/* UI Elements */
+.back-btn {
+    border: 1px solid #e2e8f0;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: #fff;
+    font-weight: 600;
+    width: fit-content;
+    cursor: pointer;
+}
+
+.secondary-btn {
+    background: none;
+    border: 1px solid #e2e8f0;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.report-link {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    text-decoration: underline;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-top: 10px;
 }
