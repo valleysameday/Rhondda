@@ -138,18 +138,18 @@
 }
 
 /* =========================
-   BUSINESS / PAID ADS
+   FEATURED / PAID ADS
 ========================= */
 
 /* Span both columns on mobile */
-.feed-card.business {
+.feed-card.featured {
   grid-column: span 2;
   border: 1px solid rgba(37,99,235,0.3);
   box-shadow: 0 10px 28px rgba(37,99,235,0.18);
 }
 
 /* Sponsored badge */
-.feed-card.business::before {
+.feed-card.featured::before {
   content: "Sponsored";
   position: absolute;
   top: 8px;
@@ -163,8 +163,8 @@
   z-index: 2;
 }
 
-/* Business CTA */
-.feed-card.business .cta-btn {
+/* Featured CTA */
+.feed-card.featured .cta-btn {
   margin-top: 10px;
   padding: 8px 14px;
   background: #2563eb;
@@ -175,6 +175,19 @@
   font-weight: 700;
   align-self: flex-start;
   cursor: pointer;
+}
+
+/* Business badge (non-featured) */
+.biz-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #007bff;
+  color: #fff;
+  padding: 3px 8px;
+  font-size: 11px;
+  border-radius: 6px;
+  z-index: 5;
 }
 
 /* =========================
@@ -203,8 +216,8 @@
     font-size: 1.25rem;
   }
 
-  /* Premium business feel */
-  .feed-card.business {
+  /* Premium featured feel */
+  .feed-card.featured {
     background: linear-gradient(
       90deg,
       rgba(37,99,235,0.06),
@@ -231,6 +244,7 @@
 .report-btn:hover {
   color: #dc2626;
 }
+
 .skeleton-card {
   display: flex;
   gap: 1rem;
