@@ -193,24 +193,22 @@ export async function init({ db, auth }) {
 document.getElementById("messageSeller")?.addEventListener("click", async () => {
   const buyerId = auth.currentUser?.uid;
 
-  // ⭐ If not logged in → show message → auto‑redirect after 3 seconds
+  // Not logged in → show message → open login modal after delay
   if (!buyerId) {
     alert("Please log in to view messages");
 
     setTimeout(() => {
-      loadView("login", { forceInit: true });
+      openAccountModal();
     }, 3000);
 
     return;
   }
 
-  // Prevent messaging your own ad
   if (buyerId === post.userId) {
     alert("This is your own ad");
     return;
   }
 
-  // Build conversation ID (correct order)
   const convoId = `${buyerId}_${post.userId}_${postId}`;
 
   await setDoc(doc(db, "conversations", convoId), {
@@ -223,7 +221,6 @@ document.getElementById("messageSeller")?.addEventListener("click", async () => 
   sessionStorage.setItem("activeConversationId", convoId);
   loadView("chat", { forceInit: true });
 });
-
     // Navigation
     document.getElementById("backToFeed").onclick = () => loadView("home");
     document.getElementById("viewSellerProfileBtn").onclick = () => {
