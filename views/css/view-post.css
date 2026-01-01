@@ -1,6 +1,6 @@
 /* 
    RHONDDA NOTICEBOARD 2026 
-   View Post Standard Stylesheet - Left-Aligned Grid
+   View Post Full Stylesheet - Edge-to-Edge Gallery & Styled Content
 */
 
 :root {
@@ -10,7 +10,7 @@
     --text-main: #0f172a;
     --text-muted: #64748b;
     --glass: rgba(255, 255, 255, 0.8);
-    --glass-border: rgba(255, 255, 255, 255, 0.3);
+    --glass-border: rgba(255, 255, 255, 0.3);
     --shadow-premium: 0 10px 30px -5px rgba(0, 0, 0, 0.1), 0 4px 12px -4px rgba(0, 0, 0, 0.05);
     --radius: 16px;
 }
@@ -127,9 +127,82 @@
 .share-btn:hover { background: var(--primary-hover); }
 .action-btn:active { transform: scale(0.95); }
 
+/* Primary / secondary / report buttons */
+.primary-btn {
+    background: var(--primary);
+    color: #fff;
+    font-weight: 700;
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+.primary-btn:hover { background: var(--primary-hover); }
+
+.secondary-btn {
+    background: #fff;
+    color: var(--primary);
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 12px 20px;
+    border: 1px solid var(--primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.secondary-btn:hover {
+    background: var(--primary);
+    color: #fff;
+}
+
+.report-link {
+    background: none;
+    color: #f43f5e;
+    font-weight: 600;
+    border: 1px solid #f43f5e;
+    padding: 8px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: all 0.3s ease;
+}
+.report-link:hover {
+    background: #f43f5e;
+    color: #fff;
+}
+
+/* Reveal phone number */
+.reveal-btn {
+    background: #fff;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.reveal-btn:hover {
+    background: var(--primary);
+    color: #fff;
+}
+.revealed-number {
+    margin-top: 10px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-main);
+}
+
 /* ============================================================
    3. DETAILS & CONTENT
 ============================================================ */
+
+.details-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
 
 .post-title {
     font-size: clamp(1.5rem, 5vw, 2.2rem);
@@ -178,6 +251,33 @@
     font-size: 1.1rem;
     cursor: pointer;
     margin-bottom: 12px;
+}
+
+.safety-note {
+    font-size: 0.9rem;
+    color: #dc2626;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.contact-disclaimer {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+.content-card {
+    background: #fff;
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    border: 1px solid #e2e8f0;
+    box-shadow: var(--shadow-premium);
+}
+
+.description-text {
+    color: var(--text-main);
+    line-height: 1.5;
+    margin-top: 8px;
 }
 
 /* ============================================================
@@ -249,21 +349,17 @@
 }
 
 /* ============================================================
-   5. MOBILE (NO GALLERY LAYOUT CHANGES)
+   5. MOBILE
 ============================================================ */
 
 @media (max-width: 768px) {
     .view-post-container { padding: 0 16px; }
-    .action-btn { width: 100%; }
-
-    /* Reduce gallery height for mobile */
-    .gallery-preview {
-        height: 280px;  /* adjust as needed */
-    }
+    .action-btn, .primary-btn, .secondary-btn, .report-link { width: 100%; }
+    .gallery-preview { height: 280px; }
 }
 
 /* ============================================================
-   UTILITIES
+   6. UTILITIES
 ============================================================ */
 
 .back-btn {
