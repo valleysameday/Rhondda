@@ -1,0 +1,183 @@
+<link rel="stylesheet" href="/index/css/admin-dashboard.css">
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <h1 class="admin-logo">Rhondda HQ</h1>
+    <nav class="admin-nav">
+      <button class="admin-nav-btn active" data-section="overview">Overview</button>
+      <button class="admin-nav-btn" data-section="traffic">Traffic & Engagement</button>
+      <button class="admin-nav-btn" data-section="businesses">Businesses & Plans</button>
+      <button class="admin-nav-btn" data-section="posts">Posts & Reports</button>
+      <button class="admin-nav-btn" data-section="payments">Payments & Subscriptions</button>
+      <button class="admin-nav-btn" data-section="settings">Settings</button>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <!-- OVERVIEW -->
+    <section class="admin-section" id="admin-section-overview">
+      <h2>Overview</h2>
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3>Total Users</h3>
+          <p id="adminTotalUsers" class="admin-metric">0</p>
+        </div>
+        <div class="admin-card">
+          <h3>Business Accounts</h3>
+          <p id="adminTotalBusinesses" class="admin-metric">0</p>
+        </div>
+        <div class="admin-card">
+          <h3>Total Posts</h3>
+          <p id="adminTotalPosts" class="admin-metric">0</p>
+        </div>
+        <div class="admin-card">
+          <h3>Site Views</h3>
+          <p id="adminTotalSiteViews" class="admin-metric">0</p>
+        </div>
+        <div class="admin-card">
+          <h3>Messages Sent</h3>
+          <p id="adminTotalMessages" class="admin-metric">0</p>
+        </div>
+        <div class="admin-card">
+          <h3>Active Today</h3>
+          <p id="adminActiveToday" class="admin-metric">0</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRAFFIC -->
+    <section class="admin-section" id="admin-section-traffic" style="display:none;">
+      <h2>Traffic & Engagement</h2>
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3>Top Viewed Posts</h3>
+          <div id="adminTopPosts" class="admin-list"></div>
+        </div>
+        <div class="admin-card">
+          <h3>Top Categories</h3>
+          <div id="adminTopCategories" class="admin-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUSINESSES -->
+    <section class="admin-section" id="admin-section-businesses" style="display:none;">
+      <h2>Businesses & Plans</h2>
+      <div class="admin-card">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Business</th>
+              <th>Area</th>
+              <th>Followers</th>
+              <th>Ads</th>
+              <th>Plan</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminBusinessesTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- POSTS & REPORTS -->
+    <section class="admin-section" id="admin-section-posts" style="display:none;">
+      <h2>Posts & Reports</h2>
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3>All Posts</h3>
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>User</th>
+                  <th>Category</th>
+                  <th>Views</th>
+                  <th>Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminPostsTable"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="admin-card">
+          <h3>Reported Posts</h3>
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Post</th>
+                  <th>Reason</th>
+                  <th>Reported By</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminReportsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAYMENTS -->
+    <section class="admin-section" id="admin-section-payments" style="display:none;">
+      <h2>Payments & Subscriptions</h2>
+      <div class="admin-card">
+        <p class="admin-note">
+          This section will connect to Stripe/PayPal later. For now, you can manually set plans on businesses.
+        </p>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Business</th>
+              <th>Plan</th>
+              <th>Stripe Status</th>
+              <th>Next Billing</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminSubscriptionsTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="admin-section" id="admin-section-settings" style="display:none;">
+      <h2>Settings</h2>
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3>Global Toggles</h3>
+          <label class="admin-toggle">
+            <input type="checkbox" id="toggleBusinessPremium">
+            <span>Enable Business Premium</span>
+          </label>
+          <label class="admin-toggle">
+            <input type="checkbox" id="togglePostingEnabled">
+            <span>Allow New Posts</span>
+          </label>
+          <label class="admin-toggle">
+            <input type="checkbox" id="toggleSignupsEnabled">
+            <span>Allow New Signups</span>
+          </label>
+        </div>
+
+        <div class="admin-card">
+          <h3>Homepage Banner</h3>
+          <textarea id="adminBannerInput" rows="3" placeholder="Short message to show on the homepage"></textarea>
+          <button id="adminSaveBannerBtn" class="admin-btn">Save Banner</button>
+        </div>
+
+        <div class="admin-card">
+          <h3>Featured Business</h3>
+          <input id="adminFeaturedBusinessId" type="text" placeholder="Business user ID">
+          <button id="adminSaveFeaturedBusinessBtn" class="admin-btn">Set Featured Business</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
