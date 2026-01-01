@@ -3,6 +3,7 @@ import { initUIRouter } from '/index/js/ui-router.js';
 import '/index/js/post-gate.js';
 
 import { openLoginModal } from '/index/js/auth/loginModal.js';
+window.openLoginModal = openLoginModal;
 import { openSignupModal } from '/index/js/auth/signupModal.js';
 import { openForgotModal } from '/index/js/auth/forgotModal.js';
 
