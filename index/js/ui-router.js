@@ -36,18 +36,9 @@ export function initUIRouter() {
     document.body.classList.add('modal-open');
     modal.style.display = 'flex';
 
-    // ⭐ IMPORTANT: Run modal JS when login modal opens
-    if (name === "login") {
-      openLoginModal(auth, db);
-    }
-
-    if (name === "signup") {
-      openSignupModal(auth);
-    }
-
-    if (name === "forgot") {
-      openForgotModal(auth);
-    }
+    if (name === "login") openLoginModal(auth, db);
+    if (name === "signup") openSignupModal(auth);
+    if (name === "forgot") openForgotModal(auth);
   }
 
   /* =====================================================
@@ -67,19 +58,16 @@ export function initUIRouter() {
      BUTTON HANDLERS
   ===================================================== */
 
-  // Post modal
   document.getElementById('openPostModal')?.addEventListener('click', e => {
     e.preventDefault();
     openScreen('post');
   });
 
-  // Login modal (from header or links)
   document.getElementById('openLoginModal')?.addEventListener('click', e => {
     e.preventDefault();
     openScreen('login');
   });
 
-  // Signup modal
   document.getElementById('opensignupModal')?.addEventListener('click', e => {
     e.preventDefault();
     openScreen('signup');
@@ -107,12 +95,18 @@ export function initUIRouter() {
 
     if (!action) return;
 
-    if (action === "open-screen") {
-      openScreen(value);
-    }
+    if (action === "open-screen") openScreen(value);
+    if (action === "close-screens") closeAll();
+  });
 
-    if (action === "close-screens") {
-      closeAll();
+  /* =====================================================
+     ⭐ ADMIN BUTTON HANDLER
+  ===================================================== */
+  document.getElementById("openAdminDashboard")?.addEventListener("click", () => {
+    if (!window.currentUserData?.isAdmin) {
+      alert("Admin access only");
+      return;
     }
+    loadView("admin-dashboard");
   });
 }
