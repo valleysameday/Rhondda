@@ -1,7 +1,8 @@
-/* 
-   RHONDDA NOTICEBOARD 2026 
-   View Post Full Stylesheet - Edge-to-Edge Gallery & Styled Content
-*/
+/* ================================================
+   RHONDDA NOTICEBOARD 2026
+   View Post Stylesheet
+   Full Edge-to-Edge Gallery & Responsive Layout
+================================================= */
 
 :root {
     --primary: #2563eb;
@@ -11,14 +12,16 @@
     --text-muted: #64748b;
     --glass: rgba(255, 255, 255, 0.8);
     --glass-border: rgba(255, 255, 255, 0.3);
-    --shadow-premium: 0 10px 30px -5px rgba(0, 0, 0, 0.1), 0 4px 12px -4px rgba(0, 0, 0, 0.05);
+    --shadow-premium: 0 10px 30px -5px rgba(0,0,0,0.1), 0 4px 12px -4px rgba(0,0,0,0.05);
     --radius: 16px;
 }
 
+/* ---------------------------
+   PAGE BASE STYLES
+--------------------------- */
 .view-post-page {
     background: var(--bg);
     min-height: 100vh;
-    padding-bottom: 80px;
     font-family: system-ui, -apple-system, sans-serif;
     overflow-x: hidden;
 }
@@ -33,18 +36,38 @@
     padding: 0 20px;
 }
 
-/* ============================================================
-   1. FULL WIDTH BREAKOUT GALLERY
-   3-IMAGE GRID: LARGE LEFT, 2 STACKED RIGHT (ALL DEVICES)
-============================================================ */
+/* ---------------------------
+   NAVIGATION / BACK BUTTON
+--------------------------- */
+.top-nav-bar {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+    padding: 12px 0;
+}
 
+.back-btn {
+    border: 1px solid #e2e8f0;
+    padding: 10px 18px;
+    border-radius: 100px;
+    background: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.back-btn:hover {
+    background: #f0f0f0;
+}
+
+/* ---------------------------
+   GALLERY (EDGE-TO-EDGE HERO)
+--------------------------- */
 .gallery-wrapper {
     width: 100vw;
     position: relative;
     left: 50%;
-    right: 50%;
     margin-left: -50vw;
-    margin-right: -50vw;
     background: #000;
     overflow: hidden;
     line-height: 0;
@@ -70,17 +93,18 @@
     filter: brightness(0.9);
 }
 
-/* Large image (left, spans rows) */
+/* Large image (left) */
 .gallery-preview img.main {
     grid-column: 1;
     grid-row: 1 / span 2;
 }
 
+/* IMAGE COUNT BADGE */
 .image-count {
     position: absolute;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(0, 0, 0, 0.6);
+    bottom: 16px;
+    right: 16px;
+    background: rgba(0,0,0,0.6);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     color: #fff;
@@ -88,120 +112,66 @@
     padding: 8px 16px;
     border-radius: 100px;
     font-weight: 600;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255,255,255,0.2);
     z-index: 5;
 }
 
-/* ============================================================
-   2. ACTION BUTTONS
-============================================================ */
+/* GALLERY ACTION BUTTONS (SAVE & SHARE) */
+.gallery-actions {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    display: flex;
+    gap: 10px;
+    z-index: 5;
+}
 
 .action-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 14px 28px;
+    gap: 8px;
+    padding: 10px 18px;
     border-radius: 100px;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 0.9rem;
     font-weight: 700;
     border: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
     box-shadow: var(--shadow-premium);
-    margin-top: 10px;
-}
-
-.action-btn .icon {
-    width: 20px;
-    height: 20px;
-    stroke: currentColor;
-    stroke-width: 2.5;
-    fill: none;
-}
-
-.save-btn { background: #fff; color: #f43f5e; border: 1px solid #fee2e2; }
-.save-btn.saved { background: #f43f5e; color: #fff; border-color: #f43f5e; }
-.save-btn.saved .icon { fill: currentColor; }
-.share-btn { background: var(--primary); color: #fff; }
-.share-btn:hover { background: var(--primary-hover); }
-.action-btn:active { transform: scale(0.95); }
-
-/* Primary / secondary / report buttons */
-.primary-btn {
-    background: var(--primary);
-    color: #fff;
-    font-weight: 700;
-    border-radius: 12px;
-    padding: 14px 20px;
-    font-size: 1rem;
-    border: none;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-.primary-btn:hover { background: var(--primary-hover); }
-
-.secondary-btn {
     background: #fff;
-    color: var(--primary);
-    font-weight: 600;
-    border-radius: 12px;
-    padding: 12px 20px;
-    border: 1px solid var(--primary);
-    cursor: pointer;
-    transition: all 0.3s ease;
+    color: #f43f5e;
 }
-.secondary-btn:hover {
-    background: var(--primary);
-    color: #fff;
+.action-btn:hover {
+    filter: brightness(0.95);
 }
 
-.report-link {
-    background: none;
-    color: #f43f5e;
-    font-weight: 600;
-    border: 1px solid #f43f5e;
-    padding: 8px 16px;
-    border-radius: 12px;
-    cursor: pointer;
-    margin-top: 12px;
-    transition: all 0.3s ease;
-}
-.report-link:hover {
+.save-btn.saved {
     background: #f43f5e;
     color: #fff;
 }
-
-/* Reveal phone number */
-.reveal-btn {
-    background: #fff;
-    color: var(--primary);
-    border: 1px solid var(--primary);
-    border-radius: 12px;
-    padding: 12px 16px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-.reveal-btn:hover {
+.share-btn {
     background: var(--primary);
     color: #fff;
 }
-.revealed-number {
-    margin-top: 10px;
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--text-main);
+.share-btn:hover {
+    background: var(--primary-hover);
 }
 
-/* ============================================================
-   3. DETAILS & CONTENT
-============================================================ */
-
+/* ---------------------------
+   POST DETAILS
+--------------------------- */
 .details-section {
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+
+.meta-header {
+    display: flex;
+    gap: 12px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
 }
 
 .post-title {
@@ -209,63 +179,36 @@
     font-weight: 800;
     color: var(--text-main);
     letter-spacing: -0.03em;
-    margin: 10px 0;
+    margin: 8px 0;
+}
+
+.price-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
 }
 
 .price-tag {
     font-size: 2rem;
     font-weight: 800;
     color: var(--primary);
-    font-variant-numeric: tabular-nums;
 }
 
 .location-tag {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 14px;
+    padding: 6px 12px;
     border-radius: 100px;
     background: #fff;
     border: 1px solid #e2e8f0;
     color: var(--text-muted);
     font-weight: 500;
-}
-
-.contact-box {
-    background: #fff;
-    padding: 24px;
-    border-radius: var(--radius);
-    border: 1px solid #e2e8f0;
-    box-shadow: var(--shadow-premium);
-    margin-top: 20px;
-}
-
-.message-btn {
-    width: 100%;
-    padding: 16px;
-    background: var(--primary);
-    color: #fff;
-    font-weight: 700;
-    border: none;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    margin-bottom: 12px;
-}
-
-.safety-note {
     font-size: 0.9rem;
-    color: #dc2626;
-    font-weight: 600;
-    margin-bottom: 8px;
 }
 
-.contact-disclaimer {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-top: 8px;
-}
-
+/* DESCRIPTION CARD */
 .content-card {
     background: #fff;
     padding: 16px 20px;
@@ -274,16 +217,109 @@
     box-shadow: var(--shadow-premium);
 }
 
+.content-card h3 {
+    margin-bottom: 8px;
+}
+
 .description-text {
     color: var(--text-main);
     line-height: 1.5;
-    margin-top: 8px;
 }
 
-/* ============================================================
-   4. LIGHTBOX
-============================================================ */
+/* CONTACT & SAFETY */
+.contact-box {
+    background: #fff;
+    padding: 20px;
+    border-radius: var(--radius);
+    border: 1px solid #e2e8f0;
+    box-shadow: var(--shadow-premium);
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
+.safety-note {
+    font-size: 0.9rem;
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.contact-disclaimer {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.reveal-btn {
+    background: #fff;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.reveal-btn:hover {
+    background: var(--primary);
+    color: #fff;
+}
+
+.revealed-number {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-main);
+}
+
+/* SELLER ACTIONS */
+.seller-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.primary-btn {
+    background: var(--primary);
+    color: #fff;
+    border-radius: 12px;
+    padding: 14px 0;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+}
+.primary-btn:hover { background: var(--primary-hover); }
+
+.secondary-btn {
+    background: #fff;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 12px;
+    padding: 12px 0;
+    font-weight: 600;
+    cursor: pointer;
+}
+.secondary-btn:hover {
+    background: var(--primary);
+    color: #fff;
+}
+
+.report-link {
+    background: none;
+    border: 1px solid #f43f5e;
+    color: #f43f5e;
+    border-radius: 12px;
+    padding: 10px 0;
+    font-weight: 600;
+    cursor: pointer;
+}
+.report-link:hover {
+    background: #f43f5e;
+    color: #fff;
+}
+
+/* ---------------------------
+   LIGHTBOX MODAL
+--------------------------- */
 #lightbox {
     position: fixed;
     inset: 0;
@@ -297,11 +333,11 @@
 
 #lightboxClose {
     position: absolute;
-    top: 30px;
+    top: 20px;
     right: 20px;
     font-size: 2.5rem;
     color: #fff;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255,255,255,0.1);
     backdrop-filter: blur(10px);
     width: 50px;
     height: 50px;
@@ -310,15 +346,13 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 10001;
 }
 
 .lightbox-track {
     flex: 1;
     display: flex;
     align-items: center;
-    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    will-change: transform;
+    transition: transform 0.4s cubic-bezier(0.25,1,0.5,1);
 }
 
 .lightbox-track div {
@@ -339,35 +373,20 @@
     width: 100%;
     height: 100px;
     background: #111;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: #666;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #666;
     font-size: 0.8rem;
-    padding-bottom: env(safe-area-inset-bottom);
+    border-top: 1px solid rgba(255,255,255,0.1);
 }
 
-/* ============================================================
-   5. MOBILE
-============================================================ */
-
+/* ---------------------------
+   MOBILE RESPONSIVENESS
+--------------------------- */
 @media (max-width: 768px) {
     .view-post-container { padding: 0 16px; }
     .action-btn, .primary-btn, .secondary-btn, .report-link { width: 100%; }
     .gallery-preview { height: 280px; }
-}
-
-/* ============================================================
-   6. UTILITIES
-============================================================ */
-
-.back-btn {
-    border: 1px solid #e2e8f0;
-    padding: 10px 18px;
-    border-radius: 100px;
-    background: #fff;
-    font-weight: 600;
-    width: fit-content;
-    cursor: pointer;
+    .gallery-actions { flex-direction: column; gap: 6px; left: 12px; bottom: 12px; }
 }
