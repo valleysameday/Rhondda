@@ -42,7 +42,7 @@ export async function loadView(view, options = {}) {
     try {
       console.log("🟡 Importing JS for:", view);
 
-      // ⭐ ADMIN ROUTE HANDLING
+      // ⭐ ADMIN ROUTE PROTECTION
       if (view === "admin-dashboard") {
         if (!window.currentUserData?.isAdmin) {
           console.warn("❌ Not an admin, redirecting");
@@ -112,6 +112,13 @@ getFirebase().then(async fb => {
 
       console.log("🟢 Business status:", window.isBusinessUser);
       console.log("🟢 Admin status:", window.currentUserData?.isAdmin);
+
+      // ⭐ SHOW ADMIN BUTTON IF ADMIN
+      const adminBtn = document.getElementById("openAdminDashboard");
+      if (adminBtn) {
+        adminBtn.style.display = window.currentUserData?.isAdmin ? "inline-block" : "none";
+      }
+
     } catch (e) {
       console.warn("❌ User lookup failed:", e);
     }
@@ -186,6 +193,15 @@ getFirebase().then(async fb => {
       };
 
       waitForRole();
+    });
+
+    // ⭐ ADMIN BUTTON CLICK HANDLER
+    document.getElementById("openAdminDashboard")?.addEventListener("click", () => {
+      if (!window.currentUserData?.isAdmin) {
+        alert("Admin access only");
+        return;
+      }
+      loadView("admin-dashboard");
     });
 
     console.log("🔵 Loading home view");
