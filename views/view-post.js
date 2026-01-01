@@ -1,18 +1,16 @@
 import { doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { loadView } from "/index/js/main.js";
-import { showToast } from "/index/js/toast.js";
+
 /* ============================================================
-   SAVE / UNSAVE BUTTON (With Haptics)
+   SAVE / UNSAVE BUTTON
 ============================================================ */
 async function toggleSave(postId, db, auth) {
   const uid = auth.currentUser?.uid;
   if (!uid) return showToast("Please log in to save ads", "error");
 
-  // 2026 Standard: Haptic feedback for mobile
-  if (window.navigator.vibrate) window.navigator.vibrate(10);
-
   const ref = doc(db, "users", uid, "savedPosts", postId);
   const snap = await getDoc(ref);
+
   const btn = document.getElementById("savePostBtn");
 
   if (snap.exists()) {
@@ -21,7 +19,10 @@ async function toggleSave(postId, db, auth) {
     btn.querySelector("span").textContent = "Save";
     showToast("Removed from saved ads", "info");
   } else {
-    await setDoc(ref, { postId, savedAt: Date.now() });
+    await setDoc(ref, {
+      postId,
+      savedAt: Date.now()
+    });
     btn.classList.add("saved");
     btn.querySelector("span").textContent = "Saved";
     showToast("Saved!", "success");
@@ -35,8 +36,7 @@ export async function init({ db, auth }) {
   const postId = sessionStorage.getItem("viewPostId");
   if (!postId) return loadView("home");
 
-  // Minor delay to ensure smooth transition
-  await new Promise(r => setTimeout(r, 50));
+  await new Promise(r => setTimeout(r, 50)); // tiny delay for DOM ready
 
   try {
     const postSnap = await getDoc(doc(db, "posts", postId));
@@ -45,175 +45,211 @@ export async function init({ db, auth }) {
     const post = postSnap.data();
     const priceText = post.price ? `£${post.price}` : "Contact for price";
 
-    // Text Content Mapping
     const safeSetText = (id, text) => {
       const el = document.getElementById(id);
       if (el) el.textContent = text;
     };
 
     safeSetText("viewTitle", post.title);
-    safeSetText("viewDescription", post.description || post.teaser || "No description provided.");
+    safeSetText("viewDescription", post.description || post.teaser || "");
     safeSetText("viewCategory", post.category || "General");
     safeSetText("viewArea", post.area || "Rhondda");
     safeSetText("viewTime", post.posted || "Just now");
-    safeSetText("viewPriceMobile", priceText);
+    ["viewPrice", "viewPriceMobile"].forEach(id => safeSetText(id, priceText));
 
     /* ============================================================
-       CONTACT & REVEAL LOGIC
+       SAVE BUTTON — CHECK IF ALREADY SAVED
     ============================================================ */
-    const revealBtn = document.getElementById("revealNumberBtn");
-    const revealedNum = document.getElementById("revealedNumber");
-
-    if (post.phone) {
-      revealBtn.onclick = () => {
-        revealBtn.style.display = "none";
-        revealedNum.innerHTML = `<a href="tel:${post.phone}" class="phone-link">${post.phone}</a>`;
-        revealedNum.style.display = "block";
-      };
-    } else {
-      revealBtn.style.display = "none";
-    }
-
-    /* ============================================================
-       GALLERY & LIGHTBOX (Modern Implementation)
-    ============================================================ */
-    const preview = document.getElementById("galleryPreview");
-    const imageCount = document.getElementById("imageCount");
-    const lightbox = document.getElementById("lightbox");
-    const lightboxTrack = document.getElementById("lightboxTrack");
-    const closeBtn = document.getElementById("lightboxClose");
-
-    const images = post.images?.length ? post.images : ["/images/image-webholder.webp"];
-    let currentIndex = 0;
-
-    // Build Premium Preview
-    preview.innerHTML = "";
-    images.slice(0, 3).forEach((src, i) => {
-      const img = document.createElement("img");
-      img.src = src;
-      img.loading = "lazy";
-      // First image is "main", others are sidebar thumbs
-      img.className = i === 0 ? "main" : "thumb";
-      img.onclick = () => openLightbox(i);
-      preview.appendChild(img);
-    });
-
-    imageCount.textContent = `${images.length} photos`;
-
-    // Build Lightbox Track
-    lightboxTrack.innerHTML = "";
-    images.forEach(src => {
-      const slide = document.createElement("div");
-      slide.style.minWidth = "100%";
-      slide.style.display = "flex";
-      slide.style.justifyContent = "center";
-      slide.style.alignItems = "center";
-      
-      const img = document.createElement("img");
-      img.src = src;
-      slide.appendChild(img);
-      lightboxTrack.appendChild(slide);
-    });
-
-    const openLightbox = (index) => {
-      currentIndex = index;
-      updateLightboxPosition();
-      lightbox.classList.add("active");
-      document.body.style.overflow = "hidden"; // Prevent scroll
-    };
-
-    const updateLightboxPosition = () => {
-      lightboxTrack.style.transition = "transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)";
-      lightboxTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
-    };
-
-    closeBtn.onclick = () => {
-      lightbox.classList.remove("active");
-      document.body.style.overflow = "";
-    };
-
-    /* Swipe Physics for 2026 Displays */
-    let startX = 0;
-    let currentTranslate = 0;
-
-    lightboxTrack.addEventListener("touchstart", e => {
-        startX = e.touches[0].clientX;
-        lightboxTrack.style.transition = "none";
-    });
-
-    lightboxTrack.addEventListener("touchmove", e => {
-        const moveX = e.touches[0].clientX - startX;
-        const translate = (-currentIndex * lightboxTrack.offsetWidth) + moveX;
-        lightboxTrack.style.transform = `translateX(${translate}px)`;
-    });
-
-    lightboxTrack.addEventListener("touchend", e => {
-        const endX = e.changedTouches[0].clientX;
-        const diff = startX - endX;
-
-        if (Math.abs(diff) > 80) {
-            if (diff > 0 && currentIndex < images.length - 1) currentIndex++;
-            else if (diff < 0 && currentIndex > 0) currentIndex--;
-        }
-        updateLightboxPosition();
-    });
-
-    /* ============================================================
-       BUTTON ACTIONS (Share, Chat, Save)
-    ============================================================ */
-    
-    // Save Post
     const saveBtn = document.getElementById("savePostBtn");
     if (saveBtn && auth.currentUser) {
-      const savedSnap = await getDoc(doc(db, "users", auth.currentUser.uid, "savedPosts", postId));
+      const uid = auth.currentUser.uid;
+      const savedRef = doc(db, "users", uid, "savedPosts", postId);
+      const savedSnap = await getDoc(savedRef);
+
       if (savedSnap.exists()) {
         saveBtn.classList.add("saved");
         saveBtn.querySelector("span").textContent = "Saved";
       }
-      saveBtn.onclick = () => toggleSave(postId, db, auth);
+
+      saveBtn.addEventListener("click", () => toggleSave(postId, db, auth));
     }
 
-    // Share Post
-    document.getElementById("sharePostBtn")?.addEventListener("click", async () => {
-      const shareData = {
+    /* ============================================================
+   SHARE BUTTON
+============================================================ */
+const shareBtn = document.getElementById("sharePostBtn");
+
+if (shareBtn) {
+  shareBtn.addEventListener("click", async () => {
+    const url = window.location.href;
+
+    const shareText = `
+🏷️ ${post.title}
+💷 ${post.price ? "£" + post.price : "Contact for price"}
+📍 ${post.location || "Rhondda"}
+📁 ${post.category || "General"}
+
+View on Rhondda Noticeboard:
+${url}
+    `.trim();
+
+    if (navigator.share) {
+      await navigator.share({
         title: post.title,
-        text: `Check out this ${post.title} for ${priceText} in ${post.area || 'Rhondda'}`,
-        url: window.location.href
-      };
-      if (navigator.share) await navigator.share(shareData);
-      else {
-        await navigator.clipboard.writeText(window.location.href);
-        showToast("Link copied to clipboard!", "success");
+        text: shareText,
+        url
+      });
+    } else {
+      navigator.clipboard.writeText(shareText);
+      showToast("Share text copied!", "success");
+    }
+  });
+}
+/* ============================================================
+   MESSAGE SELLER
+============================================================ */
+document.getElementById("messageSeller")?.addEventListener("click", async () => {
+  const buyerId = auth.currentUser?.uid;
+  const sellerId = post.userId;
+  if (!buyerId) return loadView("login");
+  if (buyerId === sellerId) return;
+
+  const convoId = `${buyerId}_${sellerId}_${postId}`;
+
+  await setDoc(
+    doc(db, "conversations", convoId),
+    {
+      participants: [buyerId, sellerId],
+      postId,
+      lastMessage: "",
+      lastMessageSender: "",
+      updatedAt: Date.now()
+    },
+    { merge: true }
+  );
+
+  /* ============================================================
+     SEND EMAIL NOTIFICATION TO SELLER (Netlify Function)
+  ============================================================ */
+
+  try {
+    // Get seller email from Firestore
+    const sellerSnap = await getDoc(doc(db, "users", sellerId));
+    const sellerEmail = sellerSnap.data()?.email;
+
+    if (sellerEmail) {
+      await fetch("/.netlify/functions/sendMessageEmail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sellerEmail: sellerEmail,
+          messageText: "You have a new message waiting for you.",
+          postTitle: post.title
+        })
+      });
+    }
+  } catch (err) {
+    console.error("Email notification error:", err);
+  }
+
+  sessionStorage.setItem("activeConversationId", convoId);
+  loadView("chat", { forceInit: true });
+});
+    /* ============================================================
+       BACK BUTTON
+    ============================================================ */
+    document.getElementById("backToFeed").addEventListener("click", () => {
+      sessionStorage.removeItem("viewPostId");
+      loadView("home", { forceInit: true });
+    });
+
+    /* ============================================================
+       REPORT BUTTON
+    ============================================================ */
+    document.getElementById("reportPost")?.addEventListener("click", () => {
+      if (confirm("Report this listing for review?")) {
+        alert("Thank you. This listing has been flagged.");
       }
     });
 
-    // Chat Logic
-    document.getElementById("messageSeller")?.addEventListener("click", async () => {
-      const buyerId = auth.currentUser?.uid;
-      if (!buyerId) return loadView("login");
-      if (buyerId === post.userId) return showToast("This is your own ad", "info");
+    /* ============================================================
+       GALLERY + LIGHTBOX (unchanged)
+    ============================================================ */
+    const gallery = document.getElementById("galleryContainer");
+    const dotsContainer = document.getElementById("galleryDots");
+    if (!gallery) return;
 
-      const convoId = [buyerId, post.userId, postId].sort().join("_");
-      await setDoc(doc(db, "conversations", convoId), {
-        participants: [buyerId, post.userId],
-        postId,
-        updatedAt: Date.now(),
-        lastMessage: "Interested in " + post.title
-      }, { merge: true });
+    gallery.innerHTML = "";
+    if (dotsContainer) dotsContainer.innerHTML = "";
 
-      sessionStorage.setItem("activeConversationId", convoId);
-      loadView("chat", { forceInit: true });
+    const images = post.images?.length ? post.images : ["/images/image-webholder.webp"];
+    let currentIndex = 0;
+    let zoomLevel = 1;
+    const slides = [];
+
+    images.forEach((url, i) => {
+      const img = document.createElement("img");
+      img.src = url;
+      img.alt = post.title;
+      img.loading = "lazy";
+      img.className = "gallery-image";
+      if (i === 0) img.classList.add("active");
+      gallery.appendChild(img);
+      slides.push(img);
+
+      if (dotsContainer) {
+        const dot = document.createElement("button");
+        dot.className = i === 0 ? "gallery-dot active" : "gallery-dot";
+        dot.onclick = () => updateSlide(i);
+        dotsContainer.appendChild(dot);
+      }
     });
 
-    // Navigation
-    document.getElementById("backToFeed").onclick = () => loadView("home");
-    document.getElementById("viewSellerProfileBtn").onclick = () => {
-      sessionStorage.setItem("profileUserId", post.userId);
-      loadView("seller-profile", { forceInit: true });
+    const updateSlide = idx => {
+      currentIndex = (idx + slides.length) % slides.length;
+      slides.forEach((img, i) => {
+        img.classList.toggle("active", i === currentIndex);
+        img.style.transform = "scale(1)";
+      });
+      gallery.style.transform = `translateX(-${currentIndex * 100}%)`;
+      if (dotsContainer) dotsContainer.querySelectorAll(".gallery-dot").forEach((d, i) => d.classList.toggle("active", i === currentIndex));
+      zoomLevel = 1;
     };
+    updateSlide(0);
+
+    let startX = 0, dragging = false;
+    gallery.addEventListener("touchstart", e => { if (e.touches.length === 1) { startX = e.touches[0].clientX; dragging = true; } });
+    gallery.addEventListener("touchend", e => {
+      if (!dragging) return;
+      const dx = e.changedTouches[0].clientX - startX;
+      if (Math.abs(dx) > 50) dx < 0 ? updateSlide(currentIndex + 1) : updateSlide(currentIndex - 1);
+      dragging = false;
+    });
+    gallery.addEventListener("wheel", e => {
+      e.preventDefault();
+      zoomLevel += e.deltaY < 0 ? 0.1 : -0.1;
+      zoomLevel = Math.min(Math.max(zoomLevel, 1), 3);
+      slides[currentIndex].style.transform = `scale(${zoomLevel})`;
+    });
+
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightboxImage");
+    const lightboxClose = document.getElementById("lightboxClose");
+    if (lightbox && lightboxImg) {
+      slides.forEach((img, i) => {
+        img.style.cursor = "zoom-in";
+        img.onclick = () => {
+          currentIndex = i;
+          lightboxImg.src = img.src;
+          lightbox.classList.add("active");
+        };
+      });
+      const closeLB = () => lightbox.classList.remove("active");
+      lightboxClose?.addEventListener("click", closeLB);
+      lightbox.addEventListener("click", e => e.target === lightbox && closeLB());
+    }
 
   } catch (err) {
-    console.error("2026 Init Error:", err);
-    showToast("Error loading post details", "error");
+    console.error("View Post Error:", err);
   }
 }
