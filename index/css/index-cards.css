@@ -281,3 +281,23 @@
   50% { opacity: 1; }
   100% { opacity: 0.6; }
 }
+.save-heart {
+  margin-left: auto; /* pushes it to the right */
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #d1d5db;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  transition: color .2s ease, transform .15s ease;
+}
+
+.save-heart:hover {
+  color: #ef4444;
+  transform: scale(1.15);
+}
+
+.save-heart.saved {
+  color: #ef4444;
+}
