@@ -175,3 +175,20 @@ body {
     padding: 1rem;
   }
 }
+.admin-modal {
+  animation: fadeIn 0.2s ease;
+}
+
+.admin-modal-content {
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0 }
+  to { opacity: 1 }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0 }
+  to { transform: translateY(0); opacity: 1 }
+}
