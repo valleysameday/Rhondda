@@ -12,20 +12,33 @@ import {
 
 let auth, db, storage;
 
+/* ============================================================
+   INIT
+============================================================ */
 export async function init({ auth: a, db: d, storage: s }) {
+  console.log("🛠️ Admin init called");
+
   auth = a;
   db = d;
   storage = s;
 
-  if (!auth || !db) return;
+  if (!auth || !db) {
+    console.warn("❌ Missing auth or db");
+    return;
+  }
 
   const user = auth.currentUser;
-  if (!user) return;
-
-  // You should have loaded user data somewhere globally
-  if (!window.currentUserData || !window.currentUserData.isAdmin) {
-    return; // extra safety
+  if (!user) {
+    console.warn("❌ No logged-in user");
+    return;
   }
+
+  if (!window.currentUserData || !window.currentUserData.isAdmin) {
+    console.warn("⛔ User is not admin");
+    return;
+  }
+
+  console.log("✅ Admin authenticated:", user.uid);
 
   initNav();
   await loadOverview();
@@ -34,23 +47,30 @@ export async function init({ auth: a, db: d, storage: s }) {
   await loadPostsAndReports();
   await loadSettings();
   await loadSubscriptions();
+
+  console.log("✅ Admin dashboard loaded");
 }
 
 /* ============================================================
-   NAVIGATION BETWEEN SECTIONS
+   NAVIGATION
 ============================================================ */
 function initNav() {
+  console.log("🧭 Initialising navigation");
+
   const buttons = document.querySelectorAll(".admin-nav-btn");
   const sections = document.querySelectorAll(".admin-section");
 
   buttons.forEach(btn => {
     btn.addEventListener("click", () => {
+      console.log("➡️ Nav click:", btn.dataset.section);
+
       buttons.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
 
       const target = btn.dataset.section;
       sections.forEach(sec => {
-        sec.style.display = sec.id === `admin-section-${target}` ? "block" : "none";
+        sec.style.display =
+          sec.id === `admin-section-${target}` ? "block" : "none";
       });
     });
   });
@@ -60,48 +80,40 @@ function initNav() {
    OVERVIEW
 ============================================================ */
 async function loadOverview() {
-  // Total users
+  console.log("📊 Loading overview");
+
   const usersSnap = await getDocs(collection(db, "users"));
   const totalUsers = usersSnap.size;
   const businessUsers = usersSnap.docs.filter(d => d.data().isBusiness).length;
 
-  // Total posts
   const postsSnap = await getDocs(collection(db, "posts"));
   const totalPosts = postsSnap.size;
 
-  // Site views (from analyticsEvents)
   const analyticsSnap = await getDocs(
     query(collection(db, "analyticsEvents"), where("type", "==", "site_view"))
   );
   const totalSiteViews = analyticsSnap.size;
 
-  // Messages (conversations or messages collection)
   let totalMessages = 0;
   try {
     const messagesSnap = await getDocs(collection(db, "messages"));
     totalMessages = messagesSnap.size;
-  } catch (e) {
-    // if you don't have messages collection yet, ignore
+  } catch {
+    console.warn("ℹ️ No messages collection");
   }
 
-  // Active today (users with any event today)
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+
   let activeToday = 0;
   try {
     const todaySnap = await getDocs(
-      query(
-        collection(db, "analyticsEvents"),
-        where("timestamp", ">=", today)
-      )
+      query(collection(db, "analyticsEvents"), where("timestamp", ">=", today))
     );
-    const uniqueUsers = new Set();
-    todaySnap.forEach(doc => {
-      const d = doc.data();
-      if (d.userId) uniqueUsers.add(d.userId);
-    });
-    activeToday = uniqueUsers.size;
-  } catch (e) {}
+    const users = new Set();
+    todaySnap.forEach(d => d.data().userId && users.add(d.data().userId));
+    activeToday = users.size;
+  } catch {}
 
   document.getElementById("adminTotalUsers").textContent = totalUsers;
   document.getElementById("adminTotalBusinesses").textContent = businessUsers;
@@ -109,16 +121,19 @@ async function loadOverview() {
   document.getElementById("adminTotalSiteViews").textContent = totalSiteViews;
   document.getElementById("adminTotalMessages").textContent = totalMessages;
   document.getElementById("adminActiveToday").textContent = activeToday;
+
+  console.log("✅ Overview loaded");
 }
 
 /* ============================================================
-   TRAFFIC & ENGAGEMENT
+   TRAFFIC
 ============================================================ */
 async function loadTraffic() {
+  console.log("📈 Loading traffic");
+
   const topPostsEl = document.getElementById("adminTopPosts");
   const topCatsEl = document.getElementById("adminTopCategories");
 
-  // Top viewed posts
   const postsSnap = await getDocs(
     query(collection(db, "posts"), orderBy("views", "desc"), limit(5))
   );
@@ -135,35 +150,37 @@ async function loadTraffic() {
     topPostsEl.appendChild(div);
   });
 
-  // Top categories (simple count)
   const allPostsSnap = await getDocs(collection(db, "posts"));
   const catCounts = {};
+
   allPostsSnap.forEach(docSnap => {
-    const d = docSnap.data();
-    const cat = d.category || "other";
+    const cat = docSnap.data().category || "other";
     catCounts[cat] = (catCounts[cat] || 0) + 1;
   });
 
-  const sortedCats = Object.entries(catCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5);
-
   topCatsEl.innerHTML = "";
-  sortedCats.forEach(([cat, count]) => {
-    const div = document.createElement("div");
-    div.className = "admin-list-item";
-    div.innerHTML = `
-      <span>${cat}</span>
-      <span>${count} posts</span>
-    `;
-    topCatsEl.appendChild(div);
-  });
+  Object.entries(catCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .forEach(([cat, count]) => {
+      const div = document.createElement("div");
+      div.className = "admin-list-item";
+      div.innerHTML = `
+        <span>${cat}</span>
+        <span>${count} posts</span>
+      `;
+      topCatsEl.appendChild(div);
+    });
+
+  console.log("✅ Traffic loaded");
 }
 
 /* ============================================================
-   BUSINESSES & PLANS
+   BUSINESSES
 ============================================================ */
 async function loadBusinesses() {
+  console.log("🏪 Loading businesses");
+
   const tbody = document.getElementById("adminBusinessesTable");
   tbody.innerHTML = "";
 
@@ -171,73 +188,66 @@ async function loadBusinesses() {
     query(collection(db, "users"), where("isBusiness", "==", true))
   );
 
-  for (const docSnap of snap.docs) {
+  snap.docs.forEach(docSnap => {
     const d = docSnap.data();
     const tr = document.createElement("tr");
-
-    const plan = d.plan || "free";
-    const status = d.suspended ? "Suspended" : "Active";
 
     tr.innerHTML = `
       <td>${d.name || d.displayName || "(no name)"}</td>
       <td>${d.area || "-"}</td>
       <td>${d.followersCount || 0}</td>
       <td>${d.adsCount || 0}</td>
-      <td>${plan}</td>
-      <td>${status}</td>
+      <td>${d.plan || "free"}</td>
+      <td>${d.suspended ? "Suspended" : "Active"}</td>
       <td>
-        <button class="admin-btn small" data-action="upgrade" data-id="${docSnap.id}">Upgrade</button>
-        <button class="admin-btn small secondary" data-action="downgrade" data-id="${docSnap.id}">Downgrade</button>
-        <button class="admin-btn small danger" data-action="toggleSuspend" data-id="${docSnap.id}">
+        <button data-action="upgrade" data-id="${docSnap.id}">Upgrade</button>
+        <button data-action="downgrade" data-id="${docSnap.id}">Downgrade</button>
+        <button data-action="toggleSuspend" data-id="${docSnap.id}">
           ${d.suspended ? "Unsuspend" : "Suspend"}
         </button>
       </td>
     `;
 
     tbody.appendChild(tr);
-  }
+  });
 
-  tbody.addEventListener("click", async e => {
+  tbody.onclick = async e => {
     const btn = e.target.closest("button[data-action]");
     if (!btn) return;
 
-    const id = btn.dataset.id;
-    const action = btn.dataset.action;
-    const userRef = doc(db, "users", id);
+    console.log("🛠️ Business action:", btn.dataset.action, btn.dataset.id);
 
-    if (action === "upgrade") {
-      await updateDoc(userRef, { plan: "premium" });
-    }
-    if (action === "downgrade") {
-      await updateDoc(userRef, { plan: "free" });
-    }
-    if (action === "toggleSuspend") {
-      const snap = await getDoc(userRef);
-      const d = snap.data();
-      await updateDoc(userRef, { suspended: !d.suspended });
+    const ref = doc(db, "users", btn.dataset.id);
+
+    if (btn.dataset.action === "upgrade") await updateDoc(ref, { plan: "premium" });
+    if (btn.dataset.action === "downgrade") await updateDoc(ref, { plan: "free" });
+    if (btn.dataset.action === "toggleSuspend") {
+      const snap = await getDoc(ref);
+      await updateDoc(ref, { suspended: !snap.data().suspended });
     }
 
     await loadBusinesses();
     await loadSubscriptions();
-  });
+  };
 }
 
 /* ============================================================
    POSTS & REPORTS
 ============================================================ */
 async function loadPostsAndReports() {
+  console.log("📝 Loading posts & reports");
+
   const postsTbody = document.getElementById("adminPostsTable");
   const reportsTbody = document.getElementById("adminReportsTable");
 
   postsTbody.innerHTML = "";
   reportsTbody.innerHTML = "";
 
-  // Posts
   const postsSnap = await getDocs(
     query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(100))
   );
 
-  for (const docSnap of postsSnap.docs) {
+  postsSnap.docs.forEach(docSnap => {
     const d = docSnap.data();
     const tr = document.createElement("tr");
 
@@ -252,31 +262,30 @@ async function loadPostsAndReports() {
       <td>${d.views || 0}</td>
       <td>${created}</td>
       <td>
-        <button class="admin-btn small danger" data-post-action="delete" data-id="${docSnap.id}">Delete</button>
+        <button data-post-action="delete" data-id="${docSnap.id}">Delete</button>
       </td>
     `;
 
     postsTbody.appendChild(tr);
-  }
+  });
 
-  postsTbody.addEventListener("click", async e => {
+  postsTbody.onclick = async e => {
     const btn = e.target.closest("button[data-post-action]");
     if (!btn) return;
 
-    const id = btn.dataset.id;
+    console.log("🗑️ Deleting post:", btn.dataset.id);
+
     if (!confirm("Delete this post?")) return;
 
-    await updateDoc(doc(db, "posts", id), { deleted: true });
-    // or deleteDoc if you prefer
+    await updateDoc(doc(db, "posts", btn.dataset.id), { deleted: true });
     await loadPostsAndReports();
-  });
+  };
 
-  // Reports
   const reportsSnap = await getDocs(
     query(collection(db, "reports"), orderBy("createdAt", "desc"), limit(100))
   );
 
-  for (const docSnap of reportsSnap.docs) {
+  reportsSnap.docs.forEach(docSnap => {
     const d = docSnap.data();
     const tr = document.createElement("tr");
 
@@ -291,41 +300,39 @@ async function loadPostsAndReports() {
       <td>${created}</td>
       <td>${d.status || "open"}</td>
       <td>
-        <button class="admin-btn small" data-report-action="resolve" data-id="${docSnap.id}">Resolve</button>
-        <button class="admin-btn small secondary" data-report-action="dismiss" data-id="${docSnap.id}">Dismiss</button>
+        <button data-report-action="resolve" data-id="${docSnap.id}">Resolve</button>
+        <button data-report-action="dismiss" data-id="${docSnap.id}">Dismiss</button>
       </td>
     `;
 
     reportsTbody.appendChild(tr);
-  }
+  });
 
-  reportsTbody.addEventListener("click", async e => {
+  reportsTbody.onclick = async e => {
     const btn = e.target.closest("button[data-report-action]");
     if (!btn) return;
 
-    const id = btn.dataset.id;
-    const action = btn.dataset.reportAction;
-    const ref = doc(db, "reports", id);
+    console.log("🚨 Report action:", btn.dataset.reportAction, btn.dataset.id);
 
-    if (action === "resolve") {
-      await updateDoc(ref, { status: "resolved" });
-    }
-    if (action === "dismiss") {
-      await updateDoc(ref, { status: "dismissed" });
-    }
+    const ref = doc(db, "reports", btn.dataset.id);
+    if (btn.dataset.reportAction === "resolve") await updateDoc(ref, { status: "resolved" });
+    if (btn.dataset.reportAction === "dismiss") await updateDoc(ref, { status: "dismissed" });
 
     await loadPostsAndReports();
-  });
+  };
 }
 
 /* ============================================================
    SETTINGS
 ============================================================ */
 async function loadSettings() {
+  console.log("⚙️ Loading settings");
+
   const settingsRef = doc(db, "settings", "global");
   let snap = await getDoc(settingsRef);
 
   if (!snap.exists()) {
+    console.warn("⚠️ Global settings missing, creating defaults");
     await updateDoc(settingsRef, {
       businessPremiumEnabled: false,
       postingEnabled: true,
@@ -338,46 +345,19 @@ async function loadSettings() {
 
   const d = snap.data() || {};
 
-  const toggleBusinessPremium = document.getElementById("toggleBusinessPremium");
-  const togglePostingEnabled = document.getElementById("togglePostingEnabled");
-  const toggleSignupsEnabled = document.getElementById("toggleSignupsEnabled");
-  const bannerInput = document.getElementById("adminBannerInput");
-  const bannerBtn = document.getElementById("adminSaveBannerBtn");
-  const featuredInput = document.getElementById("adminFeaturedBusinessId");
-  const featuredBtn = document.getElementById("adminSaveFeaturedBusinessBtn");
-
-  toggleBusinessPremium.checked = !!d.businessPremiumEnabled;
-  togglePostingEnabled.checked = !!d.postingEnabled;
-  toggleSignupsEnabled.checked = !!d.newSignupsEnabled;
-  bannerInput.value = d.homepageBanner || "";
-  featuredInput.value = d.homepageFeaturedBusinessId || "";
-
-  toggleBusinessPremium.addEventListener("change", async () => {
-    await updateDoc(settingsRef, { businessPremiumEnabled: toggleBusinessPremium.checked });
-  });
-
-  togglePostingEnabled.addEventListener("change", async () => {
-    await updateDoc(settingsRef, { postingEnabled: togglePostingEnabled.checked });
-  });
-
-  toggleSignupsEnabled.addEventListener("change", async () => {
-    await updateDoc(settingsRef, { newSignupsEnabled: toggleSignupsEnabled.checked });
-  });
-
-  bannerBtn.addEventListener("click", async () => {
-    await updateDoc(settingsRef, { homepageBanner: bannerInput.value.trim() });
-  });
-
-  featuredBtn.addEventListener("click", async () => {
-    const val = featuredInput.value.trim() || null;
-    await updateDoc(settingsRef, { homepageFeaturedBusinessId: val });
-  });
+  document.getElementById("toggleBusinessPremium").checked = !!d.businessPremiumEnabled;
+  document.getElementById("togglePostingEnabled").checked = !!d.postingEnabled;
+  document.getElementById("toggleSignupsEnabled").checked = !!d.newSignupsEnabled;
+  document.getElementById("adminBannerInput").value = d.homepageBanner || "";
+  document.getElementById("adminFeaturedBusinessId").value = d.homepageFeaturedBusinessId || "";
 }
 
 /* ============================================================
-   PAYMENTS & SUBSCRIPTIONS (PLAN VIEW)
+   SUBSCRIPTIONS
 ============================================================ */
 async function loadSubscriptions() {
+  console.log("💳 Loading subscriptions");
+
   const tbody = document.getElementById("adminSubscriptionsTable");
   if (!tbody) return;
   tbody.innerHTML = "";
@@ -386,42 +366,35 @@ async function loadSubscriptions() {
     query(collection(db, "users"), where("isBusiness", "==", true))
   );
 
-  for (const docSnap of snap.docs) {
+  snap.docs.forEach(docSnap => {
     const d = docSnap.data();
     const tr = document.createElement("tr");
 
-    const plan = d.plan || "free";
-
     tr.innerHTML = `
       <td>${d.name || d.displayName || "(no name)"}</td>
-      <td>${plan}</td>
+      <td>${d.plan || "free"}</td>
       <td>${d.stripeStatus || "-"}</td>
       <td>${d.nextBillingDate || "-"}</td>
       <td>
-        <button class="admin-btn small" data-sub-action="upgrade" data-id="${docSnap.id}">Upgrade</button>
-        <button class="admin-btn small secondary" data-sub-action="downgrade" data-id="${docSnap.id}">Downgrade</button>
+        <button data-sub-action="upgrade" data-id="${docSnap.id}">Upgrade</button>
+        <button data-sub-action="downgrade" data-id="${docSnap.id}">Downgrade</button>
       </td>
     `;
 
     tbody.appendChild(tr);
-  }
+  });
 
-  tbody.addEventListener("click", async e => {
+  tbody.onclick = async e => {
     const btn = e.target.closest("button[data-sub-action]");
     if (!btn) return;
 
-    const id = btn.dataset.id;
-    const action = btn.dataset.subAction;
-    const userRef = doc(db, "users", id);
+    console.log("💳 Subscription action:", btn.dataset.subAction, btn.dataset.id);
 
-    if (action === "upgrade") {
-      await updateDoc(userRef, { plan: "premium" });
-    }
-    if (action === "downgrade") {
-      await updateDoc(userRef, { plan: "free" });
-    }
+    const ref = doc(db, "users", btn.dataset.id);
+    if (btn.dataset.subAction === "upgrade") await updateDoc(ref, { plan: "premium" });
+    if (btn.dataset.subAction === "downgrade") await updateDoc(ref, { plan: "free" });
 
     await loadSubscriptions();
     await loadBusinesses();
-  });
-      }
+  };
+    }
