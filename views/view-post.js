@@ -227,7 +227,28 @@ document.getElementById("messageSeller")?.addEventListener("click", async () => 
       sessionStorage.setItem("profileUserId", post.userId);
       loadView("seller-profile", { forceInit: true });
     };
+// Report Post
+document.getElementById("reportPost")?.addEventListener("click", async () => {
+  const reason = prompt("Why are you reporting this listing?");
+  if (!reason) return;
 
+  try {
+    await setDoc(
+      doc(db, "reports", `${postId}_${Date.now()}`),
+      {
+        postId,
+        reason,
+        reportedAt: Date.now(),
+        reporterId: auth.currentUser?.uid || "anonymous"
+      }
+    );
+
+    alert("Thanks — we’ll review this shortly.");
+  } catch (err) {
+    console.error("Report error:", err);
+    alert("Something went wrong — please try again.");
+  }
+});
   } catch (err) {
     console.error("2026 Init Error:", err);
     showToast("Error loading post details", "error");
