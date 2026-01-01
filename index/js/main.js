@@ -109,7 +109,30 @@ getFirebase().then(async fb => {
     }
 
     try {
-      const snap = await getDoc(doc(db, "users", user.uid));
+  let snap = await getDoc(doc(db, "users", user.uid));
+
+  // ⭐ FIX: If Firestore doc isn't ready yet (new signup), retry once after 200ms
+  if (!snap.exists()) {
+    console.warn("⏳ User doc not ready — retrying...");
+    await new Promise(r => setTimeout(r, 200));
+    snap = await getDoc(doc(db, "users", user.uid));
+  }
+
+  window.currentUserData = snap.exists() ? snap.data() : null;
+  window.isBusinessUser = snap.exists() && snap.data().isBusiness === true;
+
+  console.log("🟢 Business status:", window.isBusinessUser);
+  console.log("🟢 Admin status:", window.currentUserData?.isAdmin);
+
+  // ⭐ SHOW ADMIN BUTTON IF ADMIN
+  const adminBtn = document.getElementById("openAdminDashboard");
+  if (adminBtn) {
+    adminBtn.style.display = window.currentUserData?.isAdmin ? "inline-block" : "none";
+  }
+
+} catch (e) {
+  console.warn("❌ User lookup failed:", e);
+    }
 
       window.currentUserData = snap.exists() ? snap.data() : null;
       window.isBusinessUser = snap.exists() && snap.data().isBusiness === true;
