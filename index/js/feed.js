@@ -64,7 +64,8 @@ export async function initFeed({ db }, options = {}) {
           price: d.price || null,
           area: d.area || "Rhondda",
           image: d.images?.[0] || "/images/image-webholder.webp",
-          type: d.isBusiness ? "business" : "standard",
+          type: d.isFeatured ? "featured" : "standard",
+          isBusiness: d.isBusiness === true,
           cta: d.cta || null,
           rentFrequency: d.rentFrequency || null,
           bedrooms: d.bedrooms || null,
@@ -82,7 +83,7 @@ export async function initFeed({ db }, options = {}) {
         };
       });
 
-      // ⭐ Add featured business at top
+      // ⭐ Static featured business at top (still uses "featured" styling)
       posts.unshift({
         id: "featured-biz",
         title: "Rhondda Pro Cleaning Services",
@@ -91,7 +92,8 @@ export async function initFeed({ db }, options = {}) {
         categoryLabel: "Sponsored",
         area: "Rhondda Valleys",
         image: "/images/business-cleaning.jpg",
-        type: "business",
+        type: "featured",
+        isBusiness: true,
         cta: "Get a Quote"
       });
 
@@ -139,19 +141,18 @@ export async function initFeed({ db }, options = {}) {
       card.innerHTML = `
         <div class="feed-image">
           <img src="${post.image}" alt="${post.title}">
-          ${post.type === "business" ? `<span class="sponsored-badge">Sponsored</span>` : ''}
+          ${post.isBusiness && post.type !== "featured" ? `<span class="biz-badge">Business Account</span>` : ''}
         </div>
 
         <div class="feed-content">
           <h3 class="feed-title">${post.title}</h3>
           <div class="feed-meta">${buildMeta(post)}</div>
-          ${post.type === "business" && post.cta ? `<button class="cta-btn">${post.cta}</button>` : ''}
+          ${post.type === "featured" && post.cta ? `<button class="cta-btn">${post.cta}</button>` : ''}
         </div>
 
         <button class="report-btn" data-id="${post.id}" title="Report">⚑</button>
       `;
 
-      /* ⭐ OPEN POST + SAVE SCROLL POSITION */
       card.addEventListener('click', e => {
         if (e.target.closest('.report-btn') || e.target.closest('.cta-btn')) return;
 
@@ -250,7 +251,6 @@ export async function initFeed({ db }, options = {}) {
   showSkeletons();
   const posts = await fetchPosts();
 
-  // ⭐ Restore category
   const savedCategory = sessionStorage.getItem("feedCategory");
   if (savedCategory) {
     const btn = document.querySelector(`.category-btn[data-category="${savedCategory}"]`);
@@ -269,7 +269,6 @@ export async function initFeed({ db }, options = {}) {
   loadWeather();
   initFeaturedAds();
 
-  // ⭐ Restore scroll
   const savedScroll = sessionStorage.getItem("feedScroll");
   if (savedScroll) {
     setTimeout(() => {
