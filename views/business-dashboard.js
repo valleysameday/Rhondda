@@ -34,6 +34,17 @@ export async function init({ auth: a, db: d, storage: s }) {
 
   const data = snap.data();
 
+  // ⭐ Load global settings (for premium toggle)
+  let premiumEnabled = false;
+  try {
+    const settingsSnap = await getDoc(doc(db, "settings", "global"));
+    premiumEnabled = settingsSnap.exists() && settingsSnap.data().businessPremiumEnabled === true;
+  } catch (e) {
+    console.warn("No global settings doc yet, premium disabled by default.");
+  }
+
+  const plan = data.plan || "free"; // "free" or "premium"
+
   document.getElementById("bizHeaderName").textContent =
     data.name || "Your Business";
 
@@ -49,8 +60,25 @@ export async function init({ auth: a, db: d, storage: s }) {
   document.getElementById("bizViewBio").textContent = data.bio || "Add bio";
 
   if (data.avatarUrl) {
-    document.getElementById("bizDashboardAvatar").style.backgroundImage =
-      `url('${data.avatarUrl}')`;
+    const avatarEl = document.getElementById("bizDashboardAvatar");
+    if (avatarEl) {
+      avatarEl.style.backgroundImage = `url('${data.avatarUrl}')`;
+    }
+  }
+
+  // ⭐ Plan tag on button
+  const planTag = document.getElementById("bizPlanTag");
+  if (premiumEnabled) {
+    if (plan === "premium") {
+      planTag.textContent = "Premium";
+      planTag.style.background = "#16a34a";
+    } else {
+      planTag.textContent = "Upgrade available";
+      planTag.style.background = "#f97316";
+    }
+  } else {
+    planTag.textContent = "Business";
+    planTag.style.background = "#007bff";
   }
 
   const postsSnap = await getDocs(
@@ -94,7 +122,7 @@ export async function init({ auth: a, db: d, storage: s }) {
     const snap = await getDocs(collection(db, "users", userId, "followers"));
     const count = snap.size;
 
-    const el = document.getElementById("bizStatFollowers");
+    const el = document.getElementById("myFollowersCount");
     if (el) el.textContent = count;
   }
 
@@ -107,8 +135,14 @@ export async function init({ auth: a, db: d, storage: s }) {
     window.location.href = "/";
   };
 
-  document.getElementById("bizNewPostBtn").onclick =
-    () => openScreen("post");
+  // ============================================================
+  // NEW POST BUTTON
+  // ============================================================
+  document.getElementById("bizNewPostBtn").onclick = () => {
+    // If premium is required later, you can gate featured options here
+    // For now, just open the normal post screen
+    window.openScreen("post");
+  };
 
   // ============================================================
   // ⭐ UNREAD MESSAGE BADGE LISTENER
