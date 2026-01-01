@@ -3,9 +3,12 @@ import { initUIRouter } from '/index/js/ui-router.js';
 import '/index/js/post-gate.js';
 
 import { openLoginModal } from '/index/js/auth/loginModal.js';
-window.openLoginModal = openLoginModal;
 import { openSignupModal } from '/index/js/auth/signupModal.js';
 import { openForgotModal } from '/index/js/auth/forgotModal.js';
+
+window.openLoginModal = openLoginModal;
+window.openSignupModal = openSignupModal;
+window.openForgotModal = openForgotModal;
 
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
