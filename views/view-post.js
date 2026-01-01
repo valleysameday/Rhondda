@@ -1,6 +1,8 @@
 import { doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { loadView } from "/index/js/main.js";
-
+function showToast(message) {
+  alert(message);
+}
 /* ============================================================
    SAVE / UNSAVE BUTTON (With Haptics)
 ============================================================ */
