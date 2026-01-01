@@ -3,23 +3,30 @@
 <button id="backToFeed" class="back-btn">
   ← Back to Feed
 </button>
-    <!-- Gallery -->
-    <div class="gallery-wrapper">
-      <div class="gallery-section">
-        <div class="gallery-track" id="galleryContainer">
-          <!-- Images injected by JS -->
-        </div>
+<!-- GALLERY PREVIEW -->
+<div class="gallery-wrapper">
+  <div class="gallery-preview" id="galleryPreview">
+    <!-- Injected by JS -->
+  </div>
 
-        <div class="gallery-dots" id="galleryDots"></div>
-      </div>
-    </div>
-<div class="gallery-hint">Click image to enlarge</div>
+  <!-- Image count badge -->
+  <div class="image-count" id="imageCount"></div>
+</div>
+
 <!-- LIGHTBOX -->
 <div id="lightbox">
   <button id="lightboxClose">×</button>
-  <img id="lightboxImage" alt="Lightbox image">
+
+  <div class="lightbox-track" id="lightboxTrack">
+    <!-- Images injected -->
+  </div>
+
+  <!-- Small landscape ad slot -->
+  <div class="lightbox-ad">
+    <!-- Your ad / promo -->
+    <span>Advertisement</span>
+  </div>
 </div>
-    <div class="post-action-bar">
 
   <!-- Save Button -->
   <button id="savePostBtn" class="action-btn save-btn">
