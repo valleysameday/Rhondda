@@ -3,9 +3,6 @@ import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebase
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getFirebase } from "/index/js/firebase/init.js";
 
-/**
- * @param {import("firebase/auth").Auth} auth - Firebase auth instance
- */
 export function openSignupModal(auth) {
   const modal = document.getElementById("signup");
   if (!modal) return;
@@ -22,11 +19,9 @@ export function openSignupModal(auth) {
   const signupBtn = modal.querySelector("#signupSubmit");
   const emailInput = modal.querySelector("#signupEmail");
   const passInput = modal.querySelector("#signupPassword");
+  const businessCheckbox = modal.querySelector("#isBusinessAccount");
   const feedback = modal.querySelector("#signupFeedback");
 
-  if (!signupBtn || !emailInput || !passInput) return;
-
-  // Remove previous click listeners to avoid duplicates
   signupBtn.replaceWith(signupBtn.cloneNode(true));
   const newSignupBtn = modal.querySelector("#signupSubmit");
 
@@ -41,20 +36,17 @@ export function openSignupModal(auth) {
     }
 
     try {
-      // Create user in Firebase Auth
       const userCred = await createUserWithEmailAndPassword(auth, email, password);
 
-      // Get Firestore instance
       const fb = await getFirebase();
       const db = fb.db;
 
-      // Create Firestore user document
       await setDoc(doc(db, "users", userCred.user.uid), {
-        email: email,
+        email,
         createdAt: Date.now(),
-        isBusiness: false,
+        isBusiness: businessCheckbox?.checked === true,
         isAdmin: false,
-        name: email.split("@")[0] // simple default name
+        name: email.split("@")[0]
       });
 
       feedback.textContent = "Account created!";
