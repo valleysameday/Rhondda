@@ -271,6 +271,35 @@ export async function initFeed({ db }, options = {}) {
     alert("Thanks — we’ll review this shortly.");
   });
 
+
+document.addEventListener("click", async e => {
+  const btn = e.target.closest(".save-heart");
+  if (!btn) return;
+
+  e.stopPropagation();
+
+  const postId = btn.dataset.id;
+  const uid = window.currentUser?.uid;
+
+  if (!uid) {
+    alert("Please log in to save posts");
+    return;
+  }
+
+  const ref = doc(db, "users", uid, "savedPosts", postId);
+  const snap = await getDoc(ref);
+
+  if (snap.exists()) {
+    await deleteDoc(ref);
+    btn.classList.remove("saved");
+    btn.textContent = "♡";
+  } else {
+    await setDoc(ref, { postId, savedAt: Date.now() });
+    btn.classList.add("saved");
+    btn.textContent = "♥";
+  }
+});  
+  
   /* ============================================================
      INITIAL LOAD
   ============================================================ */
