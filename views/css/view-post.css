@@ -390,3 +390,9 @@
     .gallery-preview { height: 280px; }
     .gallery-actions { flex-direction: column; gap: 6px; left: 12px; bottom: 12px; }
 }
+
+
+#lightboxClose {
+    z-index: 10002;
+    pointer-events: auto;
+}
