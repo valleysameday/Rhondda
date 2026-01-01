@@ -2,7 +2,8 @@ import {
   collection,
   getDocs,
   query,
-  orderBy
+  orderBy,
+  limit
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 import { initFeaturedAds } from "/index/js/featured-ads.js";
@@ -26,10 +27,13 @@ export async function initFeed({ db }, options = {}) {
   }
 
   /* ============================================================
-     SKELETON LOADING
+     SKELETON LOADING (with shimmer + loading text)
   ============================================================ */
   function showSkeletons(count = 6) {
-    postsContainer.innerHTML = "";
+    postsContainer.innerHTML = `
+      <p class="loading-text">Loading posts…</p>
+    `;
+
     for (let i = 0; i < count; i++) {
       const skel = document.createElement("div");
       skel.className = "feed-card skeleton-card";
@@ -43,14 +47,30 @@ export async function initFeed({ db }, options = {}) {
       `;
       postsContainer.appendChild(skel);
     }
+
+    // ⭐ Slow connection fallback
+    setTimeout(() => {
+      const hasRealPosts = postsContainer.querySelector('.feed-card:not(.skeleton-card)');
+      if (!hasRealPosts) {
+        postsContainer.insertAdjacentHTML(
+          "beforeend",
+          `<p class="loading-text">Still loading… slow connection or heavy traffic</p>`
+        );
+      }
+    }, 5000);
   }
 
   /* ============================================================
-     FETCH POSTS
+     FETCH POSTS (LIMITED for speed)
   ============================================================ */
   async function fetchPosts() {
     try {
-      const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
+      const q = query(
+        collection(db, 'posts'),
+        orderBy('createdAt', 'desc'),
+        limit(50) // ⭐ MUCH faster
+      );
+
       const snap = await getDocs(q);
 
       const posts = snap.docs.map(doc => {
@@ -83,7 +103,7 @@ export async function initFeed({ db }, options = {}) {
         };
       });
 
-      // ⭐ Static featured business at top (still uses "featured" styling)
+      // ⭐ Static featured business at top
       posts.unshift({
         id: "featured-biz",
         title: "Rhondda Pro Cleaning Services",
