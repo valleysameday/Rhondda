@@ -2,11 +2,14 @@ import { doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebase
 import { loadView } from "/index/js/main.js";
 
 /* ============================================================
-   SAVE / UNSAVE BUTTON
+   SAVE / UNSAVE BUTTON (With Haptics)
 ============================================================ */
 async function toggleSave(postId, db, auth) {
   const uid = auth.currentUser?.uid;
   if (!uid) return showToast("Please log in to save ads", "error");
+
+  // 2026 Standard: Haptic feedback for mobile
+  if (window.navigator.vibrate) window.navigator.vibrate(10);
 
   const ref = doc(db, "users", uid, "savedPosts", postId);
   const snap = await getDoc(ref);
@@ -32,6 +35,7 @@ export async function init({ db, auth }) {
   const postId = sessionStorage.getItem("viewPostId");
   if (!postId) return loadView("home");
 
+  // Minor delay to ensure smooth transition
   await new Promise(r => setTimeout(r, 50));
 
   try {
@@ -41,31 +45,127 @@ export async function init({ db, auth }) {
     const post = postSnap.data();
     const priceText = post.price ? `£${post.price}` : "Contact for price";
 
-    document.getElementById("viewSellerProfileBtn").onclick = () => {
-      sessionStorage.setItem("profileUserId", post.userId);
-      loadView("seller-profile", { forceInit: true });
-    };
-
+    // Text Content Mapping
     const safeSetText = (id, text) => {
       const el = document.getElementById(id);
       if (el) el.textContent = text;
     };
 
     safeSetText("viewTitle", post.title);
-    safeSetText("viewDescription", post.description || post.teaser || "");
+    safeSetText("viewDescription", post.description || post.teaser || "No description provided.");
     safeSetText("viewCategory", post.category || "General");
     safeSetText("viewArea", post.area || "Rhondda");
     safeSetText("viewTime", post.posted || "Just now");
-    ["viewPrice", "viewPriceMobile"].forEach(id => safeSetText(id, priceText));
+    safeSetText("viewPriceMobile", priceText);
 
     /* ============================================================
-       SAVE BUTTON
+       CONTACT & REVEAL LOGIC
     ============================================================ */
+    const revealBtn = document.getElementById("revealNumberBtn");
+    const revealedNum = document.getElementById("revealedNumber");
+
+    if (post.phone) {
+      revealBtn.onclick = () => {
+        revealBtn.style.display = "none";
+        revealedNum.innerHTML = `<a href="tel:${post.phone}" class="phone-link">${post.phone}</a>`;
+        revealedNum.style.display = "block";
+      };
+    } else {
+      revealBtn.style.display = "none";
+    }
+
+    /* ============================================================
+       GALLERY & LIGHTBOX (Modern Implementation)
+    ============================================================ */
+    const preview = document.getElementById("galleryPreview");
+    const imageCount = document.getElementById("imageCount");
+    const lightbox = document.getElementById("lightbox");
+    const lightboxTrack = document.getElementById("lightboxTrack");
+    const closeBtn = document.getElementById("lightboxClose");
+
+    const images = post.images?.length ? post.images : ["/images/image-webholder.webp"];
+    let currentIndex = 0;
+
+    // Build Premium Preview
+    preview.innerHTML = "";
+    images.slice(0, 3).forEach((src, i) => {
+      const img = document.createElement("img");
+      img.src = src;
+      img.loading = "lazy";
+      // First image is "main", others are sidebar thumbs
+      img.className = i === 0 ? "main" : "thumb";
+      img.onclick = () => openLightbox(i);
+      preview.appendChild(img);
+    });
+
+    imageCount.textContent = `${images.length} photos`;
+
+    // Build Lightbox Track
+    lightboxTrack.innerHTML = "";
+    images.forEach(src => {
+      const slide = document.createElement("div");
+      slide.style.minWidth = "100%";
+      slide.style.display = "flex";
+      slide.style.justifyContent = "center";
+      slide.style.alignItems = "center";
+      
+      const img = document.createElement("img");
+      img.src = src;
+      slide.appendChild(img);
+      lightboxTrack.appendChild(slide);
+    });
+
+    const openLightbox = (index) => {
+      currentIndex = index;
+      updateLightboxPosition();
+      lightbox.classList.add("active");
+      document.body.style.overflow = "hidden"; // Prevent scroll
+    };
+
+    const updateLightboxPosition = () => {
+      lightboxTrack.style.transition = "transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)";
+      lightboxTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
+    };
+
+    closeBtn.onclick = () => {
+      lightbox.classList.remove("active");
+      document.body.style.overflow = "";
+    };
+
+    /* Swipe Physics for 2026 Displays */
+    let startX = 0;
+    let currentTranslate = 0;
+
+    lightboxTrack.addEventListener("touchstart", e => {
+        startX = e.touches[0].clientX;
+        lightboxTrack.style.transition = "none";
+    });
+
+    lightboxTrack.addEventListener("touchmove", e => {
+        const moveX = e.touches[0].clientX - startX;
+        const translate = (-currentIndex * lightboxTrack.offsetWidth) + moveX;
+        lightboxTrack.style.transform = `translateX(${translate}px)`;
+    });
+
+    lightboxTrack.addEventListener("touchend", e => {
+        const endX = e.changedTouches[0].clientX;
+        const diff = startX - endX;
+
+        if (Math.abs(diff) > 80) {
+            if (diff > 0 && currentIndex < images.length - 1) currentIndex++;
+            else if (diff < 0 && currentIndex > 0) currentIndex--;
+        }
+        updateLightboxPosition();
+    });
+
+    /* ============================================================
+       BUTTON ACTIONS (Share, Chat, Save)
+    ============================================================ */
+    
+    // Save Post
     const saveBtn = document.getElementById("savePostBtn");
     if (saveBtn && auth.currentUser) {
-      const savedSnap = await getDoc(
-        doc(db, "users", auth.currentUser.uid, "savedPosts", postId)
-      );
+      const savedSnap = await getDoc(doc(db, "users", auth.currentUser.uid, "savedPosts", postId));
       if (savedSnap.exists()) {
         saveBtn.classList.add("saved");
         saveBtn.querySelector("span").textContent = "Saved";
@@ -73,136 +173,47 @@ export async function init({ db, auth }) {
       saveBtn.onclick = () => toggleSave(postId, db, auth);
     }
 
-    /* ============================================================
-       SHARE BUTTON
-    ============================================================ */
+    // Share Post
     document.getElementById("sharePostBtn")?.addEventListener("click", async () => {
-      const url = window.location.href;
-      const shareText = `
-🏷️ ${post.title}
-💷 ${post.price ? "£" + post.price : "Contact for price"}
-📍 ${post.area || "Rhondda"}
-📁 ${post.category || "General"}
-
-View on Rhondda Noticeboard:
-${url}`.trim();
-
-      if (navigator.share) {
-        await navigator.share({ title: post.title, text: shareText, url });
-      } else {
-        await navigator.clipboard.writeText(shareText);
-        showToast("Share text copied!", "success");
+      const shareData = {
+        title: post.title,
+        text: `Check out this ${post.title} for ${priceText} in ${post.area || 'Rhondda'}`,
+        url: window.location.href
+      };
+      if (navigator.share) await navigator.share(shareData);
+      else {
+        await navigator.clipboard.writeText(window.location.href);
+        showToast("Link copied to clipboard!", "success");
       }
     });
 
-    /* ============================================================
-       MESSAGE SELLER
-    ============================================================ */
+    // Chat Logic
     document.getElementById("messageSeller")?.addEventListener("click", async () => {
       const buyerId = auth.currentUser?.uid;
       if (!buyerId) return loadView("login");
-      if (buyerId === post.userId) return;
+      if (buyerId === post.userId) return showToast("This is your own ad", "info");
 
-      const convoId = `${buyerId}_${post.userId}_${postId}`;
-
-      await setDoc(
-        doc(db, "conversations", convoId),
-        {
-          participants: [buyerId, post.userId],
-          postId,
-          updatedAt: Date.now()
-        },
-        { merge: true }
-      );
+      const convoId = [buyerId, post.userId, postId].sort().join("_");
+      await setDoc(doc(db, "conversations", convoId), {
+        participants: [buyerId, post.userId],
+        postId,
+        updatedAt: Date.now(),
+        lastMessage: "Interested in " + post.title
+      }, { merge: true });
 
       sessionStorage.setItem("activeConversationId", convoId);
       loadView("chat", { forceInit: true });
     });
 
-    /* ============================================================
-       BACK + REPORT
-    ============================================================ */
-    document.getElementById("backToFeed").onclick = () => {
-      sessionStorage.removeItem("viewPostId");
-      loadView("home", { forceInit: true });
+    // Navigation
+    document.getElementById("backToFeed").onclick = () => loadView("home");
+    document.getElementById("viewSellerProfileBtn").onclick = () => {
+      sessionStorage.setItem("profileUserId", post.userId);
+      loadView("seller-profile", { forceInit: true });
     };
-
-    document.getElementById("reportPost")?.addEventListener("click", () => {
-      if (confirm("Report this listing for review?")) {
-        alert("Thank you. This listing has been flagged.");
-      }
-    });
-
-    /* ============================================================
-       NEW GALLERY PREVIEW + LIGHTBOX (LAZY LOADED)
-    ============================================================ */
-
-    const preview = document.getElementById("galleryPreview");
-    const imageCount = document.getElementById("imageCount");
-    const lightbox = document.getElementById("lightbox");
-    const lightboxTrack = document.getElementById("lightboxTrack");
-    const closeBtn = document.getElementById("lightboxClose");
-
-    const images = post.images?.length
-      ? post.images
-      : ["/images/image-webholder.webp"];
-
-    let currentIndex = 0;
-
-    /* Build preview (3 images) */
-    preview.innerHTML = "";
-    images.slice(0, 3).forEach((src, i) => {
-      const img = document.createElement("img");
-      img.src = src;
-      img.loading = "lazy";
-      img.className = i === 0 ? "main" : "";
-      img.onclick = () => openLightbox(i);
-      preview.appendChild(img);
-    });
-
-    imageCount.textContent = `${images.length} photos`;
-
-    /* Build lightbox */
-    lightboxTrack.innerHTML = "";
-    images.forEach(src => {
-      const img = document.createElement("img");
-      img.src = src;
-      img.loading = "lazy";
-      lightboxTrack.appendChild(img);
-    });
-
-    const updateLightbox = () => {
-      lightboxTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
-    };
-
-    const openLightbox = index => {
-      currentIndex = index;
-      updateLightbox();
-      lightbox.classList.add("active");
-    };
-
-    closeBtn.onclick = () => lightbox.classList.remove("active");
-
-    /* Swipe */
-    let startX = 0;
-    lightboxTrack.addEventListener("touchstart", e => {
-      startX = e.touches[0].clientX;
-    });
-
-    lightboxTrack.addEventListener("touchend", e => {
-      const dx = e.changedTouches[0].clientX - startX;
-      if (Math.abs(dx) > 50) {
-        if (dx < 0 && currentIndex < images.length - 1) currentIndex++;
-        if (dx > 0 && currentIndex > 0) currentIndex--;
-        updateLightbox();
-      }
-    });
-
-    lightbox.addEventListener("click", e => {
-      if (e.target === lightbox) lightbox.classList.remove("active");
-    });
 
   } catch (err) {
-    console.error("View Post Error:", err);
+    console.error("2026 Init Error:", err);
+    showToast("Error loading post details", "error");
   }
 }
