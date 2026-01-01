@@ -1,3 +1,5 @@
+// /index/js/admin-dashboard.js
+
 import {
   collection,
   doc,
@@ -7,11 +9,17 @@ import {
   where,
   orderBy,
   limit,
-  updateDoc
+  updateDoc,
+  deleteDoc,
+  addDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let auth, db, storage;
 
+/* ============================================================
+   INIT
+============================================================ */
 export async function init({ auth: a, db: d, storage: s }) {
   auth = a;
   db = d;
@@ -19,12 +27,9 @@ export async function init({ auth: a, db: d, storage: s }) {
 
   if (!auth || !db) return;
 
-  const user = auth.currentUser;
-  if (!user) return;
-
-  // You should have loaded user data somewhere globally
-  if (!window.currentUserData || !window.currentUserData.isAdmin) {
-    return; // extra safety
+  if (!window.currentUserData?.isAdmin) {
+    console.warn("Not an admin");
+    return;
   }
 
   initNav();
@@ -34,10 +39,11 @@ export async function init({ auth: a, db: d, storage: s }) {
   await loadPostsAndReports();
   await loadSettings();
   await loadSubscriptions();
+  await loadUsers(); // ⭐ NEW: Full user manager
 }
 
 /* ============================================================
-   NAVIGATION BETWEEN SECTIONS
+   NAVIGATION
 ============================================================ */
 function initNav() {
   const buttons = document.querySelectorAll(".admin-nav-btn");
@@ -60,40 +66,31 @@ function initNav() {
    OVERVIEW
 ============================================================ */
 async function loadOverview() {
-  // Total users
   const usersSnap = await getDocs(collection(db, "users"));
   const totalUsers = usersSnap.size;
   const businessUsers = usersSnap.docs.filter(d => d.data().isBusiness).length;
 
-  // Total posts
   const postsSnap = await getDocs(collection(db, "posts"));
   const totalPosts = postsSnap.size;
 
-  // Site views (from analyticsEvents)
   const analyticsSnap = await getDocs(
     query(collection(db, "analyticsEvents"), where("type", "==", "site_view"))
   );
   const totalSiteViews = analyticsSnap.size;
 
-  // Messages (conversations or messages collection)
   let totalMessages = 0;
   try {
     const messagesSnap = await getDocs(collection(db, "messages"));
     totalMessages = messagesSnap.size;
-  } catch (e) {
-    // if you don't have messages collection yet, ignore
-  }
+  } catch {}
 
-  // Active today (users with any event today)
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+
   let activeToday = 0;
   try {
     const todaySnap = await getDocs(
-      query(
-        collection(db, "analyticsEvents"),
-        where("timestamp", ">=", today)
-      )
+      query(collection(db, "analyticsEvents"), where("timestamp", ">=", today))
     );
     const uniqueUsers = new Set();
     todaySnap.forEach(doc => {
@@ -101,7 +98,7 @@ async function loadOverview() {
       if (d.userId) uniqueUsers.add(d.userId);
     });
     activeToday = uniqueUsers.size;
-  } catch (e) {}
+  } catch {}
 
   document.getElementById("adminTotalUsers").textContent = totalUsers;
   document.getElementById("adminTotalBusinesses").textContent = businessUsers;
@@ -112,13 +109,12 @@ async function loadOverview() {
 }
 
 /* ============================================================
-   TRAFFIC & ENGAGEMENT
+   TRAFFIC
 ============================================================ */
 async function loadTraffic() {
   const topPostsEl = document.getElementById("adminTopPosts");
   const topCatsEl = document.getElementById("adminTopCategories");
 
-  // Top viewed posts
   const postsSnap = await getDocs(
     query(collection(db, "posts"), orderBy("views", "desc"), limit(5))
   );
@@ -135,7 +131,6 @@ async function loadTraffic() {
     topPostsEl.appendChild(div);
   });
 
-  // Top categories (simple count)
   const allPostsSnap = await getDocs(collection(db, "posts"));
   const catCounts = {};
   allPostsSnap.forEach(docSnap => {
@@ -161,7 +156,7 @@ async function loadTraffic() {
 }
 
 /* ============================================================
-   BUSINESSES & PLANS
+   BUSINESSES
 ============================================================ */
 async function loadBusinesses() {
   const tbody = document.getElementById("adminBusinessesTable");
@@ -205,16 +200,12 @@ async function loadBusinesses() {
     const action = btn.dataset.action;
     const userRef = doc(db, "users", id);
 
-    if (action === "upgrade") {
-      await updateDoc(userRef, { plan: "premium" });
-    }
-    if (action === "downgrade") {
-      await updateDoc(userRef, { plan: "free" });
-    }
+    if (action === "upgrade") await updateDoc(userRef, { plan: "premium" });
+    if (action === "downgrade") await updateDoc(userRef, { plan: "free" });
+
     if (action === "toggleSuspend") {
       const snap = await getDoc(userRef);
-      const d = snap.data();
-      await updateDoc(userRef, { suspended: !d.suspended });
+      await updateDoc(userRef, { suspended: !snap.data().suspended });
     }
 
     await loadBusinesses();
@@ -232,9 +223,8 @@ async function loadPostsAndReports() {
   postsTbody.innerHTML = "";
   reportsTbody.innerHTML = "";
 
-  // Posts
   const postsSnap = await getDocs(
-    query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(100))
+    query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(200))
   );
 
   for (const docSnap of postsSnap.docs) {
@@ -266,14 +256,12 @@ async function loadPostsAndReports() {
     const id = btn.dataset.id;
     if (!confirm("Delete this post?")) return;
 
-    await updateDoc(doc(db, "posts", id), { deleted: true });
-    // or deleteDoc if you prefer
+    await deleteDoc(doc(db, "posts", id));
     await loadPostsAndReports();
   });
 
-  // Reports
   const reportsSnap = await getDocs(
-    query(collection(db, "reports"), orderBy("createdAt", "desc"), limit(100))
+    query(collection(db, "reports"), orderBy("createdAt", "desc"), limit(200))
   );
 
   for (const docSnap of reportsSnap.docs) {
@@ -307,12 +295,8 @@ async function loadPostsAndReports() {
     const action = btn.dataset.reportAction;
     const ref = doc(db, "reports", id);
 
-    if (action === "resolve") {
-      await updateDoc(ref, { status: "resolved" });
-    }
-    if (action === "dismiss") {
-      await updateDoc(ref, { status: "dismissed" });
-    }
+    if (action === "resolve") await updateDoc(ref, { status: "resolved" });
+    if (action === "dismiss") await updateDoc(ref, { status: "dismissed" });
 
     await loadPostsAndReports();
   });
@@ -375,7 +359,7 @@ async function loadSettings() {
 }
 
 /* ============================================================
-   PAYMENTS & SUBSCRIPTIONS (PLAN VIEW)
+   PAYMENTS / PLANS
 ============================================================ */
 async function loadSubscriptions() {
   const tbody = document.getElementById("adminSubscriptionsTable");
@@ -414,14 +398,164 @@ async function loadSubscriptions() {
     const action = btn.dataset.subAction;
     const userRef = doc(db, "users", id);
 
-    if (action === "upgrade") {
-      await updateDoc(userRef, { plan: "premium" });
-    }
-    if (action === "downgrade") {
-      await updateDoc(userRef, { plan: "free" });
-    }
+    if (action === "upgrade") await updateDoc(userRef, { plan: "premium" });
+    if (action === "downgrade") await updateDoc(userRef, { plan: "free" });
 
     await loadSubscriptions();
     await loadBusinesses();
   });
+}
+
+/* ============================================================
+   USERS & ACCOUNTS (FULL CONTROL)
+============================================================ */
+async function loadUsers() {
+  const tbody = document.getElementById("adminUsersTable");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  const snap = await getDocs(collection(db, "users"));
+
+  for (const docSnap of snap.docs) {
+    const d = docSnap.data();
+    const uid = docSnap.id;
+
+    const type = d.isAdmin ? "Admin" : d.isBusiness ? "Business" : "User";
+    const plan = d.plan || "free";
+    const status = d.suspended ? "Suspended" : "Active";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${d.name || d.displayName || "(no name)"}</td>
+      <td>${d.email || "-"}</td>
+      <td>${type}</td>
+      <td>${plan}</td>
+      <td>${d.area || "-"}</td>
+      <td>${d.followersCount || 0}</td>
+      <td>${d.adsCount || 0}</td>
+      <td>${status}</td>
+      <td>
+        <button class="admin-btn small" data-action="view" data-id="${uid}">View</button>
+        <button class="admin-btn small secondary" data-action="toggleSuspend" data-id="${uid}">
+          ${d.suspended ? "Unsuspend" : "Suspend"}
+        </button>
+        <button class="admin-btn small danger" data-action="deleteUser" data-id="${uid}">Delete</button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  }
+
+  tbody.addEventListener("click", async e => {
+    const btn = e.target.closest("button[data-action]");
+    if (!btn) return;
+
+    const uid = btn.dataset.id;
+    const action = btn.dataset.action;
+
+    if (action === "toggleSuspend") {
+      const ref = doc(db, "users", uid);
+      const snap = await getDoc(ref);
+      await updateDoc(ref, { suspended: !snap.data().suspended });
+      return loadUsers();
+    }
+
+    if (action === "deleteUser") {
+      if (!confirm("Delete this user and ALL their data?")) return;
+      await deleteUserAndData(uid);
+      return loadUsers();
+    }
+
+    if (action === "view") {
+      openUserModal(uid);
+    }
+  });
+}
+
+/* ============================================================
+   DELETE USER + ALL DATA
+============================================================ */
+async function deleteUserAndData(uid) {
+  // Delete posts
+  const postsSnap = await getDocs(query(collection(db, "posts"), where("userId", "==", uid)));
+  for (const p of postsSnap.docs) {
+    await deleteDoc(doc(db, "posts", p.id));
+  }
+
+  // Delete followers
+  const followersSnap = await getDocs(collection(db, "users", uid, "followers"));
+  for (const f of followersSnap.docs) {
+    await deleteDoc(doc(db, "users", uid, "followers", f.id));
+  }
+
+  // Delete user doc
+  await deleteDoc(doc(db, "users", uid));
+
+  console.warn("⚠️ Firebase Auth deletion must be done via Admin SDK or Cloud Function");
+}
+
+/* ============================================================
+   VIEW USER MODAL (DETAILED INFO)
+============================================================ */
+async function openUserModal(uid) {
+  const modal = document.getElementById("adminUserModal");
+  const body = document.getElementById("adminUserModalBody");
+
+  if (!modal || !body) return;
+
+  const snap = await getDoc(doc(db, "users", uid));
+  const d = snap.data();
+
+  // Format dates
+  const createdAt = d.createdAt?.toDate
+    ? d.createdAt.toDate().toLocaleString()
+    : "Unknown";
+
+  const lastLogin = d.lastLogin?.toDate
+    ? d.lastLogin.toDate().toLocaleString()
+    : "Unknown";
+
+  // Build modal content
+  body.innerHTML = `
+    <h3>${d.name || d.displayName || "(no name)"}</h3>
+
+    <p><strong>Email:</strong> ${d.email || "-"}</p>
+    <p><strong>Type:</strong> ${d.isAdmin ? "Admin" : d.isBusiness ? "Business" : "User"}</p>
+    <p><strong>Plan:</strong> ${d.plan || "free"}</p>
+    <p><strong>Status:</strong> ${d.suspended ? "Suspended" : "Active"}</p>
+
+    <hr>
+
+    <p><strong>Area:</strong> ${d.area || "-"}</p>
+    <p><strong>Followers:</strong> ${d.followersCount || 0}</p>
+    <p><strong>Ads:</strong> ${d.adsCount || 0}</p>
+
+    <hr>
+
+    <p><strong>Created At:</strong> ${createdAt}</p>
+    <p><strong>Last Login:</strong> ${lastLogin}</p>
+
+    <hr>
+
+    <h4>User JSON</h4>
+    <pre style="background:#f3f4f6;padding:10px;border-radius:6px;max-height:200px;overflow:auto;">
+${JSON.stringify(d, null, 2)}
+    </pre>
+
+    <button id="adminCloseUserModal" class="admin-btn secondary" style="margin-top:10px;">Close</button>
+  `;
+
+  // Show modal
+  modal.style.display = "flex";
+
+  // Close handler
+  document.getElementById("adminCloseUserModal").onclick = () => {
+    modal.style.display = "none";
+  };
+
+  // Close when clicking outside
+  modal.onclick = e => {
+    if (e.target === modal) modal.style.display = "none";
+  };
 }
