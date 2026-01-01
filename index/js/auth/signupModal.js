@@ -1,5 +1,7 @@
 // index/js/auth/signupModal.js
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirebase } from "/index/js/firebase/init.js";
 
 /**
  * @param {import("firebase/auth").Auth} auth - Firebase auth instance
@@ -39,9 +41,25 @@ export function openSignupModal(auth) {
     }
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      // Create user in Firebase Auth
+      const userCred = await createUserWithEmailAndPassword(auth, email, password);
+
+      // Get Firestore instance
+      const fb = await getFirebase();
+      const db = fb.db;
+
+      // Create Firestore user document
+      await setDoc(doc(db, "users", userCred.user.uid), {
+        email: email,
+        createdAt: Date.now(),
+        isBusiness: false,
+        isAdmin: false,
+        name: email.split("@")[0] // simple default name
+      });
+
       feedback.textContent = "Account created!";
       closeModal();
+
     } catch (err) {
       feedback.textContent = err.message;
       console.error("Signup error:", err);
