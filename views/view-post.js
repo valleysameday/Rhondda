@@ -10,7 +10,6 @@ async function toggleSave(postId, db, auth) {
 
   const ref = doc(db, "users", uid, "savedPosts", postId);
   const snap = await getDoc(ref);
-
   const btn = document.getElementById("savePostBtn");
 
   if (snap.exists()) {
@@ -19,10 +18,7 @@ async function toggleSave(postId, db, auth) {
     btn.querySelector("span").textContent = "Save";
     showToast("Removed from saved ads", "info");
   } else {
-    await setDoc(ref, {
-      postId,
-      savedAt: Date.now()
-    });
+    await setDoc(ref, { postId, savedAt: Date.now() });
     btn.classList.add("saved");
     btn.querySelector("span").textContent = "Saved";
     showToast("Saved!", "success");
@@ -36,7 +32,7 @@ export async function init({ db, auth }) {
   const postId = sessionStorage.getItem("viewPostId");
   if (!postId) return loadView("home");
 
-  await new Promise(r => setTimeout(r, 50)); // tiny delay for DOM ready
+  await new Promise(r => setTimeout(r, 50));
 
   try {
     const postSnap = await getDoc(doc(db, "posts", postId));
@@ -44,12 +40,13 @@ export async function init({ db, auth }) {
 
     const post = postSnap.data();
     const priceText = post.price ? `£${post.price}` : "Contact for price";
-document.getElementById("viewSellerProfileBtn").onclick = () => {
-  sessionStorage.setItem("profileUserId", post.userId);
-  loadView("seller-profile", { forceInit: true });
-};
- 
-     const safeSetText = (id, text) => {
+
+    document.getElementById("viewSellerProfileBtn").onclick = () => {
+      sessionStorage.setItem("profileUserId", post.userId);
+      loadView("seller-profile", { forceInit: true });
+    };
+
+    const safeSetText = (id, text) => {
       const el = document.getElementById(id);
       if (el) el.textContent = text;
     };
@@ -62,114 +59,74 @@ document.getElementById("viewSellerProfileBtn").onclick = () => {
     ["viewPrice", "viewPriceMobile"].forEach(id => safeSetText(id, priceText));
 
     /* ============================================================
-       SAVE BUTTON — CHECK IF ALREADY SAVED
+       SAVE BUTTON
     ============================================================ */
     const saveBtn = document.getElementById("savePostBtn");
     if (saveBtn && auth.currentUser) {
-      const uid = auth.currentUser.uid;
-      const savedRef = doc(db, "users", uid, "savedPosts", postId);
-      const savedSnap = await getDoc(savedRef);
-
+      const savedSnap = await getDoc(
+        doc(db, "users", auth.currentUser.uid, "savedPosts", postId)
+      );
       if (savedSnap.exists()) {
         saveBtn.classList.add("saved");
         saveBtn.querySelector("span").textContent = "Saved";
       }
-
-      saveBtn.addEventListener("click", () => toggleSave(postId, db, auth));
+      saveBtn.onclick = () => toggleSave(postId, db, auth);
     }
 
     /* ============================================================
-   SHARE BUTTON
-============================================================ */
-const shareBtn = document.getElementById("sharePostBtn");
-
-if (shareBtn) {
-  shareBtn.addEventListener("click", async () => {
-    const url = window.location.href;
-
-    const shareText = `
+       SHARE BUTTON
+    ============================================================ */
+    document.getElementById("sharePostBtn")?.addEventListener("click", async () => {
+      const url = window.location.href;
+      const shareText = `
 🏷️ ${post.title}
 💷 ${post.price ? "£" + post.price : "Contact for price"}
-📍 ${post.location || "Rhondda"}
+📍 ${post.area || "Rhondda"}
 📁 ${post.category || "General"}
 
 View on Rhondda Noticeboard:
-${url}
-    `.trim();
+${url}`.trim();
 
-    if (navigator.share) {
-      await navigator.share({
-        title: post.title,
-        text: shareText,
-        url
-      });
-    } else {
-      navigator.clipboard.writeText(shareText);
-      showToast("Share text copied!", "success");
-    }
-  });
-}
-/* ============================================================
-   MESSAGE SELLER
-============================================================ */
-document.getElementById("messageSeller")?.addEventListener("click", async () => {
-  const buyerId = auth.currentUser?.uid;
-  const sellerId = post.userId;
-  if (!buyerId) return loadView("login");
-  if (buyerId === sellerId) return;
-
-  const convoId = `${buyerId}_${sellerId}_${postId}`;
-
-  await setDoc(
-    doc(db, "conversations", convoId),
-    {
-      participants: [buyerId, sellerId],
-      postId,
-      lastMessage: "",
-      lastMessageSender: "",
-      updatedAt: Date.now()
-    },
-    { merge: true }
-  );
-
-  /* ============================================================
-     SEND EMAIL NOTIFICATION TO SELLER (Netlify Function)
-  ============================================================ */
-
-  try {
-    // Get seller email from Firestore
-    const sellerSnap = await getDoc(doc(db, "users", sellerId));
-    const sellerEmail = sellerSnap.data()?.email;
-
-    if (sellerEmail) {
-      await fetch("/.netlify/functions/sendMessageEmail", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sellerEmail: sellerEmail,
-          messageText: "You have a new message waiting for you.",
-          postTitle: post.title
-        })
-      });
-    }
-  } catch (err) {
-    console.error("Email notification error:", err);
-  }
-
-  sessionStorage.setItem("activeConversationId", convoId);
-  loadView("chat", { forceInit: true });
-});
-    /* ============================================================
-       BACK BUTTON
-    ============================================================ */
-    document.getElementById("backToFeed").addEventListener("click", () => {
-      sessionStorage.removeItem("viewPostId");
-      loadView("home", { forceInit: true });
+      if (navigator.share) {
+        await navigator.share({ title: post.title, text: shareText, url });
+      } else {
+        await navigator.clipboard.writeText(shareText);
+        showToast("Share text copied!", "success");
+      }
     });
 
     /* ============================================================
-       REPORT BUTTON
+       MESSAGE SELLER
     ============================================================ */
+    document.getElementById("messageSeller")?.addEventListener("click", async () => {
+      const buyerId = auth.currentUser?.uid;
+      if (!buyerId) return loadView("login");
+      if (buyerId === post.userId) return;
+
+      const convoId = `${buyerId}_${post.userId}_${postId}`;
+
+      await setDoc(
+        doc(db, "conversations", convoId),
+        {
+          participants: [buyerId, post.userId],
+          postId,
+          updatedAt: Date.now()
+        },
+        { merge: true }
+      );
+
+      sessionStorage.setItem("activeConversationId", convoId);
+      loadView("chat", { forceInit: true });
+    });
+
+    /* ============================================================
+       BACK + REPORT
+    ============================================================ */
+    document.getElementById("backToFeed").onclick = () => {
+      sessionStorage.removeItem("viewPostId");
+      loadView("home", { forceInit: true });
+    };
+
     document.getElementById("reportPost")?.addEventListener("click", () => {
       if (confirm("Report this listing for review?")) {
         alert("Thank you. This listing has been flagged.");
@@ -177,81 +134,73 @@ document.getElementById("messageSeller")?.addEventListener("click", async () => 
     });
 
     /* ============================================================
-       GALLERY + LIGHTBOX (unchanged)
+       NEW GALLERY PREVIEW + LIGHTBOX (LAZY LOADED)
     ============================================================ */
-    const gallery = document.getElementById("galleryContainer");
-    const dotsContainer = document.getElementById("galleryDots");
-    if (!gallery) return;
 
-    gallery.innerHTML = "";
-    if (dotsContainer) dotsContainer.innerHTML = "";
+    const preview = document.getElementById("galleryPreview");
+    const imageCount = document.getElementById("imageCount");
+    const lightbox = document.getElementById("lightbox");
+    const lightboxTrack = document.getElementById("lightboxTrack");
+    const closeBtn = document.getElementById("lightboxClose");
 
-    const images = post.images?.length ? post.images : ["/images/image-webholder.webp"];
+    const images = post.images?.length
+      ? post.images
+      : ["/images/image-webholder.webp"];
+
     let currentIndex = 0;
-    let zoomLevel = 1;
-    const slides = [];
 
-    images.forEach((url, i) => {
+    /* Build preview (3 images) */
+    preview.innerHTML = "";
+    images.slice(0, 3).forEach((src, i) => {
       const img = document.createElement("img");
-      img.src = url;
-      img.alt = post.title;
+      img.src = src;
       img.loading = "lazy";
-      img.className = "gallery-image";
-      if (i === 0) img.classList.add("active");
-      gallery.appendChild(img);
-      slides.push(img);
+      img.className = i === 0 ? "main" : "";
+      img.onclick = () => openLightbox(i);
+      preview.appendChild(img);
+    });
 
-      if (dotsContainer) {
-        const dot = document.createElement("button");
-        dot.className = i === 0 ? "gallery-dot active" : "gallery-dot";
-        dot.onclick = () => updateSlide(i);
-        dotsContainer.appendChild(dot);
+    imageCount.textContent = `${images.length} photos`;
+
+    /* Build lightbox */
+    lightboxTrack.innerHTML = "";
+    images.forEach(src => {
+      const img = document.createElement("img");
+      img.src = src;
+      img.loading = "lazy";
+      lightboxTrack.appendChild(img);
+    });
+
+    const updateLightbox = () => {
+      lightboxTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
+    };
+
+    const openLightbox = index => {
+      currentIndex = index;
+      updateLightbox();
+      lightbox.classList.add("active");
+    };
+
+    closeBtn.onclick = () => lightbox.classList.remove("active");
+
+    /* Swipe */
+    let startX = 0;
+    lightboxTrack.addEventListener("touchstart", e => {
+      startX = e.touches[0].clientX;
+    });
+
+    lightboxTrack.addEventListener("touchend", e => {
+      const dx = e.changedTouches[0].clientX - startX;
+      if (Math.abs(dx) > 50) {
+        if (dx < 0 && currentIndex < images.length - 1) currentIndex++;
+        if (dx > 0 && currentIndex > 0) currentIndex--;
+        updateLightbox();
       }
     });
 
-    const updateSlide = idx => {
-      currentIndex = (idx + slides.length) % slides.length;
-      slides.forEach((img, i) => {
-        img.classList.toggle("active", i === currentIndex);
-        img.style.transform = "scale(1)";
-      });
-      gallery.style.transform = `translateX(-${currentIndex * 100}%)`;
-      if (dotsContainer) dotsContainer.querySelectorAll(".gallery-dot").forEach((d, i) => d.classList.toggle("active", i === currentIndex));
-      zoomLevel = 1;
-    };
-    updateSlide(0);
-
-    let startX = 0, dragging = false;
-    gallery.addEventListener("touchstart", e => { if (e.touches.length === 1) { startX = e.touches[0].clientX; dragging = true; } });
-    gallery.addEventListener("touchend", e => {
-      if (!dragging) return;
-      const dx = e.changedTouches[0].clientX - startX;
-      if (Math.abs(dx) > 50) dx < 0 ? updateSlide(currentIndex + 1) : updateSlide(currentIndex - 1);
-      dragging = false;
+    lightbox.addEventListener("click", e => {
+      if (e.target === lightbox) lightbox.classList.remove("active");
     });
-    gallery.addEventListener("wheel", e => {
-      e.preventDefault();
-      zoomLevel += e.deltaY < 0 ? 0.1 : -0.1;
-      zoomLevel = Math.min(Math.max(zoomLevel, 1), 3);
-      slides[currentIndex].style.transform = `scale(${zoomLevel})`;
-    });
-
-    const lightbox = document.getElementById("lightbox");
-    const lightboxImg = document.getElementById("lightboxImage");
-    const lightboxClose = document.getElementById("lightboxClose");
-    if (lightbox && lightboxImg) {
-      slides.forEach((img, i) => {
-        img.style.cursor = "zoom-in";
-        img.onclick = () => {
-          currentIndex = i;
-          lightboxImg.src = img.src;
-          lightbox.classList.add("active");
-        };
-      });
-      const closeLB = () => lightbox.classList.remove("active");
-      lightboxClose?.addEventListener("click", closeLB);
-      lightbox.addEventListener("click", e => e.target === lightbox && closeLB());
-    }
 
   } catch (err) {
     console.error("View Post Error:", err);
