@@ -160,19 +160,24 @@ export async function initFeed({ db }, options = {}) {
       const card = document.createElement('article');
       card.className = `feed-card ${post.type}`;
       card.innerHTML = `
-        <div class="feed-image">
-          <img src="${post.image}" alt="${post.title}">
-          ${post.isBusiness && post.type !== "featured" ? `<span class="biz-badge">Business</span>` : ''}
-        </div>
+  <div class="feed-image">
+    <img src="${post.image}" alt="${post.title}">
+    ${post.isBusiness && post.type !== "featured" ? `<span class="biz-badge">Business</span>` : ''}
+  </div>
 
-        <div class="feed-content">
-          <h3 class="feed-title">${post.title}</h3>
-          <div class="feed-meta">${buildMeta(post)}</div>
-          ${post.type === "featured" && post.cta ? `<button class="cta-btn">${post.cta}</button>` : ''}
-        </div>
+  <div class="feed-content">
+    <h3 class="feed-title">${post.title}</h3>
 
-        <button class="report-btn" data-id="${post.id}" title="Report">⚑</button>
-      `;
+    <div class="feed-meta">
+      ${buildMeta(post)}
+      <button class="save-heart" data-id="${post.id}" title="Save">♡</button>
+    </div>
+
+    ${post.type === "featured" && post.cta ? `<button class="cta-btn">${post.cta}</button>` : ''}
+  </div>
+
+  <button class="report-btn" data-id="${post.id}" title="Report">⚑</button>
+`;
 
       card.addEventListener('click', e => {
         if (e.target.closest('.report-btn') || e.target.closest('.cta-btn')) return;
