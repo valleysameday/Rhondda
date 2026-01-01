@@ -255,6 +255,11 @@
 @media (max-width: 768px) {
     .view-post-container { padding: 0 16px; }
     .action-btn { width: 100%; }
+
+    /* Reduce gallery height for mobile */
+    .gallery-preview {
+        height: 280px;  /* adjust as needed */
+    }
 }
 
 /* ============================================================
