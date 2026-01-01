@@ -4,6 +4,9 @@ import { openSignupModal } from "/index/js/auth/signupModal.js";
 import { openForgotModal } from "/index/js/auth/forgotModal.js";
 import { getFirebase } from "/index/js/firebase/init.js";
 
+// ⭐ Needed for admin button to load the admin dashboard
+import { loadView } from "/index/js/main.js";
+
 let auth, db;
 
 getFirebase().then(fb => {
