@@ -1,5 +1,6 @@
 <link rel="stylesheet" href="/index/css/business-dashboard.css">
 <input type="file" id="avatarUploadInput" accept="image/*" style="display:none;">
+
 <header class="biz-header">
   <div class="biz-header-left">
     <h1 id="bizHeaderName">Your Business</h1>
@@ -32,11 +33,13 @@
       </div>
     </div>
   </div>
-<div class="follower-mini-card">
-  <h4>Your Followers</h4>
-  <p id="myFollowersCount">0</p>
-  <small class="dash-subtext">When someone follows you, your new ads pop up in their dashboard feed.</small>
-</div>
+
+  <div class="follower-mini-card">
+    <h4>Your Followers</h4>
+    <p id="myFollowersCount">0</p>
+    <small class="dash-subtext">When someone follows you, your new ads pop up in their dashboard feed.</small>
+  </div>
+
   <!-- BUSINESS PROFILE -->
   <div class="biz-profile-box">
     <div class="biz-profile-header">
@@ -114,7 +117,7 @@
   <!-- POST BUTTON -->
   <button id="bizNewPostBtn" class="biz-new-post">
     <span class="biz-new-post-label">+ Create Business Ad</span>
-    <span class="biz-new-post-tag">PREMIUM</span>
+    <span class="biz-new-post-tag" id="bizPlanTag">Business</span>
   </button>
 
   <!-- BUSINESS ADS -->
@@ -130,4 +133,3 @@
     <small>Please wait</small>
   </div>
 </div>
-
