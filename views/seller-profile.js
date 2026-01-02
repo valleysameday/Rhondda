@@ -13,6 +13,7 @@ import {
 import { loadView } from "/index/js/main.js";
 
 let auth, db;
+let sellerIsPremium = false; // Business or Seller+
 
 export async function init({ auth: a, db: d }) {
   auth = a;
@@ -25,6 +26,9 @@ export async function init({ auth: a, db: d }) {
   if (!profileSnap.exists()) return loadView("home");
 
   const user = profileSnap.data();
+
+  /* ---------------- Determine Seller Type ---------------- */
+  sellerIsPremium = user.isBusiness || user.isSellerPlus;
 
   /* ---------------- SAFE NAME ---------------- */
   const safeName =
@@ -62,14 +66,7 @@ export async function init({ auth: a, db: d }) {
   /* ---------------- Stats ---------------- */
   const stats = {
     completedJobs: user.completedJobs || 0,
-    avgReplyTime: user.avgReplyTime || 999,
-    communityEvents: user.communityEvents || 0,
-    lastActiveHour: user.lastActiveHour ?? 12,
-    loginStreak: user.loginStreak || 0,
-    freebieClicks: user.freebieClicks || 0,
-    firstInCategory: user.firstInCategory || false,
-    helpfulAnswers: user.helpfulAnswers || 0,
-    accountAgeYears: user.accountAgeYears || 0
+    loginStreak: user.loginStreak || 0
   };
 
   document.getElementById("sellerStats").textContent =
@@ -116,17 +113,6 @@ export async function init({ auth: a, db: d }) {
   };
 }
 
-/* ---------------- TOAST POPUP ---------------- */
-function showFollowToast(message) {
-  const toast = document.getElementById("followToast");
-  toast.textContent = message;
-  toast.classList.add("show");
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 2500);
-}
-
 /* ---------------- FOLLOW SYSTEM ---------------- */
 async function setupFollowButton(sellerId, safeName) {
   const btn = document.getElementById("followSellerBtn");
@@ -150,7 +136,6 @@ async function setupFollowButton(sellerId, safeName) {
 
   btn.onclick = async () => {
     if (isFollowing) {
-      // UNFOLLOW
       await deleteDoc(followingRef);
       await deleteDoc(followerRef);
 
@@ -158,10 +143,8 @@ async function setupFollowButton(sellerId, safeName) {
       btn.classList.remove("following");
       isFollowing = false;
 
-      showFollowToast(`You’ve unfollowed ${safeName}.`);
       loadSellerFollowers(sellerId);
     } else {
-      // FOLLOW
       await setDoc(followingRef, { followedAt: Date.now() });
       await setDoc(followerRef, { followedAt: Date.now() });
 
@@ -169,7 +152,6 @@ async function setupFollowButton(sellerId, safeName) {
       btn.classList.add("following");
       isFollowing = true;
 
-      showFollowToast(`You’re now following ${safeName}. Updates will appear in your dashboard.`);
       loadSellerFollowers(sellerId);
     }
   };
@@ -208,11 +190,15 @@ async function loadSellerAds(sellerId) {
 
     const card = document.createElement("div");
     card.className = "post-card";
-    card.addEventListener("click", () => {
-      sessionStorage.setItem("viewPostId", post.id);
-      loadView("view-post", { forceInit: true });
-    });
 
+    /* ---------------- Tick Box (everyone sees it) ---------------- */
+    const tick = document.createElement("input");
+    tick.type = "checkbox";
+    tick.className = "bundle-tick";
+    tick.dataset.postId = post.id;
+    card.appendChild(tick);
+
+    /* ---------------- Image ---------------- */
     const imgSrc =
       post.imageUrl ||
       (Array.isArray(post.imageUrls) && post.imageUrls[0]) ||
@@ -241,4 +227,27 @@ async function loadSellerAds(sellerId) {
 
     container.appendChild(card);
   });
+
+  /* ---------------- Premium Logic ---------------- */
+  if (sellerIsPremium) {
+    const btn = document.getElementById("combinedEnquiryBtn");
+    btn.style.display = "block";
+
+    btn.onclick = () => {
+      const selected = [...document.querySelectorAll(".bundle-tick:checked")]
+        .map(t => t.dataset.postId);
+
+      if (selected.length === 0) {
+        alert("Select at least one item");
+        return;
+      }
+
+      sessionStorage.setItem("bundleItems", JSON.stringify(selected));
+      sessionStorage.setItem("bundleSellerId", sellerId);
+
+      loadView("bundle-enquiry", { forceInit: true });
+    };
+  } else {
+    document.getElementById("sellerPlusUpsell").style.display = "block";
+  }
 }
