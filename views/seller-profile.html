@@ -1,90 +1,79 @@
 <link rel="stylesheet" href="/views/seller-profile.css">
 
 <section id="sellerProfilePage" class="seller-profile-page">
+  <button id="backToPost" class="back-btn"><span>←</span> Back</button>
 
-  <!-- Back Button -->
-  <button id="backToPost" class="back-btn">← Back</button>
-
-  <!-- Banner -->
   <div class="seller-banner"></div>
 
-  <!-- Avatar -->
   <div class="seller-avatar-wrapper">
     <div class="seller-avatar" id="sellerAvatar"></div>
+    <div id="businessRibbon" class="business-ribbon-badge" style="display:none;">
+      <svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5zM12 4.4l7 3.9v8.4l-7 3.9-7-3.9V8.3l7-3.9z"/></svg>
+      Verified Business
+    </div>
   </div>
 
-  <!-- Business Ribbon (Hidden by default, shown via JS if Business/Seller+) -->
-  <div id="businessRibbon" class="business-ribbon" style="display:none;">Verified Business</div>
-
-  <!-- Name + Reliability -->
   <div class="seller-header">
     <h2 id="sellerName">Loading…</h2>
     <p id="sellerReliability" class="seller-reliability"></p>
   </div>
 
-  <!-- Badges -->
-  <div id="sellerBadges"></div>
+  <div class="seller-stats-grid">
+    <div class="stat-card">
+      <span class="stat-value" id="jobCount">0</span>
+      <span class="stat-label">Jobs Done</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value" id="streakCount">0</span>
+      <span class="stat-label">Day Streak</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value" id="followerCount">0</span>
+      <span class="stat-label">Followers</span>
+    </div>
+  </div>
 
-  <!-- Stats -->
-  <div class="seller-stats" id="sellerStats"></div>
+  <div class="seller-bio-section">
+    <h3>About Seller</h3>
+    <p id="sellerBio"></p>
+  </div>
 
-  <!-- Followers -->
-  <div class="seller-followers" id="sellerFollowers"></div>
+  <div id="businessInfo" class="business-info-card" style="display:none;"></div>
 
-  <!-- Bio -->
-  <div class="seller-bio" id="sellerBio"></div>
-
-  <!-- Business Info -->
-  <div id="businessInfo" class="business-info"></div>
-
-  <!-- Contact -->
-  <button id="followSellerBtn" class="follow-btn">Follow Seller</button>
-
-  <!-- Seller’s Other Ads -->
-  <h3 class="seller-ads-title">Other ads by this seller</h3>
-
-  <!-- 2026 LOGIC: ACTION BAR -->
-  <div class="bundle-action-bar">
-    <!-- Paywall Message: Shown only if current poster is FREE -->
-    <div id="sellerPaywallNotice" class="paywall-notice" style="display:none;">
-      <p>Unlock this user's contact number for <strong>£1.50</strong></p>
-      <button id="unlockPosterBtn" class="unlock-btn">Unlock Number (£1.50)</button>
+  <div class="action-dock">
+    <button id="followSellerBtn" class="follow-btn">Follow</button>
+    
+    <!-- 2026 Update: Only shown if seller has a number + is FREE -->
+    <div id="unlockSection" class="unlock-wrapper" style="display:none;">
+      <button id="unlockPosterBtn" class="premium-unlock-btn">
+        <span class="btn-icon">🔒</span>
+        <span class="btn-text">Unlock Number</span>
+        <span class="btn-price">£1.50</span>
+      </button>
     </div>
 
-    <!-- Bundle Button: Triggers different logic based on poster type -->
-    <button id="combinedEnquiryBtn" class="primary-btn bundle-trigger" style="display:none;">
-      Contact About Selected Items (<span id="selectedCount">0</span>)
+    <button id="combinedEnquiryBtn" class="bundle-send-btn" style="display:none;">
+      Bundle Enquiry (<span id="selectedCount">0</span>)
     </button>
   </div>
 
-  <section id="sellerAdsContainer" class="posts-grid">
-    <!-- Individual ads injected here will need a checkbox with class "ad-selector" -->
-  </section>
+  <h3 class="section-title">Store Items</h3>
+  <section id="sellerAdsContainer" class="posts-grid"></section>
 
-  <div id="followToast" class="follow-toast"></div>
-
-  <!-- POPUP FOR CONTACTING SELLER (Updated for 'Nice' UX) -->
+  <!-- NICE POPUP -->
   <div id="contactPopup" class="popup-overlay" style="display:none;">
-    <div class="popup-box" id="popupBoxContainer">
-
-      <h3 id="popupTitle">Your Bundle Order</h3>
-
-      <!-- This container will hold the 'nice' list with prices for Business users -->
-      <div id="popupItemsSummary" class="order-summary-list"></div>
-
-      <!-- Price Tally (Only visible for Business/Seller+) -->
-      <div id="popupPriceTally" class="price-tally-row" style="display:none;">
-        <span>Total Bundle Price:</span>
+    <div class="glass-modal">
+      <h3>Review Your Order</h3>
+      <div id="popupItemsSummary" class="order-summary-scroll"></div>
+      <div id="popupPriceTally" class="total-bar" style="display:none;">
+        <label>Total Value</label>
         <span id="totalPriceAmount">£0.00</span>
       </div>
-
-      <textarea id="popupMessage" placeholder="Add a message…"></textarea>
-
-      <div class="popup-footer">
-        <button id="popupSendBtn" class="primary-btn">Send Enquiry</button>
-        <button id="popupCancelBtn" class="secondary-btn">Cancel</button>
+      <textarea id="popupMessage" placeholder="Send a custom note..."></textarea>
+      <div class="modal-actions">
+        <button id="popupSendBtn" class="glow-confirm-btn">Send Enquiry</button>
+        <button id="popupCancelBtn" class="text-cancel-btn">Go Back</button>
       </div>
-
     </div>
   </div>
 </section>
