@@ -480,3 +480,44 @@ body {
   background: #f3f4f6;
   border-radius: 10px;
 }
+
+/* ============================================================
+   USER POST ACTION BUTTONS (Edit / Delete)
+============================================================ */
+
+.dash-actions {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.dash-btn {
+  padding: 0.35rem 0.7rem;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+/* Edit button */
+.dash-edit {
+  background: #ffc107;
+  color: #222;
+}
+
+.dash-edit:hover {
+  background: #e0a800;
+}
+
+/* Delete button */
+.dash-delete {
+  background: #ff4d4d;
+  color: #fff;
+}
+
+.dash-delete:hover {
+  background: #e60000;
+}
