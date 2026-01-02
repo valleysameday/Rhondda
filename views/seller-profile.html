@@ -13,8 +13,8 @@
     <div class="seller-avatar" id="sellerAvatar"></div>
   </div>
 
-  <!-- Business Ribbon -->
-  <div id="businessRibbon" class="business-ribbon">Verified Business</div>
+  <!-- Business Ribbon (Hidden by default, shown via JS if Business/Seller+) -->
+  <div id="businessRibbon" class="business-ribbon" style="display:none;">Verified Business</div>
 
   <!-- Name + Reliability -->
   <div class="seller-header">
@@ -43,30 +43,48 @@
   <!-- Seller’s Other Ads -->
   <h3 class="seller-ads-title">Other ads by this seller</h3>
 
-  <!-- Upsell (only shown if seller is FREE) -->
-  <div id="sellerPlusUpsell" class="seller-plus-upsell" style="display:none;">
-    This seller uses a free account.  
-    You can still tick items, but combined enquiries are not available.
+  <!-- 2026 LOGIC: ACTION BAR -->
+  <div class="bundle-action-bar">
+    <!-- Paywall Message: Shown only if current poster is FREE -->
+    <div id="sellerPaywallNotice" class="paywall-notice" style="display:none;">
+      <p>Unlock this user's contact number for <strong>£1.50</strong></p>
+      <button id="unlockPosterBtn" class="unlock-btn">Unlock Number (£1.50)</button>
+    </div>
+
+    <!-- Bundle Button: Triggers different logic based on poster type -->
+    <button id="combinedEnquiryBtn" class="primary-btn bundle-trigger" style="display:none;">
+      Contact About Selected Items (<span id="selectedCount">0</span>)
+    </button>
   </div>
-<button id="combinedEnquiryBtn" class="primary-btn" style="display:none;">
-  Contact about selected items
-</button>
-  <section id="sellerAdsContainer" class="posts-grid"></section>
+
+  <section id="sellerAdsContainer" class="posts-grid">
+    <!-- Individual ads injected here will need a checkbox with class "ad-selector" -->
+  </section>
 
   <div id="followToast" class="follow-toast"></div>
-<!-- POPUP FOR CONTACTING SELLER -->
-<div id="contactPopup" class="popup-overlay" style="display:none;">
-  <div class="popup-box">
 
-    <h3 id="popupTitle">Contact Seller</h3>
+  <!-- POPUP FOR CONTACTING SELLER (Updated for 'Nice' UX) -->
+  <div id="contactPopup" class="popup-overlay" style="display:none;">
+    <div class="popup-box" id="popupBoxContainer">
 
-    <div id="popupItems"></div>
+      <h3 id="popupTitle">Your Bundle Order</h3>
 
-    <textarea id="popupMessage" placeholder="Add a message…"></textarea>
+      <!-- This container will hold the 'nice' list with prices for Business users -->
+      <div id="popupItemsSummary" class="order-summary-list"></div>
 
-    <button id="popupSendBtn" class="primary-btn">Send Enquiry</button>
-    <button id="popupCancelBtn" class="secondary-btn">Cancel</button>
+      <!-- Price Tally (Only visible for Business/Seller+) -->
+      <div id="popupPriceTally" class="price-tally-row" style="display:none;">
+        <span>Total Bundle Price:</span>
+        <span id="totalPriceAmount">£0.00</span>
+      </div>
 
+      <textarea id="popupMessage" placeholder="Add a message…"></textarea>
+
+      <div class="popup-footer">
+        <button id="popupSendBtn" class="primary-btn">Send Enquiry</button>
+        <button id="popupCancelBtn" class="secondary-btn">Cancel</button>
+      </div>
+
+    </div>
   </div>
-</div>
 </section>
