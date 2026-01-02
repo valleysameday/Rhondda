@@ -1,28 +1,26 @@
 <link rel="stylesheet" href="/index/css/chat.css">
 
 <div class="chat-container">
-
   <div class="chat-header">
     <button id="chatBackBtn" class="chat-back">← Back</button>
     <h2 id="chatHeaderName">Chat</h2>
   </div>
 
-  <!-- Ad Preview -->
+  <!-- Updated Preview Area: Handles single ad OR Bundle -->
   <div id="chatAdPreview" class="chat-ad-preview">
     <img id="chatAdImage" class="chat-ad-img" />
     <div class="chat-ad-info">
       <h4 id="chatAdTitle"></h4>
       <p id="chatAdPrice"></p>
+      <!-- Container for bundle item count if applicable -->
+      <small id="bundleNote" style="display:none; color: #6b7280;"></small>
     </div>
   </div>
 
-  <!-- Messages -->
   <div id="chatMessages" class="chat-messages"></div>
 
-  <!-- Input -->
   <div class="chat-input-bar">
     <input id="chatInput" type="text" placeholder="Type a message…" />
     <button id="chatSendBtn" class="chat-send">Send</button>
   </div>
-
 </div>
