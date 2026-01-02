@@ -1,11 +1,13 @@
 <link rel="stylesheet" href="/index/css/general-dashboard.css">
 <input type="file" id="avatarUploadInput" accept="image/*" style="display:none;">
+
 <header class="dash-header sunset">
   <div>
     <p class="dash-hello">Shwmae,</p>
     <h1 id="headerName">Your Account</h1>
     <p id="headerTagline" class="dash-tagline">Let’s get your Rhondda profile looking tidy</p>
   </div>
+
   <div class="dash-header-right">
     <span id="headerAreaBadge" class="area-badge">Add your area</span>
     <button id="logoutBtn" class="logout-btn">Log out</button>
@@ -14,34 +16,38 @@
 
 <section class="dash-section">
 
-  <!-- STATS BAR -->
+  <!-- ============================
+       BASIC STATS (NO ANALYTICS)
+  ============================= -->
   <div class="stats-box">
-    <h2>Your stats</h2>
+    <h2>Your activity</h2>
     <div class="stats-grid">
       <div class="stat-pill">
         <span id="statAdsCount" class="stat-number">0</span>
-        <span class="stat-label">Ads posted</span>
-      </div>
-      <div class="stat-pill">
-        <span id="statTotalViews" class="stat-number">0</span>
-        <span class="stat-label">Total views</span>
-      </div>
-      <div class="stat-pill">
-        <span id="statUnlocks" class="stat-number">0</span>
-        <span class="stat-label">Contact unlocks</span>
+        <span class="stat-label">Active ads</span>
       </div>
     </div>
+
+    <!-- ⭐ Upgrade prompt -->
+    <p class="upgrade-hint">
+      Want unlimited ads, analytics & followers?
+      <span id="upgradeToBusiness" class="upgrade-link">Become a business</span>
+    </p>
   </div>
 
-  <!-- PROFILE SECTION -->
+  <!-- ============================
+       PROFILE SECTION
+  ============================= -->
   <div class="profile-box">
-    <!-- ✅ AVATAR SECTION -->
-<div class="avatar-section">
-  <div id="avatarClickArea" class="avatar-wrapper">
-    <div id="dashboardAvatar" class="avatar-circle"></div>
-  </div>
-  <p class="avatar-edit-hint">Tap to change photo</p>
-</div>
+
+    <!-- Avatar -->
+    <div class="avatar-section">
+      <div id="avatarClickArea" class="avatar-wrapper">
+        <div id="dashboardAvatar" class="avatar-circle"></div>
+      </div>
+      <p class="avatar-edit-hint">Tap to change photo</p>
+    </div>
+
     <div class="profile-box-header">
       <h2>Your Profile</h2>
       <button id="toggleEditProfile" class="edit-profile-btn">Edit profile</button>
@@ -53,14 +59,17 @@
         <span class="profile-label">Name</span>
         <span id="viewName" class="profile-value">Add your name</span>
       </div>
+
       <div class="profile-line">
         <span class="profile-label">Phone (private)</span>
         <span id="viewPhone" class="profile-value">Add your phone</span>
       </div>
+
       <div class="profile-line">
         <span class="profile-label">Area</span>
         <span id="viewArea" class="profile-value">Add your area</span>
       </div>
+
       <div class="profile-line profile-line-bio">
         <span class="profile-label">Bio</span>
         <p id="viewBio" class="profile-value bio-value">
@@ -71,33 +80,28 @@
 
     <!-- EDIT MODE -->
     <div id="profileEditMode" class="profile-edit" style="display:none;">
-      <!-- NAME -->
       <div class="profile-row">
         <label for="profileNameInput">Name</label>
         <input id="profileNameInput" type="text" placeholder="Your name">
       </div>
 
-      <!-- PHONE (PRIVATE) -->
       <div class="profile-row">
         <label for="profilePhoneInput">Phone (private)</label>
         <input id="profilePhoneInput" type="text" placeholder="Your phone number">
-        <small class="hint-text">This is for buyers to contact you. We never show it publicly without your say‑so.</small>
+        <small class="hint-text">Buyers use this to contact you. Never shown publicly without permission.</small>
       </div>
 
-      <!-- AREA WITH AUTOCOMPLETE -->
       <div class="profile-row" style="position: relative;">
         <label for="profileAreaInput">Area</label>
         <input id="profileAreaInput" type="text" placeholder="e.g. Treorchy, Tonypandy, Porth">
         <div id="areaSuggestions" class="suggestions-box"></div>
       </div>
 
-      <!-- BIO -->
       <div class="profile-row">
         <label for="profileBioInput">Bio</label>
-        <textarea id="profileBioInput" placeholder="Tell locals who you are, what you sell, and how you like to deal."></textarea>
+        <textarea id="profileBioInput" placeholder="Tell locals who you are and what you sell."></textarea>
       </div>
 
-      <!-- ACTIONS -->
       <div class="profile-edit-actions">
         <button id="saveProfileBtn" class="dash-save-btn">Save changes</button>
         <button id="cancelEditProfileBtn" class="cancel-edit-btn">Cancel</button>
@@ -107,20 +111,32 @@
     <p id="profileFeedback" class="feedback-text"></p>
   </div>
 
-  <!-- POST BUTTON -->
+  <!-- ============================
+       POST BUTTON (LIMITED)
+  ============================= -->
   <button id="newPostBtn" class="dash-new-post">
     <span class="new-post-label">+ Post an Ad</span>
-    <span class="new-post-tag">FREE</span>
+    <span class="new-post-tag">3 FREE</span>
   </button>
+
+  <!-- ============================
+       FOLLOW FEED
+  ============================= -->
   <h3 class="dash-section-title">Updates from sellers you follow</h3>
-<div id="followFeed"></div>
-  
-<!-- SAVED ADS -->
-<h2 class="section-title">Things you’re keeping an eye on</h2>
-<div id="savedPosts" class="dash-posts-grid"></div>
-  <!-- your adds -->
-<h2 class="section-title">Your ads on Noticeboard</h2>
-<div id="userPosts" class="dash-posts-grid"></div>
+  <div id="followFeed"></div>
+
+  <!-- ============================
+       SAVED ADS
+  ============================= -->
+  <h2 class="section-title">Things you’re keeping an eye on</h2>
+  <div id="savedPosts" class="dash-posts-grid"></div>
+
+  <!-- ============================
+       USER ADS (LIMITED)
+  ============================= -->
+  <h2 class="section-title">Your ads on Noticeboard</h2>
+  <div id="userPosts" class="dash-posts-grid"></div>
+
 </section>
 
 <!-- LOGOUT OVERLAY -->
@@ -130,6 +146,3 @@
     <small>Please wait</small>
   </div>
 </div>
-
-
-
