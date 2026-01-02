@@ -1,6 +1,6 @@
 // index/js/admin/users.js
 import { collection, doc, getDocs, getDoc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { showToast, formatDate } from "./utils.js";
+import { showToast, formatDate } from "/index/js/admin/utils.js";
 
 export async function init({ db }) {
   console.log("🔹 Users module init");
