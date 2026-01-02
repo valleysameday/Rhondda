@@ -1,6 +1,4 @@
-import { signOut } from
-  "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
+import { signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import {
   collection,
   query,
@@ -13,8 +11,8 @@ import {
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-import { renderPostsAndStats } from '/index/js/dashboard/posts.js';
-import { loadView } from '/index/js/main.js';
+import { renderPostsAndStats } from "/index/js/dashboard/posts.js";
+import { loadView } from "/index/js/main.js";
 
 let auth, db;
 
@@ -27,14 +25,18 @@ export async function init({ auth: a, db: d }) {
   const user = auth.currentUser;
   if (!user) return loadView("home");
 
-  // ============================
-  // LOAD USER POSTS
-  // ============================
+  // ============================================================
+  // LOAD USER POSTS (with 3‑ad limit)
+  // ============================================================
   const snap = await getDocs(
     query(collection(db, "posts"), where("userId", "==", user.uid))
   );
 
-  const stats = renderPostsAndStats(
+  const adsCount = snap.size;
+  document.getElementById("statAdsCount").textContent = adsCount;
+
+  // Render posts normally
+  renderPostsAndStats(
     "userPosts",
     snap,
     id => {
@@ -48,31 +50,30 @@ export async function init({ auth: a, db: d }) {
     }
   );
 
-  document.getElementById("statAdsCount").textContent = stats.adsCount;
-  document.getElementById("statTotalViews").textContent = stats.totalViews;
-  document.getElementById("statUnlocks").textContent = stats.totalLeads;
+  // ============================================================
+  // ⭐ LIMIT POSTING FOR GENERAL USERS
+  // ============================================================
+  const newPostBtn = document.getElementById("newPostBtn");
 
-  // ============================
-  // ⭐ LOAD FOLLOWERS COUNT
-  // ============================
-  loadMyFollowers(user.uid);
+  newPostBtn.onclick = () => {
+    if (adsCount >= 3) {
+      alert(
+        "You’ve reached your 3 free ads.\n\nBecome a business to post unlimited ads, get analytics, and build followers!"
+      );
+      return;
+    }
 
-  async function loadMyFollowers(uid) {
-    const snap = await getDocs(collection(db, "users", uid, "followers"));
-    const count = snap.size;
+    window.openScreen("post");
+  };
 
-    const el = document.getElementById("statFollowers");
-    if (el) el.textContent = count;
-  }
-
-  // ============================
+  // ============================================================
   // ⭐ LOAD SAVED ADS
-  // ============================
+  // ============================================================
   await loadSavedPosts(user.uid);
 
-  // ============================
-  // ⭐ LOAD FOLLOW FEED (Option C)
-  // ============================
+  // ============================================================
+  // ⭐ LOAD FOLLOW FEED
+  // ============================================================
   await loadFollowFeed(user.uid);
 
   async function loadFollowFeed(uid) {
@@ -86,11 +87,11 @@ export async function init({ auth: a, db: d }) {
     const sellerIds = followingSnap.docs.map(doc => doc.id);
 
     if (sellerIds.length === 0) {
-  container.innerHTML = `<p style="opacity:0.6;">Follow the sellers and businesses you’re interested in to see their new posts here.</p>`;
-  return;
+      container.innerHTML = `<p style="opacity:0.6;">Follow sellers and businesses to see their new posts here.</p>`;
+      return;
     }
 
-    // 2. Load posts from those sellers
+    // 2. Load posts from followed sellers
     let posts = [];
 
     for (const sellerId of sellerIds) {
@@ -115,7 +116,9 @@ export async function init({ auth: a, db: d }) {
     posts.sort((a, b) => b.createdAt - a.createdAt);
 
     // 4. Render
-    container.innerHTML = posts.map(post => `
+    container.innerHTML = posts
+      .map(
+        post => `
       <div class="follow-update-card">
         <img src="${post.imageUrl || post.imageUrls?.[0] || '/images/image-webholder.webp'}">
         <div>
@@ -123,7 +126,9 @@ export async function init({ auth: a, db: d }) {
           <p>${new Date(post.createdAt).toLocaleDateString()}</p>
         </div>
       </div>
-    `).join("");
+    `
+      )
+      .join("");
 
     // 5. Click to view
     container.querySelectorAll(".follow-update-card").forEach((card, i) => {
@@ -134,18 +139,18 @@ export async function init({ auth: a, db: d }) {
     });
   }
 
-  // ============================
+  // ============================================================
   // LOGOUT
-  // ============================
+  // ============================================================
   document.getElementById("logoutBtn").onclick = async () => {
     document.getElementById("logoutOverlay").style.display = "flex";
     await signOut(auth);
     window.location.href = "/";
   };
 
-  // ============================
+  // ============================================================
   // ⭐ UNREAD MESSAGE BADGE LISTENER
-  // ============================
+  // ============================================================
   initUnreadMessageListener();
 
   function initUnreadMessageListener() {
@@ -155,7 +160,7 @@ export async function init({ auth: a, db: d }) {
     const convosRef = collection(db, "conversations");
     const q = query(convosRef, where("participants", "array-contains", user.uid));
 
-    onSnapshot(q, (snap) => {
+    onSnapshot(q, snap => {
       let hasUnread = false;
 
       snap.forEach(docSnap => {
@@ -172,7 +177,7 @@ export async function init({ auth: a, db: d }) {
 }
 
 /* ============================================================
-   ⭐ LOAD SAVED POSTS FUNCTION
+   ⭐ LOAD SAVED POSTS
 ============================================================ */
 async function loadSavedPosts(uid) {
   const savedContainer = document.getElementById("savedPosts");
