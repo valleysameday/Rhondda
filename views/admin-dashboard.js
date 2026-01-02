@@ -87,3 +87,7 @@ function appendStatus(msg, container, success = true) {
   container.appendChild(p);
   container.scrollTop = container.scrollHeight;
 }
+
+export async function init({ auth, db, storage }) {
+  return initAdminDashboard({ auth, db, storage });
+}
