@@ -18,13 +18,15 @@ let auth, db, storage;
    SPA VIEW LOADER
 ===================================================== */
 export async function loadView(view, options = {}) {
-// ⭐ Prevent duplicate view loads
-if (window.currentView === view) {
-  console.warn("⛔ Prevented duplicate load:", view);
-  return;
-}
-window.currentView = view;
-   console.log("🔵 loadView() →", view);
+
+  // ⭐ Prevent duplicate view loads
+  if (window.currentView === view) {
+    console.warn("⛔ Prevented duplicate load:", view);
+    return;
+  }
+  window.currentView = view;
+
+  console.log("🔵 loadView() →", view);
 
   const app = document.getElementById("app");
   if (!app) return console.log("❌ #app container missing");
@@ -146,10 +148,9 @@ getFirebase().then(async fb => {
   /* =====================================================
      START APP
   ===================================================== */
-console.trace("LOADVIEW TRACE");
-   
-   
-   const start = () => {
+  console.trace("LOADVIEW TRACE");
+
+  const start = () => {
     console.log("🟢 App start()");
     initUIRouter();
 
@@ -200,8 +201,6 @@ console.trace("LOADVIEW TRACE");
           return;
         }
 
-        
-
         loadView(
           window.isBusinessUser
             ? "business-dashboard"
@@ -212,12 +211,17 @@ console.trace("LOADVIEW TRACE");
       waitForRole();
     });
 
-    // ⭐ ADMIN BUTTON CLICK HANDLER
-    document.getElementById("openAdminDashboard")?.addEventListener("click", () => {
+    // ⭐ ADMIN BUTTON CLICK HANDLER (FIXED)
+    document.getElementById("openAdminDashboard")?.addEventListener("click", (e) => {
+
+      // ⭐ Ignore synthetic / auto-triggered clicks
+      if (!e.isTrusted) return;
+
       if (!window.currentUserData?.isAdmin) {
         alert("Admin access only");
         return;
       }
+
       loadView("admin-dashboard");
     });
 
