@@ -1,13 +1,16 @@
-// index/js/admin/utils.js
-export function showToast(message, success = true) {
-  const toast = document.createElement("div");
-  toast.className = `admin-toast ${success ? "success" : "error"}`;
-  toast.textContent = message;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
+export function showToast(msg, success = true) {
+  const t = document.createElement("div");
+  t.textContent = msg;
+  t.style.cssText = `
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:${success ? "#10b981" : "#ef4444"};color:white;
+    padding:10px 20px;border-radius:6px;z-index:10000;font-size:14px;
+  `;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
 }
 
-// optional helper to format Firestore timestamps
-export function formatDate(ts) {
-  return ts?.toDate ? ts.toDate().toLocaleString() : "Unknown";
+export function formatDate(firestoreTimestamp) {
+  if (!firestoreTimestamp?.toDate) return "Unknown";
+  return firestoreTimestamp.toDate().toLocaleString();
 }
