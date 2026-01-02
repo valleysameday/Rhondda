@@ -289,3 +289,8 @@ contactBtn.onclick = async () => {
   };
 };
 }
+function updateButtonVisibility() {
+  const selected = document.querySelectorAll(".bundle-tick:checked").length;
+  const contactBtn = document.getElementById("combinedEnquiryBtn");
+  contactBtn.style.display = selected > 0 ? "block" : "none";
+}
