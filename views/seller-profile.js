@@ -10,7 +10,6 @@ import {
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-import { BADGE_SVGS, computeBadges, renderBadges } from "/views/seller-badges.js";
 import { loadView } from "/index/js/main.js";
 
 let auth, db;
@@ -78,10 +77,6 @@ export async function init({ auth: a, db: d }) {
 
   /* ---------------- Followers Count ---------------- */
   loadSellerFollowers(userId);
-
-  /* ---------------- Badges ---------------- */
-  const badgeObject = computeBadges(user, stats);
-  document.getElementById("sellerBadges").innerHTML = renderBadges(badgeObject);
 
   /* ---------------- Bio ---------------- */
   document.getElementById("sellerBio").textContent =
@@ -164,7 +159,7 @@ async function setupFollowButton(sellerId, safeName) {
       isFollowing = false;
 
       showFollowToast(`You’ve unfollowed ${safeName}.`);
-      loadSellerFollowers(sellerId); // update count
+      loadSellerFollowers(sellerId);
     } else {
       // FOLLOW
       await setDoc(followingRef, { followedAt: Date.now() });
@@ -175,7 +170,7 @@ async function setupFollowButton(sellerId, safeName) {
       isFollowing = true;
 
       showFollowToast(`You’re now following ${safeName}. Updates will appear in your dashboard.`);
-      loadSellerFollowers(sellerId); // update count
+      loadSellerFollowers(sellerId);
     }
   };
 }
