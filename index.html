@@ -108,20 +108,26 @@
     <input type="email" id="signupEmail" placeholder="Email" autocomplete="email">
     <input type="password" id="signupPassword" placeholder="Password" autocomplete="new-password">
 
-    <label class="checkbox-label">
-      <input type="checkbox" id="isBusinessAccount">
-      This is a business account
-    </label>
+    <div class="account-type-row">
+  <span class="account-type-label">General Account</span>
 
-    <div id="businessBenefits" class="business-benefits">
-      <h4>Business Account Benefits</h4>
-      <ul>
-        <li>Post featured ads</li>
-        <li>Get premium visibility</li>
-        <li>Access business analytics</li>
-        <li>Priority support</li>
-      </ul>
-    </div>
+  <label class="switch">
+    <input type="checkbox" id="isBusinessAccount">
+    <span class="slider"></span>
+  </label>
+
+  <span class="account-type-label">Business Account</span>
+</div>
+
+<div id="businessBenefits" class="business-benefits" style="display:none;">
+  <h4>Business Account Benefits</h4>
+  <ul>
+    <li>Post featured ads</li>
+    <li>Get premium visibility</li>
+    <li>Access business analytics</li>
+    <li>Priority support</li>
+  </ul>
+</div>
 
     <button id="signupSubmit">Create account</button>
 
