@@ -1,6 +1,6 @@
 // index/js/admin/overview.js
 import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { showToast } from "./utils.js";
+import { showToast } from "/index/js/admin/utils.js";
 
 let db;
 
