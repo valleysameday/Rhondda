@@ -180,6 +180,40 @@
   box-shadow: 0 4px 12px rgba(37,99,235,0.35);
   opacity: 0.95;
 }
+/* Ensure bundle lists look good in bubbles */
+.bubble-text {
+  margin: 0;
+  white-space: pre-wrap; /* Crucial for displaying the bundle list correctly */
+}
+
+/* Style for the bundle icon in preview */
+.chat-ad-img[src*="bundle-icon"] {
+  background: #eff6ff;
+  padding: 10px;
+  border: 1px solid #dbeafe;
+}
+
+/* Sticky Header and Preview fix for 2026 UX */
+.chat-header {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.chat-ad-preview {
+  border-bottom: 2px solid #f3f4f6;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* 2026 Focus state for input */
+#chatInput:focus {
+  border-color: #2563eb;
+  background: #fff;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
 /* =========================
    RESPONSIVE
