@@ -12,22 +12,23 @@ export async function loadSettings(db) {
   let snap = await getDoc(settingsRef);
 
   if (!snap.exists()) {
-    console.warn("⚠️ Global settings not found, creating defaults");
-    try {
-      await updateDoc(settingsRef, {
-        businessPremiumEnabled: false,
-        generalDashboardEnabled: false,
-        postingEnabled: true,
-        newSignupsEnabled: true,
-        homepageBanner: "",
-        homepageFeaturedBusinessId: null
-      });
-      snap = await getDoc(settingsRef);
-    } catch (err) {
-      console.error("❌ Failed to create default settings", err);
-      showToast("❌ Failed to initialize settings", false);
-      return;
-    }
+  console.warn("⚠️ Global settings not found, creating defaults");
+  try {
+    await setDoc(settingsRef, {
+      businessPremiumEnabled: false,
+      generalDashboardEnabled: false,
+      postingEnabled: true,
+      newSignupsEnabled: true,
+      homepageBanner: "",
+      homepageFeaturedBusinessId: null
+    }, { merge: true });
+
+    snap = await getDoc(settingsRef);
+  } catch (err) {
+    console.error("❌ Failed to create default settings", err);
+    showToast("❌ Failed to initialize settings", false);
+    return;
+  }
   }
 
   const data = snap.data() || {};
