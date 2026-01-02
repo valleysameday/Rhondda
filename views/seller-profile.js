@@ -225,36 +225,66 @@ async function loadSellerAds(sellerId) {
     container.appendChild(card);
   });
 
-  /* ---------------- Universal Contact Button Logic ---------------- */
-  const contactBtn = document.getElementById("combinedEnquiryBtn");
 
-  contactBtn.onclick = () => {
-    const selected = [...document.querySelectorAll(".bundle-tick:checked")]
-      .map(t => t.dataset.postId);
 
-    if (selected.length === 0) return;
+/* ---------------- Universal Contact Button Logic ---------------- */
+const contactBtn = document.getElementById("combinedEnquiryBtn");
 
-    sessionStorage.setItem("bundleItems", JSON.stringify(selected));
-    sessionStorage.setItem("bundleSellerId", sellerId);
+contactBtn.onclick = async () => {
+  const selectedIds = [...document.querySelectorAll(".bundle-tick:checked")]
+    .map(t => t.dataset.postId);
 
-    if (sellerIsPremium) {
-      // Business / Seller+ → full bundle flow
-      loadView("bundle-enquiry", { forceInit: true });
-    } else {
-      // Free seller → simple message in chat
-      sessionStorage.setItem(
-        "activeConversationId",
-        `${auth.currentUser.uid}_${sellerId}`
-      );
-      sessionStorage.setItem("pendingBundleMode", "basic");
-      loadView("chat", { forceInit: true });
-    }
+  if (selectedIds.length === 0) return;
+
+  // Load posts for popup
+  const popupItems = document.getElementById("popupItems");
+  popupItems.innerHTML = "";
+
+  let total = 0;
+
+  for (const id of selectedIds) {
+    const snap = await getDoc(doc(db, "posts", id));
+    if (!snap.exists()) continue;
+
+    const post = snap.data();
+
+    const priceText = sellerIsPremium && post.price ? ` (£${post.price})` : "";
+
+    popupItems.innerHTML += `<p>• ${post.title}${priceText}</p>`;
+
+    if (sellerIsPremium) total += Number(post.price || 0);
+  }
+
+  // Premium sellers show total
+  if (sellerIsPremium) {
+    popupItems.innerHTML += `<p><strong>Total: £${total}</strong></p>`;
+  }
+
+  // Show popup
+  document.getElementById("contactPopup").style.display = "flex";
+
+  // Send button
+  document.getElementById("popupSendBtn").onclick = () => {
+    const custom = document.getElementById("popupMessage").value.trim();
+
+    let message = "I'm interested in:\n";
+    popupItems.querySelectorAll("p").forEach(p => {
+      message += p.textContent + "\n";
+    });
+
+    if (custom) message += `\n${custom}`;
+
+    sessionStorage.setItem("pendingMessage", message);
+    sessionStorage.setItem(
+      "activeConversationId",
+      `${auth.currentUser.uid}_${sellerId}`
+    );
+
+    loadView("chat", { forceInit: true });
   };
-}
 
-/* ---------------- Show button only when items are ticked ---------------- */
-function updateButtonVisibility() {
-  const selected = document.querySelectorAll(".bundle-tick:checked").length;
-  const contactBtn = document.getElementById("combinedEnquiryBtn");
-  contactBtn.style.display = selected > 0 ? "block" : "none";
-}
+  // Cancel button
+  document.getElementById("popupCancelBtn").onclick = () => {
+    document.getElementById("contactPopup").style.display = "none";
+  };
+};
