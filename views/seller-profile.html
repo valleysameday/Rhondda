@@ -1,28 +1,26 @@
 <link rel="stylesheet" href="/views/seller-profile.css">
 
 <section id="sellerProfilePage" class="seller-profile-page">
-  <button id="backToPost" class="back-btn"><span>←</span> Back</button>
-
-  <div class="seller-banner"></div>
-
-  <div class="seller-avatar-wrapper">
-    <div class="seller-avatar" id="sellerAvatar"></div>
-    <div id="businessRibbon" class="business-ribbon-badge" style="display:none;">
-      <svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5zM12 4.4l7 3.9v8.4l-7 3.9-7-3.9V8.3l7-3.9z"/></svg>
-      Verified Business
-    </div>
+  <!-- Top Navigation -->
+  <div class="top-nav">
+    <button id="backToPost" class="back-btn">← Back</button>
   </div>
 
+  <!-- Hero Section -->
+  <div class="seller-banner"></div>
+  <div class="seller-avatar-wrapper">
+    <div class="seller-avatar" id="sellerAvatar"></div>
+    <div id="businessRibbon" class="business-ribbon-badge" style="display:none;">Verified Business</div>
+  </div>
+
+  <!-- Header Info -->
   <div class="seller-header">
     <h2 id="sellerName">Loading…</h2>
     <p id="sellerReliability" class="seller-reliability"></p>
   </div>
 
+  <!-- Stats Grid (Jobs Done Removed) -->
   <div class="seller-stats-grid">
-    <div class="stat-card">
-      <span class="stat-value" id="jobCount">0</span>
-      <span class="stat-label">Jobs Done</span>
-    </div>
     <div class="stat-card">
       <span class="stat-value" id="streakCount">0</span>
       <span class="stat-label">Day Streak</span>
@@ -33,43 +31,48 @@
     </div>
   </div>
 
+  <!-- Bio Section -->
   <div class="seller-bio-section">
     <h3>About Seller</h3>
-    <p id="sellerBio"></p>
+    <p id="sellerBio">Loading bio...</p>
   </div>
 
-  <div id="businessInfo" class="business-info-card" style="display:none;"></div>
-
+  <!-- Dynamic Action Dock (Sticky Bottom) -->
   <div class="action-dock">
-    <button id="followSellerBtn" class="follow-btn">Follow</button>
+    <button id="followSellerBtn" class="follow-btn">Follow Seller</button>
     
-    <!-- 2026 Update: Only shown if seller has a number + is FREE -->
+    <!-- Unlock Section: Only shown if Free Seller + Has Number -->
     <div id="unlockSection" class="unlock-wrapper" style="display:none;">
       <button id="unlockPosterBtn" class="premium-unlock-btn">
-        <span class="btn-icon">🔒</span>
-        <span class="btn-text">Unlock Number</span>
-        <span class="btn-price">£1.50</span>
+        <span class="unlock-text">🔒 Unlock Phone Number</span>
+        <span class="unlock-price">£1.50</span>
       </button>
     </div>
 
+    <!-- Bundle Button: Shown when items are ticked -->
     <button id="combinedEnquiryBtn" class="bundle-send-btn" style="display:none;">
-      Bundle Enquiry (<span id="selectedCount">0</span>)
+      Send Bundle Enquiry (<span id="selectedCount">0</span>)
     </button>
   </div>
 
-  <h3 class="section-title">Store Items</h3>
+  <!-- Ads Grid -->
+  <h3 class="section-title">Other Ads by this Seller</h3>
   <section id="sellerAdsContainer" class="posts-grid"></section>
 
-  <!-- NICE POPUP -->
+  <!-- Modern Glass Popup -->
   <div id="contactPopup" class="popup-overlay" style="display:none;">
     <div class="glass-modal">
-      <h3>Review Your Order</h3>
+      <h3>Bundle Summary</h3>
       <div id="popupItemsSummary" class="order-summary-scroll"></div>
+      
+      <!-- Price Tally (Only for Business/Seller+) -->
       <div id="popupPriceTally" class="total-bar" style="display:none;">
-        <label>Total Value</label>
+        <label>Total Value:</label>
         <span id="totalPriceAmount">£0.00</span>
       </div>
-      <textarea id="popupMessage" placeholder="Send a custom note..."></textarea>
+
+      <textarea id="popupMessage" placeholder="Write a message to the seller..."></textarea>
+      
       <div class="modal-actions">
         <button id="popupSendBtn" class="glow-confirm-btn">Send Enquiry</button>
         <button id="popupCancelBtn" class="text-cancel-btn">Go Back</button>
