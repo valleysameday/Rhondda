@@ -275,10 +275,12 @@ contactBtn.onclick = async () => {
     if (custom) message += `\n${custom}`;
 
     sessionStorage.setItem("pendingMessage", message);
-    sessionStorage.setItem(
-      "activeConversationId",
-      `${auth.currentUser.uid}_${sellerId}`
-    );
+    const firstPostId = selectedIds[0];
+
+sessionStorage.setItem(
+  "activeConversationId",
+  `${auth.currentUser.uid}_${sellerId}_${firstPostId}`
+);
 
     loadView("chat", { forceInit: true });
   };
