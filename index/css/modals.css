@@ -373,3 +373,11 @@ input:checked + .slider:before {
     transform: translateY(0);
   }
 }
+.account-type-title {
+  margin-top: 10px;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #444;
+  text-align: center;
+}
