@@ -101,7 +101,7 @@ async function loadSellerAds(sellerId) {
              data-title="${post.title}" 
              data-price="${post.price || 0}">
       <div class="post-image">
-        <img src="${post.imageUrl || '/images/placeholder.webp'}" loading="lazy">
+        <img src="${post.imageUrl || '/images/image-webholder.webp'}" loading="lazy">
       </div>
       <div class="post-body">
         <h3>${post.title}</h3>
