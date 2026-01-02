@@ -261,31 +261,28 @@ contactBtn.onclick = async () => {
   }
 
   // Show popup
+  document.getElementById("contactPopup").style.display = "flex";
+
+  // Send button
   document.getElementById("popupSendBtn").onclick = () => {
+    const custom = document.getElementById("popupMessage").value.trim();
 
-  // ⭐ If not logged in → go straight to login
-  if (!auth.currentUser) {
-    loadView("login", { forceInit: true });
-    return;
-  }
+    let message = "I'm interested in:\n";
+    popupItems.querySelectorAll("p").forEach(p => {
+      message += p.textContent + "\n";
+    });
 
-  const custom = document.getElementById("popupMessage").value.trim();
+    if (custom) message += `\n${custom}`;
 
-  let message = "I'm interested in:\n";
-  popupItems.querySelectorAll("p").forEach(p => {
-    message += p.textContent + "\n";
-  });
+    sessionStorage.setItem("pendingMessage", message);
+    sessionStorage.setItem(
+      "activeConversationId",
+      `${auth.currentUser.uid}_${sellerId}`
+    );
 
-  if (custom) message += `\n${custom}`;
+    loadView("chat", { forceInit: true });
+  };
 
-  sessionStorage.setItem("pendingMessage", message);
-  sessionStorage.setItem(
-    "activeConversationId",
-    `${auth.currentUser.uid}_${sellerId}`
-  );
-
-  loadView("chat", { forceInit: true });
-};
   // Cancel button
   document.getElementById("popupCancelBtn").onclick = () => {
     document.getElementById("contactPopup").style.display = "none";
