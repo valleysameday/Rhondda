@@ -1,5 +1,5 @@
 // index/js/admin/settings.js
-import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { showToast } from "/index/js/admin/utils.js";
 
 export async function init({ db }) {
