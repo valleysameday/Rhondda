@@ -1,10 +1,10 @@
-import * as Overview from "../index/js/admin/overview.js";
-import * as Traffic from "../index/js/admin/traffic.js";
-import * as Businesses from "../index/js/admin/businesses.js";
-import * as Posts from "../index/js/admin/posts.js";
-import * as Subscriptions from "../index/js/admin/subscriptions.js";
-import * as Settings from "../index/js/admin/settings.js";
-import * as Users from "../index/js/admin/users.js";
+import * as Overview from "/index/js/admin/overview.js";
+import * as Traffic from "/index/js/admin/traffic.js";
+import * as Businesses from "/index/js/admin/businesses.js";
+import * as Posts from "/index/js/admin/posts.js";
+import * as Subscriptions from "/index/js/admin/subscriptions.js";
+import * as Settings from "/index/js/admin/settings.js";
+import * as Users from "/index/js/admin/users.js";
 
 let auth, db, storage;
 
