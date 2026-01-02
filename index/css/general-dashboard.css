@@ -421,10 +421,9 @@ body {
 
 .dash-post-img {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  height: 120px;
   object-fit: cover;
   background: #f3f4f6;
-  border-radius: 10px;
 }
 
 .dash-post-info {
@@ -472,4 +471,12 @@ body {
 
 .logout-card p {
   margin: 0 0 .2rem;
+}
+.post-img,
+.dash-post-img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: #f3f4f6;
+  border-radius: 10px;
 }
