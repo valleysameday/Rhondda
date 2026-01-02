@@ -140,7 +140,10 @@ getFirebase().then(async fb => {
   /* =====================================================
      START APP
   ===================================================== */
-  const start = () => {
+console.trace("LOADVIEW TRACE");
+   
+   
+   const start = () => {
     console.log("🟢 App start()");
     initUIRouter();
 
