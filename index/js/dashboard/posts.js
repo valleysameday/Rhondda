@@ -47,7 +47,7 @@ export function renderPostsAndStats(containerId, postsSnap, onEdit, onDelete) {
       // GENERAL DASHBOARD LAYOUT
       card.className = "dash-card";
       card.innerHTML = `
-        <img src="${imgUrl}" class="dash-img">
+        <img src="${imgUrl}" class="dash-post-img">
         <div class="dash-info">
           <h3>${p.title}</h3>
           <p>${p.description}</p>
