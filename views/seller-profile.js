@@ -275,11 +275,9 @@ contactBtn.onclick = async () => {
     if (custom) message += `\n${custom}`;
 
     sessionStorage.setItem("pendingMessage", message);
-    const firstPostId = selectedIds[0];
-
-sessionStorage.setItem(
+    sessionStorage.setItem(
   "activeConversationId",
-  `${auth.currentUser.uid}_${sellerId}_${firstPostId}`
+  `${auth.currentUser.uid}_${sellerId}_bundle`
 );
 
     loadView("chat", { forceInit: true });
