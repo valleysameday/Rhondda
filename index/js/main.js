@@ -194,10 +194,7 @@ console.trace("LOADVIEW TRACE");
           return;
         }
 
-        // ⭐ If admin → go straight to admin dashboard
-        if (window.currentUserData?.isAdmin) {
-          return loadView("admin-dashboard");
-        }
+        
 
         loadView(
           window.isBusinessUser
