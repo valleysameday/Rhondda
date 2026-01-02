@@ -1,4 +1,5 @@
 <link rel="stylesheet" href="/views/seller-profile.css">
+
 <section id="sellerProfilePage" class="seller-profile-page">
 
   <!-- Back Button -->
@@ -27,8 +28,9 @@
   <!-- Stats -->
   <div class="seller-stats" id="sellerStats"></div>
 
-<div class="seller-followers" id="sellerFollowers"></div>
-  
+  <!-- Followers -->
+  <div class="seller-followers" id="sellerFollowers"></div>
+
   <!-- Bio -->
   <div class="seller-bio" id="sellerBio"></div>
 
@@ -37,9 +39,24 @@
 
   <!-- Contact -->
   <button class="primary-btn" id="contactSellerBtn">Contact Seller</button>
-<button id="followSellerBtn" class="follow-btn">Follow Seller</button>
+  <button id="followSellerBtn" class="follow-btn">Follow Seller</button>
+
   <!-- Seller’s Other Ads -->
   <h3 class="seller-ads-title">Other ads by this seller</h3>
+
+  <!-- Upsell (only shown if seller is FREE) -->
+  <div id="sellerPlusUpsell" class="seller-plus-upsell" style="display:none;">
+    This seller uses a free account.  
+    You can still tick items, but combined enquiries are not available.
+  </div>
+
+  <!-- Combined enquiry button (only for Business/Seller+) -->
+  <button id="combinedEnquiryBtn" class="primary-btn" style="display:none;">
+    Send Combined Enquiry
+  </button>
+
   <section id="sellerAdsContainer" class="posts-grid"></section>
-<div id="followToast" class="follow-toast"></div>
+
+  <div id="followToast" class="follow-toast"></div>
+
 </section>
