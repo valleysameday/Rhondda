@@ -258,3 +258,81 @@
   opacity: 1;
   transform: translateX(-50%) translateY(-6px);
 }
+/* ============================================================
+   TICK-TO-ENQUIRE SYSTEM
+   Works for all users, but premium sellers unlock full features
+============================================================ */
+
+/* Tick box on each ad */
+.bundle-tick {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  accent-color: #1cc88a; /* green tick */
+  z-index: 5;
+}
+
+/* Wrap post-card so ticks can sit on top */
+.post-card {
+  position: relative;
+  padding-top: 6px; /* space for tick */
+}
+
+/* Combined Enquiry Button (only for Business/Seller+) */
+#combinedEnquiryBtn {
+  width: 100%;
+  padding: 14px;
+  background: #4e73df;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 17px;
+  margin: 18px 0;
+  cursor: pointer;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: none; /* shown by JS */
+}
+
+/* Upsell box (shown only if seller is FREE) */
+.seller-plus-upsell {
+  background: #fff7e6;
+  border: 1px solid #ffd27f;
+  padding: 14px;
+  border-radius: 10px;
+  margin: 14px 0;
+  font-size: 14px;
+  color: #8a5a00;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+/* When ticks are selected, highlight the card */
+.post-card.selected {
+  border: 2px solid #1cc88a;
+  box-shadow: 0 0 0 3px rgba(28,200,138,0.25);
+}
+
+/* Smooth hover effect */
+.post-card:hover {
+  transform: translateY(-2px);
+  transition: 0.15s ease;
+}
+
+/* Grid fix so tick doesn't overlap text */
+.post-image {
+  position: relative;
+}
+
+/* Tick alignment for mobile */
+@media (max-width: 480px) {
+  .bundle-tick {
+    width: 20px;
+    height: 20px;
+    top: 8px;
+    left: 8px;
+  }
+}
