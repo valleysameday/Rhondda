@@ -12,7 +12,8 @@ import {
   updateDoc,
   deleteDoc,
   addDoc,
-  serverTimestamp
+  serverTimestamp,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let auth, db, storage;
@@ -39,7 +40,10 @@ export async function init({ auth: a, db: d, storage: s }) {
   await loadPostsAndReports();
   await loadSettings();
   await loadSubscriptions();
-  await loadUsers(); // ⭐ NEW: Full user manager
+  await loadUsers();
+
+  // ⭐ Add real-time updates for dashboard and switches
+  initRealtimeListeners();
 }
 
 /* ============================================================
@@ -303,7 +307,7 @@ async function loadPostsAndReports() {
 }
 
 /* ============================================================
-   SETTINGS
+   SETTINGS (INCLUDING GENERAL SWITCH)
 ============================================================ */
 async function loadSettings() {
   const settingsRef = doc(db, "settings", "global");
@@ -314,6 +318,7 @@ async function loadSettings() {
       businessPremiumEnabled: false,
       postingEnabled: true,
       newSignupsEnabled: true,
+      generalDashboardUpgradeEnabled: false,
       homepageBanner: "",
       homepageFeaturedBusinessId: null
     }).catch(() => {});
@@ -325,6 +330,7 @@ async function loadSettings() {
   const toggleBusinessPremium = document.getElementById("toggleBusinessPremium");
   const togglePostingEnabled = document.getElementById("togglePostingEnabled");
   const toggleSignupsEnabled = document.getElementById("toggleSignupsEnabled");
+  const toggleGeneralDashboard = document.getElementById("toggleGeneralDashboard"); // ✅ NEW
   const bannerInput = document.getElementById("adminBannerInput");
   const bannerBtn = document.getElementById("adminSaveBannerBtn");
   const featuredInput = document.getElementById("adminFeaturedBusinessId");
@@ -333,6 +339,7 @@ async function loadSettings() {
   toggleBusinessPremium.checked = !!d.businessPremiumEnabled;
   togglePostingEnabled.checked = !!d.postingEnabled;
   toggleSignupsEnabled.checked = !!d.newSignupsEnabled;
+  toggleGeneralDashboard.checked = !!d.generalDashboardUpgradeEnabled; // ✅ NEW
   bannerInput.value = d.homepageBanner || "";
   featuredInput.value = d.homepageFeaturedBusinessId || "";
 
@@ -348,6 +355,10 @@ async function loadSettings() {
     await updateDoc(settingsRef, { newSignupsEnabled: toggleSignupsEnabled.checked });
   });
 
+  toggleGeneralDashboard.addEventListener("change", async () => {
+    await updateDoc(settingsRef, { generalDashboardUpgradeEnabled: toggleGeneralDashboard.checked });
+  });
+
   bannerBtn.addEventListener("click", async () => {
     await updateDoc(settingsRef, { homepageBanner: bannerInput.value.trim() });
   });
@@ -359,7 +370,7 @@ async function loadSettings() {
 }
 
 /* ============================================================
-   PAYMENTS / PLANS
+   SUBSCRIPTIONS
 ============================================================ */
 async function loadSubscriptions() {
   const tbody = document.getElementById("adminSubscriptionsTable");
@@ -407,7 +418,7 @@ async function loadSubscriptions() {
 }
 
 /* ============================================================
-   USERS & ACCOUNTS (FULL CONTROL)
+   USERS & ACCOUNTS
 ============================================================ */
 async function loadUsers() {
   const tbody = document.getElementById("adminUsersTable");
@@ -507,6 +518,12 @@ async function openUserModal(uid) {
   const snap = await getDoc(doc(db, "users", uid));
   const d = snap.data();
 
+  if (!d) {
+    body.innerHTML = `<p>User not found.</p>`;
+    modal.style.display = "flex";
+    return;
+  }
+
   // Format dates
   const createdAt = d.createdAt?.toDate
     ? d.createdAt.toDate().toLocaleString()
@@ -559,3 +576,35 @@ ${JSON.stringify(d, null, 2)}
     if (e.target === modal) modal.style.display = "none";
   };
 }
+
+/* ============================================================
+   REAL-TIME FIRESTORE LISTENERS
+============================================================ */
+function initRealtimeListeners() {
+  // Users count update
+  onSnapshot(collection(db, "users"), () => loadOverview());
+
+  // Posts count update
+  onSnapshot(collection(db, "posts"), () => {
+    loadOverview();
+    loadTraffic();
+    loadPostsAndReports();
+  });
+
+  // Reports count update
+  onSnapshot(collection(db, "reports"), () => loadPostsAndReports());
+
+  // Business / Subscriptions update
+  onSnapshot(query(collection(db, "users"), where("isBusiness", "==", true)), () => {
+    loadBusinesses();
+    loadSubscriptions();
+  });
+
+  // Settings / dashboard switches
+  const settingsRef = doc(db, "settings", "global");
+  onSnapshot(settingsRef, snap => {
+    const d = snap.data() || {};
+    const toggleGeneralDashboard = document.getElementById("toggleGeneralDashboard");
+    if (toggleGeneralDashboard) toggleGeneralDashboard.checked = !!d.generalDashboardUpgradeEnabled;
+  });
+    }
