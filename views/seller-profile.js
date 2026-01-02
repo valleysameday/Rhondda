@@ -30,51 +30,50 @@ export async function init({ auth: a, db: d }) {
   /* ---------------- Determine Seller Type ---------------- */
   sellerIsPremium = !!(user.isBusiness || user.isSellerPlus);
 
-  /* ---------------- Conditional Unlock Logic (2026) ---------------- */
-  // Check if any contact number field exists and is not empty
+  /* ---------------- Fix NaN Date Error ---------------- */
+  const joinedTimestamp = user.joined; 
+  let reliabilityText = "Verified Member";
+  
+  if (joinedTimestamp) {
+    const joinedDate = new Date(joinedTimestamp);
+    if (!isNaN(joinedDate.getTime())) {
+      reliabilityText = `Member since ${joinedDate.getFullYear()}`;
+    }
+  }
+  document.getElementById("sellerReliability").textContent = reliabilityText;
+
+  /* ---------------- Unlock Number Logic ---------------- */
   const hasContactNumber = !!(user.phone || user.contactNumber || user.whatsapp);
   const unlockSection = document.getElementById("unlockSection");
 
   if (!sellerIsPremium && hasContactNumber) {
     unlockSection.style.display = "block";
     document.getElementById("unlockPosterBtn").onclick = () => {
-      // payment integration hook for £1.50
-      console.log("Initiating payment for user: " + userId);
+      alert("Opening secure payment for £1.50 to unlock contact details...");
     };
   } else {
     unlockSection.style.display = "none";
   }
 
-  /* ---------------- UI Enhancements ---------------- */
-  const safeName = user.name || user.displayName || "User";
+  /* ---------------- UI Data Mapping ---------------- */
+  document.getElementById("sellerName").textContent = user.name || user.displayName || "User";
+  document.getElementById("streakCount").textContent = user.loginStreak || 0;
+  document.getElementById("sellerBio").textContent = user.bio || "This user hasn't added a bio yet.";
+  
   const avatar = document.getElementById("sellerAvatar");
-
   if (user.avatarUrl) {
     avatar.style.backgroundImage = `url(${user.avatarUrl})`;
   } else {
-    avatar.textContent = safeName.charAt(0).toUpperCase();
+    avatar.textContent = (user.name || "U").charAt(0).toUpperCase();
   }
-
-  document.getElementById("sellerName").textContent = safeName;
-  document.getElementById("sellerReliability").textContent = `Member since ${new Date(user.joined).getFullYear()}`;
-
-  // Bento-grid stats
-  document.getElementById("jobCount").textContent = user.completedJobs || 0;
-  document.getElementById("streakCount").textContent = user.loginStreak || 0;
-  loadFollowerCount(userId);
-
-  document.getElementById("sellerBio").textContent = user.bio || "No bio provided.";
 
   if (user.isBusiness) {
-    const ribbon = document.getElementById("businessRibbon");
-    ribbon.style.display = "flex";
-    const info = document.getElementById("businessInfo");
-    info.style.display = "block";
-    info.innerHTML = `<h4>Business Info</h4><p>${user.businessDescription || "Local Business"}</p>`;
+    document.getElementById("businessRibbon").style.display = "flex";
   }
 
-  setupFollowSystem(userId);
+  loadFollowerCount(userId);
   loadSellerAds(userId);
+  setupFollowBtn(userId);
 
   document.getElementById("backToPost").onclick = () => loadView("view-post", { forceInit: true });
 }
@@ -86,7 +85,7 @@ async function loadSellerAds(sellerId) {
   container.innerHTML = "";
 
   if (snap.empty) {
-    container.innerHTML = "<p class='empty-msg'>No ads posted yet.</p>";
+    container.innerHTML = "<p class='empty-msg'>No other ads found.</p>";
     return;
   }
 
@@ -94,37 +93,33 @@ async function loadSellerAds(sellerId) {
     const post = { id: docSnap.id, ...docSnap.data() };
     const card = document.createElement("div");
     card.className = "post-card";
-    
     card.innerHTML = `
-      <input type="checkbox" class="bundle-tick" 
-             data-id="${post.id}" 
-             data-title="${post.title}" 
-             data-price="${post.price || 0}">
-      <div class="post-image">
-        <img src="${post.imageUrl || '/images/image-webholder.webp'}" loading="lazy">
-      </div>
+      <input type="checkbox" class="bundle-tick" data-id="${post.id}" data-title="${post.title}" data-price="${post.price || 0}">
+      <div class="post-image"><img src="${post.imageUrl || '/images/placeholder.webp'}"></div>
       <div class="post-body">
         <h3>${post.title}</h3>
         <p class="post-price">£${post.price || '0.00'}</p>
       </div>
     `;
 
-    card.querySelector(".bundle-tick").addEventListener("change", updateBundleBar);
+    card.querySelector(".bundle-tick").addEventListener("change", updateBundleUI);
     container.appendChild(card);
   });
 
-  initEnquiryButton(sellerId);
+  setupPopupLogic(sellerId);
 }
 
-function updateBundleBar() {
-  const selected = document.querySelectorAll(".bundle-tick:checked");
+function updateBundleUI() {
+  const selectedCount = document.querySelectorAll(".bundle-tick:checked").length;
   const btn = document.getElementById("combinedEnquiryBtn");
-  document.getElementById("selectedCount").textContent = selected.length;
-  btn.style.display = selected.length > 0 ? "block" : "none";
+  document.getElementById("selectedCount").textContent = selectedCount;
+  btn.style.display = selectedCount > 0 ? "block" : "none";
 }
 
-function initEnquiryButton(sellerId) {
-  document.getElementById("combinedEnquiryBtn").onclick = () => {
+function setupPopupLogic(sellerId) {
+  const enquiryBtn = document.getElementById("combinedEnquiryBtn");
+  
+  enquiryBtn.onclick = () => {
     const selected = document.querySelectorAll(".bundle-tick:checked");
     const summary = document.getElementById("popupItemsSummary");
     const tally = document.getElementById("popupPriceTally");
@@ -135,9 +130,11 @@ function initEnquiryButton(sellerId) {
       const price = parseFloat(t.dataset.price);
       total += price;
       
-      summary.innerHTML += sellerIsPremium 
-        ? `<div class="summary-item"><span>${t.dataset.title}</span><span>£${price.toFixed(2)}</span></div>`
-        : `<p>• ${t.dataset.title}</p>`;
+      if (sellerIsPremium) {
+        summary.innerHTML += `<div class="summary-item"><span>${t.dataset.title}</span><span>£${price.toFixed(2)}</span></div>`;
+      } else {
+        summary.innerHTML += `<p class="plain-item">• ${t.dataset.title}</p>`;
+      }
     });
 
     if (sellerIsPremium) {
@@ -148,10 +145,16 @@ function initEnquiryButton(sellerId) {
     document.getElementById("contactPopup").style.display = "flex";
 
     document.getElementById("popupSendBtn").onclick = () => {
-      const msg = document.getElementById("popupMessage").value;
-      const finalMsg = `Bundle Order:\n${Array.from(selected).map(t => t.dataset.title).join(", ")}\n\n${msg}`;
+      const userMsg = document.getElementById("popupMessage").value;
+      let finalMsg = `Bundle Enquiry:\n`;
+      selected.forEach(t => {
+        finalMsg += `- ${t.dataset.title} ${sellerIsPremium ? `(£${t.dataset.price})` : ""}\n`;
+      });
+      if (sellerIsPremium) finalMsg += `Total: £${total.toFixed(2)}\n`;
+      if (userMsg) finalMsg += `\nMessage: ${userMsg}`;
+
       sessionStorage.setItem("pendingMessage", finalMsg);
-      loadView("chat");
+      loadView("chat", { forceInit: true });
     };
   };
 
@@ -165,11 +168,10 @@ async function loadFollowerCount(id) {
   document.getElementById("followerCount").textContent = snap.size;
 }
 
-async function setupFollowSystem(id) {
+function setupFollowBtn(id) {
   const btn = document.getElementById("followSellerBtn");
-  btn.onclick = async () => {
-    // Logic for follow/unfollow toggle
+  btn.onclick = () => {
     btn.classList.toggle("following");
-    btn.textContent = btn.classList.contains("following") ? "Following" : "Follow";
+    btn.textContent = btn.classList.contains("following") ? "Following ✓" : "Follow Seller";
   };
 }
