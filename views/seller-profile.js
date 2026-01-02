@@ -219,9 +219,14 @@ async function loadSellerAds(sellerId) {
 
     const h3 = document.createElement("h3");
     h3.textContent = post.title || "Untitled";
+  postBody.appendChild(h3);
 
-    postBody.appendChild(h3);
+const price = document.createElement("p");
+price.className = "post-price";
+price.textContent = post.price ? `£${post.price}` : "£0";
 
+postBody.appendChild(price);
+    
     card.appendChild(postImageDiv);
     card.appendChild(postBody);
 
