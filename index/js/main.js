@@ -18,7 +18,13 @@ let auth, db, storage;
    SPA VIEW LOADER
 ===================================================== */
 export async function loadView(view, options = {}) {
-  console.log("🔵 loadView() →", view);
+// ⭐ Prevent duplicate view loads
+if (window.currentView === view) {
+  console.warn("⛔ Prevented duplicate load:", view);
+  return;
+}
+window.currentView = view;
+   console.log("🔵 loadView() →", view);
 
   const app = document.getElementById("app");
   if (!app) return console.log("❌ #app container missing");
