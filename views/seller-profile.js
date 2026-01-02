@@ -288,3 +288,4 @@ contactBtn.onclick = async () => {
     document.getElementById("contactPopup").style.display = "none";
   };
 };
+}
