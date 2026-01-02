@@ -1,451 +1,405 @@
 /* ============================================================
-   GENERAL DASHBOARD — CLEAN, UPDATED, NO BUSINESS STYLES
+   GLOBAL
 ============================================================ */
-
-/* GLOBAL */
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #f7f7f9;
   margin: 0;
-  padding: 0;
-  color: #222;
+  font-family: system-ui, sans-serif;
+  background: #f7f7f7;
+  color: #1a1a1a;
 }
 
 .section-title {
-  margin: 1rem 0 .5rem;
+  margin: 18px 0 8px;
   font-size: 1.1rem;
-  font-weight: 600;
-  color: #222;
+}
+
+.dash-section-title {
+  margin: 22px 0 8px;
+  font-size: 1rem;
+  opacity: 0.85;
 }
 
 /* ============================================================
    HEADER
 ============================================================ */
 .dash-header {
-  padding: 1.1rem 1rem;
+  background: linear-gradient(135deg, #FF8A00, #FF3D77);
+  color: white;
+  padding: 24px;
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
-  color: #fff;
-}
-
-.dash-header.sunset {
-  background: linear-gradient(135deg, #ff7e5f, #fd3a84, #6a0572);
+  align-items: flex-start;
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
 }
 
 .dash-hello {
-  margin: 0;
-  font-size: .9rem;
-  opacity: .9;
-}
-
-.dash-header h1 {
-  margin: .1rem 0;
-  font-size: 1.4rem;
+  opacity: 0.9;
+  font-size: 0.9rem;
 }
 
 .dash-tagline {
-  margin: .1rem 0 0;
-  font-size: .9rem;
-  opacity: .85;
-}
-
-.dash-header-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: .4rem;
+  opacity: 0.85;
+  margin-top: 4px;
 }
 
 .area-badge {
-  background: rgb(255 255 255 / .12);
-  border-radius: 999px;
-  padding: .15rem .7rem;
-  font-size: .8rem;
-  border: 1px solid rgb(255 255 255 / .35);
+  background: rgba(255,255,255,0.2);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
 }
 
 .logout-btn {
-  background: rgb(0 0 0 / .2);
+  margin-top: 10px;
+  background: white;
+  color: #FF3D77;
   border: none;
-  padding: .45rem .9rem;
-  color: #fff;
-  border-radius: 999px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
-  font-size: .85rem;
-  backdrop-filter: blur(4px);
-  transition: background 0.2s ease, transform 0.1s ease;
-}
-
-.logout-btn:hover {
-  background: rgb(0 0 0 / .35);
-  transform: translateY(-1px);
 }
 
 /* ============================================================
-   MAIN SECTION
+   SECTION WRAPPER
 ============================================================ */
 .dash-section {
-  padding: 1rem;
-  max-width: 800px;
-  margin: 0 auto 2.5rem;
+  padding: 20px;
 }
 
 /* ============================================================
-   STATS (GENERAL USERS ONLY)
+   STATS
 ============================================================ */
 .stats-box {
-  background: #fff;
-  padding: 1rem;
+  background: white;
+  padding: 18px;
   border-radius: 14px;
-  box-shadow: 0 10px 30px rgb(0 0 0 / .06);
-  margin-top: -1.2rem;
-  margin-bottom: 1.3rem;
-  position: relative;
-  z-index: 1;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  margin-bottom: 24px;
 }
 
-.stats-box h2 {
-  margin: 0 0 .7rem;
-  font-size: 1.05rem;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-  gap: .7rem;
-}
-
-.stat-pill {
-  background: linear-gradient(135deg, #fff8f4, #ffe9f4);
-  border-radius: 999px;
-  padding: .5rem .7rem;
+.stats-row {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  border: 1px solid rgb(253 58 132 / .25);
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.stat-card {
+  flex: 1;
+  background: #e0f2f1;
+  padding: 14px;
+  border-radius: 12px;
+  text-align: center;
 }
 
 .stat-number {
+  font-size: 1.6rem;
   font-weight: 700;
-  font-size: 1.05rem;
-  color: #fd3a84;
 }
 
 .stat-label {
-  font-size: .75rem;
-  color: #555;
+  font-size: 0.85rem;
+  opacity: 0.7;
 }
 
-/* Upgrade hint */
 .upgrade-hint {
-  margin-top: .6rem;
-  font-size: .8rem;
-  color: #666;
+  margin-top: 14px;
+  font-size: 0.9rem;
 }
 
 .upgrade-link {
-  color: #fd3a84;
+  color: #FF3D77;
   font-weight: 600;
   cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 2px;
 }
 
 /* ============================================================
-   PROFILE BOX
+   PROFILE CARD
 ============================================================ */
 .profile-box {
-  background: #fff;
-  padding: 1.1rem;
+  background: white;
+  padding: 18px;
   border-radius: 14px;
-  box-shadow: 0 8px 24px rgb(0 0 0 / .06);
-  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  margin-bottom: 24px;
 }
 
-.profile-box-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: .8rem;
-}
-
-.profile-box h2 {
-  margin: 0;
-  font-size: 1.1rem;
-}
-
-.edit-profile-btn {
-  background: #f3f3ff;
-  color: #333;
-  border-radius: 999px;
-  border: 1px solid #ddd;
-  padding: .3rem .8rem;
-  font-size: .85rem;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: .3rem;
-}
-
-.edit-profile-btn::before {
-  content: "✏️";
-  font-size: .85rem;
-}
-
-.edit-profile-btn:hover {
-  background: #e7e7ff;
-}
-
-/* Avatar */
 .avatar-section {
   text-align: center;
-  margin-bottom: .8rem;
 }
 
 .avatar-wrapper {
   width: 90px;
   height: 90px;
+  margin: 0 auto;
   border-radius: 50%;
   overflow: hidden;
-  margin: 0 auto;
+  background: #ddd;
   cursor: pointer;
-  border: 2px solid #eee;
 }
 
 .avatar-circle {
   width: 100%;
   height: 100%;
-  background: #ddd;
   background-size: cover;
   background-position: center;
 }
 
 .avatar-edit-hint {
-  font-size: .8rem;
-  color: #777;
-  margin-top: .3rem;
+  font-size: 0.8rem;
+  opacity: 0.6;
+  margin-top: 6px;
 }
 
-/* Profile view */
-.profile-view {
-  border-top: 1px solid #f1f1f1;
-  padding-top: .8rem;
+.profile-box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.edit-profile-btn {
+  background: #5865F2;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .profile-line {
   display: flex;
-  flex-direction: column;
-  margin-bottom: .6rem;
+  justify-content: space-between;
+  margin: 12px 0;
 }
 
 .profile-label {
-  font-size: .8rem;
-  color: #777;
-  margin-bottom: .1rem;
-}
-
-.profile-value {
-  font-size: .95rem;
-  color: #222;
-  background: #fafafa;
-  padding: .5rem .7rem;
-  border-radius: 8px;
-}
-
-.profile-line-bio .profile-value {
-  min-height: 40px;
-}
-
-/* Profile edit */
-.profile-edit {
-  border-top: 1px solid #f1f1f1;
-  padding-top: .8rem;
-}
-
-.profile-row {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: .8rem;
-}
-
-.profile-row label {
-  font-size: .85rem;
-  margin-bottom: .2rem;
-  color: #555;
-}
-
-.profile-row input,
-.profile-row textarea {
-  padding: .55rem .7rem;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background: #fafafa;
-  font-size: .95rem;
-  transition: all 0.2s ease;
-}
-
-.profile-row input:focus,
-.profile-row textarea:focus {
-  border-color: #fd3a84;
-  box-shadow: 0 0 0 3px rgb(253 58 132 / .15);
-  outline: none;
-}
-
-.profile-row textarea {
-  min-height: 80px;
-  resize: vertical;
-}
-
-.hint-text {
-  font-size: .75rem;
-  color: #888;
-  margin-top: .2rem;
-}
-
-.profile-edit-actions {
-  display: flex;
-  gap: .6rem;
-  margin-top: .4rem;
-}
-
-.dash-save-btn {
-  background: linear-gradient(135deg, #ff7e5f, #fd3a84);
-  color: #fff;
-  padding: .6rem 1rem;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
   font-weight: 600;
-  font-size: .95rem;
-  flex: 1;
-  transition: all 0.15s ease;
+  opacity: 0.7;
 }
 
-.dash-save-btn:hover {
-  opacity: .95;
-  transform: translateY(-1px);
-}
-
-.cancel-edit-btn {
-  background: #f3f3f3;
-  color: #555;
-  padding: .6rem 1rem;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  font-size: .9rem;
-}
-
-.feedback-text {
-  margin-top: .5rem;
-  font-size: .85rem;
-  min-height: 18px;
+.bio-value {
+  margin-top: 6px;
+  opacity: 0.8;
 }
 
 /* ============================================================
-   NEW POST BUTTON (3 FREE)
+   POST AN AD
 ============================================================ */
 .dash-new-post {
-  background: #222;
-  color: #fff;
-  padding: .75rem .9rem;
-  border-radius: 999px;
   width: 100%;
+  background: #5865F2;
+  color: white;
+  padding: 16px;
+  border-radius: 14px;
   border: none;
-  cursor: pointer;
-  font-size: .95rem;
-  margin-bottom: 1.3rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.new-post-label {
+  font-size: 1.1rem;
   font-weight: 600;
+  margin-bottom: 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .new-post-tag {
-  background: linear-gradient(135deg, #ff7e5f, #fd3a84);
-  padding: .2rem .6rem;
-  border-radius: 999px;
-  font-size: .8rem;
-  font-weight: 600;
+  background: rgba(255,255,255,0.2);
+  padding: 4px 10px;
+  border-radius: 8px;
 }
 
 /* ============================================================
-   FOLLOW FEED
+   SHARE ADS BUTTON
 ============================================================ */
-.follow-update-card {
-  display: flex;
-  gap: 12px;
-  background: #fff;
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 12px;
-  box-shadow: 0 2px 6px rgb(0 0 0 / .1);
-  border: 1px solid #e6e6e6;
+.dash-share-btn {
+  width: 100%;
+  background: #FFD93D;
+  color: #1a1a1a;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  cursor: pointer;
+  transition: transform .15s ease;
 }
 
-.follow-update-card img {
-  width: 70px;
-  height: 70px;
-  border-radius: 8px;
+.dash-share-btn:active {
+  transform: scale(0.96);
+}
+
+/* ============================================================
+   STORIES FEED
+============================================================ */
+.stories-strip {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 10px 2px;
+  scroll-snap-type: x mandatory;
+}
+
+.stories-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.story-card {
+  flex: 0 0 auto;
+  width: 120px;
+  scroll-snap-align: start;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.story-card img {
+  width: 100%;
+  height: 90px;
   object-fit: cover;
 }
 
+.story-info {
+  padding: 8px;
+}
+
+.story-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.story-time {
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
 /* ============================================================
-   SAVED ADS + USER ADS
+   POSTS GRID
 ============================================================ */
 .dash-posts-grid {
   display: grid;
-  gap: .9rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 30px;
 }
 
 .dash-post-card {
-  background: #fff;
+  background: white;
   border-radius: 14px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 2px 8px rgb(0 0 0 / .06);
   overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
   cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  flex-direction: column;
-}
-
-.dash-post-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 14px rgb(0 0 0 / .12);
 }
 
 .dash-post-img {
   width: 100%;
   height: 120px;
   object-fit: cover;
-  background: #f3f4f6;
 }
 
 .dash-post-info {
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  padding: 10px;
 }
 
 .dash-post-info h3 {
-  font-size: .95rem;
-  font-weight: 700;
-  color: #1e293b;
-  line-height: 1.2;
-  max-height: 2.4em;
-  overflow: hidden;
+  font-size: 0.95rem;
+  margin: 0;
 }
 
 .dash-post-info p {
-  font-size: .85rem;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+/* ============================================================
+   PLANS SECTION
+============================================================ */
+.plans-section {
+  margin-top: 10px;
+  margin-bottom: 40px;
+}
+
+.plans-subtitle {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: 12px;
+}
+
+.plans-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.plan-card {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.plan-general {
+  border: 1px solid #e0e0e0;
+}
+
+.plan-seller-plus {
+  border: 1px solid #5865F2;
+}
+
+.plan-business {
+  border: 1px solid #FF8A00;
+}
+
+.plan-price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 4px 0;
+}
+
+.plan-trial {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin-bottom: 8px;
+}
+
+.plan-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 8px 0 12px;
+  font-size: 0.9rem;
+}
+
+.plan-list li::before {
+  content: "• ";
+  color: #4caf50;
+}
+
+.plan-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
   font-weight: 600;
-  color: #475569;
+  cursor: pointer;
+}
+
+.plan-btn.disabled {
+  background: #e0e0e0;
+  color: #777;
+  cursor: default;
+}
+
+.plan-seller-plus .plan-btn {
+  background: #5865F2;
+  color: white;
+}
+
+.plan-business .plan-btn {
+  background: #FF8A00;
+  color: white;
 }
 
 /* ============================================================
@@ -454,70 +408,24 @@ body {
 .logout-overlay {
   position: fixed;
   inset: 0;
-  background: rgb(0 0 0 / .4);
+  background: rgba(0,0,0,0.4);
   display: none;
   align-items: center;
   justify-content: center;
-  z-index: 999;
 }
 
 .logout-card {
-  background: #fff;
-  padding: 1rem 1.3rem;
+  background: white;
+  padding: 20px;
   border-radius: 12px;
   text-align: center;
-  box-shadow: 0 10px 30px rgb(0 0 0 / .25);
-}
-
-.logout-card p {
-  margin: 0 0 .2rem;
-}
-.post-img,
-.dash-post-img {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  background: #f3f4f6;
-  border-radius: 10px;
 }
 
 /* ============================================================
-   USER POST ACTION BUTTONS (Edit / Delete)
+   RESPONSIVE
 ============================================================ */
-
-.dash-actions {
-  margin-left: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-
-.dash-btn {
-  padding: 0.35rem 0.7rem;
-  border: none;
-  border-radius: 999px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 600;
-  transition: all 0.15s ease;
-}
-
-/* Edit button */
-.dash-edit {
-  background: #ffc107;
-  color: #222;
-}
-
-.dash-edit:hover {
-  background: #e0a800;
-}
-
-/* Delete button */
-.dash-delete {
-  background: #ff4d4d;
-  color: #fff;
-}
-
-.dash-delete:hover {
-  background: #e60000;
+@media (min-width: 768px) {
+  .plans-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
