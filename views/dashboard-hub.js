@@ -1,6 +1,5 @@
 import { initBadges, updateTrialBadges } from "./dashboard/badges.js";
 import { updateSidebar } from "./dashboard/sidebar.js";
-import { renderWidgets } from "./dashboard/widgets.js";
 import { loadCounts } from "./dashboard/counts.js";
 import { loadRecentAds } from "./dashboard/recent-ads.js";
 import { initModals, showUpgradeModal, hideUpgradeModal } from "./dashboard/modals.js";
