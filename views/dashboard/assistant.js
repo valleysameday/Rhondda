@@ -1,5 +1,5 @@
 // assistant.js
-import { showAIPopup } from "./assistant-ui.js";
+import { showAIPopup } from "/views/dashboard/assistant-ui.js";
 
 export const AI = {
   triggers: {
