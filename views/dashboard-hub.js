@@ -130,7 +130,9 @@ export async function renderDashboard() {
     console.log("   plan:", plan);
     console.log("   auth:", auth);
     console.log("   db:", db);
-    renderWidgets(plan, auth, db);
+    requestAnimationFrame(() => {
+  renderWidgets(plan, auth, db);
+});
   } catch (e) {
     console.error("❌ renderWidgets() FAILED:", e);
   }
