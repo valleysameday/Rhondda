@@ -1,0 +1,431 @@
+/* RHONDDA HUB — UNIFIED DASHBOARD 2026 */
+
+/* ANIMATIONS */
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.slide-up {
+  animation: slideUp 0.35s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* LAYOUT */
+.dashboard-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto;
+  height: 100vh;
+  background: #f8fafc;
+}
+
+/* -----------------------------------------
+   MOBILE NAV (BOTTOM BAR) — CLEAN + COMPACT
+------------------------------------------ */
+.sidebar {
+  background: #0f172a;
+  color: white;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  height: 58px; /* compact height */
+  box-shadow: 0 -1px 6px rgba(0,0,0,0.25);
+}
+
+.sidebar-brand,
+.sidebar-footer,
+.nav-text {
+  display: none;
+}
+
+.sidebar-nav {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.nav-item {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: color 0.2s ease, transform 0.1s ease;
+}
+
+.nav-icon {
+  font-size: 18px; /* smaller, cleaner */
+  line-height: 1;
+}
+
+.nav-item.active {
+  color: #38bdf8;
+  transform: translateY(-2px);
+}
+
+/* ⭐ Your requested rule */
+.nav-item.active .nav-text {
+  display: block;
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+/* MAIN CONTENT */
+.main-content {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.plan-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 5px;
+}
+
+.plan-badge.free { background: #e2e8f0; color: #475569; }
+.plan-badge.sellerplus { background: #dcfce7; color: #166534; }
+.plan-badge.business { background: #e0f2fe; color: #0369a1; }
+
+.trial-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #f97316;
+  color: #fff7ed;
+}
+
+/* WIDGET GRID */
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.widget {
+  background: white;
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 4px 12px rgba(15,23,42,0.08);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.widget:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(15,23,42,0.12);
+}
+
+.widget-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.widget-value {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.widget-sub {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+/* LOCKED WIDGET */
+.locked-widget {
+  cursor: pointer;
+}
+
+.locked-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(248,250,252,0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+/* ADS MINI LIST */
+.ads-management .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.text-link-btn {
+  background: none;
+  border: none;
+  color: #0ea5e9;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.ads-mini-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mini-ad {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 1px 4px rgba(15,23,42,0.06);
+}
+
+.mini-ad img {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* SIDEBAR FOOTER (DESKTOP ONLY) */
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px;
+  background: #111827;
+  border-radius: 14px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.trial-label {
+  font-size: 11px;
+  color: #facc15;
+  margin-top: 4px;
+}
+
+.upgrade-sidebar-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 999px;
+  border: none;
+  background: #38bdf8;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 2000;
+}
+
+.pricing-modal {
+  background: white;
+  width: 100%;
+  max-height: 90vh;
+  padding: 24px 18px 30px;
+  border-radius: 24px 24px 0 0;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-handle {
+  width: 40px;
+  height: 5px;
+  background: #cbd5e1;
+  border-radius: 999px;
+  margin: 0 auto 12px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  font-size: 22px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.modal-sub {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 16px;
+}
+
+.tiers-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tier-card {
+  padding: 16px;
+  border-radius: 18px;
+  border: 2px solid #e2e8f0;
+  position: relative;
+}
+
+.tier-card.featured {
+  border-color: #38bdf8;
+  background: #f0f9ff;
+}
+
+.ribbon,
+.ribbon-outline {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.ribbon { background: #0ea5e9; color: white; }
+.ribbon-outline { border: 1px solid #f97316; color: #c2410c; background: #fffbeb; }
+
+.price {
+  font-size: 24px;
+  font-weight: 800;
+  margin: 6px 0;
+}
+
+.price span {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.daily-hint {
+  font-size: 11px;
+  color: #0ea5e9;
+  font-weight: 700;
+}
+
+.tier-features {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 12px;
+  font-size: 13px;
+}
+
+.tier-features li { margin-bottom: 4px; }
+
+.tier-action-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 999px;
+  border: none;
+  background: #0f172a;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.tier-action-btn.btn-disabled {
+  background: #94a3b8;
+  cursor: default;
+}
+
+/* -----------------------------------------
+   DESKTOP SIDEBAR (UNCHANGED)
+------------------------------------------ */
+@media (min-width: 768px) {
+  .dashboard-container {
+    grid-template-columns: 260px 1fr;
+    grid-template-rows: 1fr;
+  }
+
+  .sidebar {
+    flex-direction: column;
+    align-items: stretch;
+    height: 100vh;
+    padding: 24px 18px;
+    box-shadow: none;
+  }
+
+  .sidebar-brand,
+  .sidebar-footer,
+  .nav-text {
+    display: block;
+  }
+
+  .sidebar-nav {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .nav-item {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 10px;
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+
+  .nav-item.active {
+    background: #1f2937;
+  }
+
+  .main-content {
+    padding: 30px 32px;
+  }
+
+  .overview-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .modal-overlay {
+    align-items: center;
+  }
+
+  .pricing-modal {
+    width: 90%;
+    max-width: 820px;
+    border-radius: 24px;
+  }
+
+  .modal-handle {
+    display: none;
+  }
+}
