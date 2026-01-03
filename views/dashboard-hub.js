@@ -132,10 +132,12 @@ export async function renderDashboard() {
     const { renderWidgets } = await import(`./dashboard/widgets.js?cache=${Date.now()}`);
 
     requestAnimationFrame(() => {
-      const grid = document.getElementById("widgetGrid");
-      console.log("➡ renderWidgets() now running, #widgetGrid:", grid);
-      renderWidgets(plan, auth, db);
-    });
+  requestAnimationFrame(() => {
+    const grid = document.getElementById("widgetGrid");
+    console.log("➡ renderWidgets() now running (double RAF), #widgetGrid:", grid);
+    renderWidgets(plan, auth, db);
+  });
+});
 
   } catch (e) {
     console.error("❌ renderWidgets() FAILED:", e);
