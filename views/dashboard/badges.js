@@ -13,7 +13,7 @@ export function initBadges(userData) {
   badge.className = `plan-badge ${plan}`;
 
   // AI feedback for first plan recognition
-  if (plan === "free") AI.speak("FIRST_DASHBOARD_BADGE", { name: userData.name });
+
 }
 
 export function updateTrialBadges(userData) {
