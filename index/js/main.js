@@ -1,3 +1,6 @@
+/* =====================================================
+   IMPORTS
+===================================================== */
 import { getFirebase } from '/index/js/firebase/init.js';
 import { initUIRouter } from '/index/js/ui-router.js';
 import '/index/js/post-gate.js';
@@ -6,16 +9,18 @@ import { openLoginModal } from '/index/js/auth/loginModal.js';
 import { openSignupModal } from '/index/js/auth/signupModal.js';
 import { openForgotModal } from '/index/js/auth/forgotModal.js';
 
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+/* Expose modal functions globally */
 window.openLoginModal = openLoginModal;
 window.openSignupModal = openSignupModal;
 window.openForgotModal = openForgotModal;
 
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
+/* Firebase handles */
 let auth, db, storage;
 
 /* =====================================================
-   SPA VIEW LOADER (FIXED)
+   SPA VIEW LOADER
 ===================================================== */
 export async function loadView(view, options = {}) {
 
@@ -24,21 +29,19 @@ export async function loadView(view, options = {}) {
   window.currentView = view;
 
   const app = document.getElementById("app");
-  if (!app) return console.log("❌ #app missing");
+  if (!app) return console.error("❌ #app missing");
 
-  /* =====================================================
-     HARD FIX: Remove ALL old dashboard containers
-  ====================================================== */
+  /* Remove old dashboard containers */
   if (view === "dashboard-hub") {
     document.querySelectorAll('[id^="view-dashboard"]').forEach(el => {
       if (el.id !== "view-dashboard-hub") el.remove();
     });
   }
 
-  // Hide all views
+  /* Hide all views */
   app.querySelectorAll(".view").forEach(v => v.hidden = true);
 
-  // Create container if missing
+  /* Create container if missing */
   let target = document.getElementById(`view-${view}`);
   if (!target) {
     target = document.createElement("div");
@@ -48,9 +51,7 @@ export async function loadView(view, options = {}) {
     app.appendChild(target);
   }
 
-  /* =====================================================
-     FORCE dashboard-hub to ALWAYS reload fresh
-  ====================================================== */
+  /* Force dashboard to reload fresh */
   if (view === "dashboard-hub") {
     delete target.dataset.loaded;
   }
@@ -58,24 +59,25 @@ export async function loadView(view, options = {}) {
   const shouldReload = options.forceInit || !target.dataset.loaded;
 
   if (shouldReload) {
+    /* Load HTML */
     const html = await fetch(`/views/${view}.html`).then(r => r.text());
     target.innerHTML = html;
     target.dataset.loaded = "true";
 
     try {
-      // Admin protection
+      /* Admin protection */
       if (view === "admin-dashboard" && !window.currentUserData?.isAdmin) {
         return loadView("home");
       }
 
-      // Dashboard special import
-      let mod;
-      if (view === "dashboard-hub") {
-        mod = await import(`/views/dashboard-hub.js?cache=${Date.now()}`);
-      } else {
-        mod = await import(`/views/${view}.js?cache=${Date.now()}`);
-      }
+      /* Load JS module */
+      const mod = await import(
+        view === "dashboard-hub"
+          ? `/views/dashboard-hub.js?cache=${Date.now()}`
+          : `/views/${view}.js?cache=${Date.now()}`
+      );
 
+      /* Run init AFTER HTML is injected */
       mod.init?.({ auth, db, storage });
 
     } catch (err) {
@@ -83,6 +85,7 @@ export async function loadView(view, options = {}) {
     }
   }
 
+  /* Show view */
   target.hidden = false;
 }
 
@@ -108,7 +111,7 @@ getFirebase().then(async fb => {
     window.currentUserData = null;
     window.authReady = false;
 
-    // Update account dot
+    /* Update account dot */
     const statusDot = document.getElementById("accountStatusDot");
     if (statusDot) {
       statusDot.style.background = user ? "green" : "red";
@@ -121,9 +124,9 @@ getFirebase().then(async fb => {
     }
 
     try {
+      /* Load Firestore user doc */
       let snap = await getDoc(doc(db, "users", user.uid));
 
-      // Retry if Firestore doc not created yet
       if (!snap.exists()) {
         await new Promise(r => setTimeout(r, 200));
         snap = await getDoc(doc(db, "users", user.uid));
@@ -131,19 +134,19 @@ getFirebase().then(async fb => {
 
       window.currentUserData = snap.exists() ? snap.data() : {};
 
-      // Normalise plan
+      /* Normalise plan */
       if (!window.currentUserData.plan) {
         window.currentUserData.plan = "free";
       }
 
-      // Business trial expiry check
+      /* Trial expiry */
       const trial = window.currentUserData.businessTrial;
       if (trial?.active && Date.now() > trial.expiresAt) {
         window.currentUserData.plan = "free";
         window.currentUserData.businessTrial.active = false;
       }
 
-      // Admin button visibility
+      /* Admin button */
       const adminBtn = document.getElementById("openAdminDashboard");
       if (adminBtn) {
         adminBtn.style.display = window.currentUserData?.isAdmin ? "inline-block" : "none";
@@ -163,7 +166,7 @@ getFirebase().then(async fb => {
 
     initUIRouter();
 
-    // Login / Signup / Forgot
+    /* Login / Signup / Forgot */
     document.querySelectorAll('[data-value="login"]').forEach(btn =>
       btn.onclick = e => { e.preventDefault(); openLoginModal(auth, db); }
     );
@@ -176,7 +179,7 @@ getFirebase().then(async fb => {
       btn.onclick = e => { e.preventDefault(); openForgotModal(auth); }
     );
 
-    // Chat list
+    /* Chat list */
     document.getElementById("openChatList")?.addEventListener("click", e => {
       e.preventDefault();
       if (!auth.currentUser) {
@@ -187,7 +190,7 @@ getFirebase().then(async fb => {
       loadView("chat-list");
     });
 
-    // Account button → ALWAYS unified dashboard
+    /* Account button → unified dashboard */
     document.getElementById("openAccountModal")?.addEventListener("click", e => {
       e.preventDefault();
 
@@ -204,14 +207,14 @@ getFirebase().then(async fb => {
       waitForAuth();
     });
 
-    // Admin dashboard
+    /* Admin dashboard */
     document.getElementById("openAdminDashboard")?.addEventListener("click", e => {
       if (!e.isTrusted) return;
       if (!window.currentUserData?.isAdmin) return alert("Admin access only");
       loadView("admin-dashboard");
     });
 
-    // Default view
+    /* Default view */
     loadView("home");
   };
 
