@@ -1,11 +1,6 @@
-/* =====================================================
-   RHONDDA HUB — UNIFIED DASHBOARD 2026
-   Mobile-First · SPA-Ready · Scalable
-===================================================== */
+/* RHONDDA HUB — UNIFIED DASHBOARD 2026 */
 
-/* -----------------------------
-   ANIMATIONS
------------------------------ */
+/* ANIMATIONS */
 .fade-in {
   animation: fadeIn 0.4s ease-out;
 }
@@ -16,17 +11,15 @@
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* -----------------------------
-   LAYOUT (MOBILE FIRST)
------------------------------ */
+/* LAYOUT */
 .dashboard-container {
   display: grid;
   grid-template-columns: 1fr;
@@ -35,9 +28,9 @@
   background: #f8fafc;
 }
 
-/* =====================================================
-   MOBILE NAV — BOTTOM BAR
-===================================================== */
+/* -----------------------------------------
+   MOBILE NAV (BOTTOM BAR) — CLEAN + COMPACT
+------------------------------------------ */
 .sidebar {
   background: #0f172a;
   color: white;
@@ -46,9 +39,8 @@
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
-  height: 58px;
+  height: 58px; /* compact height */
   box-shadow: 0 -1px 6px rgba(0,0,0,0.25);
-  z-index: 1000;
 }
 
 .sidebar-brand,
@@ -77,7 +69,7 @@
 }
 
 .nav-icon {
-  font-size: 18px;
+  font-size: 18px; /* smaller, cleaner */
   line-height: 1;
 }
 
@@ -86,16 +78,14 @@
   transform: translateY(-2px);
 }
 
-/* Active label only */
+/* ⭐ Your requested rule */
 .nav-item.active .nav-text {
   display: block;
   font-size: 10px;
   margin-top: 2px;
 }
 
-/* =====================================================
-   MAIN CONTENT
-===================================================== */
+/* MAIN CONTENT */
 .main-content {
   padding: 20px;
   overflow-y: auto;
@@ -108,9 +98,6 @@
   margin-bottom: 20px;
 }
 
-/* -----------------------------
-   PLAN BADGES
------------------------------ */
 .plan-badge {
   display: inline-block;
   padding: 4px 12px;
@@ -120,20 +107,9 @@
   margin-top: 5px;
 }
 
-.plan-badge.free {
-  background: #e2e8f0;
-  color: #475569;
-}
-
-.plan-badge.sellerplus {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.plan-badge.business {
-  background: #e0f2fe;
-  color: #0369a1;
-}
+.plan-badge.free { background: #e2e8f0; color: #475569; }
+.plan-badge.sellerplus { background: #dcfce7; color: #166534; }
+.plan-badge.business { background: #e0f2fe; color: #0369a1; }
 
 .trial-badge {
   display: inline-block;
@@ -146,9 +122,7 @@
   color: #fff7ed;
 }
 
-/* =====================================================
-   OVERVIEW / WIDGET GRID
-===================================================== */
+/* WIDGET GRID */
 .overview-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -189,7 +163,7 @@
   color: #94a3b8;
 }
 
-/* Locked widget overlay */
+/* LOCKED WIDGET */
 .locked-widget {
   cursor: pointer;
 }
@@ -206,9 +180,7 @@
   font-size: 14px;
 }
 
-/* =====================================================
-   ADS MINI LIST
-===================================================== */
+/* ADS MINI LIST */
 .ads-management .section-header {
   display: flex;
   justify-content: space-between;
@@ -247,9 +219,35 @@
   object-fit: cover;
 }
 
-/* =====================================================
-   MODAL — MOBILE FIRST (BOTTOM SHEET)
-===================================================== */
+/* SIDEBAR FOOTER (DESKTOP ONLY) */
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px;
+  background: #111827;
+  border-radius: 14px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.trial-label {
+  font-size: 11px;
+  color: #facc15;
+  margin-top: 4px;
+}
+
+.upgrade-sidebar-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 999px;
+  border: none;
+  background: #38bdf8;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* MODAL */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -294,9 +292,6 @@
   margin-bottom: 16px;
 }
 
-/* -----------------------------
-   PRICING TIERS
------------------------------ */
 .tiers-container {
   display: flex;
   flex-direction: column;
@@ -326,16 +321,8 @@
   font-weight: 700;
 }
 
-.ribbon {
-  background: #0ea5e9;
-  color: white;
-}
-
-.ribbon-outline {
-  border: 1px solid #f97316;
-  color: #c2410c;
-  background: #fffbeb;
-}
+.ribbon { background: #0ea5e9; color: white; }
+.ribbon-outline { border: 1px solid #f97316; color: #c2410c; background: #fffbeb; }
 
 .price {
   font-size: 24px;
@@ -361,9 +348,7 @@
   font-size: 13px;
 }
 
-.tier-features li {
-  margin-bottom: 4px;
-}
+.tier-features li { margin-bottom: 4px; }
 
 .tier-action-btn {
   width: 100%;
@@ -382,9 +367,9 @@
   cursor: default;
 }
 
-/* =====================================================
-   DESKTOP ENHANCEMENTS (≥768px)
-===================================================== */
+/* -----------------------------------------
+   DESKTOP SIDEBAR (UNCHANGED)
+------------------------------------------ */
 @media (min-width: 768px) {
   .dashboard-container {
     grid-template-columns: 260px 1fr;
@@ -420,7 +405,6 @@
 
   .nav-item.active {
     background: #1f2937;
-    transform: none;
   }
 
   .main-content {
