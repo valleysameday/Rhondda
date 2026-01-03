@@ -55,7 +55,8 @@ export async function loadView(view, options = {}) {
       // Fix dashboard import path
       let mod;
       if(view === "dashboard-hub"){
-        mod = await import(`/views/dashboard/dashboard-hub.js?cache=${Date.now()}`);
+  mod = await import(`/views/dashboard-hub.js?cache=${Date.now()}`);
+      }
       } else {
         mod = await import(`/views/${view}.js?cache=${Date.now()}`);
       }
