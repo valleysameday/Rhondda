@@ -160,7 +160,7 @@ function widgetActiveAds() {
   return `
     <div class="widget-title">Active Ads</div>
     <div class="widget-value" id="widgetAdCount">0</div>
-    <div class="widget-sub">Live in Rhondda right now</div>
+    <div class="widget-sub">Live right now</div>
   `;
 }
 
