@@ -1,0 +1,126 @@
+<!-- UNIFIED SELLER HUB — RHONDDA NOTICEBOARD -->
+<link rel="stylesheet" href="/views/dashboard-hub.css">
+
+<div class="dashboard-container fade-in">
+
+  <!-- SIDEBAR / MOBILE NAV -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">Rhondda Hub</div>
+
+    <nav class="sidebar-nav" id="sidebarNav">
+      <button class="nav-item active" data-tab="overview" onclick="switchTab('overview')">
+        <span class="nav-icon">📊</span>
+        <span class="nav-text">Overview</span>
+      </button>
+      <button class="nav-item" data-tab="my-ads" onclick="switchTab('my-ads')">
+        <span class="nav-icon">📦</span>
+        <span class="nav-text">My Ads</span>
+      </button>
+      <button class="nav-item" data-tab="messages" onclick="switchTab('messages')">
+        <span class="nav-icon">💬</span>
+        <span class="nav-text">Messages</span>
+      </button>
+      <button class="nav-item" data-tab="payments" onclick="switchTab('payments')">
+        <span class="nav-icon">💳</span>
+        <span class="nav-text">Payments</span>
+      </button>
+      <button class="nav-item" data-tab="settings" onclick="switchTab('settings')">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-text">Settings</span>
+      </button>
+    </nav>
+
+    <!-- Upgrade / Trial Box -->
+    <div id="sidebarUpgradeBox" class="sidebar-footer">
+      <p id="sidebarPlanLabel">Free Account</p>
+      <p id="sidebarTrialLabel" class="trial-label"></p>
+      <button class="upgrade-sidebar-btn" onclick="showUpgradeModal()">Upgrade</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <header class="content-header">
+      <div>
+        <h1 id="viewTitle">Overview</h1>
+        <div id="planBadge" class="plan-badge free">Free Member</div>
+        <span id="trialBadge" class="trial-badge" style="display:none;"></span>
+      </div>
+    </header>
+
+    <!-- WIDGET GRID -->
+    <div id="widgetGrid" class="overview-grid"></div>
+
+    <!-- LISTINGS PREVIEW -->
+    <section class="ads-management slide-up">
+      <div class="section-header">
+        <h3>My Recent Listings</h3>
+        <button class="text-link-btn" onclick="switchTab('my-ads')">See all</button>
+      </div>
+      <div id="adsList" class="ads-mini-list"></div>
+    </section>
+  </main>
+</div>
+
+<!-- UPGRADE / TRIAL MODAL -->
+<div id="upgradeModal" class="modal-overlay" style="display:none;">
+  <div class="pricing-modal slide-up">
+    <div class="modal-handle"></div>
+    <button class="close-btn" onclick="hideUpgradeModal()">×</button>
+
+    <h2>Upgrade Your Selling</h2>
+    <p class="modal-sub">Unlock more tools without leaving Rhondda.</p>
+
+    <div class="tiers-container">
+
+      <!-- FREE -->
+      <div class="tier-card" id="tier-free">
+        <h4>Free</h4>
+        <div class="price">£0<span>/mo</span></div>
+        <ul class="tier-features">
+          <li>£1.50 per number unlock</li>
+          <li>Basic dashboard</li>
+          <li>Standard visibility</li>
+        </ul>
+        <button class="tier-action-btn" data-plan="free" onclick="handleSubscription('free')">
+          Current
+        </button>
+      </div>
+
+      <!-- SELLER+ -->
+      <div class="tier-card featured" id="tier-sellerplus">
+        <div class="ribbon">Popular</div>
+        <h4>Seller+</h4>
+        <div class="price">£12<span>/mo</span></div>
+        <p class="daily-hint">Less than 40p a day</p>
+        <ul class="tier-features">
+          <li><strong>Free</strong> number unlocks</li>
+          <li>Bundle enquiries</li>
+          <li>Verified seller badge</li>
+        </ul>
+        <button class="tier-action-btn" data-plan="sellerplus" onclick="handleSubscription('sellerplus')">
+          Upgrade
+        </button>
+      </div>
+
+      <!-- BUSINESS -->
+      <div class="tier-card" id="tier-business">
+        <div class="ribbon ribbon-outline">30‑Day Free Trial</div>
+        <h4>Business</h4>
+        <div class="price">£25<span>/mo</span></div>
+        <p class="daily-hint">No card needed to start</p>
+        <ul class="tier-features">
+          <li>Business ribbon on profile</li>
+          <li>Full performance analytics</li>
+          <li>Priority ad support</li>
+        </ul>
+        <button class="tier-action-btn" data-plan="business" onclick="handleSubscription('business')">
+          Start 30‑Day Free Trial
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/views/dashboard-hub.js"></script>
