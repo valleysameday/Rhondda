@@ -1,73 +1,365 @@
-/* RHONDDA HUB — UNIFIED DASHBOARD 2026 */
+/* =====================================================
+   RHONDDA HUB — UNIFIED DASHBOARD 2026
+===================================================== */
 
-/* ANIMATIONS */
+/* =====================================================
+   ANIMATIONS
+===================================================== */
 .fade-in { animation: fadeIn 0.4s ease-out; }
 .slide-up { animation: slideUp 0.35s ease-out; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-/* LAYOUT */
-.dashboard-container { display: grid; grid-template-columns: 1fr; grid-template-rows: 1fr auto; height: 100vh; background: #f8fafc; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-/* SIDEBAR / NAV */
-.sidebar { background: #0f172a; color: white; padding: 0; display: flex; flex-direction: row; justify-content: space-around; align-items: center; height: 58px; box-shadow: 0 -1px 6px rgba(0,0,0,0.25); }
-.sidebar-brand, .sidebar-footer, .nav-text { display: none; }
-.sidebar-nav { display: flex; width: 100%; justify-content: space-around; }
-.nav-item { background: none; border: none; color: #94a3b8; padding: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; transition: color 0.2s ease, transform 0.1s ease; }
-.nav-icon { font-size: 18px; line-height: 1; }
-.nav-item.active { color: #38bdf8; transform: translateY(-2px); }
-.nav-item.active .nav-text { display: block; font-size: 10px; margin-top: 2px; }
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-/* MAIN CONTENT */
-.main-content { padding: 20px; overflow-y: auto; }
-.content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.plan-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 5px; }
-.plan-badge.free { background: #e2e8f0; color: #475569; }
+/* =====================================================
+   LAYOUT
+===================================================== */
+.dashboard-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto;
+  height: 100vh;
+  background: #f8fafc;
+}
+
+/* =====================================================
+   SIDEBAR / NAV
+===================================================== */
+.sidebar {
+  background: #0f172a;
+  color: white;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  height: 58px;
+  box-shadow: 0 -1px 6px rgba(0,0,0,0.25);
+}
+
+.sidebar-brand,
+.sidebar-footer,
+.nav-text {
+  display: none;
+}
+
+.sidebar-nav {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.nav-item {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: color 0.2s ease, transform 0.1s ease;
+}
+
+.nav-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.nav-item.active {
+  color: #38bdf8;
+  transform: translateY(-2px);
+}
+
+.nav-item.active .nav-text {
+  display: block;
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+/* =====================================================
+   MAIN CONTENT
+===================================================== */
+.main-content {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.plan-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 5px;
+}
+
+.plan-badge.free       { background: #e2e8f0; color: #475569; }
 .plan-badge.sellerplus { background: #dcfce7; color: #166534; }
-.plan-badge.business { background: #e0f2fe; color: #0369a1; }
-.trial-badge { display: inline-block; margin-left: 8px; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; background: #f97316; color: #fff7ed; }
+.plan-badge.business   { background: #e0f2fe; color: #0369a1; }
 
-/* WIDGET GRID */
-.overview-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 30px; }
-.widget { background: white; padding: 20px; border-radius: 18px; box-shadow: 0 4px 12px rgba(15,23,42,0.08); position: relative; overflow: hidden; transition: transform 0.12s ease, box-shadow 0.12s ease; }
-.widget:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(15,23,42,0.12); }
-.widget-title { font-size: 14px; font-weight: 600; color: #64748b; margin-bottom: 4px; }
-.widget-value { font-size: 26px; font-weight: 800; color: #0f172a; }
-.widget-sub { font-size: 13px; color: #94a3b8; }
+.trial-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #f97316;
+  color: #fff7ed;
+}
+
+/* =====================================================
+   WIDGET GRID
+===================================================== */
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.widget {
+  background: white;
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 4px 12px rgba(15,23,42,0.08);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.widget:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(15,23,42,0.12);
+}
+
+.widget-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.widget-value {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.widget-sub {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
 .locked-widget { cursor: pointer; }
-.locked-overlay { position: absolute; inset: 0; background: rgba(248,250,252,0.92); display: flex; align-items: center; justify-content: center; font-weight: 700; color: #0f172a; font-size: 14px; }
 
-/* ADS MINI LIST */
-.ads-management .section-header { display: flex; justify-content: space-between; align-items: center; }
-.text-link-btn { background: none; border: none; color: #0ea5e9; font-size: 13px; cursor: pointer; }
-.ads-mini-list { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
-.mini-ad { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: white; box-shadow: 0 1px 4px rgba(15,23,42,0.06); }
-.mini-ad img { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; }
+.locked-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(248,250,252,0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 14px;
+}
 
-/* SIDEBAR FOOTER */
-.sidebar-footer { margin-top: auto; padding: 12px; background: #111827; border-radius: 14px; text-align: center; font-size: 13px; }
-.trial-label { font-size: 11px; color: #facc15; margin-top: 4px; }
-.upgrade-sidebar-btn { width: 100%; margin-top: 8px; padding: 8px; border-radius: 999px; border: none; background: #38bdf8; color: white; font-weight: 700; cursor: pointer; display: none; }
+/* =====================================================
+   ADS MINI LIST
+===================================================== */
+.ads-management .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-/* SIMPLE UPGRADE MODAL */
-.upgrade-modal { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 18px; text-align: center; position: relative; }
-.upgrade-modal h2 { font-size: 18px; margin-bottom: 12px; }
-.upgrade-modal p { font-size: 13px; color: #64748b; margin-bottom: 18px; }
-.upgrade-modal button { padding: 10px 16px; border-radius: 999px; border: none; background: #0f172a; color: white; font-weight: 700; cursor: pointer; margin-top: 10px; }
+.text-link-btn {
+  background: none;
+  border: none;
+  color: #0ea5e9;
+  font-size: 13px;
+  cursor: pointer;
+}
 
-/* AI POPUPS */
-.ai-popup { background: #2563eb; color: #fff; padding: 12px 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-top: 8px; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; font-size: 13px; position: relative; }
-.ai-popup span { float: right; cursor: pointer; margin-left: 8px; }
+.ads-mini-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-/* DESKTOP SIDEBAR */
+.mini-ad {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 1px 4px rgba(15,23,42,0.06);
+}
+
+.mini-ad img {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* =====================================================
+   SIDEBAR FOOTER
+===================================================== */
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px;
+  background: #111827;
+  border-radius: 14px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.trial-label {
+  font-size: 11px;
+  color: #facc15;
+  margin-top: 4px;
+}
+
+.upgrade-sidebar-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 999px;
+  border: none;
+  background: #38bdf8;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  display: none;
+}
+
+/* =====================================================
+   SIMPLE UPGRADE MODAL
+===================================================== */
+.upgrade-modal {
+  background: white;
+  width: 90%;
+  max-width: 400px;
+  padding: 20px;
+  border-radius: 18px;
+  text-align: center;
+  position: relative;
+}
+
+.upgrade-modal h2 {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.upgrade-modal p {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 18px;
+}
+
+.upgrade-modal button {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: none;
+  background: #0f172a;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* =====================================================
+   AI POPUPS
+===================================================== */
+.ai-popup {
+  background: #2563eb;
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  margin-top: 8px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.4s ease;
+  font-size: 13px;
+  position: relative;
+}
+
+.ai-popup span {
+  float: right;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+/* =====================================================
+   DESKTOP SIDEBAR
+===================================================== */
 @media (min-width: 768px) {
-  .dashboard-container { grid-template-columns: 260px 1fr; grid-template-rows: 1fr; }
-  .sidebar { flex-direction: column; align-items: stretch; height: 100vh; padding: 24px 18px; box-shadow: none; }
-  .sidebar-brand, .sidebar-footer, .nav-text { display: block; }
-  .sidebar-nav { flex-direction: column; gap: 6px; }
-  .nav-item { flex-direction: row; justify-content: flex-start; gap: 10px; border-radius: 10px; padding: 10px 12px; }
-  .nav-item.active { background: #1f2937; }
-  .main-content { padding: 30px 32px; }
-  .overview-grid { grid-template-columns: repeat(3, 1fr); }
-  .modal-overlay { align-items: center; }
+  .dashboard-container {
+    grid-template-columns: 260px 1fr;
+    grid-template-rows: 1fr;
+  }
+
+  .sidebar {
+    flex-direction: column;
+    align-items: stretch;
+    height: 100vh;
+    padding: 24px 18px;
+    box-shadow: none;
+  }
+
+  .sidebar-brand,
+  .sidebar-footer,
+  .nav-text {
+    display: block;
+  }
+
+  .sidebar-nav {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .nav-item {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 10px;
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+
+  .nav-item.active {
+    background: #1f2937;
+  }
+
+  .main-content {
+    padding: 30px 32px;
+  }
+
+  .overview-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .modal-overlay {
+    align-items: center;
+  }
 }
