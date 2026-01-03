@@ -15,16 +15,25 @@ import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-
 let auth, db, storage;
 
 /* =====================================================
-   SPA VIEW LOADER
+   SPA VIEW LOADER (FIXED)
 ===================================================== */
 export async function loadView(view, options = {}) {
 
   // Prevent duplicate loads
-  if (window.currentView === view) return;
+  if (window.currentView === view && !options.forceInit) return;
   window.currentView = view;
 
   const app = document.getElementById("app");
   if (!app) return console.log("❌ #app missing");
+
+  /* =====================================================
+     HARD FIX: Remove ALL old dashboard containers
+  ====================================================== */
+  if (view === "dashboard-hub") {
+    document.querySelectorAll('[id^="view-dashboard"]').forEach(el => {
+      if (el.id !== "view-dashboard-hub") el.remove();
+    });
+  }
 
   // Hide all views
   app.querySelectorAll(".view").forEach(v => v.hidden = true);
@@ -37,6 +46,13 @@ export async function loadView(view, options = {}) {
     target.className = "view";
     target.hidden = true;
     app.appendChild(target);
+  }
+
+  /* =====================================================
+     FORCE dashboard-hub to ALWAYS reload fresh
+  ====================================================== */
+  if (view === "dashboard-hub") {
+    delete target.dataset.loaded;
   }
 
   const shouldReload = options.forceInit || !target.dataset.loaded;
@@ -52,16 +68,15 @@ export async function loadView(view, options = {}) {
         return loadView("home");
       }
 
-      // Fix dashboard import path
-let mod;
+      // Dashboard special import
+      let mod;
+      if (view === "dashboard-hub") {
+        mod = await import(`/views/dashboard-hub.js?cache=${Date.now()}`);
+      } else {
+        mod = await import(`/views/${view}.js?cache=${Date.now()}`);
+      }
 
-if (view === "dashboard-hub") {
-  mod = await import(`/views/dashboard-hub.js?cache=${Date.now()}`);
-} else {
-  mod = await import(`/views/${view}.js?cache=${Date.now()}`);
-}
-
-mod.init?.({ auth, db, storage });
+      mod.init?.({ auth, db, storage });
 
     } catch (err) {
       console.error("❌ View JS error:", err);
@@ -86,7 +101,7 @@ getFirebase().then(async fb => {
 
   /* =====================================================
      AUTH STATE LISTENER
-  ===================================================== */
+  ====================================================== */
   auth.onAuthStateChanged(async user => {
 
     window.currentUser = user || null;
@@ -143,7 +158,7 @@ getFirebase().then(async fb => {
 
   /* =====================================================
      START APP
-  ===================================================== */
+  ====================================================== */
   const start = () => {
 
     initUIRouter();
