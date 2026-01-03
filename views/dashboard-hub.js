@@ -127,12 +127,9 @@ export async function renderDashboard() {
 
   try {
     console.log("➡ renderWidgets(plan, auth, db)");
-    console.log("   plan:", plan);
-    console.log("   auth:", auth);
-    console.log("   db:", db);
     requestAnimationFrame(() => {
-  renderWidgets(plan, auth, db);
-});
+      renderWidgets(plan, auth, db);
+    });
   } catch (e) {
     console.error("❌ renderWidgets() FAILED:", e);
   }
@@ -170,21 +167,18 @@ function wireButtons() {
   });
 
   // Upgrade sidebar
-  console.log("🟦 Wiring upgradeSidebarBtn");
   document.getElementById("upgradeSidebarBtn")?.addEventListener("click", () => {
     console.log("🟦 upgradeSidebarBtn clicked");
     showUpgradeModal();
   });
 
   // Upgrade modal close
-  console.log("🟦 Wiring closeUpgradeModalBtn");
   document.getElementById("closeUpgradeModalBtn")?.addEventListener("click", () => {
     console.log("🟦 closeUpgradeModalBtn clicked");
     hideUpgradeModal();
   });
 
   // Tier action buttons
-  console.log("🟦 Wiring tier-action-btn buttons");
   document.querySelectorAll(".tier-action-btn").forEach(btn => {
     console.log("🟦 Found tier button:", btn.dataset.plan);
     btn.addEventListener("click", () => {
@@ -194,7 +188,6 @@ function wireButtons() {
   });
 
   // "See all" ads
-  console.log("🟦 Wiring seeAllAdsBtn");
   document.getElementById("seeAllAdsBtn")?.addEventListener("click", () => {
     console.log("🟦 seeAllAdsBtn clicked");
     switchTab("my-ads");
@@ -204,17 +197,30 @@ function wireButtons() {
 }
 
 /* =====================================================
-   TAB SWITCH WRAPPER
+   TAB SWITCH WRAPPER — FIXED
 ===================================================== */
 function switchTab(tab) {
   console.log("🔵 switchTab() called:", tab);
 
+  // Run your internal tab logic
   try {
     switchTabLogic(tab);
   } catch (e) {
     console.error("❌ switchTabLogic FAILED:", e);
   }
 
+  // Hide all tab-content sections
+  document.querySelectorAll(".tab-content").forEach(sec => {
+    sec.style.display = "none";
+  });
+
+  // Show the selected tab-content
+  const target = document.querySelector(`.tab-content[data-tab="${tab}"]`);
+  if (target) {
+    target.style.display = "block";
+  }
+
+  // Update title
   const titleMap = {
     "overview": "Overview",
     "my-ads": "My Ads",
@@ -229,6 +235,7 @@ function switchTab(tab) {
     title.textContent = titleMap[tab] || "Overview";
   }
 
+  // Update sidebar active state
   document.querySelectorAll(".nav-item").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.tab === tab);
   });
@@ -237,4 +244,12 @@ function switchTab(tab) {
 /* =====================================================
    EXPORTS
 ===================================================== */
-export { userData, auth, db, showUpgradeModal, hideUpgradeModal, handleSubscription, switchTab };
+export {
+  userData,
+  auth,
+  db,
+  showUpgradeModal,
+  hideUpgradeModal,
+  handleSubscription,
+  switchTab
+};
