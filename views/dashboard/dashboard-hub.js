@@ -56,7 +56,7 @@ export async function renderDashboard() {
   initBadges(userData);
   updateSidebar(userData);
   updateTrialBadges(userData);
-  renderWidgets(plan);
+  renderWidgets(plan, auth, db);
   await loadCounts(auth, db);
   await loadRecentAds(auth, db);
 }
