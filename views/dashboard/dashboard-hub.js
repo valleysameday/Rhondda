@@ -1,13 +1,15 @@
 // dashboard-hub.js — Main orchestrator (with full debug logging)
 
-import { initBadges, updateTrialBadges } from "/views/dashboard/badges.js";
-import { updateSidebar } from "/views/dashboard/sidebar.js";
-import { renderWidgets } from "/views/dashboard/widgets.js";
-import { loadCounts } from "/views/dashboard/counts.js";
-import { loadRecentAds } from "/views/dashboard/recent-ads.js";
+console.log("🧩 widgets.js LOADED");
+
+import { initBadges, updateTrialBadges } from "./badges.js";
+import { updateSidebar } from "./sidebar.js";
+import { renderWidgets } from "./widgets.js";
+import { loadCounts } from "./counts.js";
+import { loadRecentAds } from "./recent-ads.js";
 import { initModals, showUpgradeModal, hideUpgradeModal } from "./modals.js";
-import { handleSubscription } from "/views/dashboard/subscription.js";
-import { switchTab as switchTabLogic } from "/views/dashboard/tabs.js";
+import { handleSubscription } from "./subscription.js";
+import { switchTab as switchTabLogic } from "./tabs.js";
 
 import { AI } from "/index/js/ai/assistant.js";
 
