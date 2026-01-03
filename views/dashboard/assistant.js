@@ -34,7 +34,10 @@ export const AI = {
       "You’ve maxed out Free — unlimited ads unlocks more reach!",
       "Your Free plan allows 4 ads. Upgrade for unlimited posting."
     ],
-
+AD_LIMIT_NEAR: [
+  "You're close to the Free plan limit — 4 ads max!",
+  "Almost at your ad limit. Upgrade for unlimited posting, {{name}}."
+],
     // ---------- BUNDLES ----------
     FIRST_BUNDLE_UNLOCK: [
       "Your first bundle enquiry! 🎉 Great start.",
