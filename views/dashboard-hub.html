@@ -8,19 +8,23 @@
     <div class="sidebar-brand">Rhondda Hub</div>
 
     <nav class="sidebar-nav" id="sidebarNav">
-      <button class="nav-item active" data-tab="overview" onclick="switchTab('overview')">
+      <button class="nav-item active" data-tab="overview">
         <span class="nav-icon">📊</span>
         <span class="nav-text">Overview</span>
       </button>
-      <button class="nav-item" data-tab="my-ads" onclick="switchTab('my-ads')">
+      <button class="nav-item" data-tab="my-ads">
         <span class="nav-icon">📦</span>
         <span class="nav-text">My Ads</span>
       </button>
-      <button class="nav-item" data-tab="messages" onclick="switchTab('messages')">
+      <button class="nav-item" data-tab="messages">
         <span class="nav-icon">💬</span>
         <span class="nav-text">Messages</span>
       </button>
-      <button class="nav-item" data-tab="settings" onclick="switchTab('settings')">
+      <button class="nav-item" data-tab="payments">
+        <span class="nav-icon">💳</span>
+        <span class="nav-text">Payments</span>
+      </button>
+      <button class="nav-item" data-tab="settings">
         <span class="nav-icon">⚙️</span>
         <span class="nav-text">Settings</span>
       </button>
@@ -30,7 +34,7 @@
     <div id="sidebarUpgradeBox" class="sidebar-footer">
       <p id="sidebarPlanLabel">Free Account</p>
       <p id="sidebarTrialLabel" class="trial-label"></p>
-      <button class="upgrade-sidebar-btn" onclick="showUpgradeModal()" style="display:none;">Unlock More</button>
+      <button class="upgrade-sidebar-btn" id="upgradeSidebarBtn">Upgrade</button>
     </div>
   </aside>
 
@@ -51,23 +55,66 @@
     <section class="ads-management slide-up">
       <div class="section-header">
         <h3>My Recent Listings</h3>
-        <button class="text-link-btn" onclick="switchTab('my-ads')">See all</button>
+        <button class="text-link-btn" id="seeAllAdsBtn">See all</button>
       </div>
       <div id="adsList" class="ads-mini-list"></div>
     </section>
   </main>
 </div>
 
-<!-- AI POPUP CONTAINER -->
-<div id="ai-popup-container"></div>
-
-<!-- SIMPLE UPGRADE / HINT MODAL -->
+<!-- UPGRADE / TRIAL MODAL -->
 <div id="upgradeModal" class="modal-overlay" style="display:none;">
-  <div class="upgrade-modal slide-up">
-    <button class="close-btn" onclick="hideUpgradeModal()">×</button>
-    <h2 id="upgradeModalTitle">Unlock More Features</h2>
-    <p id="upgradeModalText">You can get more tools and capabilities by upgrading when ready.</p>
-    <div id="upgradeModalActions"></div> <!-- JS will insert relevant buttons -->
+  <div class="pricing-modal slide-up">
+    <div class="modal-handle"></div>
+    <button class="close-btn" id="closeUpgradeModalBtn">×</button>
+
+    <h2>Upgrade Your Selling</h2>
+    <p class="modal-sub">Unlock more tools & features.</p>
+
+    <div class="tiers-container">
+      <!-- Free, Seller+, Business tiers same as before -->
+      <div class="tier-card" id="tier-free">
+        <h4>Free Forever</h4>
+        <div class="price">£0<span>/mo</span></div>
+        <ul class="tier-features">
+          <li>Small fee for number unlocks</li>
+          <li>Basic dashboard</li>
+          <li>Standard visibility</li>
+          <li>Online Messaging</li>
+        </ul>
+        <button class="tier-action-btn" data-plan="free">Current</button>
+      </div>
+
+      <div class="tier-card featured" id="tier-sellerplus">
+        <div class="ribbon">Popular</div>
+        <h4>Seller+</h4>
+        <div class="price">£3.99<span>/mo</span></div>
+        <p class="daily-hint">Less than 15p/day</p>
+        <ul class="tier-features">
+          <li><strong>Free</strong> number unlocks</li>
+          <li>Bundle enquiries</li>
+          <li>Online Messaging</li>          
+          <li>Verified seller badge</li>
+        </ul>
+        <button class="tier-action-btn" data-plan="sellerplus">Upgrade</button>
+      </div>
+
+      <div class="tier-card" id="tier-business">
+        <div class="ribbon ribbon-outline">30‑Day Free Trial</div>
+        <h4>Business</h4>
+        <div class="price">£9.99<span>/mo</span></div>
+        <p class="daily-hint">No card needed</p>
+        <ul class="tier-features">
+          <li>Business ribbon on profile</li>
+          <li>Full performance analytics</li>
+          <li><strong>Free</strong> number unlocks</li>
+          <li>Bundle enquiries</li>
+          <li>Priority ad support</li>
+          <li>Online Messaging</li>
+        </ul>
+        <button class="tier-action-btn" data-plan="business">Start Trial</button>
+      </div>
+    </div>
   </div>
 </div>
 
