@@ -1,4 +1,4 @@
-// widgets.js — Dashboard Widgets
+console.log("🧩 widgets.js LOADED");// widgets.js — Dashboard Widgets
 import { AI } from "/index/js/ai/assistant.js";
 import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
