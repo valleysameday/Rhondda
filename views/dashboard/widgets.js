@@ -91,7 +91,7 @@ async function updateWidgetCounts(auth, db) {
   try {
     // Active Ads
     const adsSnap = await getDocs(
-      query(collection(db, "ads"), where("ownerId", "==", uid), where("status", "==", "active"))
+      query(collection(db, "posts"), where("ownerId", "==", uid), where("status", "==", "active"))
     );
     document.getElementById("widgetAdCount").textContent = adsSnap.size;
 
