@@ -1,10 +1,10 @@
 // index/js/ai/assistant.js
-import { TRIGGERS } from "./triggers.js";
-import { getMessage } from "./messages.js";
-import { showToast } from "./ui-toast.js";
-import { showBanner } from "./ui-banner.js";
-import { showModal } from "./ui-modal.js";
-import { canSpeak, remember } from "./memory.js";
+import { TRIGGERS } from "/index/js/ai/triggers.js";
+import { getMessage } from "/index/js/ai/messages.js";
+import { showToast } from "/index/js/ai/ui-toast.js";
+import { showBanner } from "/index/js/ai/ui-banner.js";
+import { showModal } from "/index/js/ai/ui-modal.js";
+import { canSpeak, remember } from "/index/js/ai/memory.js";
 
 export const AI = {
   speak(trigger, context = {}) {
