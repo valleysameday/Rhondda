@@ -1,13 +1,11 @@
-
-
-import { initBadges, updateTrialBadges } from "./badges.js";
-import { updateSidebar } from "./sidebar.js";
-import { renderWidgets } from "./widgets.js";
-import { loadCounts } from "./counts.js";
-import { loadRecentAds } from "./recent-ads.js";
-import { initModals, showUpgradeModal, hideUpgradeModal } from "./modals.js";
-import { handleSubscription } from "./subscription.js";
-import { switchTab as switchTabLogic } from "./tabs.js";
+import { initBadges, updateTrialBadges } from "./dashboard/badges.js";
+import { updateSidebar } from "./dashboard/sidebar.js";
+import { renderWidgets } from "./dashboard/widgets.js";
+import { loadCounts } from "./dashboard/counts.js";
+import { loadRecentAds } from "./dashboard/recent-ads.js";
+import { initModals, showUpgradeModal, hideUpgradeModal } from "./dashboard/modals.js";
+import { handleSubscription } from "./dashboard/subscription.js";
+import { switchTab as switchTabLogic } from "./dashboard/tabs.js";
 
 import { AI } from "/index/js/ai/assistant.js";
 
