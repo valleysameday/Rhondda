@@ -1,4 +1,3 @@
-// main.js — SPA orchestrator
 import { getFirebase } from '/index/js/firebase/init.js';
 import { initUIRouter } from '/index/js/ui-router.js';
 import '/index/js/post-gate.js';
@@ -20,6 +19,7 @@ let auth, db, storage;
 ===================================================== */
 export async function loadView(view, options = {}) {
 
+  // Prevent duplicate loads
   if (window.currentView === view) return;
   window.currentView = view;
 
@@ -42,7 +42,6 @@ export async function loadView(view, options = {}) {
   const shouldReload = options.forceInit || !target.dataset.loaded;
 
   if (shouldReload) {
-    // Fetch HTML
     const html = await fetch(`/views/${view}.html`).then(r => r.text());
     target.innerHTML = html;
     target.dataset.loaded = "true";
@@ -53,13 +52,15 @@ export async function loadView(view, options = {}) {
         return loadView("home");
       }
 
-      // Dynamic import of the view JS
-      const mod = await import(`/views/${view}/${view}.js?cache=${Date.now()}`);
-      // All dashboard modules should export init({ auth, db, storage })
-      await mod.init?.({ auth, db, storage });
+      // Fix dashboard import path
+      let mod;
+      if(view === "dashboard-hub"){
+        mod = await import(`/views/dashboard/dashboard-hub.js?cache=${Date.now()}`);
+      } else {
+        mod = await import(`/views/${view}.js?cache=${Date.now()}`);
+      }
 
-      // Optionally expose AI popup globally
-      if (mod.AI) window.AI = mod.AI;
+      mod.init?.({ auth, db, storage });
 
     } catch (err) {
       console.error("❌ View JS error:", err);
@@ -106,6 +107,7 @@ getFirebase().then(async fb => {
     try {
       let snap = await getDoc(doc(db, "users", user.uid));
 
+      // Retry if Firestore doc not created yet
       if (!snap.exists()) {
         await new Promise(r => setTimeout(r, 200));
         snap = await getDoc(doc(db, "users", user.uid));
@@ -113,10 +115,12 @@ getFirebase().then(async fb => {
 
       window.currentUserData = snap.exists() ? snap.data() : {};
 
-      // Normalize plan
-      if (!window.currentUserData.plan) window.currentUserData.plan = "free";
+      // Normalise plan
+      if (!window.currentUserData.plan) {
+        window.currentUserData.plan = "free";
+      }
 
-      // Business trial check
+      // Business trial expiry check
       const trial = window.currentUserData.businessTrial;
       if (trial?.active && Date.now() > trial.expiresAt) {
         window.currentUserData.plan = "free";
@@ -125,7 +129,9 @@ getFirebase().then(async fb => {
 
       // Admin button visibility
       const adminBtn = document.getElementById("openAdminDashboard");
-      if (adminBtn) adminBtn.style.display = window.currentUserData?.isAdmin ? "inline-block" : "none";
+      if (adminBtn) {
+        adminBtn.style.display = window.currentUserData?.isAdmin ? "inline-block" : "none";
+      }
 
     } catch (e) {
       console.warn("❌ User lookup failed:", e);
@@ -141,13 +147,15 @@ getFirebase().then(async fb => {
 
     initUIRouter();
 
-    // Auth modals
+    // Login / Signup / Forgot
     document.querySelectorAll('[data-value="login"]').forEach(btn =>
       btn.onclick = e => { e.preventDefault(); openLoginModal(auth, db); }
     );
+
     document.querySelectorAll('[data-value="signup"]').forEach(btn =>
       btn.onclick = e => { e.preventDefault(); openSignupModal(auth); }
     );
+
     document.querySelectorAll('[data-value="forgot"]').forEach(btn =>
       btn.onclick = e => { e.preventDefault(); openForgotModal(auth); }
     );
@@ -163,7 +171,7 @@ getFirebase().then(async fb => {
       loadView("chat-list");
     });
 
-    // Account button → Dashboard hub
+    // Account button → ALWAYS unified dashboard
     document.getElementById("openAccountModal")?.addEventListener("click", e => {
       e.preventDefault();
 
