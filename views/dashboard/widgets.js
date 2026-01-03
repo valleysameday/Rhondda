@@ -1,9 +1,8 @@
 // widgets.js — Dashboard Widgets
 import { AI } from "/index/js/ai/assistant.js";
 import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { auth, db } from "./dashboard-hub.js"; // adjust path if needed
 
-export function renderWidgets(plan) {
+export function renderWidgets(plan, auth, db) {
   const grid = document.getElementById("widgetGrid");
   if (!grid) return;
   grid.innerHTML = "";
@@ -19,9 +18,9 @@ export function renderWidgets(plan) {
   if (plan === "business") addWidget(grid, widgetPerformance());
 
   // Update counts dynamically
-  updateWidgetCounts();
+  updateWidgetCounts(auth, db);
 
-  // AI feedback after rendering widgets
+  // AI feedback
   AI.speak("DASHBOARD_RENDERED", { plan });
 }
 
@@ -85,25 +84,28 @@ function widgetPerformance() {
 }
 
 /* --- Dynamic widget counts --- */
-async function updateWidgetCounts() {
+async function updateWidgetCounts(auth, db) {
   if (!auth?.currentUser || !db) return;
   const uid = auth.currentUser.uid;
 
   try {
     // Active Ads
-    const adsSnap = await getDocs(query(collection(db, "ads"), where("ownerId", "==", uid), where("status", "==", "active")));
-    const adsElem = document.getElementById("widgetAdCount");
-    if (adsElem) adsElem.textContent = adsSnap.size;
+    const adsSnap = await getDocs(
+      query(collection(db, "ads"), where("ownerId", "==", uid), where("status", "==", "active"))
+    );
+    document.getElementById("widgetAdCount").textContent = adsSnap.size;
 
     // Unread Messages
-    const msgSnap = await getDocs(query(collection(db, "messages"), where("to", "==", uid), where("read", "==", false)));
-    const msgElem = document.getElementById("widgetMsgCount");
-    if (msgElem) msgElem.textContent = msgSnap.size;
+    const msgSnap = await getDocs(
+      query(collection(db, "messages"), where("to", "==", uid), where("read", "==", false))
+    );
+    document.getElementById("widgetMsgCount").textContent = msgSnap.size;
 
     // Bundle Enquiries
-    const bundleSnap = await getDocs(query(collection(db, "enquiries"), where("targetUid", "==", uid), where("type", "==", "bundle")));
-    const bundleElem = document.getElementById("widgetBundleCount");
-    if (bundleElem) bundleElem.textContent = bundleSnap.size;
+    const bundleSnap = await getDocs(
+      query(collection(db, "enquiries"), where("targetUid", "==", uid), where("type", "==", "bundle"))
+    );
+    document.getElementById("widgetBundleCount").textContent = bundleSnap.size;
 
   } catch (e) {
     console.warn("Failed to fetch widget counts:", e);
