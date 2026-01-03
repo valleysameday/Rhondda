@@ -53,15 +53,15 @@ export async function loadView(view, options = {}) {
       }
 
       // Fix dashboard import path
-      let mod;
-      if(view === "dashboard-hub"){
-  mod = await import(`/views/dashboard-hub.js?cache=${Date.now()}`);
-      }
-      } else {
-        mod = await import(`/views/${view}.js?cache=${Date.now()}`);
-      }
+let mod;
 
-      mod.init?.({ auth, db, storage });
+if (view === "dashboard-hub") {
+  mod = await import(`/views/dashboard-hub.js?cache=${Date.now()}`);
+} else {
+  mod = await import(`/views/${view}.js?cache=${Date.now()}`);
+}
+
+mod.init?.({ auth, db, storage });
 
     } catch (err) {
       console.error("❌ View JS error:", err);
