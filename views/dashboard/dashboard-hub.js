@@ -6,15 +6,11 @@ import { loadCounts } from "./counts.js";
 import { loadRecentAds } from "./recent-ads.js";
 import { initModals, showUpgradeModal, hideUpgradeModal } from "./modals.js";
 import { handleSubscription } from "./subscription.js";
-import { switchTab } from "./tabs.js";
+import { switchTab as switchTabLogic } from "./tabs.js";
 
-import { AI } from "/index/js/ai/assistant.js"; // AI assistant triggers
-import { showAIPopup } from "./assistant-ui.js"; // AI popup UI
+import { AI } from "/index/js/ai/assistant.js";
 
-import {
-  doc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let auth, db;
 let userData;
@@ -30,17 +26,14 @@ export async function init({ auth: a, db: d }) {
   if (!snap.exists()) return;
 
   userData = snap.data();
-
   normalizePlan();
   handleBusinessTrialState();
   await renderDashboard();
   initModals(); // wire modal listeners
+  wireButtons();    // wire all buttons
 
   // AI trigger for first login / dashboard open
   AI.speak("DASHBOARD_OPENED", { name: userData.name });
-
-  // Example popup
-  showAIPopup(`Welcome back, ${userData.name}! Your dashboard is ready.`);
 }
 
 function normalizePlan() {
@@ -68,4 +61,52 @@ export async function renderDashboard() {
   await loadRecentAds(auth, db);
 }
 
+function wireButtons() {
+  // Sidebar nav
+  document.querySelectorAll(".nav-item").forEach(btn => {
+    btn.addEventListener("click", () => {
+      switchTab(btn.dataset.tab);
+    });
+  });
+
+  // Upgrade sidebar
+  document.getElementById("upgradeSidebarBtn")?.addEventListener("click", showUpgradeModal);
+
+  // Upgrade modal close
+  document.getElementById("closeUpgradeModalBtn")?.addEventListener("click", hideUpgradeModal);
+
+  // Tier action buttons
+  document.querySelectorAll(".tier-action-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const plan = btn.dataset.plan;
+      handleSubscription(plan);
+    });
+  });
+
+  // "See all" ads
+  document.getElementById("seeAllAdsBtn")?.addEventListener("click", () => {
+    switchTab("my-ads");
+  });
+}
+
+// SPA tab switch (wrap imported logic)
+function switchTab(tab) {
+  switchTabLogic(tab); // keep modular
+  const titleMap = {
+    "overview": "Overview",
+    "my-ads": "My Ads",
+    "messages": "Messages",
+    "payments": "Payments",
+    "settings": "Settings"
+  };
+  const title = document.getElementById("viewTitle");
+  if (title) title.textContent = titleMap[tab] || "Overview";
+
+  // active button UI
+  document.querySelectorAll(".nav-item").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.tab === tab);
+  });
+}
+
+// Export for testing if needed
 export { userData, auth, db, showUpgradeModal, hideUpgradeModal, handleSubscription, switchTab };
