@@ -7,7 +7,6 @@ import { handleSubscription } from "./dashboard/subscription.js";
 import { switchTab as switchTabLogic } from "./dashboard/tabs.js";
 
 import { AI } from "/index/js/ai/assistant.js";
-
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let auth, db;
@@ -124,14 +123,20 @@ export async function renderDashboard() {
     console.error("❌ updateTrialBadges() FAILED:", e);
   }
 
+  /* =====================================================
+     WIDGETS — DYNAMIC IMPORT (FIXED)
+  ====================================================== */
   try {
-    console.log("➡ renderWidgets(plan, auth, db)");
-    console.log("   plan:", plan);
-    console.log("   auth:", auth);
-    console.log("   db:", db);
+    console.log("➡ renderWidgets(plan, auth, db) (dynamic import)");
+
+    const { renderWidgets } = await import(`./dashboard/widgets.js?cache=${Date.now()}`);
+
     requestAnimationFrame(() => {
-  renderWidgets(plan, auth, db);
-});
+      const grid = document.getElementById("widgetGrid");
+      console.log("➡ renderWidgets() now running, #widgetGrid:", grid);
+      renderWidgets(plan, auth, db);
+    });
+
   } catch (e) {
     console.error("❌ renderWidgets() FAILED:", e);
   }
@@ -159,7 +164,6 @@ export async function renderDashboard() {
 function wireButtons() {
   console.log("🟦 wireButtons() START");
 
-  // Sidebar nav
   document.querySelectorAll(".nav-item").forEach(btn => {
     console.log("🟦 Wiring nav-item:", btn.dataset.tab);
     btn.addEventListener("click", () => {
@@ -168,21 +172,18 @@ function wireButtons() {
     });
   });
 
-  // Upgrade sidebar
   console.log("🟦 Wiring upgradeSidebarBtn");
   document.getElementById("upgradeSidebarBtn")?.addEventListener("click", () => {
     console.log("🟦 upgradeSidebarBtn clicked");
     showUpgradeModal();
   });
 
-  // Upgrade modal close
   console.log("🟦 Wiring closeUpgradeModalBtn");
   document.getElementById("closeUpgradeModalBtn")?.addEventListener("click", () => {
     console.log("🟦 closeUpgradeModalBtn clicked");
     hideUpgradeModal();
   });
 
-  // Tier action buttons
   console.log("🟦 Wiring tier-action-btn buttons");
   document.querySelectorAll(".tier-action-btn").forEach(btn => {
     console.log("🟦 Found tier button:", btn.dataset.plan);
@@ -192,7 +193,6 @@ function wireButtons() {
     });
   });
 
-  // "See all" ads
   console.log("🟦 Wiring seeAllAdsBtn");
   document.getElementById("seeAllAdsBtn")?.addEventListener("click", () => {
     console.log("🟦 seeAllAdsBtn clicked");
