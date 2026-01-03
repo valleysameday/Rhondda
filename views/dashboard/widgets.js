@@ -1,7 +1,6 @@
 console.log("🧩 widgets.js LOADED");// widgets.js — Dashboard Widgets
 import { AI } from "/index/js/ai/assistant.js";
 import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-console.log("🧩 renderWidgets() called — checking #widgetGrid:", document.getElementById("widgetGrid"));
 export function renderWidgets(plan, auth, db) {
   const grid = document.getElementById("widgetGrid");
   if (!grid) return;
