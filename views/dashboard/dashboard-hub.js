@@ -9,6 +9,7 @@ import { handleSubscription } from "./subscription.js";
 import { switchTab } from "./tabs.js";
 
 import { AI } from "/index/js/ai/assistant.js"; // AI assistant triggers
+import { showAIPopup } from "./assistant-ui.js"; // AI popup UI
 
 import {
   doc,
@@ -37,6 +38,9 @@ export async function init({ auth: a, db: d }) {
 
   // AI trigger for first login / dashboard open
   AI.speak("DASHBOARD_OPENED", { name: userData.name });
+
+  // Example popup
+  showAIPopup(`Welcome back, ${userData.name}! Your dashboard is ready.`);
 }
 
 function normalizePlan() {
