@@ -1,6 +1,4 @@
-// dashboard-hub.js — Main orchestrator (with full debug logging)
 
-console.log("🧩 widgets.js LOADED");
 
 import { initBadges, updateTrialBadges } from "./badges.js";
 import { updateSidebar } from "./sidebar.js";
