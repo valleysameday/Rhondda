@@ -1,5 +1,5 @@
 // index/js/limits/ad-limits.js
-import { AI } from "../ai/assistant.js";
+import { AI } from "index/js/ai/ai/assistant.js";
 
 export function checkAdLimit(adCount, user) {
   if (adCount === 3) {
