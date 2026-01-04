@@ -19,6 +19,9 @@ let loadingMore = false;
 let reachedEnd = false;
 let currentCategory = "all";
 
+// Keep track of saved posts locally to avoid losing state
+const savedPosts = new Set();
+
 export async function initFeed({ db }, options = {}) {
   const postsContainer = document.getElementById('feed');
   const categoryBtns = document.querySelectorAll('.category-btn');
@@ -40,10 +43,7 @@ export async function initFeed({ db }, options = {}) {
      SKELETON LOADING
   ============================================================ */
   function showSkeletons(count = 6) {
-    postsContainer.innerHTML = `
-      <p class="loading-text">Loading posts…</p>
-    `;
-
+    postsContainer.innerHTML = `<p class="loading-text">Loading posts…</p>`;
     for (let i = 0; i < count; i++) {
       const skel = document.createElement("div");
       skel.className = "feed-card skeleton-card";
@@ -189,7 +189,7 @@ export async function initFeed({ db }, options = {}) {
   }
 
   /* ============================================================
-     RENDER POSTS (supports append)
+     RENDER POSTS (supports append + saved hearts)
   ============================================================ */
   function renderPosts(posts, category = 'all', options = {}) {
     if (!options.append) {
@@ -222,7 +222,9 @@ export async function initFeed({ db }, options = {}) {
 
           <div class="feed-meta">
             ${buildMeta(post)}
-            <button class="save-heart" data-id="${post.id}" title="Save">♡</button>
+            <button class="save-heart ${savedPosts.has(post.id) ? 'saved' : ''}" data-id="${post.id}" title="Save">
+              ${savedPosts.has(post.id) ? '♥' : '♡'}
+            </button>
           </div>
 
           ${post.type === "featured" && post.cta ? `<button class="cta-btn">${post.cta}</button>` : ''}
@@ -231,8 +233,15 @@ export async function initFeed({ db }, options = {}) {
         <button class="report-btn" data-id="${post.id}" title="Report">⚑</button>
       `;
 
+      // -----------------------------
+      // CARD CLICK (load post) FIXED
+      // -----------------------------
       card.addEventListener('click', e => {
-        if (e.target.closest('.report-btn') || e.target.closest('.cta-btn')) return;
+        if (
+          e.target.closest('.report-btn') ||
+          e.target.closest('.cta-btn') ||
+          e.target.closest('.save-heart')
+        ) return;
 
         sessionStorage.setItem("feedScroll", window.scrollY);
         sessionStorage.setItem("feedCategory", currentCategory);
@@ -262,7 +271,7 @@ export async function initFeed({ db }, options = {}) {
     const btn = e.target.closest(".save-heart");
     if (!btn) return;
 
-    e.stopPropagation();
+    e.stopPropagation(); // prevent card click
 
     const postId = btn.dataset.id;
     const uid = window.currentUser?.uid;
@@ -279,10 +288,12 @@ export async function initFeed({ db }, options = {}) {
       await deleteDoc(ref);
       btn.classList.remove("saved");
       btn.textContent = "♡";
+      savedPosts.delete(postId);
     } else {
       await setDoc(ref, { postId, savedAt: Date.now() });
       btn.classList.add("saved");
       btn.textContent = "♥";
+      savedPosts.add(postId);
     }
   });
 
@@ -295,7 +306,6 @@ export async function initFeed({ db }, options = {}) {
       btn.classList.add('active');
 
       currentCategory = btn.dataset.category;
-
       reachedEnd = false;
       lastDoc = null;
 
@@ -319,7 +329,6 @@ export async function initFeed({ db }, options = {}) {
       showBottomLoader();
 
       const morePosts = await fetchPosts(false);
-
       hideBottomLoader();
 
       if (morePosts.length > 0) {
@@ -355,8 +364,9 @@ export async function initFeed({ db }, options = {}) {
     renderPosts(posts);
   }
 
-  loadGreeting();
-  loadWeather();
+  // Load greeting, weather, and featured ads
+  if (window.loadGreeting) window.loadGreeting();
+  if (window.loadWeather) window.loadWeather();
   initFeaturedAds();
 
   const savedScroll = sessionStorage.getItem("feedScroll");
@@ -365,4 +375,4 @@ export async function initFeed({ db }, options = {}) {
       window.scrollTo(0, parseInt(savedScroll));
     }, 50);
   }
-}
+  }
