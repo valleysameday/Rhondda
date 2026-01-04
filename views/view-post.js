@@ -113,6 +113,40 @@ if (detailsBox) {
     safeSetText("viewTime", timeAgo(post.createdAt));
     safeSetText("viewPriceMobile", priceText);
 
+   /* ============================================================
+   FRIENDLY ACCOUNT AGE (Option A)
+============================================================ */
+try {
+  const sellerSnap = await getDoc(doc(db, "users", post.userId));
+  const sellerData = sellerSnap.data();
+  const joinedAt = sellerData?.createdAt;
+
+  if (joinedAt) {
+    const days = Math.floor((Date.now() - joinedAt) / (1000 * 60 * 60 * 24));
+    const el = document.getElementById("memberSince");
+
+    let message = "";
+
+    if (days < 1) {
+      message = "Part of Noticeboard today";
+    } else if (days === 1) {
+      message = "Part of Noticeboard for 1 day";
+    } else if (days < 30) {
+      message = `Part of Noticeboard for ${days} days`;
+    } else if (days < 365) {
+      const months = Math.floor(days / 30);
+      message = `Part of Noticeboard for ${months} month${months > 1 ? "s" : ""}`;
+    } else {
+      const years = Math.floor(days / 365);
+      message = `Part of Noticeboard for ${years} year${years > 1 ? "s" : ""}`;
+    }
+
+    if (el) el.textContent = message;
+  }
+} catch (err) {
+  console.warn("Could not load account age:", err);
+}
+    
     /* ============================================================
        GALLERY & LIGHTBOX
     ============================================================ */
