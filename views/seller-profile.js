@@ -26,14 +26,15 @@ export async function init({ auth: a, db: d }) {
   const user = profileSnap.data();
   sellerIsPremium = !!(user.isBusiness || user.isSellerPlus);
 
+  // -------------------- Basic Profile Info --------------------
   setText("sellerName", user.name || user.displayName || "User");
   setText("streakCount", user.loginStreak || 0);
   setText("sellerBio", user.bio || "This user hasn't added a bio yet.");
-
   if (user.joined?.toDate) {
     setText("sellerReliability", `Member since ${user.joined.toDate().getFullYear()}`);
   }
 
+  // -------------------- Avatar --------------------
   const avatar = document.getElementById("sellerAvatar");
   if (avatar) {
     if (user.avatarUrl) {
@@ -44,27 +45,23 @@ export async function init({ auth: a, db: d }) {
     }
   }
 
+  // -------------------- Business Ribbon --------------------
   const ribbon = document.getElementById("businessRibbon");
   if (ribbon && user.isBusiness) ribbon.style.display = "flex";
 
+  // -------------------- Load Followers & Ads --------------------
   await loadFollowerCount(userId);
   await loadSellerAds(userId);
 
+  // -------------------- Back Button --------------------
   const backBtn = document.getElementById("backToPost");
   if (backBtn) backBtn.onclick = () => loadView("view-post", { forceInit: true });
-
-  // Setup popup cancel
-  const cancelBtn = document.getElementById("popupCancelBtn");
-  if (cancelBtn) cancelBtn.onclick = closePopup;
 }
 
-/* --------------------------
-   Load Ads
--------------------------- */
+/* -------------------- Load Seller Ads -------------------- */
 async function loadSellerAds(sellerId) {
   const container = document.getElementById("sellerAdsContainer");
   if (!container) return;
-
   container.innerHTML = "";
 
   const q = query(
@@ -106,9 +103,7 @@ async function loadSellerAds(sellerId) {
   setupDockButton();
 }
 
-/* --------------------------
-   Action Dock
--------------------------- */
+/* -------------------- Update Dock Button -------------------- */
 function updateActionDock() {
   const selected = document.querySelectorAll(".bundle-tick:checked");
   const dockBtn = document.getElementById("combinedEnquiryBtn");
@@ -125,6 +120,7 @@ function updateActionDock() {
   if (countEl) countEl.textContent = selected.length;
 }
 
+/* -------------------- Dock Button Click -------------------- */
 function setupDockButton() {
   const dockBtn = document.getElementById("combinedEnquiryBtn");
   if (!dockBtn) return;
@@ -132,19 +128,17 @@ function setupDockButton() {
   dockBtn.onclick = () => openPopup();
 }
 
-/* --------------------------
-   Popup
--------------------------- */
+/* -------------------- Popup -------------------- */
 function openPopup() {
   const selected = document.querySelectorAll(".bundle-tick:checked");
   if (!selected.length) return;
 
   const summary = document.getElementById("popupItemsSummary");
-  const tally = document.getElementById("popupPriceTally");
+  const tally = document.getElementById("totalPriceAmount") ? document.getElementById("popupPriceTally") : null;
   const popup = document.getElementById("contactPopup");
 
-  let total = 0;
   summary.innerHTML = "";
+  let total = 0;
 
   selected.forEach(t => {
     const price = parseFloat(t.dataset.price || 0);
@@ -161,8 +155,9 @@ function openPopup() {
     if (totalEl) totalEl.textContent = `£${total.toFixed(2)}`;
   }
 
-  popup.style.display = "flex";
+  if (popup) popup.style.display = "flex";
 
+  // Send button
   const sendBtn = document.getElementById("popupSendBtn");
   if (sendBtn) {
     sendBtn.onclick = () => {
@@ -177,16 +172,15 @@ function openPopup() {
       loadView("chat", { forceInit: true });
     };
   }
+
+  // Cancel button
+  const cancelBtn = document.getElementById("popupCancelBtn");
+  if (cancelBtn) cancelBtn.onclick = () => {
+    if (popup) popup.style.display = "none";
+  };
 }
 
-function closePopup() {
-  const popup = document.getElementById("contactPopup");
-  if (popup) popup.style.display = "none";
-}
-
-/* --------------------------
-   Followers
--------------------------- */
+/* -------------------- Load Follower Count -------------------- */
 async function loadFollowerCount(id) {
   const el = document.getElementById("followerCount");
   if (!el) return;
@@ -195,9 +189,7 @@ async function loadFollowerCount(id) {
   el.textContent = snap.size;
 }
 
-/* --------------------------
-   Helpers
--------------------------- */
+/* -------------------- Helpers -------------------- */
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value;
