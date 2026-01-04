@@ -1,8 +1,6 @@
 import {
   doc,
   getDoc,
-  setDoc,
-  deleteDoc,
   collection,
   query,
   where,
@@ -13,8 +11,11 @@ import {
 import { loadView } from "/index/js/main.js";
 
 let auth, db;
-let sellerIsPremium = false; 
+let sellerIsPremium = false;
 
+/* ===============================
+   INIT
+================================ */
 export async function init({ auth: a, db: d }) {
   auth = a;
   db = d;
@@ -27,151 +28,223 @@ export async function init({ auth: a, db: d }) {
 
   const user = profileSnap.data();
 
-  /* ---------------- Determine Seller Type ---------------- */
+  /* ---------------- Seller Type ---------------- */
   sellerIsPremium = !!(user.isBusiness || user.isSellerPlus);
 
-  /* ---------------- Fix NaN Date Error ---------------- */
-  const joinedTimestamp = user.joined; 
+  /* ---------------- Reliability Text ---------------- */
   let reliabilityText = "Verified Member";
-  
-  if (joinedTimestamp) {
-    const joinedDate = new Date(joinedTimestamp);
-    if (!isNaN(joinedDate.getTime())) {
-      reliabilityText = `Member since ${joinedDate.getFullYear()}`;
+
+  if (user.joined?.toDate) {
+    const joinedDate = user.joined.toDate();
+    reliabilityText = `Member since ${joinedDate.getFullYear()}`;
+  }
+
+  const reliabilityEl = document.getElementById("sellerReliability");
+  if (reliabilityEl) reliabilityEl.textContent = reliabilityText;
+
+  /* ---------------- Basic Profile Data ---------------- */
+  setText("sellerName", user.name || user.displayName || "User");
+  setText("streakCount", user.loginStreak || 0);
+  setText(
+    "sellerBio",
+    user.bio || "This user hasn't added a bio yet."
+  );
+
+  /* ---------------- Avatar ---------------- */
+  const avatar = document.getElementById("sellerAvatar");
+  if (avatar) {
+    if (user.avatarUrl) {
+      avatar.style.backgroundImage = `url(${user.avatarUrl})`;
+      avatar.textContent = "";
+    } else {
+      avatar.textContent = (user.name || "U").charAt(0).toUpperCase();
     }
   }
-  document.getElementById("sellerReliability").textContent = reliabilityText;
 
-  /* ---------------- Unlock Number Logic ---------------- */
-  const hasContactNumber = !!(user.phone || user.contactNumber || user.whatsapp);
-  const unlockSection = document.getElementById("unlockSection");
-
-  if (!sellerIsPremium && hasContactNumber) {
-    unlockSection.style.display = "block";
-    document.getElementById("unlockPosterBtn").onclick = () => {
-      alert("Opening secure payment for £1.50 to unlock contact details...");
-    };
-  } else {
-    unlockSection.style.display = "none";
+  /* ---------------- Business Ribbon ---------------- */
+  const ribbon = document.getElementById("businessRibbon");
+  if (ribbon && user.isBusiness) {
+    ribbon.style.display = "flex";
   }
 
-  /* ---------------- UI Data Mapping ---------------- */
-  document.getElementById("sellerName").textContent = user.name || user.displayName || "User";
-  document.getElementById("streakCount").textContent = user.loginStreak || 0;
-  document.getElementById("sellerBio").textContent = user.bio || "This user hasn't added a bio yet.";
-  
-  const avatar = document.getElementById("sellerAvatar");
-  if (user.avatarUrl) {
-    avatar.style.backgroundImage = `url(${user.avatarUrl})`;
-  } else {
-    avatar.textContent = (user.name || "U").charAt(0).toUpperCase();
+  /* ---------------- Load Extras ---------------- */
+  await loadFollowerCount(userId);
+  await loadSellerAds(userId);
+  setupFollowBtn();
+
+  /* ---------------- Back Button ---------------- */
+  const backBtn = document.getElementById("backToPost");
+  if (backBtn) {
+    backBtn.onclick = () =>
+      loadView("view-post", { forceInit: true });
   }
-
-  if (user.isBusiness) {
-    document.getElementById("businessRibbon").style.display = "flex";
-  }
-
-  loadFollowerCount(userId);
-  loadSellerAds(userId);
-  setupFollowBtn(userId);
-
-  document.getElementById("backToPost").onclick = () => loadView("view-post", { forceInit: true });
 }
 
+/* ===============================
+   LOAD SELLER ADS
+================================ */
 async function loadSellerAds(sellerId) {
   const container = document.getElementById("sellerAdsContainer");
-  const q = query(collection(db, "posts"), where("userId", "==", sellerId), orderBy("createdAt", "desc"));
-  const snap = await getDocs(q);
+  if (!container) return;
+
   container.innerHTML = "";
 
+  const q = query(
+    collection(db, "posts"),
+    where("userId", "==", sellerId),
+    orderBy("createdAt", "desc")
+  );
+
+  const snap = await getDocs(q);
+
   if (snap.empty) {
-    container.innerHTML = "<p class='empty-msg'>No other ads found.</p>";
+    container.innerHTML =
+      "<p class='empty-msg'>No other ads found.</p>";
     return;
   }
 
   snap.forEach(docSnap => {
     const post = { id: docSnap.id, ...docSnap.data() };
+
     const card = document.createElement("div");
     card.className = "post-card";
     card.innerHTML = `
-      <input type="checkbox" class="bundle-tick" data-id="${post.id}" data-title="${post.title}" data-price="${post.price || 0}">
-      <div class="post-image"><img src="${post.imageUrl || '/images/placeholder.webp'}"></div>
+      <input
+        type="checkbox"
+        class="bundle-tick"
+        data-id="${post.id}"
+        data-title="${post.title}"
+        data-price="${post.price || 0}"
+      >
+      <div class="post-image">
+        <img src="${post.imageUrl || '/images/placeholder.webp'}">
+      </div>
       <div class="post-body">
         <h3>${post.title}</h3>
-        <p class="post-price">£${post.price || '0.00'}</p>
+        <p class="post-price">£${post.price || "0.00"}</p>
       </div>
     `;
 
-    card.querySelector(".bundle-tick").addEventListener("change", updateBundleUI);
+    card
+      .querySelector(".bundle-tick")
+      .addEventListener("change", updateBundleUI);
+
     container.appendChild(card);
   });
 
   setupPopupLogic(sellerId);
 }
 
+/* ===============================
+   BUNDLE UI
+================================ */
 function updateBundleUI() {
-  const selectedCount = document.querySelectorAll(".bundle-tick:checked").length;
+  const count = document.querySelectorAll(
+    ".bundle-tick:checked"
+  ).length;
+
   const btn = document.getElementById("combinedEnquiryBtn");
-  document.getElementById("selectedCount").textContent = selectedCount;
-  btn.style.display = selectedCount > 0 ? "block" : "none";
+  const countEl = document.getElementById("selectedCount");
+
+  if (countEl) countEl.textContent = count;
+  if (btn) btn.style.display = count > 0 ? "block" : "none";
 }
 
+/* ===============================
+   POPUP LOGIC
+================================ */
 function setupPopupLogic(sellerId) {
   const enquiryBtn = document.getElementById("combinedEnquiryBtn");
-  
+  if (!enquiryBtn) return;
+
   enquiryBtn.onclick = () => {
-    const selected = document.querySelectorAll(".bundle-tick:checked");
+    const selected = document.querySelectorAll(
+      ".bundle-tick:checked"
+    );
+
     const summary = document.getElementById("popupItemsSummary");
     const tally = document.getElementById("popupPriceTally");
-    let total = 0;
 
-    summary.innerHTML = "";
+    let total = 0;
+    if (summary) summary.innerHTML = "";
+
     selected.forEach(t => {
-      const price = parseFloat(t.dataset.price);
+      const price = parseFloat(t.dataset.price || 0);
       total += price;
-      
-      if (sellerIsPremium) {
-        summary.innerHTML += `<div class="summary-item"><span>${t.dataset.title}</span><span>£${price.toFixed(2)}</span></div>`;
-      } else {
-        summary.innerHTML += `<p class="plain-item">• ${t.dataset.title}</p>`;
+
+      if (summary) {
+        summary.innerHTML += sellerIsPremium
+          ? `<div class="summary-item">
+              <span>${t.dataset.title}</span>
+              <span>£${price.toFixed(2)}</span>
+            </div>`
+          : `<p class="plain-item">• ${t.dataset.title}</p>`;
       }
     });
 
-    if (sellerIsPremium) {
-      tally.style.display = "flex";
-      document.getElementById("totalPriceAmount").textContent = `£${total.toFixed(2)}`;
+    if (tally) {
+      tally.style.display = sellerIsPremium ? "flex" : "none";
+      const totalEl = document.getElementById("totalPriceAmount");
+      if (totalEl)
+        totalEl.textContent = `£${total.toFixed(2)}`;
     }
 
-    document.getElementById("contactPopup").style.display = "flex";
+    const popup = document.getElementById("contactPopup");
+    if (popup) popup.style.display = "flex";
 
-    document.getElementById("popupSendBtn").onclick = () => {
-      const userMsg = document.getElementById("popupMessage").value;
-      let finalMsg = `Bundle Enquiry:\n`;
-      selected.forEach(t => {
-        finalMsg += `- ${t.dataset.title} ${sellerIsPremium ? `(£${t.dataset.price})` : ""}\n`;
-      });
-      if (sellerIsPremium) finalMsg += `Total: £${total.toFixed(2)}\n`;
-      if (userMsg) finalMsg += `\nMessage: ${userMsg}`;
+    const sendBtn = document.getElementById("popupSendBtn");
+    if (sendBtn) {
+      sendBtn.onclick = () => {
+        let msg = "Bundle Enquiry:\n";
+        selected.forEach(t => {
+          msg += `- ${t.dataset.title}\n`;
+        });
 
-      sessionStorage.setItem("pendingMessage", finalMsg);
-      loadView("chat", { forceInit: true });
+        sessionStorage.setItem("pendingMessage", msg);
+        loadView("chat", { forceInit: true });
+      };
+    }
+  };
+
+  const cancelBtn = document.getElementById("popupCancelBtn");
+  if (cancelBtn) {
+    cancelBtn.onclick = () => {
+      const popup = document.getElementById("contactPopup");
+      if (popup) popup.style.display = "none";
     };
-  };
-
-  document.getElementById("popupCancelBtn").onclick = () => {
-    document.getElementById("contactPopup").style.display = "none";
-  };
+  }
 }
 
+/* ===============================
+   FOLLOWERS
+================================ */
 async function loadFollowerCount(id) {
-  const snap = await getDocs(collection(db, "users", id, "followers"));
-  document.getElementById("followerCount").textContent = snap.size;
+  const countEl = document.getElementById("followerCount");
+  if (!countEl) return;
+
+  const snap = await getDocs(
+    collection(db, "users", id, "followers")
+  );
+
+  countEl.textContent = snap.size;
 }
 
-function setupFollowBtn(id) {
+function setupFollowBtn() {
   const btn = document.getElementById("followSellerBtn");
+  if (!btn) return;
+
   btn.onclick = () => {
     btn.classList.toggle("following");
-    btn.textContent = btn.classList.contains("following") ? "Following ✓" : "Follow Seller";
+    btn.textContent = btn.classList.contains("following")
+      ? "Following ✓"
+      : "Follow Seller";
   };
+}
+
+/* ===============================
+   HELPERS
+================================ */
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
 }
