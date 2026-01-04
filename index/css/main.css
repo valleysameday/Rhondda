@@ -1,249 +1,298 @@
 /* =====================================================
-   FONT IMPORTS
-===================================================== */
-@font-face {
-  font-family: 'Poppins';
-  src: url('/site/fonts/Poppins-Regular.woff2') format('woff2');
-  font-weight: 400;
-}
-@font-face {
-  font-family: 'Poppins';
-  src: url('/site/fonts/Poppins-Medium.woff2') format('woff2');
-  font-weight: 500;
-}
-@font-face {
-  font-family: 'BricolageGrotesque';
-  src: url('/site/fonts/BricolageGrotesque-Regular.woff2') format('woff2');
-  font-weight: 400;
-}
-
-/* =====================================================
-   ROOT VARIABLES (Modernized Palette)
+   ROOT VARIABLES
 ===================================================== */
 :root {
   --primary: #2563eb;
-  --primary-soft: rgba(37, 99, 235, 0.1);
-  --accent: #f97316;
-  --bg: #f8fafc;
+  --bg: #f2f4f5;
+  --text-main: #111827;
+  --text-muted: #6b7280;
   --surface: #ffffff;
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --border: #e2e8f0;
-  --radius: 16px;
+  --radius: 12px;
   
-  /* Typography Scale */
+  /* 2026 Readable Scale */
   --text-body: 16px;
   --text-small: 14px;
   --text-meta: 12px;
   --text-title: 17px;
-  --text-section: 22px;
   --text-h1: 28px;
-  --text-h2: 24px;
 }
 
 /* =====================================================
-   GLOBAL RESET & BASE
+   GLOBAL RESET
 ===================================================== */
 *, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
-  background: var(--bg);
-  color: var(--text-main);
-  line-height: 1.6;
-  font-size: var(--text-body);
-  padding-bottom: 90px; /* Space for Action Bar */
-  -webkit-font-smoothing: antialiased;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    line-height: 1.6;
+    font-size: var(--text-body);
+    padding-bottom: 90px; /* Increased for better action bar clearance */
+    -webkit-font-smoothing: antialiased;
 }
 
 a { text-decoration: none; color: inherit; }
-
-h1, h2, h3, .feed-title, .view-title, .greeting-welsh, .greeting-english {
-  font-family: 'BricolageGrotesque', sans-serif;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-
-h1 { font-size: var(--text-h1); }
-h2 { font-size: var(--text-h2); }
 
 /* =====================================================
    HEADER
 ===================================================== */
 header {
-  background: var(--text-main);
-  color: #fff;
-  text-align: center;
-  padding: 20px 15px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+    background: #0000DD; /* 2026 Electric Blue */
+    color: #fff;
+    text-align: center;
+    padding: 18px 15px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 221, 0.15);
 }
 
 header img.logo {
-  height: 44px;
-  width: auto;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    height: 48px;
+    filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.15));
 }
 
 /* =====================================================
    WEATHER SNIPPET
 ===================================================== */
 .weather-snippet {
-  background: var(--surface);
-  color: var(--text-main);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 20px;
-  margin: 16px auto;
-  border-radius: 50px;
-  width: fit-content;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    background: #008080; 
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 24px; 
+    margin: 16px auto;
+    border-radius: 50px; 
+    width: fit-content;
+    min-width: 280px;
+    box-shadow: 0 8px 20px rgba(0, 128, 128, 0.15);
 }
 
-.weather-emoji { font-size: 1.4rem; }
-.weather-info { font-size: 0.95rem; font-weight: 600; }
+.weather-emoji { font-size: 1.5rem; }
+.weather-info { 
+    font-size: 1rem; 
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
 
 /* =====================================================
-   CATEGORIES (Keep Scroll, Improve Feel)
+   GREETINGS
 ===================================================== */
-#categories {
-  display: flex;
-  gap: 10px;
-  margin: 20px 0;
-  padding: 4px 16px;
-  overflow-x: auto;
-  white-space: nowrap;
-  scrollbar-width: none; /* Firefox */
-  -webkit-overflow-scrolling: touch;
+.greeting-snippet {
+  margin: 20px 0 8px;
+  padding: 0 16px;
 }
 
+.greeting-welsh {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+
+.greeting-english {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* =====================================================
+   CATEGORIES (Preserved Scroll)
+===================================================== */
+#categories {
+    display: flex;
+    gap: 10px;
+    margin: 16px 0;
+    padding: 4px 16px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
 #categories::-webkit-scrollbar { display: none; }
 
 .category-btn {
-  padding: 10px 22px;
-  background: var(--surface);
-  color: var(--text-muted);
-  border: 1.5px solid var(--border);
-  border-radius: 100px;
-  font-size: var(--text-small);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  flex-shrink: 0;
+    padding: 10px 22px;
+    background: var(--surface);
+    color: var(--text-main);
+    border: 1px solid #e5e7eb;
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: var(--text-small);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
 }
 
 .category-btn.active {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-  transform: translateY(-1px);
+    background: #FF7EB3;
+    color: #fff;
+    border-color: #FF7EB3;
+    box-shadow: 0 4px 12px rgba(255,126,179,0.35);
+    transform: translateY(-1px);
+}
+
+/* =====================================================
+   FEATURED ADS (Preserved Scroll)
+===================================================== */
+.featured-ads {
+  margin: 16px 0;
+  padding-bottom: 8px;
+}
+
+.featured-track {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 0 16px;
+  scrollbar-width: none;
+}
+.featured-track::-webkit-scrollbar { display: none; }
+
+.featured-card {
+  flex: 0 0 85%;
+  scroll-snap-align: center;
+  background: white;
+  border-radius: var(--radius);
+  padding: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+  border: 1px solid #eee;
+}
+
+.featured-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
 /* =====================================================
    POSTS GRID
 ===================================================== */
 .posts-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  padding: 0 16px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    padding: 0 16px;
 }
 
-/* =====================================================
-   FEED CARDS
-===================================================== */
+/* Card Readability Fixes */
 .feed-card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-  border: 1px solid var(--border);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  display: flex;
-  flex-direction: column;
-}
-
-.feed-card:active {
-  transform: scale(0.97);
-}
-
-.feed-image img {
-  width: 100%;
-  height: 130px;
-  object-fit: cover;
-  background: #f1f5f9;
-}
-
-.feed-content {
-  padding: 12px;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .feed-title {
-  font-size: var(--text-title);
-  line-height: 1.3;
-  margin-bottom: 8px;
-  color: var(--text-main);
-  /* Truncate long titles to keep grid neat */
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.feed-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: auto;
-}
-
-.post-time {
-  font-size: var(--text-meta);
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
-.save-heart {
-  background: var(--primary-soft);
-  color: var(--primary);
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
+    font-size: var(--text-title);
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 10px;
+    /* Limit height for grid balance */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 /* =====================================================
-   SKELETON & LOADERS
+   FIXED ACTION BAR
 ===================================================== */
+.action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
+    background: rgba(15, 23, 42, 0.95); 
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+}
+
+.action-link {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #94a3b8; 
+    font-size: 11px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.action-link:hover, .action-link.active {
+    color: #FFFFFF; 
+}
+
+.free-ribbon {
+    position: absolute;
+    top: -12px;
+    right: -18px;
+    background: #FF5F1F; 
+    color: #fff;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(255, 95, 31, 0.3);
+}
+
+/* =====================================================
+   STATUS INDICATORS
+===================================================== */
+.account-status-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ef4444;
+  border: 2px solid #0f172a;
+}
+
+.message-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ff3b30;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* =====================================================
+   LOADING & SKELETONS
+==================================================== */
 .skeleton-card {
-  background: #fff;
+  background: #e5e7eb;
   border-radius: var(--radius);
-  height: 200px;
-  overflow: hidden;
+  height: 180px;
   position: relative;
+  overflow: hidden;
 }
 
 .skeleton-card::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
   animation: shimmer 1.5s infinite;
 }
 
@@ -252,76 +301,20 @@ header img.logo {
   100% { transform: translateX(100%); }
 }
 
-.feed-loading-more {
-  padding: 30px;
-  font-weight: 500;
-  color: var(--text-muted);
-}
-
-/* =====================================================
-   ACTION BAR (Native App Feel)
-===================================================== */
-.action-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: rgba(15, 23, 42, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
-  display: flex;
-  justify-content: space-around;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  z-index: 1000;
-}
-
-.action-link {
-  color: #94a3b8;
-  font-size: 11px;
-  font-weight: 500;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  transition: color 0.2s;
-}
-
-.action-link.active, .action-link:hover {
-  color: #fff;
-}
-
-/* Icon Placeholders - replace with your SVG/Icon font */
-.action-link::before {
-  content: '';
-  width: 24px;
-  height: 24px;
-  background: currentColor;
-  mask-size: contain;
-  -webkit-mask-size: contain;
-  mask-repeat: no-repeat;
-}
-
 /* =====================================================
    FOOTER
 ===================================================== */
 .site-footer {
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  color: var(--text-muted);
-  padding: 40px 20px;
+  background: #0f172a;
+  color: #94a3b8;
+  padding: 48px 20px;
   text-align: center;
 }
 
-.footer-links {
-  margin-top: 12px;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
+.footer-links a {
+  color: #f97316;
+  font-weight: 600;
+  transition: opacity 0.2s;
 }
 
-.footer-links a {
-  color: var(--primary);
-  font-size: var(--text-small);
-  font-weight: 600;
-}
+.footer-links a:active { opacity: 0.6; }
