@@ -111,7 +111,7 @@ async function loadChat(convoId, auth, db) {
   let adTitle = "Listing";
   if (convo.postId) {
     try {
-      const adSnap = await getDoc(doc(db, "ads", convo.postId));
+      const adSnap = await getDoc(doc(db, "posts", convo.postId));
       if (adSnap.exists()) {
         const ad = adSnap.data();
         adTitle = ad.title || "Listing";
