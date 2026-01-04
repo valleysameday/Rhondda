@@ -26,7 +26,6 @@ export async function init({ auth: a, db: d }) {
   const user = profileSnap.data();
   sellerIsPremium = !!(user.isBusiness || user.isSellerPlus);
 
-  // -------------------- Basic Profile Info --------------------
   setText("sellerName", user.name || user.displayName || "User");
   setText("streakCount", user.loginStreak || 0);
   setText("sellerBio", user.bio || "This user hasn't added a bio yet.");
@@ -34,7 +33,6 @@ export async function init({ auth: a, db: d }) {
     setText("sellerReliability", `Member since ${user.joined.toDate().getFullYear()}`);
   }
 
-  // -------------------- Avatar --------------------
   const avatar = document.getElementById("sellerAvatar");
   if (avatar) {
     if (user.avatarUrl) {
@@ -45,17 +43,16 @@ export async function init({ auth: a, db: d }) {
     }
   }
 
-  // -------------------- Business Ribbon --------------------
   const ribbon = document.getElementById("businessRibbon");
   if (ribbon && user.isBusiness) ribbon.style.display = "flex";
 
-  // -------------------- Load Followers & Ads --------------------
   await loadFollowerCount(userId);
   await loadSellerAds(userId);
 
-  // -------------------- Back Button --------------------
   const backBtn = document.getElementById("backToPost");
   if (backBtn) backBtn.onclick = () => loadView("view-post", { forceInit: true });
+
+  createToastContainer();
 }
 
 /* -------------------- Load Seller Ads -------------------- */
@@ -95,92 +92,87 @@ async function loadSellerAds(sellerId) {
     `;
 
     const checkbox = card.querySelector(".bundle-tick");
-    if (checkbox) checkbox.addEventListener("change", updateActionDock);
+    if (checkbox) checkbox.addEventListener("change", updateToast);
 
     container.appendChild(card);
   });
-
-  setupDockButton();
 }
 
-/* -------------------- Update Dock Button -------------------- */
-function updateActionDock() {
-  const selected = document.querySelectorAll(".bundle-tick:checked");
-  const dockBtn = document.getElementById("combinedEnquiryBtn");
-  const countEl = document.getElementById("selectedCount");
+/* -------------------- Toast -------------------- */
+function createToastContainer() {
+  let existing = document.getElementById("bundleToast");
+  if (existing) return;
 
-  if (!dockBtn) return;
+  const toast = document.createElement("div");
+  toast.id = "bundleToast";
+  toast.style.position = "fixed";
+  toast.style.bottom = "20px";
+  toast.style.right = "20px";
+  toast.style.width = "300px";
+  toast.style.maxHeight = "400px";
+  toast.style.overflowY = "auto";
+  toast.style.background = "#fff";
+  toast.style.border = "1px solid #ccc";
+  toast.style.borderRadius = "10px";
+  toast.style.boxShadow = "0 4px 10px rgba(0,0,0,0.2)";
+  toast.style.padding = "15px";
+  toast.style.display = "none";
+  toast.style.zIndex = "9999";
+
+  toast.innerHTML = `
+    <h4 style="margin-top:0;">Bundle Selected</h4>
+    <div id="toastItems"></div>
+    <div style="margin-top:10px; text-align:right;">
+      <button id="toastSendBtn" style="padding:6px 12px;">Send</button>
+    </div>
+  `;
+
+  document.body.appendChild(toast);
+
+  const sendBtn = document.getElementById("toastSendBtn");
+  sendBtn.addEventListener("click", () => {
+    const selected = document.querySelectorAll(".bundle-tick:checked");
+    if (!selected.length) return;
+
+    let msg = "Bundle Enquiry:\n\n";
+    selected.forEach(t => {
+      msg += `• ${t.dataset.title}`;
+      if (sellerIsPremium) msg += ` (£${parseFloat(t.dataset.price).toFixed(2)})`;
+      msg += "\n";
+    });
+
+    sessionStorage.setItem("pendingMessage", msg);
+    loadView("chat", { forceInit: true });
+  });
+}
+
+function updateToast() {
+  const selected = document.querySelectorAll(".bundle-tick:checked");
+  const toast = document.getElementById("bundleToast");
+  const toastItems = document.getElementById("toastItems");
+
+  if (!toast || !toastItems) return;
 
   if (!selected.length) {
-    dockBtn.style.display = "none";
+    toast.style.display = "none";
+    toastItems.innerHTML = "";
     return;
   }
 
-  dockBtn.style.display = "flex";
-  if (countEl) countEl.textContent = selected.length;
-}
-
-/* -------------------- Dock Button Click -------------------- */
-function setupDockButton() {
-  const dockBtn = document.getElementById("combinedEnquiryBtn");
-  if (!dockBtn) return;
-
-  dockBtn.onclick = () => openPopup();
-}
-
-/* -------------------- Popup -------------------- */
-function openPopup() {
-  const selected = document.querySelectorAll(".bundle-tick:checked");
-  if (!selected.length) return;
-
-  const summary = document.getElementById("popupItemsSummary");
-  const tally = document.getElementById("totalPriceAmount") ? document.getElementById("popupPriceTally") : null;
-  const popup = document.getElementById("contactPopup");
-
-  summary.innerHTML = "";
-  let total = 0;
-
+  toastItems.innerHTML = "";
   selected.forEach(t => {
-    const price = parseFloat(t.dataset.price || 0);
-    total += price;
-
-    summary.innerHTML += sellerIsPremium
-      ? `<div class="summary-item"><span>${t.dataset.title}</span><span>£${price.toFixed(2)}</span></div>`
-      : `<p class="plain-item">• ${t.dataset.title}</p>`;
+    const div = document.createElement("div");
+    div.textContent = sellerIsPremium
+      ? `${t.dataset.title} (£${parseFloat(t.dataset.price).toFixed(2)})`
+      : t.dataset.title;
+    div.style.marginBottom = "4px";
+    toastItems.appendChild(div);
   });
 
-  if (tally) {
-    tally.style.display = sellerIsPremium ? "flex" : "none";
-    const totalEl = document.getElementById("totalPriceAmount");
-    if (totalEl) totalEl.textContent = `£${total.toFixed(2)}`;
-  }
-
-  if (popup) popup.style.display = "flex";
-
-  // Send button
-  const sendBtn = document.getElementById("popupSendBtn");
-  if (sendBtn) {
-    sendBtn.onclick = () => {
-      let msg = "Bundle Enquiry:\n\n";
-      selected.forEach(t => {
-        msg += `• ${t.dataset.title}`;
-        if (sellerIsPremium) msg += ` (£${parseFloat(t.dataset.price).toFixed(2)})`;
-        msg += "\n";
-      });
-
-      sessionStorage.setItem("pendingMessage", msg);
-      loadView("chat", { forceInit: true });
-    };
-  }
-
-  // Cancel button
-  const cancelBtn = document.getElementById("popupCancelBtn");
-  if (cancelBtn) cancelBtn.onclick = () => {
-    if (popup) popup.style.display = "none";
-  };
+  toast.style.display = "block";
 }
 
-/* -------------------- Load Follower Count -------------------- */
+/* -------------------- Followers -------------------- */
 async function loadFollowerCount(id) {
   const el = document.getElementById("followerCount");
   if (!el) return;
