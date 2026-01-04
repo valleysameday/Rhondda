@@ -94,15 +94,20 @@ async function loadChat(convoId, auth, db) {
   const snap = await getDocs(q);
 
   snap.forEach(doc => {
-    const msg = doc.data();
-    const isMe = msg.senderId === auth.currentUser.uid;
+  const msg = doc.data();
+  const isMe = msg.senderId === auth.currentUser.uid;
 
-    chatBox.innerHTML += `
+  const senderName = isMe ? "You" : otherName;
+
+  chatBox.innerHTML += `
+    <div class="chat-message ${isMe ? "me" : "them"}">
+      <div class="chat-name">${senderName}</div>
       <div class="chat-bubble ${isMe ? "me" : "them"}">
         ${msg.text}
       </div>
-    `;
-  });
+    </div>
+  `;
+});
 
   // Auto-scroll to bottom
   chatBox.scrollTop = chatBox.scrollHeight;
