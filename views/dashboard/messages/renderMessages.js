@@ -88,27 +88,76 @@ async function loadChat(convoId, auth, db) {
   const chatBox = document.getElementById("chatMessages");
   chatBox.innerHTML = "";
 
+  // 1️⃣ Load conversation doc
+  const convoSnap = await getDoc(doc(db, "conversations", convoId));
+  const convo = convoSnap.data();
+
+  // 2️⃣ Work out the OTHER user
+  const [userA, userB] = convo.participants;
+  const otherUserId = auth.currentUser.uid === userA ? userB : userA;
+
+  // 3️⃣ Load the other user's name
+  let otherName = "User";
+  try {
+    const otherSnap = await getDoc(doc(db, "users", otherUserId));
+    if (otherSnap.exists()) {
+      otherName = otherSnap.data().name || "User";
+    }
+  } catch (e) {
+    console.warn("Failed to load other user:", e);
+  }
+
+  // 4️⃣ Load the ad being discussed
+  let adTitle = "Listing";
+  if (convo.postId) {
+    try {
+      const adSnap = await getDoc(doc(db, "ads", convo.postId));
+      if (adSnap.exists()) {
+        const ad = adSnap.data();
+        adTitle = ad.title || "Listing";
+      }
+    } catch (e) {
+      console.warn("Failed to load ad:", e);
+    }
+  }
+
+  // 5️⃣ Insert ad info at top of chat
+  const adCard = `
+    <div class="chat-ad-card">
+      <div class="chat-ad-title">${truncate(adTitle, 40)}</div>
+    </div>
+  `;
+  chatBox.innerHTML = adCard;
+
+  // 6️⃣ Load messages
   const messagesRef = collection(db, "conversations", convoId, "messages");
   const q = query(messagesRef, orderBy("createdAt", "asc"));
 
   const snap = await getDocs(q);
 
   snap.forEach(doc => {
-  const msg = doc.data();
-  const isMe = msg.senderId === auth.currentUser.uid;
+    const msg = doc.data();
+    const isMe = msg.senderId === auth.currentUser.uid;
 
-  const senderName = isMe ? "You" : otherName;
+    const senderName = isMe ? "You" : otherName;
 
-  chatBox.innerHTML += `
-    <div class="chat-message ${isMe ? "me" : "them"}">
-      <div class="chat-name">${senderName}</div>
-      <div class="chat-bubble ${isMe ? "me" : "them"}">
-        ${msg.text}
+    chatBox.innerHTML += `
+      <div class="chat-message ${isMe ? "me" : "them"}">
+        <div class="chat-name">${senderName}</div>
+        <div class="chat-bubble ${isMe ? "me" : "them"}">
+          ${msg.text}
+        </div>
       </div>
-    </div>
-  `;
-});
+    `;
+  });
 
-  // Auto-scroll to bottom
+  // 7️⃣ Auto-scroll to bottom
   chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+/* ============================================================
+   Helper: truncate long ad titles
+============================================================ */
+function truncate(str, max) {
+  return str.length > max ? str.substring(0, max) + "…" : str;
 }
