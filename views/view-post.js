@@ -113,7 +113,41 @@ if (detailsBox) {
     safeSetText("viewTime", timeAgo(post.createdAt));
     safeSetText("viewPriceMobile", priceText);
 
-   /* ============================================================
+/* ============================================================
+   ACCOUNT TYPE BANNER (Seller / Business)
+============================================================ */
+try {
+  const sellerSnap = await getDoc(doc(db, "users", post.userId));
+  const sellerData = sellerSnap.data();
+
+  const banner = document.getElementById("accountBanner");
+  if (!banner) return;
+
+  if (sellerData?.isBusiness) {
+    banner.classList.add("business");
+    banner.innerHTML = `
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M3 21h18M3 10h18M3 6h18M9 3v18M15 3v18" />
+      </svg>
+      <span>Business Account</span>
+    `;
+    banner.hidden = false;
+  } else {
+    banner.classList.add("seller");
+    banner.innerHTML = `
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="7" r="4" />
+        <path d="M5.5 21a6.5 6.5 0 0113 0" />
+      </svg>
+      <span>Seller Account</span>
+    `;
+    banner.hidden = false;
+  }
+} catch (err) {
+  console.warn("Could not load account banner:", err);
+}
+    
+    /* ============================================================
    FRIENDLY ACCOUNT AGE (Option A)
 ============================================================ */
 try {
