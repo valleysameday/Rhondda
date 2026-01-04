@@ -23,31 +23,25 @@ export async function init({ auth: a, db: d }) {
   const userId = sessionStorage.getItem("profileUserId");
   if (!userId) return loadView("home");
 
-  const profileSnap = await getDoc(doc(db, "users", userId));
-  if (!profileSnap.exists()) return loadView("home");
+  const snap = await getDoc(doc(db, "users", userId));
+  if (!snap.exists()) return loadView("home");
 
-  const user = profileSnap.data();
+  const user = snap.data();
 
   /* ---------------- Seller Tier ---------------- */
-  // ONLY business & seller+ get totals
   sellerIsPremium = !!(user.isBusiness || user.isSellerPlus);
 
   /* ---------------- Reliability ---------------- */
-  let reliabilityText = "Verified Member";
+  let reliability = "Verified Member";
   if (user.joined?.toDate) {
-    const joinedDate = user.joined.toDate();
-    reliabilityText = `Member since ${joinedDate.getFullYear()}`;
+    reliability = `Member since ${user.joined.toDate().getFullYear()}`;
   }
-
-  setText("sellerReliability", reliabilityText);
+  setText("sellerReliability", reliability);
 
   /* ---------------- Profile Data ---------------- */
   setText("sellerName", user.name || user.displayName || "User");
   setText("streakCount", user.loginStreak || 0);
-  setText(
-    "sellerBio",
-    user.bio || "This user hasn't added a bio yet."
-  );
+  setText("sellerBio", user.bio || "This user hasn't added a bio yet.");
 
   /* ---------------- Avatar ---------------- */
   const avatar = document.getElementById("sellerAvatar");
@@ -62,9 +56,7 @@ export async function init({ auth: a, db: d }) {
 
   /* ---------------- Business Ribbon ---------------- */
   const ribbon = document.getElementById("businessRibbon");
-  if (ribbon && user.isBusiness) {
-    ribbon.style.display = "flex";
-  }
+  if (ribbon && user.isBusiness) ribbon.style.display = "flex";
 
   /* ---------------- Load Data ---------------- */
   await loadFollowerCount(userId);
@@ -73,10 +65,11 @@ export async function init({ auth: a, db: d }) {
 
   /* ---------------- Back Button ---------------- */
   const backBtn = document.getElementById("backToPost");
-  if (backBtn) {
-    backBtn.onclick = () =>
-      loadView("view-post", { forceInit: true });
-  }
+  if (backBtn) backBtn.onclick = () => loadView("view-post", { forceInit: true });
+
+  /* ---------------- Popup Cancel ---------------- */
+  const cancelBtn = document.getElementById("popupCancelBtn");
+  if (cancelBtn) cancelBtn.onclick = closeBundlePopup;
 }
 
 /* ===============================
@@ -97,8 +90,7 @@ async function loadSellerAds(sellerId) {
   const snap = await getDocs(q);
 
   if (snap.empty) {
-    container.innerHTML =
-      "<p class='empty-msg'>No other ads found.</p>";
+    container.innerHTML = "<p class='empty-msg'>No other ads found.</p>";
     return;
   }
 
@@ -126,114 +118,94 @@ async function loadSellerAds(sellerId) {
 
     card
       .querySelector(".bundle-tick")
-      .addEventListener("change", updateBundleUI);
+      .addEventListener("change", handleBundleChange);
 
     container.appendChild(card);
   });
-
-  setupPopupLogic();
 }
 
 /* ===============================
-   BUNDLE UI
+   BUNDLE POPUP FLOW
 ================================ */
-function updateBundleUI() {
-  const count = document.querySelectorAll(".bundle-tick:checked").length;
-  const btn = document.getElementById("combinedEnquiryBtn");
-  const countEl = document.getElementById("selectedCount");
-
-  if (countEl) countEl.textContent = count;
-  if (btn) btn.style.display = count > 0 ? "block" : "none";
-}
-
-/* ===============================
-   POPUP LOGIC
-================================ */
-function setupPopupLogic() {
-  const enquiryBtn = document.getElementById("combinedEnquiryBtn");
-  if (!enquiryBtn) return;
-
-  enquiryBtn.onclick = () => {
-    const selected = document.querySelectorAll(".bundle-tick:checked");
-    const summary = document.getElementById("popupItemsSummary");
-    const tally = document.getElementById("popupPriceTally");
-    const popup = document.getElementById("contactPopup");
-
-    let total = 0;
-    if (summary) summary.innerHTML = "";
-
-    selected.forEach(t => {
-      const price = parseFloat(t.dataset.price || 0);
-      total += price;
-
-      // ALWAYS show item titles
-      summary.innerHTML += `
-        <div class="summary-item">
-          <span>${t.dataset.title}</span>
-          ${
-            sellerIsPremium
-              ? `<span>£${price.toFixed(2)}</span>`
-              : ``
-          }
-        </div>
-      `;
-    });
-
-    // ONLY business & seller+ see totals
-    if (tally) {
-      tally.style.display = sellerIsPremium ? "flex" : "none";
-      if (sellerIsPremium) {
-        document.getElementById("totalPriceAmount").textContent =
-          `£${total.toFixed(2)}`;
-      }
-    }
-
-    popup.style.display = "flex";
-
-    const sendBtn = document.getElementById("popupSendBtn");
-    if (sendBtn) {
-      sendBtn.onclick = () => {
-        let msg = "Bundle Enquiry:\n\n";
-
-        selected.forEach(t => {
-          msg += `• ${t.dataset.title}`;
-          if (sellerIsPremium) {
-            msg += ` (£${parseFloat(t.dataset.price || 0).toFixed(2)})`;
-          }
-          msg += "\n";
-        });
-
-        if (sellerIsPremium) {
-          msg += `\nTotal: £${total.toFixed(2)}`;
-        }
-
-        sessionStorage.setItem("pendingMessage", msg);
-        loadView("chat", { forceInit: true });
-      };
-    }
-  };
-
-  const cancelBtn = document.getElementById("popupCancelBtn");
-  if (cancelBtn) {
-    cancelBtn.onclick = () => {
-      const popup = document.getElementById("contactPopup");
-      if (popup) popup.style.display = "none";
-    };
+function handleBundleChange() {
+  const selected = document.querySelectorAll(".bundle-tick:checked");
+  if (!selected.length) {
+    closeBundlePopup();
+    return;
   }
+  openBundlePopup();
+}
+
+function openBundlePopup() {
+  const selected = document.querySelectorAll(".bundle-tick:checked");
+  const popup = document.getElementById("contactPopup");
+  const summary = document.getElementById("popupItemsSummary");
+  const tally = document.getElementById("popupPriceTally");
+  const totalEl = document.getElementById("totalPriceAmount");
+
+  let total = 0;
+  summary.innerHTML = "";
+
+  selected.forEach(t => {
+    const price = parseFloat(t.dataset.price || 0);
+    total += price;
+
+    summary.innerHTML += `
+      <div class="summary-item">
+        <span>${t.dataset.title}</span>
+        ${
+          sellerIsPremium
+            ? `<span>£${price.toFixed(2)}</span>`
+            : ""
+        }
+      </div>
+    `;
+  });
+
+  if (sellerIsPremium) {
+    tally.style.display = "flex";
+    totalEl.textContent = `£${total.toFixed(2)}`;
+  } else {
+    tally.style.display = "none";
+  }
+
+  popup.style.display = "flex";
+
+  const sendBtn = document.getElementById("popupSendBtn");
+  if (sendBtn) sendBtn.onclick = sendBundleMessage;
+}
+
+function closeBundlePopup() {
+  const popup = document.getElementById("contactPopup");
+  if (popup) popup.style.display = "none";
+}
+
+function sendBundleMessage() {
+  const selected = document.querySelectorAll(".bundle-tick:checked");
+  if (!selected.length) return;
+
+  let msg = "Bundle Enquiry:\n\n";
+  selected.forEach(t => {
+    msg += `• ${t.dataset.title}`;
+    if (sellerIsPremium) {
+      msg += ` (£${parseFloat(t.dataset.price || 0).toFixed(2)})`;
+    }
+    msg += "\n";
+  });
+
+  sessionStorage.setItem("pendingMessage", msg);
+  loadView("chat", { forceInit: true });
 }
 
 /* ===============================
    FOLLOWERS
 ================================ */
 async function loadFollowerCount(id) {
-  const countEl = document.getElementById("followerCount");
-  if (!countEl) return;
+  const el = document.getElementById("followerCount");
+  if (!el) return;
 
-  const snap = await getDocs(
-    collection(db, "users", id, "followers")
-  );
-
-  countEl.textContent = snap.size;
+  const snap = await getDocs(collection(db, "users", id, "followers"));
+  el.textContent = snap.size;
 }
 
 function setupFollowBtn() {
