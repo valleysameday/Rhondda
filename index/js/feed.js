@@ -3,11 +3,21 @@ import {
   getDocs,
   query,
   orderBy,
-  limit
+  limit,
+  startAfter,
+  doc,
+  getDoc,
+  setDoc,
+  deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 import { initFeaturedAds } from "/index/js/featured-ads.js";
 import { loadView } from "/index/js/main.js";
+
+let lastDoc = null;
+let loadingMore = false;
+let reachedEnd = false;
+let currentCategory = "all";
 
 export async function initFeed({ db }, options = {}) {
   const postsContainer = document.getElementById('feed');
@@ -27,7 +37,7 @@ export async function initFeed({ db }, options = {}) {
   }
 
   /* ============================================================
-     SKELETON LOADING (with shimmer + loading text)
+     SKELETON LOADING
   ============================================================ */
   function showSkeletons(count = 6) {
     postsContainer.innerHTML = `
@@ -47,64 +57,102 @@ export async function initFeed({ db }, options = {}) {
       `;
       postsContainer.appendChild(skel);
     }
-
-    // ⭐ Slow connection fallback
-    setTimeout(() => {
-      const hasRealPosts = postsContainer.querySelector('.feed-card:not(.skeleton-card)');
-      if (!hasRealPosts) {
-        postsContainer.insertAdjacentHTML(
-          "beforeend",
-          `<p class="loading-text">Still loading… slow connection or heavy traffic</p>`
-        );
-      }
-    }, 5000);
   }
 
   /* ============================================================
-     FETCH POSTS (LIMITED for speed)
+     BOTTOM LOADER + END MESSAGE
   ============================================================ */
-  async function fetchPosts() {
-    try {
-      const q = query(
-        collection(db, 'posts'),
-        orderBy('createdAt', 'desc'),
-        limit(50) // ⭐ MUCH faster
+  function showBottomLoader() {
+    if (!document.getElementById("feedBottomLoader")) {
+      const loader = document.createElement("div");
+      loader.id = "feedBottomLoader";
+      loader.className = "feed-loading-more";
+      loader.textContent = "Loading more posts…";
+      postsContainer.appendChild(loader);
+    }
+  }
+
+  function hideBottomLoader() {
+    const loader = document.getElementById("feedBottomLoader");
+    if (loader) loader.remove();
+  }
+
+  function showEndMessage() {
+    if (!document.getElementById("feedEndMessage")) {
+      const end = document.createElement("div");
+      end.id = "feedEndMessage";
+      end.className = "feed-end";
+      end.textContent = "You’ve reached the end";
+      postsContainer.appendChild(end);
+    }
+  }
+
+  /* ============================================================
+     FETCH POSTS (with pagination)
+  ============================================================ */
+  async function fetchPosts(initial = false) {
+    if (reachedEnd) return [];
+
+    let q;
+
+    if (initial || !lastDoc) {
+      q = query(
+        collection(db, "posts"),
+        orderBy("createdAt", "desc"),
+        limit(50)
       );
+    } else {
+      q = query(
+        collection(db, "posts"),
+        orderBy("createdAt", "desc"),
+        startAfter(lastDoc),
+        limit(50)
+      );
+    }
 
-      const snap = await getDocs(q);
+    const snap = await getDocs(q);
 
-      const posts = snap.docs.map(doc => {
-        const d = doc.data();
-        return {
-          id: doc.id,
-          userId: d.userId,
-          title: d.title,
-          teaser: d.description || "",
-          category: d.category || "misc",
-          categoryLabel: d.categoryLabel || d.category,
-          price: d.price || null,
-          area: d.area || "Rhondda",
-          image: d.images?.[0] || "/images/image-webholder.webp",
-          type: d.isFeatured ? "featured" : "standard",
-          isBusiness: d.isBusiness === true,
-          cta: d.cta || null,
-          rentFrequency: d.rentFrequency || null,
-          bedrooms: d.bedrooms || null,
-          bathrooms: d.bathrooms || null,
-          furnished: d.furnished || null,
-          condition: d.condition || null,
-          delivery: d.delivery || null,
-          jobType: d.jobType || null,
-          jobSalary: d.jobSalary || null,
-          eventDate: d.eventDate || null,
-          eventStart: d.eventStart || null,
-          communityType: d.communityType || null,
-          lostLocation: d.lostLocation || null,
-          lostReward: d.lostReward || null
-        };
-      });
+    if (snap.docs.length === 0) {
+      reachedEnd = true;
+      return [];
+    }
 
-      // ⭐ Static featured business at top
+    lastDoc = snap.docs[snap.docs.length - 1];
+
+    const posts = snap.docs.map(doc => {
+      const d = doc.data();
+      return {
+        id: doc.id,
+        userId: d.userId,
+        title: d.title,
+        teaser: d.description || "",
+        category: d.category || "misc",
+        categoryLabel: d.categoryLabel || d.category,
+        price: d.price || null,
+        area: d.area || "Rhondda",
+        image: d.images?.[0] || "/images/image-webholder.webp",
+        type: d.isFeatured ? "featured" : "standard",
+        isBusiness: d.isBusiness === true,
+        cta: d.cta || null,
+        rentFrequency: d.rentFrequency || null,
+        bedrooms: d.bedrooms || null,
+        bathrooms: d.bathrooms || null,
+        furnished: d.furnished || null,
+        condition: d.condition || null,
+        delivery: d.delivery || null,
+        jobType: d.jobType || null,
+        jobSalary: d.jobSalary || null,
+        eventDate: d.eventDate || null,
+        eventStart: d.eventStart || null,
+        communityType: d.communityType || null,
+        lostLocation: d.lostLocation || null,
+        lostReward: d.lostReward || null,
+        createdAt: d.createdAt || Date.now()
+      };
+    });
+
+    // Sponsored business card (only on first load)
+    if (initial) {
       posts.unshift({
         id: "featured-biz",
         title: "Rhondda Pro Cleaning Services",
@@ -115,14 +163,12 @@ export async function initFeed({ db }, options = {}) {
         image: "/images/business-cleaning.jpg",
         type: "featured",
         isBusiness: true,
-        cta: "Get a Quote"
+        cta: "Get a Quote",
+        createdAt: Date.now()
       });
-
-      return posts;
-    } catch (err) {
-      console.error("Feed error:", err);
-      return [];
     }
+
+    return posts;
   }
 
   /* ============================================================
@@ -130,28 +176,34 @@ export async function initFeed({ db }, options = {}) {
   ============================================================ */
   function buildMeta(p) {
     let html = "";
+
     if (p.price) {
       const freq = p.rentFrequency ? ` ${p.rentFrequency.toUpperCase()}` : '';
       html += `<span class="post-price">£${p.price}${freq}</span>`;
     }
-    if (p.category === "property") html += `<span>🏠 ${p.bedrooms || "?"} bed</span>`;
-    if (p.category === "jobs" && p.jobSalary) html += `<span>💷 ${p.jobSalary}</span>`;
-    if (p.category === "events" && p.eventDate) html += `<span>📅 ${p.eventDate}</span>`;
+
     html += `<span>📍 ${p.area}</span>`;
+    html += `<span class="post-time">${window.timeAgo(p.createdAt)}</span>`;
+
     return html;
   }
 
   /* ============================================================
-     RENDER POSTS
+     RENDER POSTS (supports append)
   ============================================================ */
-  function renderPosts(posts, category = 'all') {
-    postsContainer.innerHTML = '';
+  function renderPosts(posts, category = 'all', options = {}) {
+    if (!options.append) {
+      postsContainer.innerHTML = '';
+      hideBottomLoader();
+      const endMsg = document.getElementById("feedEndMessage");
+      if (endMsg) endMsg.remove();
+    }
 
     const filtered = category === 'all'
       ? posts
       : posts.filter(p => p.category === category);
 
-    if (!filtered.length) {
+    if (!filtered.length && !options.append) {
       postsContainer.innerHTML = `<p class="empty-feed">No posts yet</p>`;
       return;
     }
@@ -160,33 +212,30 @@ export async function initFeed({ db }, options = {}) {
       const card = document.createElement('article');
       card.className = `feed-card ${post.type}`;
       card.innerHTML = `
-  <div class="feed-image">
-    <img src="${post.image}" alt="${post.title}">
-    ${post.isBusiness && post.type !== "featured" ? `<span class="biz-badge">Business</span>` : ''}
-  </div>
+        <div class="feed-image">
+          <img src="${post.image}" alt="${post.title}">
+          ${post.isBusiness && post.type !== "featured" ? `<span class="biz-badge">Business</span>` : ''}
+        </div>
 
-  <div class="feed-content">
-    <h3 class="feed-title">${post.title}</h3>
+        <div class="feed-content">
+          <h3 class="feed-title">${post.title}</h3>
 
-    <div class="feed-meta">
-      ${buildMeta(post)}
-      <button class="save-heart" data-id="${post.id}" title="Save">♡</button>
-    </div>
+          <div class="feed-meta">
+            ${buildMeta(post)}
+            <button class="save-heart" data-id="${post.id}" title="Save">♡</button>
+          </div>
 
-    ${post.type === "featured" && post.cta ? `<button class="cta-btn">${post.cta}</button>` : ''}
-  </div>
+          ${post.type === "featured" && post.cta ? `<button class="cta-btn">${post.cta}</button>` : ''}
+        </div>
 
-  <button class="report-btn" data-id="${post.id}" title="Report">⚑</button>
-`;
+        <button class="report-btn" data-id="${post.id}" title="Report">⚑</button>
+      `;
 
       card.addEventListener('click', e => {
         if (e.target.closest('.report-btn') || e.target.closest('.cta-btn')) return;
 
         sessionStorage.setItem("feedScroll", window.scrollY);
-
-        const activeBtn = document.querySelector('.category-btn.active');
-        sessionStorage.setItem("feedCategory", activeBtn?.dataset.category || "all");
-
+        sessionStorage.setItem("feedCategory", currentCategory);
         sessionStorage.setItem("viewPostId", post.id);
 
         loadView("view-post", { forceInit: true });
@@ -195,71 +244,6 @@ export async function initFeed({ db }, options = {}) {
       postsContainer.appendChild(card);
     });
   }
-
-  /* ============================================================
-     WEATHER
-  ============================================================ */
-  async function loadWeather() {
-    const emojiEl = document.querySelector(".weather-emoji");
-    const textEl = document.querySelector(".weather-text");
-    if (!emojiEl || !textEl) return;
-
-    try {
-      const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=51.65&longitude=-3.45&current_weather=true&daily=sunrise,sunset&timezone=auto");
-      const data = await res.json();
-      const weather = data.current_weather;
-      const temp = Math.round(weather.temperature);
-      const code = weather.weathercode;
-
-      const sunrise = new Date(data.daily.sunrise[0]);
-      const sunset = new Date(data.daily.sunset[0]);
-      const now = new Date(weather.time);
-      const isDay = now >= sunrise && now <= sunset;
-
-      let emoji = isDay ? "🌤️" : "🌙";
-      let message = isDay ? "Another tidy day in the Rhondda" : "Evening in the valley — cosy vibes";
-
-      if ([51, 61, 63, 65, 80, 81, 82].includes(code)) {
-        emoji = "🌧️"; message = "Bit wet out there — brolly weather";
-      }
-      if ([71, 73, 75].includes(code)) {
-        emoji = "❄️"; message = "Cold snap in the valleys";
-      }
-
-      emojiEl.textContent = emoji;
-      textEl.textContent = `${message} · ${temp}°C`;
-    } catch (err) {
-      emojiEl.textContent = "📍";
-      textEl.textContent = "Rhondda — local updates available";
-    }
-  }
-
-  /* ============================================================
-     GREETING
-  ============================================================ */
-  function loadGreeting() {
-    const w = document.querySelector(".greeting-welsh");
-    const e = document.querySelector(".greeting-english");
-    if (!w || !e) return;
-    w.textContent = "Shwmae";
-    e.textContent = window.currentUser?.displayName
-      ? `${window.currentUser.displayName}, welcome back`
-      : "Welcome to Rhondda Noticeboard";
-  }
-
-  /* ============================================================
-     CATEGORY FILTER BUTTONS
-  ============================================================ */
-  categoryBtns.forEach(btn => {
-    btn.addEventListener('click', async () => {
-      categoryBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      showSkeletons();
-      const posts = await fetchPosts();
-      renderPosts(posts, btn.dataset.category);
-    });
-  });
 
   /* ============================================================
      REPORT BUTTON
@@ -271,43 +255,94 @@ export async function initFeed({ db }, options = {}) {
     alert("Thanks — we’ll review this shortly.");
   });
 
+  /* ============================================================
+     SAVE BUTTON
+  ============================================================ */
+  document.addEventListener("click", async e => {
+    const btn = e.target.closest(".save-heart");
+    if (!btn) return;
 
-document.addEventListener("click", async e => {
-  const btn = e.target.closest(".save-heart");
-  if (!btn) return;
+    e.stopPropagation();
 
-  e.stopPropagation();
+    const postId = btn.dataset.id;
+    const uid = window.currentUser?.uid;
 
-  const postId = btn.dataset.id;
-  const uid = window.currentUser?.uid;
+    if (!uid) {
+      alert("Please log in to save posts");
+      return;
+    }
 
-  if (!uid) {
-    alert("Please log in to save posts");
-    return;
-  }
+    const ref = doc(db, "users", uid, "savedPosts", postId);
+    const snap = await getDoc(ref);
 
-  const ref = doc(db, "users", uid, "savedPosts", postId);
-  const snap = await getDoc(ref);
+    if (snap.exists()) {
+      await deleteDoc(ref);
+      btn.classList.remove("saved");
+      btn.textContent = "♡";
+    } else {
+      await setDoc(ref, { postId, savedAt: Date.now() });
+      btn.classList.add("saved");
+      btn.textContent = "♥";
+    }
+  });
 
-  if (snap.exists()) {
-    await deleteDoc(ref);
-    btn.classList.remove("saved");
-    btn.textContent = "♡";
-  } else {
-    await setDoc(ref, { postId, savedAt: Date.now() });
-    btn.classList.add("saved");
-    btn.textContent = "♥";
-  }
-});  
-  
+  /* ============================================================
+     CATEGORY FILTER BUTTONS
+  ============================================================ */
+  categoryBtns.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      categoryBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      currentCategory = btn.dataset.category;
+
+      reachedEnd = false;
+      lastDoc = null;
+
+      showSkeletons();
+      const posts = await fetchPosts(true);
+      renderPosts(posts, currentCategory);
+    });
+  });
+
+  /* ============================================================
+     INFINITE SCROLL
+  ============================================================ */
+  window.addEventListener("scroll", async () => {
+    if (loadingMore || reachedEnd) return;
+
+    const scrollPos = window.innerHeight + window.scrollY;
+    const bottom = document.body.offsetHeight - 300;
+
+    if (scrollPos >= bottom) {
+      loadingMore = true;
+      showBottomLoader();
+
+      const morePosts = await fetchPosts(false);
+
+      hideBottomLoader();
+
+      if (morePosts.length > 0) {
+        renderPosts(morePosts, currentCategory, { append: true });
+      } else {
+        reachedEnd = true;
+        showEndMessage();
+      }
+
+      loadingMore = false;
+    }
+  });
+
   /* ============================================================
      INITIAL LOAD
   ============================================================ */
   showSkeletons();
-  const posts = await fetchPosts();
+
+  const posts = await fetchPosts(true);
 
   const savedCategory = sessionStorage.getItem("feedCategory");
   if (savedCategory) {
+    currentCategory = savedCategory;
     const btn = document.querySelector(`.category-btn[data-category="${savedCategory}"]`);
     if (btn) {
       categoryBtns.forEach(b => b.classList.remove('active'));
