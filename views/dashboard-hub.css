@@ -82,9 +82,12 @@
 
 
 
-
-<!-- MESSAGES TAB -->
-    <div class="tab-content" data-tab="messages" style="display:none;">
-      <h1>Messages</h1>
-      <div id="messagesContainer"></div>
-    </div>
+.empty-state {
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  font-size: 14px;
+  color: #475569;
+  margin-top: 10px;
+}
