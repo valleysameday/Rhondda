@@ -16,14 +16,6 @@
         <span class="nav-icon">📦</span>
         <span class="nav-text">My Ads</span>
       </button>
-      <button class="nav-item" data-tab="messages">
-        <span class="nav-icon">💬</span>
-        <span class="nav-text">Messages</span>
-      </button>
-      <button class="nav-item" data-tab="payments">
-        <span class="nav-icon">💳</span>
-        <span class="nav-text">Payments</span>
-      </button>
       <button class="nav-item" data-tab="settings">
         <span class="nav-icon">⚙️</span>
         <span class="nav-text">Settings</span>
@@ -32,7 +24,7 @@
 
     <!-- Upgrade / Trial Box -->
     <div id="sidebarUpgradeBox" class="sidebar-footer">
-      <p id="sidebarPlanLabel">Free Account</p>
+      <p id="sidebarPlanLabel">Classic</p>
       <p id="sidebarTrialLabel" class="trial-label"></p>
       <button class="upgrade-sidebar-btn" id="upgradeSidebarBtn">Upgrade</button>
     </div>
@@ -46,7 +38,7 @@
       <header class="content-header">
         <div>
           <h1 id="viewTitle">Overview</h1>
-          <div id="planBadge" class="plan-badge free">Free Member</div>
+          <div id="planBadge" class="plan-badge free">General</div>
           <span id="trialBadge" class="trial-badge" style="display:none;"></span>
         </div>
       </header>
@@ -68,32 +60,6 @@
     <div class="tab-content" data-tab="my-ads" style="display:none;">
       <h1>My Ads</h1>
       <div id="myAdsContainer"></div>
-    </div>
-
-    <!-- MESSAGES TAB -->
-    <div class="tab-content" data-tab="messages" style="display:none;">
-      <h1>Messages</h1>
-      <div id="messagesContainer" class="messages-list"></div>
-
-<!-- Hidden chat window -->
-<div id="chatWindow" class="chat-window" style="display:none;">
-  <div class="chat-header">
-    <button id="backToInbox" class="back-btn">←</button>
-    <div id="chatHeaderName">Chat</div>
-  </div>
-
-  <div id="chatMessages" class="chat-messages"></div>
-
-  <div class="chat-input-bar">
-    <input id="chatInput" type="text" placeholder="Type a message...">
-    <button id="sendMessageBtn">Send</button>
-  </div>
-</div>
-
-    <!-- PAYMENTS TAB -->
-    <div class="tab-content" data-tab="payments" style="display:none;">
-      <h1>Payments</h1>
-      <div id="paymentsContainer"></div>
     </div>
 
     <!-- SETTINGS TAB -->
