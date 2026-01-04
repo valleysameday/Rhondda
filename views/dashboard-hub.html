@@ -73,8 +73,22 @@
     <!-- MESSAGES TAB -->
     <div class="tab-content" data-tab="messages" style="display:none;">
       <h1>Messages</h1>
-      <div id="messagesContainer"></div>
-    </div>
+      <div id="messagesContainer" class="messages-list"></div>
+
+<!-- Hidden chat window -->
+<div id="chatWindow" class="chat-window" style="display:none;">
+  <div class="chat-header">
+    <button id="backToInbox" class="back-btn">←</button>
+    <div id="chatHeaderName">Chat</div>
+  </div>
+
+  <div id="chatMessages" class="chat-messages"></div>
+
+  <div class="chat-input-bar">
+    <input id="chatInput" type="text" placeholder="Type a message...">
+    <button id="sendMessageBtn">Send</button>
+  </div>
+</div>
 
     <!-- PAYMENTS TAB -->
     <div class="tab-content" data-tab="payments" style="display:none;">
