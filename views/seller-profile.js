@@ -28,21 +28,20 @@ export async function init({ auth: a, db: d }) {
 
   const user = profileSnap.data();
 
-  /* ---------------- Seller Type ---------------- */
+  /* ---------------- Seller Tier ---------------- */
+  // ONLY business & seller+ get totals
   sellerIsPremium = !!(user.isBusiness || user.isSellerPlus);
 
-  /* ---------------- Reliability Text ---------------- */
+  /* ---------------- Reliability ---------------- */
   let reliabilityText = "Verified Member";
-
   if (user.joined?.toDate) {
     const joinedDate = user.joined.toDate();
     reliabilityText = `Member since ${joinedDate.getFullYear()}`;
   }
 
-  const reliabilityEl = document.getElementById("sellerReliability");
-  if (reliabilityEl) reliabilityEl.textContent = reliabilityText;
+  setText("sellerReliability", reliabilityText);
 
-  /* ---------------- Basic Profile Data ---------------- */
+  /* ---------------- Profile Data ---------------- */
   setText("sellerName", user.name || user.displayName || "User");
   setText("streakCount", user.loginStreak || 0);
   setText(
@@ -67,7 +66,7 @@ export async function init({ auth: a, db: d }) {
     ribbon.style.display = "flex";
   }
 
-  /* ---------------- Load Extras ---------------- */
+  /* ---------------- Load Data ---------------- */
   await loadFollowerCount(userId);
   await loadSellerAds(userId);
   setupFollowBtn();
@@ -117,7 +116,7 @@ async function loadSellerAds(sellerId) {
         data-price="${post.price || 0}"
       >
       <div class="post-image">
-        <img src="${post.imageUrl || '/images/placeholder.webp'}">
+        <img src="${post.imageUrl || "/images/placeholder.webp"}">
       </div>
       <div class="post-body">
         <h3>${post.title}</h3>
@@ -132,17 +131,14 @@ async function loadSellerAds(sellerId) {
     container.appendChild(card);
   });
 
-  setupPopupLogic(sellerId);
+  setupPopupLogic();
 }
 
 /* ===============================
    BUNDLE UI
 ================================ */
 function updateBundleUI() {
-  const count = document.querySelectorAll(
-    ".bundle-tick:checked"
-  ).length;
-
+  const count = document.querySelectorAll(".bundle-tick:checked").length;
   const btn = document.getElementById("combinedEnquiryBtn");
   const countEl = document.getElementById("selectedCount");
 
@@ -153,17 +149,15 @@ function updateBundleUI() {
 /* ===============================
    POPUP LOGIC
 ================================ */
-function setupPopupLogic(sellerId) {
+function setupPopupLogic() {
   const enquiryBtn = document.getElementById("combinedEnquiryBtn");
   if (!enquiryBtn) return;
 
   enquiryBtn.onclick = () => {
-    const selected = document.querySelectorAll(
-      ".bundle-tick:checked"
-    );
-
+    const selected = document.querySelectorAll(".bundle-tick:checked");
     const summary = document.getElementById("popupItemsSummary");
     const tally = document.getElementById("popupPriceTally");
+    const popup = document.getElementById("contactPopup");
 
     let total = 0;
     if (summary) summary.innerHTML = "";
@@ -172,33 +166,46 @@ function setupPopupLogic(sellerId) {
       const price = parseFloat(t.dataset.price || 0);
       total += price;
 
-      if (summary) {
-        summary.innerHTML += sellerIsPremium
-          ? `<div class="summary-item">
-              <span>${t.dataset.title}</span>
-              <span>£${price.toFixed(2)}</span>
-            </div>`
-          : `<p class="plain-item">• ${t.dataset.title}</p>`;
-      }
+      // ALWAYS show item titles
+      summary.innerHTML += `
+        <div class="summary-item">
+          <span>${t.dataset.title}</span>
+          ${
+            sellerIsPremium
+              ? `<span>£${price.toFixed(2)}</span>`
+              : ``
+          }
+        </div>
+      `;
     });
 
+    // ONLY business & seller+ see totals
     if (tally) {
       tally.style.display = sellerIsPremium ? "flex" : "none";
-      const totalEl = document.getElementById("totalPriceAmount");
-      if (totalEl)
-        totalEl.textContent = `£${total.toFixed(2)}`;
+      if (sellerIsPremium) {
+        document.getElementById("totalPriceAmount").textContent =
+          `£${total.toFixed(2)}`;
+      }
     }
 
-    const popup = document.getElementById("contactPopup");
-    if (popup) popup.style.display = "flex";
+    popup.style.display = "flex";
 
     const sendBtn = document.getElementById("popupSendBtn");
     if (sendBtn) {
       sendBtn.onclick = () => {
-        let msg = "Bundle Enquiry:\n";
+        let msg = "Bundle Enquiry:\n\n";
+
         selected.forEach(t => {
-          msg += `- ${t.dataset.title}\n`;
+          msg += `• ${t.dataset.title}`;
+          if (sellerIsPremium) {
+            msg += ` (£${parseFloat(t.dataset.price || 0).toFixed(2)})`;
+          }
+          msg += "\n";
         });
+
+        if (sellerIsPremium) {
+          msg += `\nTotal: £${total.toFixed(2)}`;
+        }
 
         sessionStorage.setItem("pendingMessage", msg);
         loadView("chat", { forceInit: true });
