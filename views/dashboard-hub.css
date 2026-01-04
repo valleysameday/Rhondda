@@ -76,84 +76,72 @@
 
 
 /* ============================================================
-   INBOX LIST
+   INBOX LIST (The Row)
 ============================================================ */
 #messagesContainer {
   max-width: 800px;
   margin: 20px auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   padding: 0 15px;
 }
 
 .message-card {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   background: #ffffff;
-  padding: 16px;
-  border-radius: 16px;
+  padding: 14px 18px;
+  border-radius: 12px;
   border: 1px solid #e2e8f0;
   cursor: pointer;
-  transition: background 0.15s ease, box-shadow 0.15s ease;
+  transition: all 0.2s ease;
 }
 
 .message-card:hover {
-  background: #f8fafc;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  background: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+  transform: translateY(-1px);
 }
 
 .message-avatar {
-  width: 42px;
-  height: 42px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  background: #e2e8f0;
+  background: #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
-  color: #475569;
+  font-size: 20px;
+  flex-shrink: 0;
 }
 
 .message-main {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  min-width: 0;
 }
 
 .message-from {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 15px;
   color: #0f172a;
+  margin-bottom: 2px;
 }
 
 .message-preview {
-  font-size: 14px;
+  font-size: 13.5px;
   color: #64748b;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.message-meta {
-  text-align: right;
-  flex-shrink: 0;
-}
-
 .message-time {
   font-size: 12px;
   color: #94a3b8;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 40px;
-  color: #8c8c8c;
-  font-style: italic;
-  background: #f9f9f9;
-  border-radius: 12px;
-  border: 2px dashed #e0e0e0;
+  flex-shrink: 0;
 }
 
 /* ============================================================
@@ -162,26 +150,35 @@
 .chat-window {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 140px);
+  height: 85vh; /* Locks height to screen for scrolling message area */
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
 }
 
 .chat-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px;
+  padding: 16px 20px;
   background: #ffffff;
   border-bottom: 1px solid #e2e8f0;
-  font-weight: 600;
-  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
 }
 
 .back-btn {
   background: none;
   border: none;
-  font-size: 20px;
+  font-size: 18px;
   cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
 }
+
+.back-btn:hover { background: #f1f5f9; }
 
 /* ============================================================
    CHAT MESSAGES
@@ -189,13 +186,13 @@
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
+  background: #f8fafc;
 }
 
-/* Sender name above bubble */
 .chat-message {
   display: flex;
   flex-direction: column;
@@ -204,101 +201,40 @@
 
 .chat-message.me {
   align-self: flex-end;
-  text-align: right;
 }
 
 .chat-message.them {
   align-self: flex-start;
-  text-align: left;
 }
 
 .chat-name {
-  font-size: 12px;
-  color: #94a3b8;
-  margin-bottom: 2px;
-}
-
-/* Bubble wrapper (for delete button alignment) */
-.chat-bubble-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* B1 bubble colours */
-.chat-bubble {
-  padding: 10px 14px;
-  border-radius: 14px;
-  font-size: 14px;
-  line-height: 1.4;
-  max-width: 100%;
-  word-break: break-word;
-}
-
-.chat-bubble.me {
-  background: #2563eb;
-  color: white;
-}
-
-.chat-bubble.them {
-  background: #e2e8f0;
-  color: #1e293b;
-}
-
-/* Delete button */
-.delete-msg-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  opacity: 0.5;
-}
-
-.delete-msg-btn:hover {
-  opacity: 1;
-}
-
-/* ============================================================
-   AD PREVIEW CARD (P1 — compact)
-============================================================ */
-.chat-ad-card {
-  display: flex;
-  gap: 12px;
-  background: #f8fafc;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  cursor: pointer;
-}
-
-.chat-ad-thumb {
-  width: 70px;
-  height: 70px;
-  border-radius: 8px;
-  object-fit: cover;
-}
-
-.chat-ad-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.chat-ad-title {
+  font-size: 11px;
   font-weight: 600;
-  font-size: 14px;
-  color: #0f172a;
+  color: #94a3b8;
+  margin-bottom: 4px;
+  margin-left: 4px;
+  text-transform: uppercase;
 }
 
-.chat-ad-price {
+/* BUBBLES */
+.chat-bubble {
+  padding: 12px 16px;
   font-size: 14px;
-  color: #2563eb;
-  margin-top: 2px;
+  line-height: 1.5;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
-.chat-ad-area {
-  font-size: 12px;
-  color: #64748b;
+.chat-message.me .chat-bubble {
+  background: #2563eb;
+  color: #ffffff;
+  border-radius: 18px 18px 2px 18px; /* Tail on bottom right */
+}
+
+.chat-message.them .chat-bubble {
+  background: #ffffff;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px 18px 18px 2px; /* Tail on bottom left */
 }
 
 /* ============================================================
@@ -306,42 +242,68 @@
 ============================================================ */
 .chat-input-bar {
   display: flex;
-  gap: 10px;
-  padding: 12px;
+  gap: 12px;
+  padding: 16px 20px;
   background: #ffffff;
   border-top: 1px solid #e2e8f0;
 }
 
 .chat-input-bar input {
   flex: 1;
-  padding: 10px 14px;
-  border-radius: 12px;
+  padding: 12px 18px;
+  border-radius: 25px;
   border: 1px solid #cbd5e1;
+  outline: none;
+  font-size: 14px;
+}
+
+.chat-input-bar input:focus {
+  border-color: #2563eb;
 }
 
 .chat-input-bar button {
-  padding: 10px 16px;
-  border-radius: 12px;
+  padding: 0 20px;
+  border-radius: 25px;
   background: #2563eb;
-  color: white;
+  color: #ffffff;
   border: none;
+  font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s;
+}
+
+.chat-input-bar button:hover {
+  background: #1d4ed8;
 }
 
 /* ============================================================
-   MOBILE
+   AD PREVIEW (Inside Chat)
 ============================================================ */
-@media (max-width: 480px) {
-  .message-card {
-    padding: 12px;
-  }
+.chat-ad-card {
+  display: flex;
+  gap: 12px;
+  background: #f1f5f9;
+  padding: 8px;
+  margin: 0 20px 10px 20px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
 
-  .chat-ad-thumb {
-    width: 60px;
-    height: 60px;
-  }
+.chat-ad-thumb {
+  width: 45px;
+  height: 45px;
+  border-radius: 6px;
+  object-fit: cover;
+}
 
-  .chat-message {
-    max-width: 85%;
-  }
+.chat-ad-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.chat-ad-price {
+  font-size: 13px;
+  color: #2563eb;
+  font-weight: 700;
 }
