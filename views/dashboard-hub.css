@@ -71,3 +71,11 @@
   .overview-grid { grid-template-columns: repeat(3, 1fr); }
   .modal-overlay { align-items: center; }
 }
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
