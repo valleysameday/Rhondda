@@ -105,44 +105,43 @@ function createToastContainer() {
 
   const toast = document.createElement("div");
   toast.id = "bundleToast";
-  toast.style.position = "fixed";
-  toast.style.bottom = "20px";
-  toast.style.right = "20px";
-  toast.style.width = "300px";
-  toast.style.maxHeight = "400px";
-  toast.style.overflowY = "auto";
-  toast.style.background = "#fff";
-  toast.style.border = "1px solid #ccc";
-  toast.style.borderRadius = "10px";
-  toast.style.boxShadow = "0 4px 10px rgba(0,0,0,0.2)";
-  toast.style.padding = "15px";
-  toast.style.display = "none";
-  toast.style.zIndex = "9999";
+  toast.className = "bundle-toast";
 
   toast.innerHTML = `
-    <h4 style="margin-top:0;">Bundle Selected</h4>
+    <h4>Bundle Selected</h4>
     <div id="toastItems"></div>
-    <div style="margin-top:10px; text-align:right;">
-      <button id="toastSendBtn" style="padding:6px 12px;">Send</button>
+    <textarea id="toastMessage" placeholder="Add a message..."></textarea>
+    <div class="toast-actions">
+      <button id="toastSendBtn">Send</button>
+      <button id="toastCancelBtn">Cancel</button>
     </div>
   `;
 
   document.body.appendChild(toast);
 
+  // Send button
   const sendBtn = document.getElementById("toastSendBtn");
   sendBtn.addEventListener("click", () => {
     const selected = document.querySelectorAll(".bundle-tick:checked");
     if (!selected.length) return;
 
+    const extraMsg = document.getElementById("toastMessage").value.trim();
     let msg = "Bundle Enquiry:\n\n";
     selected.forEach(t => {
       msg += `• ${t.dataset.title}`;
       if (sellerIsPremium) msg += ` (£${parseFloat(t.dataset.price).toFixed(2)})`;
       msg += "\n";
     });
+    if (extraMsg) msg += `\nMessage: ${extraMsg}`;
 
     sessionStorage.setItem("pendingMessage", msg);
     loadView("chat", { forceInit: true });
+  });
+
+  // Cancel button
+  const cancelBtn = document.getElementById("toastCancelBtn");
+  cancelBtn.addEventListener("click", () => {
+    toast.style.display = "none";
   });
 }
 
@@ -150,12 +149,14 @@ function updateToast() {
   const selected = document.querySelectorAll(".bundle-tick:checked");
   const toast = document.getElementById("bundleToast");
   const toastItems = document.getElementById("toastItems");
+  const toastMsg = document.getElementById("toastMessage");
 
-  if (!toast || !toastItems) return;
+  if (!toast || !toastItems || !toastMsg) return;
 
   if (!selected.length) {
     toast.style.display = "none";
     toastItems.innerHTML = "";
+    toastMsg.value = "";
     return;
   }
 
