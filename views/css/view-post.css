@@ -83,6 +83,21 @@ body {
   grid-row: span 2;
 }
 
+
+/* Allow clicks to pass through gallery overlays */
+.image-count,
+.gallery-actions {
+  pointer-events: none;
+}
+
+/* Re-enable clicks on actual buttons */
+.gallery-actions .action-btn {
+  pointer-events: auto;
+}
+.gallery-preview img {
+  cursor: pointer;
+  pointer-events: auto;
+}
 /* ---------- GALLERY OVERLAYS ---------- */
 .image-count {
   position: absolute;
