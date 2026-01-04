@@ -79,3 +79,12 @@
 .tab-content.active {
   display: block;
 }
+
+
+
+
+<!-- MESSAGES TAB -->
+    <div class="tab-content" data-tab="messages" style="display:none;">
+      <h1>Messages</h1>
+      <div id="messagesContainer"></div>
+    </div>
