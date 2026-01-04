@@ -4,8 +4,8 @@
 #feed {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  padding: 12px;
+  gap: 4px;        /* small gap between cards */
+  padding: 4px;    /* small padding so cards aren't literally glued to screen edges */
 }
 
 @media (min-width: 900px) {
@@ -13,9 +13,10 @@
     grid-template-columns: 1fr; /* List view on Desktop */
     max-width: 800px;
     margin: 0 auto;
+    padding: 12px;   /* restore normal padding on desktop */
+    gap: 12px;
   }
 }
-
 /* =====================================================
    BASE CARD
 ===================================================== */
