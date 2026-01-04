@@ -1,3 +1,5 @@
+// tabs.js
+
 export function switchTab(tab) {
   console.log("Switching to tab:", tab);
 
@@ -6,12 +8,14 @@ export function switchTab(tab) {
     btn.classList.toggle("active", btn.dataset.tab === tab);
   });
 
-  // Hide all tabs
+  // Hide all tab-content
   document.querySelectorAll(".tab-content").forEach(sec => {
     sec.classList.remove("active");
   });
 
-  // Show selected tab
+  // Show selected tab-content
   const target = document.querySelector(`.tab-content[data-tab="${tab}"]`);
-  if (target) target.classList.add("active");
+  if (target) {
+    target.classList.add("active");
+  }
 }
