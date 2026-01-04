@@ -73,3 +73,59 @@
 }
 
 .tab-content{display:none}.tab-content.active{display:block}.empty-state{padding:20px;background:#fff;border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,.08);font-size:14px;color:#475569;margin-top:10px}
+.settings-card {
+  background: #fff;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-top: 12px;
+}
+
+.settings-card h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  font-family: 'BricolageGrotesque', sans-serif;
+}
+
+.settings-row {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-row label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.settings-row input,
+.settings-row textarea {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 15px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.settings-row textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.settings-row.readonly span {
+  padding: 10px 0;
+  opacity: 0.8;
+}
+
+.primary-btn {
+  background: #2563eb;
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  width: 100%;
+  cursor: pointer;
+}
