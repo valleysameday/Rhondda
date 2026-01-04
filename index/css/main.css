@@ -1,27 +1,10 @@
-/* =====================================================
-   ROOT VARIABLES & FONTS
-===================================================== */
 :root {
-  --primary: #2563eb;
-  --bg: #f2f4f5;
+  --primary: #2563eb; /* fallback primary color */
+  --bg: #f9fafb;
   --text-main: #111827;
-  --text-muted: #64748b;
   --surface: #ffffff;
-  --radius: 14px;
-  
-  /* 2026 Readable Typography Scale */
-  --text-body: 16px;
-  --text-small: 14px;
-  --text-meta: 12px;
-  --text-title: 17px;
+  --radius: 12px;
 }
-
-@font-face {
-  font-family: 'Poppins';
-  src: url('/site/fonts/Poppins-Regular.woff2') format('woff2');
-  font-weight: 400;
-}
-
 /* =====================================================
    GLOBAL RESET
 ===================================================== */
@@ -29,16 +12,14 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    -webkit-tap-highlight-color: transparent;
 }
 
 body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text-main);
+    background: #f2f4f5;
+    color: #111;
     line-height: 1.5;
-    padding-bottom: 90px;
-    -webkit-font-smoothing: antialiased;
+    padding-bottom: 80px;
 }
 
 a { text-decoration: none; }
@@ -47,62 +28,82 @@ a { text-decoration: none; }
    HEADER
 ===================================================== */
 header {
-    background: #0000DD;
+    background: #00D;
     color: #fff;
     text-align: center;
-    padding: 18px 15px;
-    position: sticky;
-    top: 0;
-    z-index: 1100;
-    box-shadow: 0 4px 12px rgba(0, 0, 221, 0.2);
+    padding: 15px;
+    /* Deeper shadow for a "floating" glassmorphism effect */
+    box-shadow: 0 4px 12px rgba(255, 130, 71, 0.25);
 }
 
 header img.logo {
-    height: 48px;
-    filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.15));
+    height: 60px;
+    /* Subtle drop shadow to make the logo pop against the vibrant header */
+    filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.1));
 }
 
 /* =====================================================
-   WEATHER SNIPPET
+   WEATHER SNIPPET (2026 SLIM & MODERN)
 ===================================================== */
 .weather-snippet {
+    /* 2026 Transformative Teal: Organic and Digital mix */
     background: #008080; 
     color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    padding: 10px 24px; 
-    margin: 16px auto;
+    gap: 10px;
+    
+    /* Slimmer vertical padding (Reduced from 20px to 8px) */
+    padding: 8px 24px; 
+    margin: 12px auto;
+    
+    /* Modern 2026 Pill-shape (Increased from 12px) */
     border-radius: 50px; 
+    
+    /* Inset width makes it feel like a "floating" badge */
     width: fit-content;
     min-width: 280px;
+    
+    border: none;
     box-shadow: 0 4px 15px rgba(0, 128, 128, 0.2);
 }
 
-.weather-emoji { font-size: 1.6rem; }
-.weather-info { font-size: 1rem; font-weight: 600; letter-spacing: 0.5px; }
-
-/* =====================================================
-   GREETINGS & CATEGORIES
-===================================================== */
-.greeting-snippet {
-  margin: 12px 0;
-  padding: 0 16px;
+.weather-emoji {
+    /* Scaled down for a slimmer profile */
+    font-size: 1.6rem; 
 }
 
-.greeting-welsh { display: block; font-size: 1.3rem; font-weight: 700; color: #111; }
-.greeting-english { display: block; font-size: 1rem; color: var(--text-muted); }
+.weather-info {
+    /* Slightly smaller font to keep it on one line */
+    font-size: 1rem; 
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
 
+@media (min-width: 1024px) {
+    .weather-snippet { 
+        padding: 10px 32px; 
+        margin: 18px auto;
+    }
+    .weather-info { 
+        font-size: 1.1rem; 
+    }
+}
+
+
+/* =====================================================
+   CATEGORIES
+===================================================== */
 #categories {
     display: flex;
+    justify-content: flex-start;
     gap: 8px;
     margin: 20px 0;
     padding: 0 16px;
     overflow-x: auto;
     white-space: nowrap;
     scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
 }
 #categories::-webkit-scrollbar { display: none; }
 
@@ -113,11 +114,12 @@ header img.logo {
     border: 1px solid #d1d5db;
     border-radius: 25px;
     font-weight: 500;
-    font-size: var(--text-small);
+    font-size: 0.9rem;
+    cursor: pointer;
     transition: 0.2s;
     flex-shrink: 0;
 }
-
+.category-btn:hover { background: #f9fafb; }
 .category-btn.active {
     background: #FF7EB3;
     color: #fff;
@@ -126,104 +128,77 @@ header img.logo {
 }
 
 /* =====================================================
-   FEATURED ADS
-===================================================== */
-.featured-ads { margin: 16px 0; background: #f8f9fa; padding: 12px 0; }
-.featured-track {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding: 0 16px 12px;
-  scrollbar-width: none;
-}
-.featured-track::-webkit-scrollbar { display: none; }
-
-.featured-card {
-  flex: 0 0 calc(100% - 40px);
-  scroll-snap-align: center;
-  background: white;
-  border-radius: var(--radius);
-  padding: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-  border: 1px solid #eee;
-}
-
-.featured-card img {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-/* =====================================================
-   POSTS GRID
+   POSTS GRID — CLEAN & BALANCED
 ===================================================== */
 .posts-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
-    padding: 8px 16px;
+    margin: 0;
+    padding: 6px;
 }
 
-.feed-card {
-    background: #fff;
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    border: 1px solid #eee;
-    display: flex;
-    flex-direction: column;
-}
-
-.feed-title {
-    font-size: var(--text-title);
-    font-weight: 700;
-    padding: 10px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
 
 /* =====================================================
-   FIXED ACTION BAR & INDICATORS
+   FIXED ACTION BAR
 ===================================================== */
 .action-bar {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    z-index: 2000;
+    z-index: 1000;
     display: flex;
-    justify-content: space-around;
-    padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
+    justify-content: center;
+    gap: 30px;
+    padding: 14px 0;
+    /* Aquatic Awe: Vibrant, fresh, and modern for 2026 */
     background: #0f172a; 
     border-top: 1px solid rgba(255, 255, 255, 0.2);
+    /* Subtle glassmorphism effect trending for 2026 */
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 -4px 20px rgba(0, 210, 211, 0.15);
 }
 
 .action-link {
-    position: relative; /* REQUIRED for ribbon & status positioning */
     display: flex;
     flex-direction: column;
     align-items: center;
+    /* High contrast white for readability */
     color: #FFFFFF; 
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 600;
-    flex: 1;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.icon-wrap, .icon-badge-wrap, .icon-status-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 4px;
+.action-link:hover {
+    /* Electric Lavender highlight for attention */
+    color: #E0B1FF; 
+    transform: translateY(-4px);
 }
 
-/* STATUS INDICATORS */
+.icon-wrap { position: relative; }
+
+.free-ribbon {
+    position: absolute;
+    top: -8px;
+    right: -24px;
+    /* Neon Shock accent: Blazing Orange to grab instant attention */
+    background: #FF5F1F; 
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 6px;
+    border-radius: 6px;
+    transform: rotate(12deg);
+    box-shadow: 0 2px 8px rgba(255, 95, 31, 0.4);
+}
+
+.icon-badge-wrap {
+  position: relative;
+  display: inline-block;
+}
+
 .message-badge {
   position: absolute;
   top: -4px;
@@ -233,40 +208,155 @@ header img.logo {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  z-index: 5;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+/*=====================================================
+   FOOTER
+===================================================== */
+.site-footer {
+  background: #0f172a;
+  color: #e5e7eb;
+  padding: 32px 16px;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.4;
+}
+
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.footer-brand {
+  margin-bottom: 12px;
+}
+
+.footer-tagline {
+  font-size: 1rem;
+  color: #94a3b8;
+  display: block;
+  margin: 4px 0;
+}
+
+.footer-subline {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.footer-links {
+  margin: 12px 0;
+  font-size: 0.95rem;
+}
+
+.footer-links a {
+  color: #f97316; /* warm orange */
+  text-decoration: none;
+  margin: 0 6px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: #fb923c; /* lighter orange */
+  text-decoration: underline;
+}
+
+.footer-links span {
+  color: #64748b; /* separator color */
+}
+
+.footer-links a:active {
+  opacity: 0.7; /* subtle tap feedback */
+}
+
+.footer-copy {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-top: 10px;
+}
+
+/* ===== FEATURED ADS ===== */
+.featured-ads {
+  margin: 16px 0 8px;
+  background: #f8f9fa; /* Light contrast from the main background */
+  padding: 10px 0;
+}
+
+.featured-track {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 16px 12px; /* Extra bottom padding for card shadows */
+  
+  /* Hide scrollbar for Chrome/Safari */
+  scrollbar-width: none; 
+}
+
+.featured-track::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for IE/Edge */
+}
+
+/* THE INDIVIDUAL AD CARD */
+.featured-card {
+  flex: 0 0 calc(100% - 20px); /* Full width minus a small peek */
+  scroll-snap-align: start;
+  background: white;
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border: 1px solid #eee;
+}
+
+.featured-card img {
+  width: 100%;
+  height: 140px; /* Taller, more banner-like */
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+
+.greeting-snippet {
+  margin: 12px 0 6px;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 0 12px;
+}
+
+.greeting-welsh {
+  display: block;
+  color: #444;
+}
+
+.greeting-english {
+  display: block;
+  color: #000;
+}
+.icon-status-wrap {
+  position: relative;
+  display: inline-block;
 }
 
 .account-status-dot {
   position: absolute;
   top: -3px;
   right: -3px;
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
-  background: #ff0000;
-  border: 2px solid #0f172a;
-  z-index: 5;
+  background: red;
+  border: 2px solid #fff;
+  transition: background 0.25s ease, transform 0.25s ease;
 }
 
+/* Pulse when logged out */
 .account-status-dot.logged-out {
-  animation: pulseRed 1.5s infinite ease-in-out;
-}
-
-/* THE FREE RIBBON */
-.free-ribbon {
-    position: absolute;
-    top: -10px;
-    right: -20px;
-    background: #FF5F1F; 
-    color: #fff;
-    font-size: 9px;
-    font-weight: 800;
-    padding: 2px 6px;
-    border-radius: 4px;
-    transform: rotate(12deg);
-    box-shadow: 0 2px 8px rgba(255, 95, 31, 0.4);
-    z-index: 10;
-    pointer-events: none;
+  animation: pulseRed 2.5s infinite ease-in-out;
 }
 
 @keyframes pulseRed {
@@ -275,48 +365,116 @@ header img.logo {
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* =====================================================
-   LOADING & SKELETONS
-===================================================== */
 .skeleton-card {
   position: relative;
   overflow: hidden;
-  background: #e5e7eb;
-  border-radius: var(--radius);
+  background: #f0f0f0;
+  border-radius: 12px;
+  margin-bottom: 16px;
   height: 180px;
 }
 
 .skeleton-card::after {
   content: "";
   position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  top: 0;
+  left: -150px;
+  width: 150px;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.6) 50%,
+    rgba(255,255,255,0) 100%
+  );
   animation: shimmer 1.2s infinite;
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% { left: -150px; }
+  100% { left: 100%; }
 }
 
-/* =====================================================
-   FOOTER
-===================================================== */
-.site-footer {
-  background: #0f172a;
-  color: #e5e7eb;
-  padding: 40px 16px;
+.skeleton-img {
+  width: 100%;
+  height: 110px;
+  background: #e0e0e0;
+  border-radius: 12px 12px 0 0;
+}
+
+.skeleton-line {
+  height: 12px;
+  background: #e0e0e0;
+  margin: 8px 12px;
+  border-radius: 6px;
+}
+
+.skeleton-line.short {
+  width: 40%;
+}
+
+.loading-text {
   text-align: center;
-  font-family: 'Poppins', sans-serif;
+  color: #777;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #333;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 8px;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 9999;
+  font-size: 14px;
 }
 
-.footer-links a {
-  color: #f97316;
-  font-weight: 600;
+.toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
-.footer-copy {
-  font-size: 0.8rem;
-  color: #94a3b8;
-  margin-top: 15px;
+.toast.success { background: #28a745; }
+.toast.error { background: #dc3545; }
+.toast.info { background: #007bff; }
+
+
+/* Bottom loading shimmer */
+.feed-loading-more {
+  width: 100%;
+  padding: 20px 0;
+  text-align: center;
+  opacity: 0.7;
+  font-size: 0.9rem;
 }
+
+/* Animated shimmer bar */
+.feed-loading-more::after {
+  content: "";
+  display: block;
+  width: 60%;
+  height: 6px;
+  margin: 10px auto 0;
+  background: linear-gradient(90deg, #eee, #ddd, #eee);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* End of feed message */
+.feed-end {
+  text-align: center;
+  padding: 25px 0;
+  font-size: 0.9rem;
+  opacity: 0.6;
+      }
