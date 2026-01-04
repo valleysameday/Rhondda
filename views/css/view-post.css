@@ -4,17 +4,7 @@
    Full Edge-to-Edge Gallery & Responsive Layout
 ================================================= */
 
-:root {
-    --primary: #2563eb;
-    --primary-hover: #1d4ed8;
-    --bg: #f8fafc;
-    --text-main: #0f172a;
-    --text-muted: #64748b;
-    --glass: rgba(255, 255, 255, 0.8);
-    --glass-border: rgba(255, 255, 255, 0.3);
-    --shadow-premium: 0 10px 30px -5px rgba(0,0,0,0.1), 0 4px 12px -4px rgba(0,0,0,0.05);
-    --radius: 16px;
-}
+
 
 /* ---------------------------
    PAGE BASE STYLES
