@@ -439,3 +439,37 @@ body {
   .post-title { font-size: clamp(1.8rem, 4vw, 2.5rem); }
   .price-tag { font-size: 2rem; }
 }
+/* ============================================================
+   ACCOUNT TYPE BANNERS (Seller / Business)
+============================================================ */
+.account-banner {
+  margin: 16px auto;
+  padding: 14px 18px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  width: calc(100% - 32px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+/* Seller banner */
+.account-banner.seller {
+  background: #e0f2fe; /* light blue */
+  color: #0369a1;      /* deep blue */
+  border-left: 5px solid #0284c7;
+}
+
+/* Business banner */
+.account-banner.business {
+  background: #fef3c7; /* warm gold */
+  color: #b45309;      /* deep amber */
+  border-left: 5px solid #d97706;
+}
+
+.account-banner svg {
+  width: 20px;
+  height: 20px;
+}
