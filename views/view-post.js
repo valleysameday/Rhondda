@@ -46,7 +46,61 @@ export async function init({ db, auth }) {
 
     const post = postSnap.data();
     const priceText = post.price ? `£${post.price}` : "Contact for price";
+/* ============================================================
+   POST DETAILS (Condition, Delivery, Property, etc)
+============================================================ */
+const detailsBox = document.getElementById("viewDetails");
 
+if (detailsBox) {
+  detailsBox.innerHTML = "";
+
+  const addDetail = (label, value) => {
+    if (!value) return;
+    const div = document.createElement("div");
+    div.className = "detail-chip";
+    div.innerHTML = `
+      <span>${label}</span>
+      <strong>${value}</strong>
+    `;
+    detailsBox.appendChild(div);
+  };
+
+  // FOR SALE
+  if (post.category === "forsale") {
+    addDetail("Condition", post.condition);
+    addDetail("Delivery", post.delivery);
+  }
+
+  // PROPERTY
+  if (post.category === "property") {
+    addDetail("Type", post.propertyType);
+
+    if (post.rentFrequency) {
+      addDetail(
+        "Rent",
+        post.rentFrequency === "weekly" ? "Weekly" : "Monthly"
+      );
+    }
+
+    if (post.propertyFeatures?.length) {
+      addDetail("Features", post.propertyFeatures.join(", "));
+    }
+  }
+
+  // JOBS
+  if (post.category === "jobs") {
+    addDetail("Job Type", post.jobType);
+    addDetail("Salary", post.jobSalary);
+    addDetail("Experience", post.jobExperience);
+  }
+
+  // COMMUNITY
+  if (post.category === "community") {
+    addDetail("Category", post.communityType);
+    addDetail("Lost Location", post.lostLocation);
+    addDetail("Reward", post.lostReward);
+  }
+}
     const safeSetText = (id, text) => {
       const el = document.getElementById(id);
       if (el) el.textContent = text;
