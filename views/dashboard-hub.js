@@ -6,7 +6,7 @@ import { loadRecentAds } from "./dashboard/recent-ads.js";
 import { initModals, showUpgradeModal, hideUpgradeModal } from "./dashboard/modals.js";
 import { handleSubscription } from "./dashboard/subscription.js";
 import { switchTab as switchTabLogic } from "./dashboard/tabs.js";
-
+import { initSettingsModule, renderSettingsTab } from "./dashboard/settings.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let auth, db;
@@ -42,7 +42,9 @@ export async function init({ auth: a, db: d }) {
   initModals();
   wireButtons();
 
-  AI.speak("DASHBOARD_OPENED", { name: userData.name });
+initSettingsModule(auth, db);
+   
+   AI.speak("DASHBOARD_OPENED", { name: userData.name });
 
   console.log("🚀 dashboard-hub.js init() END");
 }
@@ -141,7 +143,11 @@ function switchTab(tab) {
   const target = document.querySelector(`.tab-content[data-tab="${tab}"]`);
   if (target) target.style.display = "block";
 
-  const titleMap = {
+if (tab === "settings") {
+  renderSettingsTab();
+}
+   
+   const titleMap = {
     "overview": "Overview",
     "my-ads": "My Ads",
     "payments": "Payments",
