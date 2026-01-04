@@ -1,20 +1,25 @@
 /* =====================================================
-   ROOT VARIABLES
+   ROOT VARIABLES & FONTS
 ===================================================== */
 :root {
   --primary: #2563eb;
   --bg: #f2f4f5;
   --text-main: #111827;
-  --text-muted: #6b7280;
+  --text-muted: #64748b;
   --surface: #ffffff;
-  --radius: 12px;
+  --radius: 14px;
   
-  /* 2026 Readable Scale */
+  /* 2026 Readable Typography Scale */
   --text-body: 16px;
   --text-small: 14px;
   --text-meta: 12px;
   --text-title: 17px;
-  --text-h1: 28px;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('/site/fonts/Poppins-Regular.woff2') format('woff2');
+  font-weight: 400;
 }
 
 /* =====================================================
@@ -31,26 +36,25 @@ body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     background: var(--bg);
     color: var(--text-main);
-    line-height: 1.6;
-    font-size: var(--text-body);
-    padding-bottom: 90px; /* Increased for better action bar clearance */
+    line-height: 1.5;
+    padding-bottom: 90px;
     -webkit-font-smoothing: antialiased;
 }
 
-a { text-decoration: none; color: inherit; }
+a { text-decoration: none; }
 
 /* =====================================================
    HEADER
 ===================================================== */
 header {
-    background: #0000DD; /* 2026 Electric Blue */
+    background: #0000DD;
     color: #fff;
     text-align: center;
     padding: 18px 15px;
     position: sticky;
     top: 0;
-    z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0, 0, 221, 0.15);
+    z-index: 1100;
+    box-shadow: 0 4px 12px rgba(0, 0, 221, 0.2);
 }
 
 header img.logo {
@@ -73,47 +77,28 @@ header img.logo {
     border-radius: 50px; 
     width: fit-content;
     min-width: 280px;
-    box-shadow: 0 8px 20px rgba(0, 128, 128, 0.15);
+    box-shadow: 0 4px 15px rgba(0, 128, 128, 0.2);
 }
 
-.weather-emoji { font-size: 1.5rem; }
-.weather-info { 
-    font-size: 1rem; 
-    font-weight: 600;
-    letter-spacing: 0.3px;
-}
+.weather-emoji { font-size: 1.6rem; }
+.weather-info { font-size: 1rem; font-weight: 600; letter-spacing: 0.5px; }
 
 /* =====================================================
-   GREETINGS
+   GREETINGS & CATEGORIES
 ===================================================== */
 .greeting-snippet {
-  margin: 20px 0 8px;
+  margin: 12px 0;
   padding: 0 16px;
 }
 
-.greeting-welsh {
-  display: block;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--text-main);
-  letter-spacing: -0.02em;
-}
+.greeting-welsh { display: block; font-size: 1.3rem; font-weight: 700; color: #111; }
+.greeting-english { display: block; font-size: 1rem; color: var(--text-muted); }
 
-.greeting-english {
-  display: block;
-  font-size: 0.95rem;
-  color: var(--text-muted);
-  margin-top: 2px;
-}
-
-/* =====================================================
-   CATEGORIES (Preserved Scroll)
-===================================================== */
 #categories {
     display: flex;
-    gap: 10px;
-    margin: 16px 0;
-    padding: 4px 16px;
+    gap: 8px;
+    margin: 20px 0;
+    padding: 0 16px;
     overflow-x: auto;
     white-space: nowrap;
     scrollbar-width: none;
@@ -122,14 +107,14 @@ header img.logo {
 #categories::-webkit-scrollbar { display: none; }
 
 .category-btn {
-    padding: 10px 22px;
-    background: var(--surface);
-    color: var(--text-main);
-    border: 1px solid #e5e7eb;
-    border-radius: 100px;
-    font-weight: 600;
+    padding: 10px 20px;
+    background: #fff;
+    color: #444;
+    border: 1px solid #d1d5db;
+    border-radius: 25px;
+    font-weight: 500;
     font-size: var(--text-small);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: 0.2s;
     flex-shrink: 0;
 }
 
@@ -137,43 +122,38 @@ header img.logo {
     background: #FF7EB3;
     color: #fff;
     border-color: #FF7EB3;
-    box-shadow: 0 4px 12px rgba(255,126,179,0.35);
-    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(255,126,179,0.3);
 }
 
 /* =====================================================
-   FEATURED ADS (Preserved Scroll)
+   FEATURED ADS
 ===================================================== */
-.featured-ads {
-  margin: 16px 0;
-  padding-bottom: 8px;
-}
-
+.featured-ads { margin: 16px 0; background: #f8f9fa; padding: 12px 0; }
 .featured-track {
   display: flex;
-  gap: 14px;
+  gap: 12px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  padding: 0 16px;
+  padding: 0 16px 12px;
   scrollbar-width: none;
 }
 .featured-track::-webkit-scrollbar { display: none; }
 
 .featured-card {
-  flex: 0 0 85%;
+  flex: 0 0 calc(100% - 40px);
   scroll-snap-align: center;
   background: white;
   border-radius: var(--radius);
   padding: 10px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
   border: 1px solid #eee;
 }
 
 .featured-card img {
   width: 100%;
-  height: 160px;
+  height: 150px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 /* =====================================================
@@ -182,26 +162,24 @@ header img.logo {
 .posts-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-    padding: 0 16px;
+    gap: 12px;
+    padding: 8px 16px;
 }
 
-/* Card Readability Fixes */
 .feed-card {
-    background: var(--surface);
+    background: #fff;
     border-radius: var(--radius);
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .feed-title {
     font-size: var(--text-title);
     font-weight: 700;
-    line-height: 1.3;
-    margin: 10px;
-    /* Limit height for grid balance */
+    padding: 10px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -209,91 +187,111 @@ header img.logo {
 }
 
 /* =====================================================
-   FIXED ACTION BAR
+   FIXED ACTION BAR & INDICATORS
 ===================================================== */
 .action-bar {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    z-index: 1000;
+    z-index: 2000;
     display: flex;
     justify-content: space-around;
     padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
-    background: rgba(15, 23, 42, 0.95); 
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    background: #0f172a; 
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .action-link {
-    flex: 1;
+    position: relative; /* REQUIRED for ribbon & status positioning */
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: #94a3b8; 
+    color: #FFFFFF; 
     font-size: 11px;
     font-weight: 600;
-    transition: 0.2s;
+    flex: 1;
 }
 
-.action-link:hover, .action-link.active {
-    color: #FFFFFF; 
+.icon-wrap, .icon-badge-wrap, .icon-status-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
 }
 
-.free-ribbon {
-    position: absolute;
-    top: -12px;
-    right: -18px;
-    background: #FF5F1F; 
-    color: #fff;
-    font-size: 9px;
-    padding: 2px 6px;
-    border-radius: 4px;
-    box-shadow: 0 2px 6px rgba(255, 95, 31, 0.3);
-}
-
-/* =====================================================
-   STATUS INDICATORS
-===================================================== */
-.account-status-dot {
+/* STATUS INDICATORS */
+.message-badge {
   position: absolute;
-  top: -2px;
-  right: -2px;
+  top: -4px;
+  right: -4px;
+  background: #ff3b30;
+  color: #fff;
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #ef4444;
-  border: 2px solid #0f172a;
+  z-index: 5;
 }
 
-.message-badge {
+.account-status-dot {
   position: absolute;
-  top: -5px;
-  right: -5px;
-  background: #ff3b30;
-  width: 8px;
-  height: 8px;
+  top: -3px;
+  right: -3px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
+  background: #ff0000;
+  border: 2px solid #0f172a;
+  z-index: 5;
+}
+
+.account-status-dot.logged-out {
+  animation: pulseRed 1.5s infinite ease-in-out;
+}
+
+/* THE FREE RIBBON */
+.free-ribbon {
+    position: absolute;
+    top: -10px;
+    right: -20px;
+    background: #FF5F1F; 
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transform: rotate(12deg);
+    box-shadow: 0 2px 8px rgba(255, 95, 31, 0.4);
+    z-index: 10;
+    pointer-events: none;
+}
+
+@keyframes pulseRed {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 /* =====================================================
    LOADING & SKELETONS
-==================================================== */
+===================================================== */
 .skeleton-card {
+  position: relative;
+  overflow: hidden;
   background: #e5e7eb;
   border-radius: var(--radius);
   height: 180px;
-  position: relative;
-  overflow: hidden;
 }
 
 .skeleton-card::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-  animation: shimmer 1.5s infinite;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  animation: shimmer 1.2s infinite;
 }
 
 @keyframes shimmer {
@@ -306,15 +304,19 @@ header img.logo {
 ===================================================== */
 .site-footer {
   background: #0f172a;
-  color: #94a3b8;
-  padding: 48px 20px;
+  color: #e5e7eb;
+  padding: 40px 16px;
   text-align: center;
+  font-family: 'Poppins', sans-serif;
 }
 
 .footer-links a {
   color: #f97316;
   font-weight: 600;
-  transition: opacity 0.2s;
 }
 
-.footer-links a:active { opacity: 0.6; }
+.footer-copy {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 15px;
+}
