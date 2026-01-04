@@ -388,3 +388,30 @@
     z-index: 10002;
     pointer-events: auto;
 }
+
+
+.post-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.detail-chip {
+  background: #f1f5f9;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+}
+
+.detail-chip span {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #64748b;
+}
+
+.detail-chip strong {
+  color: #0f172a;
+}
