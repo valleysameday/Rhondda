@@ -442,3 +442,39 @@ header img.logo {
 .toast.success { background: #28a745; }
 .toast.error { background: #dc3545; }
 .toast.info { background: #007bff; }
+
+
+/* Bottom loading shimmer */
+.feed-loading-more {
+  width: 100%;
+  padding: 20px 0;
+  text-align: center;
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+/* Animated shimmer bar */
+.feed-loading-more::after {
+  content: "";
+  display: block;
+  width: 60%;
+  height: 6px;
+  margin: 10px auto 0;
+  background: linear-gradient(90deg, #eee, #ddd, #eee);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* End of feed message */
+.feed-end {
+  text-align: center;
+  padding: 25px 0;
+  font-size: 0.9rem;
+  opacity: 0.6;
+}
