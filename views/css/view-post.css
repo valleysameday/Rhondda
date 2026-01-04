@@ -211,7 +211,7 @@
 /* DESCRIPTION CARD */
 .content-card {
     background: #fff;
-    padding: 16px 20px;
+    padding: 24px 28px;
     border-radius: var(--radius);
     border: 1px solid #e2e8f0;
     box-shadow: var(--shadow-premium);
@@ -223,7 +223,9 @@
 
 .description-text {
     color: var(--text-main);
-    line-height: 1.5;
+    line-height: 1.7;
+   letter-spacing: 0.2px;
+   font-size: 1rem;
 }
 
 /* CONTACT & SAFETY */
