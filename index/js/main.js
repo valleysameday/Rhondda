@@ -14,8 +14,10 @@ import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-
 
 let auth, db, storage;
 
-
-function timeAgo(timestamp) {
+/* =====================================================
+   GLOBAL TIME FORMATTER (Used everywhere)
+===================================================== */
+window.timeAgo = function(timestamp) {
   if (!timestamp) return "";
 
   const now = Date.now();
@@ -33,22 +35,20 @@ function timeAgo(timestamp) {
   if (hours < 24) return `${hours} hours ago`;
   if (days === 1) return "Yesterday";
   return `${days} days ago`;
-}
+};
+
 /* =====================================================
    SPA VIEW LOADER (FIXED)
 ===================================================== */
 export async function loadView(view, options = {}) {
 
-  // Prevent duplicate loads
   if (window.currentView === view && !options.forceInit) return;
   window.currentView = view;
 
   const app = document.getElementById("app");
   if (!app) return console.log("❌ #app missing");
 
-  /* =====================================================
-     HARD FIX: Remove ALL old dashboard containers
-  ====================================================== */
+  // Remove old dashboard containers
   if (view === "dashboard-hub") {
     document.querySelectorAll('[id^="view-dashboard"]').forEach(el => {
       if (el.id !== "view-dashboard-hub") el.remove();
@@ -68,9 +68,7 @@ export async function loadView(view, options = {}) {
     app.appendChild(target);
   }
 
-  /* =====================================================
-     FORCE dashboard-hub to ALWAYS reload fresh
-  ====================================================== */
+  // Force dashboard-hub to reload fresh
   if (view === "dashboard-hub") {
     delete target.dataset.loaded;
   }
@@ -207,7 +205,7 @@ getFirebase().then(async fb => {
       loadView("chat-list");
     });
 
-    // Account button → ALWAYS unified dashboard
+    // Account button → unified dashboard
     document.getElementById("openAccountModal")?.addEventListener("click", e => {
       e.preventDefault();
 
