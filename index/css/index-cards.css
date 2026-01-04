@@ -42,7 +42,7 @@
 ===================================================== */
 .feed-image {
   width: 100%;
-  aspect-ratio: 4 / 3; /* Keeps cards compact and uniform */
+  aspect-ratio: 16 / 9; /* Keeps cards compact and uniform */
   background: #f3f4f6;
   position: relative;
   overflow: hidden;
