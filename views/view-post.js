@@ -56,7 +56,7 @@ export async function init({ db, auth }) {
     safeSetText("viewDescription", post.description || post.teaser || "No description provided.");
     safeSetText("viewCategory", post.category || "General");
     safeSetText("viewArea", post.area || "Rhondda");
-    safeSetText("viewTime", post.posted || "Just now");
+    safeSetText("viewTime", timeAgo(post.createdAt));
     safeSetText("viewPriceMobile", priceText);
 
     /* ============================================================
