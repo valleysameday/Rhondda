@@ -6,7 +6,7 @@ import { loadRecentAds } from "./dashboard/recent-ads.js";
 import { initModals, showUpgradeModal, hideUpgradeModal } from "./dashboard/modals.js";
 import { handleSubscription } from "./dashboard/subscription.js";
 import { switchTab as switchTabLogic } from "./dashboard/tabs.js";
-
+import { renderMessages } from "./messages/renderMessages.js";
 import { AI } from "/index/js/ai/assistant.js";
 
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -148,7 +148,16 @@ export async function renderDashboard() {
     console.error("❌ loadRecentAds() FAILED:", e);
   }
 
-  console.log("🔥 renderDashboard() END");
+
+   
+ try {
+  console.log("➡ renderMessages()");
+  await renderMessages(auth, db);
+} catch (e) {
+  console.error("❌ renderMessages FAILED:", e);
+ }  
+   
+   console.log("🔥 renderDashboard() END");
 }
 
 /* =====================================================
