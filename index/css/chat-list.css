@@ -2,146 +2,113 @@
    CHAT LIST CONTAINER
 ========================= */
 .chatlist-container {
-  padding: 1rem;
+  padding: 1.5rem 1rem;
   max-width: 600px;
   margin: 0 auto;
   font-family: 'Poppins', sans-serif;
-  background: #f9fafb;
+  background: #fcfdfe;
 }
 
-/* =========================
-   HEADER
-========================= */
 .chatlist-header {
-  padding: 0.5rem 0 1rem;
-  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1.2rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .chatlist-header h2 {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #111827;
-}
-
-/* =========================
-   CHAT ITEMS
-========================= */
-.chatlist-items {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
 }
 
 /* =========================
    INDIVIDUAL ITEM
 ========================= */
+.chatlist-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .chatlist-item {
   display: flex;
   align-items: center;
-  background: #fff;
-  padding: 0.8rem;
-  border-radius: 14px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
 
 .chatlist-item:hover {
-  background: #f3f4f6;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+  background: #ffffff;
+  border-color: #2563eb;
+  transform: scale(1.01);
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.04);
 }
 
-.chat-back-btn {
-  background: none;
-  border: none;
-  font-size: 1.6rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-right: 10px;
-  color: #1e293b;
-  padding: 4px 8px;
-  border-radius: 8px;
-  transition: background 0.2s ease;
-}
-
-.chat-back-btn:hover {
-  background: #f1f5f9;
-}
-/* =========================
-   AVATAR
-========================= */
 .chatlist-avatar {
-  width: 50px;
-  height: 50px;
-  background: #d1d5db;
+  width: 56px;
+  height: 56px;
+  background: #f1f5f9;
   border-radius: 50%;
-  margin-right: 0.8rem;
+  margin-right: 1rem;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #111827;
+  color: #1e293b;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  border: 1px solid #e2e8f0;
 }
 
-/* =========================
-   INFO
-========================= */
 .chatlist-info {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  min-width: 0;
 }
 
 .chatlist-info h3 {
-  margin: 0;
+  margin: 0 0 2px 0;
   font-size: 1rem;
-  font-weight: 600;
-  color: #111827;
+  font-weight: 700;
+  color: #0f172a;
 }
 
 .chatlist-info p {
   margin: 0;
-  font-size: 0.85rem;
-  color: #4b5563;
+  font-size: 0.9rem;
+  color: #64748b;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 /* =========================
-   UNREAD INDICATOR
+   INDICATORS
 ========================= */
 .chatlist-unread {
-  width: 12px;
-  height: 12px;
-  background: #ef4444;
+  width: 10px;
+  height: 10px;
+  background: #2563eb;
   border-radius: 50%;
-  margin-left: auto;
+  margin-left: 12px;
   flex-shrink: 0;
-  animation: pulse 1.5s infinite;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.3); opacity: 0.7; }
-}
-
-/* =========================
-   EMPTY STATE
-========================= */
 .chatlist-empty {
   text-align: center;
-  color: #6b7280;
-  padding: 2rem 0;
-  font-size: 0.95rem;
-}
-.chatlist-info p strong {
-  color: #111827;
-  font-weight: 600;
+  padding: 3rem 1rem;
+  background: #f8fafc;
+  border-radius: 20px;
+  border: 2px dashed #e2e8f0;
+  color: #94a3b8;
 }
