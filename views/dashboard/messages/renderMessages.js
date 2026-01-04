@@ -7,7 +7,8 @@ import {
   collection, 
   query, 
   orderBy, 
-  getDocs 
+  getDocs,
+  deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 export async function renderMessages(auth, db) {
@@ -63,7 +64,6 @@ export async function renderMessages(auth, db) {
     card.addEventListener("click", () => {
       const convoId = card.dataset.convo;
 
-      // Hide inbox, show chat window
       document.getElementById("messagesContainer").style.display = "none";
       document.getElementById("chatWindow").style.display = "flex";
 
@@ -71,7 +71,7 @@ export async function renderMessages(auth, db) {
     });
   });
 
-  // 3️⃣ Back button (wired once)
+  // 3️⃣ Back button
   const backBtn = document.getElementById("backToInbox");
   if (backBtn) {
     backBtn.onclick = () => {
@@ -108,26 +108,30 @@ async function loadChat(convoId, auth, db) {
   }
 
   // 4️⃣ Load the ad being discussed
-  let adTitle = "Listing";
-  if (convo.postId) {
-    try {
-      const adSnap = await getDoc(doc(db, "posts", convo.postId));
-      if (adSnap.exists()) {
-        const ad = adSnap.data();
-        adTitle = ad.title || "Listing";
-      }
-    } catch (e) {
-      console.warn("Failed to load ad:", e);
+  let ad = null;
+  try {
+    const adSnap = await getDoc(doc(db, "posts", convo.postId));
+    if (adSnap.exists()) {
+      ad = adSnap.data();
     }
+  } catch (e) {
+    console.warn("Failed to load ad:", e);
   }
 
-  // 5️⃣ Insert ad info at top of chat
-  const adCard = `
-    <div class="chat-ad-card">
-      <div class="chat-ad-title">${truncate(adTitle, 40)}</div>
-    </div>
-  `;
-  chatBox.innerHTML = adCard;
+  // 5️⃣ Insert ad preview card
+  if (ad) {
+    const adCard = `
+      <div class="chat-ad-card" onclick="window.open('/post.html?id=${convo.postId}', '_blank')">
+        <img src="${ad.imageUrl}" class="chat-ad-thumb" />
+        <div class="chat-ad-info">
+          <div class="chat-ad-title">${truncate(ad.title, 40)}</div>
+          <div class="chat-ad-price">£${ad.price}</div>
+          <div class="chat-ad-area">${ad.area || ""}</div>
+        </div>
+      </div>
+    `;
+    chatBox.innerHTML = adCard;
+  }
 
   // 6️⃣ Load messages
   const messagesRef = collection(db, "conversations", convoId, "messages");
@@ -135,8 +139,9 @@ async function loadChat(convoId, auth, db) {
 
   const snap = await getDocs(q);
 
-  snap.forEach(doc => {
-    const msg = doc.data();
+  snap.forEach(docSnap => {
+    const msg = docSnap.data();
+    const msgId = docSnap.id;
     const isMe = msg.senderId === auth.currentUser.uid;
 
     const senderName = isMe ? "You" : otherName;
@@ -144,15 +149,36 @@ async function loadChat(convoId, auth, db) {
     chatBox.innerHTML += `
       <div class="chat-message ${isMe ? "me" : "them"}">
         <div class="chat-name">${senderName}</div>
-        <div class="chat-bubble ${isMe ? "me" : "them"}">
-          ${msg.text}
+
+        <div class="chat-bubble-wrapper">
+          <div class="chat-bubble ${isMe ? "me" : "them"}">
+            ${msg.text}
+          </div>
+
+          ${isMe ? `
+            <button class="delete-msg-btn" data-id="${msgId}" data-convo="${convoId}">
+              🗑️
+            </button>
+          ` : ""}
         </div>
       </div>
     `;
   });
 
-  // 7️⃣ Auto-scroll to bottom
+  // 7️⃣ Auto-scroll
   chatBox.scrollTop = chatBox.scrollHeight;
+
+  // 8️⃣ Attach delete handlers
+  document.querySelectorAll(".delete-msg-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const msgId = btn.dataset.id;
+      const convoId = btn.dataset.convo;
+
+      await deleteDoc(doc(db, "conversations", convoId, "messages", msgId));
+
+      loadChat(convoId, auth, db); // refresh chat
+    });
+  });
 }
 
 /* ============================================================
