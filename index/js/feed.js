@@ -153,7 +153,7 @@ export async function initFeed({ db }, options = {}) {
 
     // Sponsored business card (only on first load)
     if (initial) {
-      posts.unshift({
+      posts.push({
         id: "featured-biz",
         title: "Rhondda Pro Cleaning Services",
         teaser: "Professional home & end-of-tenancy cleaning. Trusted local business.",
