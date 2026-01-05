@@ -29,6 +29,7 @@ export async function init({ auth: a, db: d }) {
   setText("sellerName", user.name || user.displayName || "User");
   setText("streakCount", user.loginStreak || 0);
   setText("sellerBio", user.bio || "This user hasn't added a bio yet.");
+
   if (user.joined?.toDate) {
     setText("sellerReliability", `Member since ${user.joined.toDate().getFullYear()}`);
   }
@@ -119,7 +120,7 @@ function createToastContainer() {
 
   document.body.appendChild(toast);
 
-  // Send button
+  // ⭐ FIXED: Send button no longer jumps to chat
   const sendBtn = document.getElementById("toastSendBtn");
   sendBtn.addEventListener("click", () => {
     const selected = document.querySelectorAll(".bundle-tick:checked");
@@ -127,15 +128,23 @@ function createToastContainer() {
 
     const extraMsg = document.getElementById("toastMessage").value.trim();
     let msg = "Bundle Enquiry:\n\n";
+
     selected.forEach(t => {
       msg += `• ${t.dataset.title}`;
       if (sellerIsPremium) msg += ` (£${parseFloat(t.dataset.price).toFixed(2)})`;
       msg += "\n";
     });
+
     if (extraMsg) msg += `\nMessage: ${extraMsg}`;
 
+    // Save message for chat page
     sessionStorage.setItem("pendingMessage", msg);
-    loadView("chat", { forceInit: true });
+
+    // Close toast
+    toast.style.display = "none";
+
+    // Show confirmation
+    showBundleConfirmation();
   });
 
   // Cancel button
@@ -143,6 +152,16 @@ function createToastContainer() {
   cancelBtn.addEventListener("click", () => {
     toast.style.display = "none";
   });
+}
+
+/* -------------------- Confirmation Toast -------------------- */
+function showBundleConfirmation() {
+  const div = document.createElement("div");
+  div.className = "bundle-confirm";
+  div.textContent = "Bundle message saved. Open chat to send.";
+  document.body.appendChild(div);
+
+  setTimeout(() => div.remove(), 2500);
 }
 
 function updateToast() {
