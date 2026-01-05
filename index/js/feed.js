@@ -23,6 +23,8 @@ let currentCategory = "all";
 const savedPosts = new Set();
 
 export async function initFeed({ db }, options = {}) {
+  console.log("🏠 Home view init");
+
   const postsContainer = document.getElementById('feed');
   const categoryBtns = document.querySelectorAll('.category-btn');
   const businessCheckbox = document.getElementById('isBusinessAccount');
@@ -189,7 +191,7 @@ export async function initFeed({ db }, options = {}) {
   }
 
   /* ============================================================
-     RENDER POSTS (supports append + saved hearts)
+     RENDER POSTS
   ============================================================ */
   function renderPosts(posts, category = 'all', options = {}) {
     if (!options.append) {
@@ -234,7 +236,7 @@ export async function initFeed({ db }, options = {}) {
       `;
 
       // -----------------------------
-      // CARD CLICK (load post) FIXED
+      // CARD CLICK
       // -----------------------------
       card.addEventListener('click', e => {
         if (
@@ -271,7 +273,7 @@ export async function initFeed({ db }, options = {}) {
     const btn = e.target.closest(".save-heart");
     if (!btn) return;
 
-    e.stopPropagation(); // prevent card click
+    e.stopPropagation();
 
     const postId = btn.dataset.id;
     const uid = window.currentUser?.uid;
@@ -343,36 +345,32 @@ export async function initFeed({ db }, options = {}) {
   });
 
   /* ============================================================
-     INITIAL LOAD
+     INITIAL LOAD (FIXED)
   ============================================================ */
   showSkeletons();
 
   const posts = await fetchPosts(true);
 
-  const savedCategory = sessionStorage.getItem("feedCategory");
-  if (savedCategory) {
-    currentCategory = savedCategory;
-    const btn = document.querySelector(`.category-btn[data-category="${savedCategory}"]`);
-    if (btn) {
-      categoryBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderPosts(posts, savedCategory);
-    } else {
-      renderPosts(posts);
-    }
-  } else {
-    renderPosts(posts);
-  }
+  // Always load ALL posts when returning to feed
+  currentCategory = "all";
+
+  // Reset category button UI
+  categoryBtns.forEach(b => b.classList.remove('active'));
+  document.querySelector('.category-btn[data-category="all"]')?.classList.add('active');
+
+  // Render ALL posts
+  renderPosts(posts, "all");
 
   // Load greeting, weather, and featured ads
   if (window.loadGreeting) window.loadGreeting();
   if (window.loadWeather) window.loadWeather();
   initFeaturedAds();
 
+  // Restore scroll
   const savedScroll = sessionStorage.getItem("feedScroll");
   if (savedScroll) {
     setTimeout(() => {
       window.scrollTo(0, parseInt(savedScroll));
     }, 50);
   }
-  }
+}
