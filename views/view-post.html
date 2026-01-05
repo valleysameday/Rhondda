@@ -1,100 +1,94 @@
-<div id="view-post" class="view-post-page">
-  <!-- 1. NAVIGATION LAYER -->
-  <div class="top-nav-bar">
-    <div class="view-post-container">
-      <button id="backToFeed" class="back-btn">
-        ← Back to Feed
-      </button>
-    </div>
+<div class="post-container">
+
+  <!-- ========================= -->
+  <!-- AD CONTENT -->
+  <!-- ========================= -->
+  <div class="post-images">
+    <img id="postImage" src="/img/placeholder.png">
   </div>
 
-  <!-- 2. FULL-WIDTH HERO SECTION (Breakout Gallery) -->
-  <div class="gallery-wrapper">
-    <div class="gallery-preview" id="galleryPreview">
-      <!-- JS Injects: 1 Large Left, 2 Stacked Right -->
+  <h1 id="postTitle"></h1>
+  <div class="post-price" id="postPrice"></div>
+  <p id="postDescription"></p>
+
+  <button class="message-btn">Message Seller</button>
+
+
+  <!-- ========================= -->
+  <!-- SELLER CARD -->
+  <!-- ========================= -->
+  <section class="seller-card">
+
+    <div class="seller-card-header" id="sellerCardHeader">
+      <!-- Auto-filled: About This Seller / Business -->
     </div>
 
-    <!-- Floating Action Overlays -->
-    <div class="image-count" id="imageCount"></div>
-    
-    <div class="gallery-actions">
-      <!-- Save Button -->
-      <button id="savePostBtn" class="action-btn save-btn">
-        <svg class="icon" viewBox="0 0 24 24">
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-        </svg>
-        <span>Save</span>
-      </button>
+    <div class="seller-card-body">
 
-      <!-- Share Button -->
-      <button id="sharePostBtn" class="action-btn share-btn">
-        <svg class="icon" viewBox="0 0 24 24">
-          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-          <polyline points="16 6 12 2 8 6" />
-          <line x1="12" y1="2" x2="12" y2="15" />
-        </svg>
-        <span>Share</span>
-      </button>
-    </div>
-  </div>
-<div id="accountBanner" class="account-banner" hidden></div>
-  <!-- 3. MAIN CONTENT SECTION -->
-  <div class="view-post-container">
-    <section class="details-section">
-      
-      <div class="meta-header">
-        <span id="viewCategory" class="badge-pill"></span>
-        <span id="viewTime" class="time-ago"></span>
-      </div>
+      <div class="seller-top">
+        <div id="sellerAvatar" class="seller-avatar"></div>
 
-      <h1 id="viewTitle" class="post-title">Loading...</h1>
-      <div class="price-group">
-        <span id="viewPriceMobile" class="price-tag"></span>
-        <div class="location-tag">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1118 0z"></path>
-            <circle cx="12" cy="10" r="3"></circle>
-          </svg>
-          <span id="viewArea"></span>
+        <div class="seller-info">
+          <div id="sellerName" class="seller-name"></div>
+          <span id="sellerRibbon" class="business-ribbon">Business</span>
         </div>
       </div>
-      <!-- CONTACT & SAFETY BLOCK -->
-      <div class="contact-box">
-        <p class="safety-note">Never pay before seeing the item</p>
-        
-        <button id="messageSeller" class="primary-btn message-btn">
-          Message Seller
-        </button>
-    </div>
-      <div id="memberSince" class="member-since"></div>
-<section id="viewDetails" class="post-details"></section>
-      <div class="content-card">
-        <h3>Description</h3>
-        <p id="viewDescription" class="description-text"></p>
+
+      <p id="sellerBio" class="seller-bio"></p>
+
+      <div class="seller-details">
+        <div><strong>📍 Area:</strong> <span id="sellerArea"></span></div>
+
+        <div id="sellerWebsiteWrapper">
+          <strong>🌐 Website:</strong>
+          <a id="sellerWebsite" href="#" target="_blank"></a>
+        </div>
+
+        <div id="sellerPhoneWrapper">
+          <strong>📞 Phone:</strong>
+          <span id="bizPhoneMasked"></span>
+          <button id="revealBizPhoneBtn" class="reveal-btn">Tap to Reveal</button>
+        </div>
       </div>
 
-      <!-- SELLER ACTIONS -->
-      <div class="seller-footer">
-        <button id="viewSellerProfileBtn" class="secondary-btn">View Seller Profile</button>
-        <button id="reportPost" class="report-link">Report listing</button>
+      <button id="followSellerBtn" class="follow-btn">Follow Seller</button>
+
+    </div>
+  </section>
+
+
+  <!-- ========================= -->
+  <!-- OTHER ADS SECTION -->
+  <!-- ========================= -->
+  <section class="other-ads-section">
+    <h2>Other Ads by This Seller</h2>
+
+    <div id="otherAdsCarousel" class="carousel"></div>
+
+    <button id="openBundleModalBtn" class="bundle-btn">
+      View All Ads & Bundle
+    </button>
+  </section>
+
+
+  <!-- ========================= -->
+  <!-- BUNDLE MODAL -->
+  <!-- ========================= -->
+  <div id="bundleModal" class="modal">
+    <div class="modal-content">
+
+      <h2>Bundle Items</h2>
+
+      <div id="bundleList" class="bundle-list"></div>
+
+      <div class="bundle-total">
+        Total: <span id="bundleTotal">£0</span>
       </div>
-    </section>
-  </div>
 
-  <!-- 4. LIGHTBOX (MODAL LAYER) -->
-  <div id="lightbox">
-    <button id="lightboxClose">×</button>
+      <button id="sendBundleBtn" class="send-bundle-btn">Send Bundle Enquiry</button>
 
-    <div class="lightbox-track" id="lightboxTrack">
-      <!-- Injected by JS: Swipeable Images -->
-    </div>
-
-    <!-- Advertising Slot -->
-    <div class="lightbox-ad">
-      <span>Advertisement</span>
+      <button class="close-modal" onclick="bundleModal.style.display='none'">Close</button>
     </div>
   </div>
+
 </div>
-
-<link rel="stylesheet" href="/views/css/view-post.css" />
-<script type="module" src="/views/view-post.js"></script>
