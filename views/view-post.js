@@ -90,7 +90,7 @@ async function loadPost() {
   postImageEl.src = post.imageUrls?.[0] || "/img/placeholder.png";
 
   // Detect seller type
-  sellerUid = post.businessId || post.uid;
+  sellerUid = post.businessId || post.userId;
 
   if (post.businessId) {
     await loadBusinessSeller(post.businessId);
@@ -185,7 +185,7 @@ async function loadOtherAds(uid) {
   otherAdsCarousel.innerHTML = "";
 
   const postsRef = collection(db, "posts");
-  const q = query(postsRef, where("uid", "==", uid));
+  const q = query(postsRef, where("userId", "==", uid));
   const snap = await getDocs(q);
 
   snap.forEach(docSnap => {
