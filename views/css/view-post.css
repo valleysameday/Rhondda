@@ -1,12 +1,6 @@
 /* ========================= */
 /* GENERAL PAGE LAYOUT */
 /* ========================= */
-.post-images {
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-top: -15px; /* cancels .post-container padding */
-}
-
 
 .post-container {
   padding: 15px;
@@ -14,13 +8,11 @@
   margin: auto;
 }
 
-/* ========================= */
-/* FULL-WIDTH POST IMAGES */
-/* ========================= */
-
+/* Full-width image strip */
 .post-images {
   width: 100vw;
   margin-left: calc(50% - 50vw);
+  margin-top: -15px; /* cancels .post-container padding */
 }
 
 /* ========================= */
@@ -32,7 +24,7 @@
   grid-template-columns: 2fr 1fr;
   grid-template-rows: 1fr 1fr;
   gap: 2px;
-  padding: 0px;
+  padding: 0;
   position: relative;
 }
 
@@ -89,15 +81,17 @@
   margin: 15px 0;
 }
 
+/* ========================= */
+/* LIGHTBOX FULL-SCREEN */
+/* ========================= */
 
-/* Lightbox full-screen layout */
 .lightbox {
   display: none;
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.95);
   z-index: 9999;
-  display: flex;
+  display: none;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -133,6 +127,7 @@
   bottom: 0;
   left: 0;
 }
+
 /* ========================= */
 /* SELLER CARD */
 /* ========================= */
