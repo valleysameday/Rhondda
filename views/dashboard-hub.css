@@ -1,12 +1,26 @@
-/* RCT‑X DASHBOARD — CLEAN 2026 */
+/* ============================================================
+   RCT‑X DASHBOARD — CLEAN, MODERN, 2026 VERSION
+   Fully rewritten for top‑nav layout (no sidebar)
+   ============================================================ */
 
 /* ANIMATIONS */
 .fade-in { animation: fadeIn 0.4s ease-out; }
 .slide-up { animation: slideUp 0.35s ease-out; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-/* LAYOUT */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+
 .dashboard-container {
   display: flex;
   flex-direction: column;
@@ -14,7 +28,10 @@
   background: #f8fafc;
 }
 
-/* TOP NAV */
+/* ============================================================
+   TOP NAVIGATION
+   ============================================================ */
+
 .top-nav {
   display: flex;
   justify-content: space-around;
@@ -54,7 +71,10 @@
   font-weight: 600;
 }
 
-/* MAIN CONTENT */
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
+
 .main-content {
   padding: 20px;
   overflow-y: auto;
@@ -67,7 +87,10 @@
   margin-bottom: 20px;
 }
 
-/* BADGES */
+/* ============================================================
+   BADGES
+   ============================================================ */
+
 .plan-badge {
   display: inline-block;
   padding: 4px 12px;
@@ -92,7 +115,10 @@
   color: #fff7ed;
 }
 
-/* WIDGET GRID */
+/* ============================================================
+   WIDGET GRID
+   ============================================================ */
+
 .overview-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -117,7 +143,10 @@
 .widget-value { font-size: 26px; font-weight: 800; color: #0f172a; }
 .widget-sub { font-size: 13px; color: #94a3b8; }
 
-/* ADS MINI LIST */
+/* ============================================================
+   ADS MINI LIST
+   ============================================================ */
+
 .ads-management .section-header {
   display: flex;
   justify-content: space-between;
@@ -156,9 +185,10 @@
   object-fit: cover;
 }
 
-/* SETTINGS — RCT‑X POLISHED */
+/* ============================================================
+   SETTINGS — FULL POLISHED VERSION
+   ============================================================ */
 
-/* Settings Page Layout */
 .settings-wrapper {
   display: flex;
   flex-direction: column;
@@ -166,7 +196,6 @@
   margin-top: 10px;
 }
 
-/* Section Title */
 .settings-section-title {
   font-size: 18px;
   font-weight: 700;
@@ -174,13 +203,45 @@
   margin: 10px 0 4px;
 }
 
-/* Settings Card Enhancements */
 .settings-card {
-  animation: fadeIn 0.3s ease-out;
+  background: #fff;
+  padding: 18px;
+  border-radius: 12px;
   border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  animation: fadeIn 0.3s ease-out;
 }
 
-/* Input Focus */
+.settings-card h2 {
+  font-size: 18px;
+  margin-bottom: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.settings-row {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-row label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #334155;
+}
+
+.settings-row input,
+.settings-row textarea {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 15px;
+  background: #fff;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
 .settings-row input:focus,
 .settings-row textarea:focus {
   border-color: #0ea5e9;
@@ -188,7 +249,11 @@
   outline: none;
 }
 
-/* Readonly Fields */
+.settings-row textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
 .settings-row.readonly span {
   padding: 10px 0;
   opacity: 0.7;
@@ -196,7 +261,6 @@
   color: #475569;
 }
 
-/* Save Button */
 .settings-save-btn {
   background: #0ea5e9;
   color: white;
@@ -215,77 +279,16 @@
   background: #0284c7;
 }
 
-/* Divider */
 .settings-divider {
   height: 1px;
   background: #e2e8f0;
   margin: 14px 0;
 }
 
-/* Profile Header (Optional) */
-.settings-profile-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 12px;
-}
+/* ============================================================
+   MODAL
+   ============================================================ */
 
-.settings-profile-header img {
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.settings-profile-header h3 {
-  font-size: 18px;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-/* Toggle Switch */
-.settings-toggle {
-  position: relative;
-  width: 46px;
-  height: 24px;
-}
-
-.settings-toggle input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.settings-toggle-slider {
-  position: absolute;
-  cursor: pointer;
-  inset: 0;
-  background: #cbd5e1;
-  border-radius: 24px;
-  transition: 0.3s;
-}
-
-.settings-toggle-slider:before {
-  content: "";
-  position: absolute;
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  bottom: 3px;
-  background: white;
-  border-radius: 50%;
-  transition: 0.3s;
-}
-
-.settings-toggle input:checked + .settings-toggle-slider {
-  background: #0ea5e9;
-}
-
-.settings-toggle input:checked + .settings-toggle-slider:before {
-  transform: translateX(22px);
-}
-/* MODAL */
 .modal-overlay {
   position: fixed;
   inset: 0;
