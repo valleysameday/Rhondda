@@ -1,5 +1,5 @@
 // ===============================
-//  VIEW POST PAGE LOGIC (FULL)
+//  VIEW POST PAGE LOGIC (UNIFIED)
 // ===============================
 
 import { getFirebase } from "/index/js/firebase/init.js";
@@ -33,6 +33,8 @@ let postId = urlParams.get("id") || sessionStorage.getItem("viewPostId");
 // -------------------------------
 //  DOM ELEMENTS
 // -------------------------------
+
+// Post
 const postTitleEl = document.getElementById("postTitle");
 const postPriceEl = document.getElementById("postPrice");
 const postDescEl = document.getElementById("postDescription");
@@ -63,12 +65,17 @@ const revealBizPhoneBtn = document.getElementById("revealBizPhoneBtn");
 // Buttons
 const messageSellerBtn = document.querySelector(".message-btn");
 const followSellerBtn = document.getElementById("followSellerBtn");
-const openBundleModalBtn = document.getElementById("openBundleModalBtn");
-const bundleModal = document.getElementById("bundleModal");
-const closeBundleModalBtn = document.querySelector(".close-modal");
 
 // Other ads
 const otherAdsCarousel = document.getElementById("otherAdsCarousel");
+
+// Bundle modal
+const openBundleModalBtn = document.getElementById("openBundleModalBtn");
+const bundleModal = document.getElementById("bundleModal");
+const bundleList = document.getElementById("bundleList");
+const bundleTotalEl = document.getElementById("bundleTotal");
+const sendBundleBtn = document.getElementById("sendBundleBtn");
+const closeBundleModalBtn = document.querySelector(".close-modal");
 
 // -------------------------------
 //  STATE
@@ -76,6 +83,7 @@ const otherAdsCarousel = document.getElementById("otherAdsCarousel");
 let sellerUid = null;
 let galleryImages = [];
 let currentImageIndex = 0;
+let bundleItems = [];
 
 // -------------------------------
 //  LOAD POST
@@ -84,7 +92,10 @@ async function loadPost() {
   if (!postId) return;
 
   const postSnap = await getDoc(doc(db, "posts", postId));
-  if (!postSnap.exists()) return;
+  if (!postSnap.exists()) {
+    postTitleEl.textContent = "Post Not Found";
+    return;
+  }
 
   const post = postSnap.data();
 
@@ -94,6 +105,7 @@ async function loadPost() {
 
   renderGallery(post);
 
+  // sellerUid is either businessId or userId
   sellerUid = post.businessId || post.userId;
 
   if (post.businessId) {
@@ -181,22 +193,30 @@ function preloadAdjacentImages() {
 }
 
 // Lightbox events
-lightboxClose.onclick = closeLightbox;
-lightbox.onclick = e => {
-  if (e.target === lightbox) closeLightbox();
-};
+if (lightboxClose) {
+  lightboxClose.onclick = closeLightbox;
+}
 
-// Swipe
-let startX = 0;
-lightbox.addEventListener("touchstart", e => startX = e.touches[0].clientX, { passive: true });
-lightbox.addEventListener("touchend", e => {
-  const diff = e.changedTouches[0].clientX - startX;
-  if (diff > 50) prevImage();
-  if (diff < -50) nextImage();
-});
+if (lightbox) {
+  lightbox.onclick = e => {
+    if (e.target === lightbox) closeLightbox();
+  };
+
+  let startX = 0;
+  lightbox.addEventListener(
+    "touchstart",
+    e => (startX = e.touches[0].clientX),
+    { passive: true }
+  );
+  lightbox.addEventListener("touchend", e => {
+    const diff = e.changedTouches[0].clientX - startX;
+    if (diff > 50) prevImage();
+    if (diff < -50) nextImage();
+  });
+}
 
 // -------------------------------
-//  LOAD SELLERS
+//  LOAD PERSONAL SELLER
 // -------------------------------
 async function loadPersonalSeller(uid) {
   const snap = await getDoc(doc(db, "users", uid));
@@ -216,9 +236,14 @@ async function loadPersonalSeller(uid) {
   if (u.avatarUrl) {
     sellerAvatarEl.style.backgroundImage = `url(${u.avatarUrl})`;
     sellerAvatarEl.textContent = "";
+  } else {
+    sellerAvatarEl.textContent = (u.name || "U").charAt(0).toUpperCase();
   }
 }
 
+// -------------------------------
+//  LOAD BUSINESS SELLER
+// -------------------------------
 async function loadBusinessSeller(uid) {
   const snap = await getDoc(doc(db, "businesses", uid));
   if (!snap.exists()) return;
@@ -234,6 +259,8 @@ async function loadBusinessSeller(uid) {
     sellerWebsiteEl.href = b.website;
     sellerWebsiteEl.textContent = b.website;
     sellerWebsiteEl.style.display = "block";
+  } else {
+    sellerWebsiteEl.style.display = "none";
   }
 
   bizPhoneMasked.textContent = "••••••••••";
@@ -243,33 +270,57 @@ async function loadBusinessSeller(uid) {
   revealBizPhoneBtn.onclick = async () => {
     bizPhoneMasked.textContent = b.phone || "No phone";
     revealBizPhoneBtn.style.display = "none";
-
     await updateDoc(doc(db, "businesses", uid), {
       leads: (b.leads || 0) + 1
     });
   };
+
+  if (!b.avatarUrl) {
+    sellerAvatarEl.textContent = (b.businessName || "B").charAt(0).toUpperCase();
+  } else {
+    sellerAvatarEl.style.backgroundImage = `url(${b.avatarUrl})`;
+    sellerAvatarEl.textContent = "";
+  }
 }
 
 // -------------------------------
-//  OTHER ADS
+//  LOAD OTHER ADS (USER OR BUSINESS)
 // -------------------------------
 async function loadOtherAds(uid) {
   otherAdsCarousel.innerHTML = "";
-  const q = query(collection(db, "posts"), where("userId", "==", uid));
-  const snap = await getDocs(q);
 
-  snap.forEach(d => {
+  const postsRef = collection(db, "posts");
+  const snaps = [];
+
+  // userId match
+  const qUser = query(postsRef, where("userId", "==", uid));
+  const snapUser = await getDocs(qUser);
+  snapUser.forEach(d => snaps.push(d));
+
+  // businessId match
+  const qBiz = query(postsRef, where("businessId", "==", uid));
+  const snapBiz = await getDocs(qBiz);
+  snapBiz.forEach(d => {
+    if (!snaps.find(x => x.id === d.id)) snaps.push(d);
+  });
+
+  snaps.forEach(d => {
     const p = d.data();
     const card = document.createElement("div");
     card.className = "carousel-card";
-
     card.onclick = () => {
       sessionStorage.setItem("viewPostId", d.id);
       location.reload();
     };
 
+    const imgSrc =
+      p.imageUrls?.[0] ||
+      p.imageUrl ||
+      (p.images && p.images[0]) ||
+      "/images/image-webholder.webp";
+
     card.innerHTML = `
-      <img src="${p.imageUrls?.[0] || p.imageUrl || "/images/image-webholder.webp"}">
+      <img src="${imgSrc}">
       <div class="carousel-price">£${p.price}</div>
     `;
 
@@ -278,23 +329,130 @@ async function loadOtherAds(uid) {
 }
 
 // -------------------------------
-//  BUTTON HANDLERS
+//  BUNDLE MODAL OPEN
 // -------------------------------
-messageSellerBtn.onclick = () => {
-  alert("Messaging coming soon");
-};
+if (openBundleModalBtn) {
+  openBundleModalBtn.onclick = async () => {
+    if (!sellerUid) return;
 
-followSellerBtn.onclick = () => {
-  alert("Follow feature coming soon");
-};
+    bundleModal.style.display = "block";
+    bundleItems = [];
+    bundleList.innerHTML = "";
+    bundleTotalEl.textContent = "£0";
 
-openBundleModalBtn.onclick = () => {
-  bundleModal.style.display = "block";
-};
+    const postsRef = collection(db, "posts");
+    const rows = [];
 
-closeBundleModalBtn.onclick = () => {
-  bundleModal.style.display = "none";
-};
+    // userId match
+    const qUser = query(postsRef, where("userId", "==", sellerUid));
+    const snapUser = await getDocs(qUser);
+    snapUser.forEach(d => rows.push(d));
+
+    // businessId match
+    const qBiz = query(postsRef, where("businessId", "==", sellerUid));
+    const snapBiz = await getDocs(qBiz);
+    snapBiz.forEach(d => {
+      if (!rows.find(x => x.id === d.id)) rows.push(d);
+    });
+
+    rows.forEach(d => {
+      const p = d.data();
+      const row = document.createElement("div");
+      row.className = "bundle-row";
+
+      const imgSrc =
+        p.imageUrls?.[0] ||
+        p.imageUrl ||
+        (p.images && p.images[0]) ||
+        "/images/image-webholder.webp";
+
+      row.innerHTML = `
+        <img src="${imgSrc}">
+        <div class="bundle-title">${p.title || "Untitled"}</div>
+        <div class="bundle-price">£${p.price || 0}</div>
+        <button class="bundle-add-btn" data-id="${d.id}" data-price="${p.price || 0}">
+          + Add
+        </button>
+      `;
+
+      bundleList.appendChild(row);
+    });
+
+    setupBundleButtons();
+  };
+}
+
+// -------------------------------
+//  BUNDLE BUTTON LOGIC
+// -------------------------------
+function setupBundleButtons() {
+  const buttons = document.querySelectorAll(".bundle-add-btn");
+
+  buttons.forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.id;
+      const price = Number(btn.dataset.price) || 0;
+
+      const exists = bundleItems.find(i => i.id === id);
+
+      if (exists) {
+        bundleItems = bundleItems.filter(i => i.id !== id);
+        btn.textContent = "+ Add";
+        btn.classList.remove("added");
+      } else {
+        bundleItems.push({ id, price });
+        btn.textContent = "✓ Added";
+        btn.classList.add("added");
+      }
+
+      updateBundleTotal();
+    };
+  });
+}
+
+function updateBundleTotal() {
+  const total = bundleItems.reduce((sum, item) => sum + item.price, 0);
+  bundleTotalEl.textContent = `£${total}`;
+}
+
+// -------------------------------
+//  SEND BUNDLE MESSAGE (PLACEHOLDER)
+// -------------------------------
+if (sendBundleBtn) {
+  sendBundleBtn.onclick = () => {
+    if (bundleItems.length === 0) {
+      alert("Select at least one item to bundle.");
+      return;
+    }
+
+    alert("Bundle enquiry sent to seller.");
+    bundleModal.style.display = "none";
+  };
+}
+
+// -------------------------------
+//  CLOSE BUNDLE MODAL
+// -------------------------------
+if (closeBundleModalBtn) {
+  closeBundleModalBtn.onclick = () => {
+    bundleModal.style.display = "none";
+  };
+}
+
+// -------------------------------
+//  MESSAGE / FOLLOW BUTTONS
+// -------------------------------
+if (messageSellerBtn) {
+  messageSellerBtn.onclick = () => {
+    alert("Message sent to seller (placeholder).");
+  };
+}
+
+if (followSellerBtn) {
+  followSellerBtn.onclick = () => {
+    alert("You are now following this seller (placeholder).");
+  };
+}
 
 // -------------------------------
 //  INIT
