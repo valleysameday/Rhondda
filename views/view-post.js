@@ -60,6 +60,13 @@ const sellerWebsiteEl = document.getElementById("sellerWebsite");
 const bizPhoneMasked = document.getElementById("bizPhoneMasked");
 const revealBizPhoneBtn = document.getElementById("revealBizPhoneBtn");
 
+// Buttons
+const messageSellerBtn = document.querySelector(".message-btn");
+const followSellerBtn = document.getElementById("followSellerBtn");
+const openBundleModalBtn = document.getElementById("openBundleModalBtn");
+const bundleModal = document.getElementById("bundleModal");
+const closeBundleModalBtn = document.querySelector(".close-modal");
+
 // Other ads
 const otherAdsCarousel = document.getElementById("otherAdsCarousel");
 
@@ -89,9 +96,11 @@ async function loadPost() {
 
   sellerUid = post.businessId || post.userId;
 
-  post.businessId
-    ? await loadBusinessSeller(post.businessId)
-    : await loadPersonalSeller(post.userId);
+  if (post.businessId) {
+    await loadBusinessSeller(post.businessId);
+  } else {
+    await loadPersonalSeller(post.userId);
+  }
 
   await loadOtherAds(sellerUid);
 }
@@ -118,7 +127,6 @@ function renderGallery(post) {
   thumb1.src = galleryImages[1] || galleryImages[0];
   thumb2.src = galleryImages[2] || galleryImages[0];
 
-  // ONLY open on click
   mainImage.onclick = () => openLightbox(0);
   thumb1.onclick = () => openLightbox(1);
   thumb2.onclick = () => openLightbox(2);
@@ -131,18 +139,17 @@ function openLightbox(index) {
   currentImageIndex = index;
   updateLightbox();
   lightbox.classList.add("active");
-  document.body.style.overflow = "hidden"; // disable background scroll
+  document.body.style.overflow = "hidden";
 }
 
 function closeLightbox() {
   lightbox.classList.remove("active");
-  document.body.style.overflow = ""; // restore scroll
+  document.body.style.overflow = "";
 }
 
 function updateLightbox() {
   lightboxImg.src = galleryImages[currentImageIndex];
 
-  // Bottom ad image (just an <img>, doesn't open lightbox)
   lightboxBottom.innerHTML = `
     <img src="/images/ad-placeholder.jpg" class="lightbox-ad" />
   `;
@@ -150,9 +157,6 @@ function updateLightbox() {
   preloadAdjacentImages();
 }
 
-// -------------------------------
-//  NEXT / PREV IMAGE (stop at edges)
-// -------------------------------
 function nextImage() {
   if (currentImageIndex < galleryImages.length - 1) {
     currentImageIndex++;
@@ -167,30 +171,22 @@ function prevImage() {
   }
 }
 
-// -------------------------------
-//  PRELOAD IMAGES
-// -------------------------------
 function preloadAdjacentImages() {
-  if (currentImageIndex < galleryImages.length - 1) {
-    const nextImg = new Image();
-    nextImg.src = galleryImages[currentImageIndex + 1];
+  if (galleryImages[currentImageIndex + 1]) {
+    new Image().src = galleryImages[currentImageIndex + 1];
   }
-  if (currentImageIndex > 0) {
-    const prevImg = new Image();
-    prevImg.src = galleryImages[currentImageIndex - 1];
+  if (galleryImages[currentImageIndex - 1]) {
+    new Image().src = galleryImages[currentImageIndex - 1];
   }
 }
 
-// -------------------------------
-//  LIGHTBOX EVENTS
-// -------------------------------
+// Lightbox events
 lightboxClose.onclick = closeLightbox;
-
 lightbox.onclick = e => {
   if (e.target === lightbox) closeLightbox();
 };
 
-// SWIPE FOR MOBILE
+// Swipe
 let startX = 0;
 lightbox.addEventListener("touchstart", e => startX = e.touches[0].clientX, { passive: true });
 lightbox.addEventListener("touchend", e => {
@@ -247,6 +243,7 @@ async function loadBusinessSeller(uid) {
   revealBizPhoneBtn.onclick = async () => {
     bizPhoneMasked.textContent = b.phone || "No phone";
     revealBizPhoneBtn.style.display = "none";
+
     await updateDoc(doc(db, "businesses", uid), {
       leads: (b.leads || 0) + 1
     });
@@ -254,7 +251,7 @@ async function loadBusinessSeller(uid) {
 }
 
 // -------------------------------
-//  LOAD OTHER ADS
+//  OTHER ADS
 // -------------------------------
 async function loadOtherAds(uid) {
   otherAdsCarousel.innerHTML = "";
@@ -265,6 +262,7 @@ async function loadOtherAds(uid) {
     const p = d.data();
     const card = document.createElement("div");
     card.className = "carousel-card";
+
     card.onclick = () => {
       sessionStorage.setItem("viewPostId", d.id);
       location.reload();
@@ -278,6 +276,25 @@ async function loadOtherAds(uid) {
     otherAdsCarousel.appendChild(card);
   });
 }
+
+// -------------------------------
+//  BUTTON HANDLERS
+// -------------------------------
+messageSellerBtn.onclick = () => {
+  alert("Messaging coming soon");
+};
+
+followSellerBtn.onclick = () => {
+  alert("Follow feature coming soon");
+};
+
+openBundleModalBtn.onclick = () => {
+  bundleModal.style.display = "block";
+};
+
+closeBundleModalBtn.onclick = () => {
+  bundleModal.style.display = "none";
+};
 
 // -------------------------------
 //  INIT
