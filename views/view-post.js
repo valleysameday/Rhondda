@@ -1,5 +1,5 @@
 // ===============================
-//  VIEW POST PAGE LOGIC (UNIFIED)
+//  VIEW POST PAGE LOGIC (UNIFIED + UX ENHANCED)
 // ===============================
 
 import { getFirebase } from "/index/js/firebase/init.js";
@@ -13,6 +13,8 @@ import {
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+import { loadView } from "/index/js/main.js";
+
 // -------------------------------
 //  FIREBASE INIT
 // -------------------------------
@@ -22,6 +24,35 @@ async function initFirebase() {
   db = fb.db;
   auth = fb.auth;
   storage = fb.storage;
+}
+
+// -------------------------------
+//  TOAST SYSTEM (NO EXTRA FILES)
+// -------------------------------
+function showToast(message) {
+  let toast = document.createElement("div");
+  toast.textContent = message;
+
+  toast.style.position = "fixed";
+  toast.style.bottom = "20px";
+  toast.style.left = "50%";
+  toast.style.transform = "translateX(-50%)";
+  toast.style.background = "rgba(0,0,0,0.85)";
+  toast.style.color = "#fff";
+  toast.style.padding = "12px 18px";
+  toast.style.borderRadius = "8px";
+  toast.style.fontSize = "15px";
+  toast.style.zIndex = "999999";
+  toast.style.opacity = "0";
+  toast.style.transition = "opacity 0.3s ease";
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => (toast.style.opacity = "1"), 10);
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    setTimeout(() => toast.remove(), 300);
+  }, 2000);
 }
 
 // -------------------------------
@@ -105,7 +136,6 @@ async function loadPost() {
 
   renderGallery(post);
 
-  // sellerUid is either businessId or userId
   sellerUid = post.businessId || post.userId;
 
   if (post.businessId) {
@@ -115,6 +145,7 @@ async function loadPost() {
   }
 
   await loadOtherAds(sellerUid);
+  await updateFollowButtonState();
 }
 
 // -------------------------------
@@ -192,7 +223,6 @@ function preloadAdjacentImages() {
   }
 }
 
-// Lightbox events
 if (lightboxClose) {
   lightboxClose.onclick = closeLightbox;
 }
@@ -284,7 +314,7 @@ async function loadBusinessSeller(uid) {
 }
 
 // -------------------------------
-//  LOAD OTHER ADS (USER OR BUSINESS)
+//  LOAD OTHER ADS
 // -------------------------------
 async function loadOtherAds(uid) {
   otherAdsCarousel.innerHTML = "";
@@ -292,12 +322,10 @@ async function loadOtherAds(uid) {
   const postsRef = collection(db, "posts");
   const snaps = [];
 
-  // userId match
   const qUser = query(postsRef, where("userId", "==", uid));
   const snapUser = await getDocs(qUser);
   snapUser.forEach(d => snaps.push(d));
 
-  // businessId match
   const qBiz = query(postsRef, where("businessId", "==", uid));
   const snapBiz = await getDocs(qBiz);
   snapBiz.forEach(d => {
@@ -308,6 +336,11 @@ async function loadOtherAds(uid) {
     const p = d.data();
     const card = document.createElement("div");
     card.className = "carousel-card";
+
+    // Tap animation
+    card.onmousedown = () => (card.style.transform = "scale(0.96)");
+    card.onmouseup = () => (card.style.transform = "scale(1)");
+
     card.onclick = () => {
       sessionStorage.setItem("viewPostId", d.id);
       location.reload();
@@ -336,6 +369,9 @@ if (openBundleModalBtn) {
     if (!sellerUid) return;
 
     bundleModal.style.display = "block";
+    bundleModal.style.opacity = "0";
+    setTimeout(() => (bundleModal.style.opacity = "1"), 10);
+
     bundleItems = [];
     bundleList.innerHTML = "";
     bundleTotalEl.textContent = "£0";
@@ -343,12 +379,10 @@ if (openBundleModalBtn) {
     const postsRef = collection(db, "posts");
     const rows = [];
 
-    // userId match
     const qUser = query(postsRef, where("userId", "==", sellerUid));
     const snapUser = await getDocs(qUser);
     snapUser.forEach(d => rows.push(d));
 
-    // businessId match
     const qBiz = query(postsRef, where("businessId", "==", sellerUid));
     const snapBiz = await getDocs(qBiz);
     snapBiz.forEach(d => {
@@ -416,17 +450,18 @@ function updateBundleTotal() {
 }
 
 // -------------------------------
-//  SEND BUNDLE MESSAGE (PLACEHOLDER)
+//  SEND BUNDLE MESSAGE (POPUP ONLY)
 // -------------------------------
 if (sendBundleBtn) {
   sendBundleBtn.onclick = () => {
     if (bundleItems.length === 0) {
-      alert("Select at least one item to bundle.");
+      showToast("Select at least one item to bundle.");
       return;
     }
 
-    alert("Bundle enquiry sent to seller.");
-    bundleModal.style.display = "none";
+    showToast("Bundle enquiry sent to seller.");
+    bundleModal.style.opacity = "0";
+    setTimeout(() => (bundleModal.style.display = "none"), 200);
   };
 }
 
@@ -435,22 +470,84 @@ if (sendBundleBtn) {
 // -------------------------------
 if (closeBundleModalBtn) {
   closeBundleModalBtn.onclick = () => {
-    bundleModal.style.display = "none";
+    bundleModal.style.opacity = "0";
+    setTimeout(() => (bundleModal.style.display = "none"), 200);
   };
 }
 
 // -------------------------------
-//  MESSAGE / FOLLOW BUTTONS
+//  MESSAGE SELLER → OPEN CHAT
 // -------------------------------
 if (messageSellerBtn) {
   messageSellerBtn.onclick = () => {
-    alert("Message sent to seller (placeholder).");
+    const user = auth.currentUser;
+    if (!user) {
+      showToast("Please log in to message sellers.");
+      return;
+    }
+
+    const convoId = `${user.uid}_${sellerUid}_${postId}`;
+    sessionStorage.setItem("activeConversationId", convoId);
+
+    loadView("chat", { forceInit: true });
   };
 }
 
+// -------------------------------
+//  FOLLOW SELLER (REAL FIRESTORE)
+// -------------------------------
+async function updateFollowButtonState() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const sellerRef = doc(db, "users", sellerUid);
+  const snap = await getDoc(sellerRef);
+  if (!snap.exists()) return;
+
+  const followers = snap.data().followers || {};
+
+  if (followers[user.uid]) {
+    followSellerBtn.textContent = "Following";
+  } else {
+    followSellerBtn.textContent = "Follow Seller";
+  }
+}
+
 if (followSellerBtn) {
-  followSellerBtn.onclick = () => {
-    alert("You are now following this seller (placeholder).");
+  followSellerBtn.onclick = async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      showToast("Please log in to follow sellers.");
+      return;
+    }
+
+    if (user.uid === sellerUid) {
+      showToast("You cannot follow yourself.");
+      return;
+    }
+
+    const sellerRef = doc(db, "users", sellerUid);
+    const snap = await getDoc(sellerRef);
+
+    if (!snap.exists()) {
+      showToast("Seller not found.");
+      return;
+    }
+
+    const data = snap.data();
+    const followers = data.followers || {};
+
+    if (followers[user.uid]) {
+      delete followers[user.uid];
+      await updateDoc(sellerRef, { followers });
+      followSellerBtn.textContent = "Follow Seller";
+      showToast("Unfollowed.");
+    } else {
+      followers[user.uid] = true;
+      await updateDoc(sellerRef, { followers });
+      followSellerBtn.textContent = "Following";
+      showToast("You are now following this seller.");
+    }
   };
 }
 
