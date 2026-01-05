@@ -41,7 +41,10 @@ window.timeAgo = function(timestamp) {
    SPA VIEW LOADER (FIXED)
 ===================================================== */
 export async function loadView(view, options = {}) {
-
+// Always reload the feed fresh
+if (view === "home") {
+  options.forceInit = true;
+}
   if (window.currentView === view && !options.forceInit) return;
   window.currentView = view;
 
