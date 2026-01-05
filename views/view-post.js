@@ -17,7 +17,6 @@ import {
 //  FIREBASE INIT
 // -------------------------------
 let db, auth, storage;
-
 async function initFirebase() {
   const fb = await getFirebase();
   db = fb.db;
@@ -119,6 +118,7 @@ function renderGallery(post) {
   thumb1.src = galleryImages[1] || galleryImages[0];
   thumb2.src = galleryImages[2] || galleryImages[0];
 
+  // ONLY open on click
   mainImage.onclick = () => openLightbox(0);
   thumb1.onclick = () => openLightbox(1);
   thumb2.onclick = () => openLightbox(2);
@@ -141,8 +141,12 @@ function closeLightbox() {
 
 function updateLightbox() {
   lightboxImg.src = galleryImages[currentImageIndex];
-  // optionally update bottom ad content
-  lightboxBottom.innerHTML = `<div>Ad / Buttons can go here</div>`;
+
+  // Bottom ad image (just an <img>, doesn't open lightbox)
+  lightboxBottom.innerHTML = `
+    <img src="/images/ad-placeholder.jpg" class="lightbox-ad" />
+  `;
+
   preloadAdjacentImages();
 }
 
