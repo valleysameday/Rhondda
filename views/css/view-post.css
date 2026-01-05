@@ -1,6 +1,12 @@
 /* ========================= */
 /* GENERAL PAGE LAYOUT */
 /* ========================= */
+.post-images {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-top: -15px; /* cancels .post-container padding */
+}
+
 
 .post-container {
   padding: 15px;
