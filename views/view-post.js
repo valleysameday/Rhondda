@@ -1,5 +1,5 @@
 // ===============================
-//  VIEW POST PAGE LOGIC (UNIFIED)
+//  VIEW POST PAGE LOGIC (FULL)
 // ===============================
 
 import { getFirebase } from "/index/js/firebase/init.js";
@@ -48,6 +48,7 @@ const thumb2 = document.getElementById("thumb2");
 const lightbox = document.getElementById("lightbox");
 const lightboxImg = document.getElementById("lightboxImage");
 const lightboxClose = document.getElementById("lightboxClose");
+const lightboxBottom = document.getElementById("lightboxBottom");
 
 // Seller
 const sellerCardHeader = document.getElementById("sellerCardHeader");
@@ -130,43 +131,50 @@ function openLightbox(index) {
   currentImageIndex = index;
   updateLightbox();
   lightbox.classList.add("active");
-  document.body.style.overflow = "hidden"; // DISABLE BACKGROUND SCROLL
-  preloadAdjacentImages();
+  document.body.style.overflow = "hidden"; // disable background scroll
 }
 
 function closeLightbox() {
   lightbox.classList.remove("active");
-  document.body.style.overflow = ""; // RE-ENABLE SCROLL
+  document.body.style.overflow = ""; // restore scroll
 }
 
 function updateLightbox() {
   lightboxImg.src = galleryImages[currentImageIndex];
+  // optionally update bottom ad content
+  lightboxBottom.innerHTML = `<div>Ad / Buttons can go here</div>`;
   preloadAdjacentImages();
 }
 
+// -------------------------------
+//  NEXT / PREV IMAGE (stop at edges)
+// -------------------------------
 function nextImage() {
-  currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
-  updateLightbox();
+  if (currentImageIndex < galleryImages.length - 1) {
+    currentImageIndex++;
+    updateLightbox();
+  }
 }
 
 function prevImage() {
-  currentImageIndex =
-    (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
-  updateLightbox();
+  if (currentImageIndex > 0) {
+    currentImageIndex--;
+    updateLightbox();
+  }
 }
 
 // -------------------------------
 //  PRELOAD IMAGES
 // -------------------------------
 function preloadAdjacentImages() {
-  const nextIndex = (currentImageIndex + 1) % galleryImages.length;
-  const prevIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
-
-  const nextImg = new Image();
-  nextImg.src = galleryImages[nextIndex];
-
-  const prevImg = new Image();
-  prevImg.src = galleryImages[prevIndex];
+  if (currentImageIndex < galleryImages.length - 1) {
+    const nextImg = new Image();
+    nextImg.src = galleryImages[currentImageIndex + 1];
+  }
+  if (currentImageIndex > 0) {
+    const prevImg = new Image();
+    prevImg.src = galleryImages[currentImageIndex - 1];
+  }
 }
 
 // -------------------------------
@@ -178,13 +186,9 @@ lightbox.onclick = e => {
   if (e.target === lightbox) closeLightbox();
 };
 
-// SWIPE
+// SWIPE FOR MOBILE
 let startX = 0;
-
-lightbox.addEventListener("touchstart", e => {
-  startX = e.touches[0].clientX;
-}, { passive: true });
-
+lightbox.addEventListener("touchstart", e => startX = e.touches[0].clientX, { passive: true });
 lightbox.addEventListener("touchend", e => {
   const diff = e.changedTouches[0].clientX - startX;
   if (diff > 50) prevImage();
@@ -192,12 +196,11 @@ lightbox.addEventListener("touchend", e => {
 });
 
 // -------------------------------
-//  SELLERS
+//  LOAD SELLERS
 // -------------------------------
 async function loadPersonalSeller(uid) {
   const snap = await getDoc(doc(db, "users", uid));
   if (!snap.exists()) return;
-
   const u = snap.data();
 
   sellerCardHeader.textContent = "About This Seller";
@@ -219,7 +222,6 @@ async function loadPersonalSeller(uid) {
 async function loadBusinessSeller(uid) {
   const snap = await getDoc(doc(db, "businesses", uid));
   if (!snap.exists()) return;
-
   const b = snap.data();
 
   sellerCardHeader.textContent = "About This Business";
@@ -248,18 +250,16 @@ async function loadBusinessSeller(uid) {
 }
 
 // -------------------------------
-//  OTHER ADS
+//  LOAD OTHER ADS
 // -------------------------------
 async function loadOtherAds(uid) {
   otherAdsCarousel.innerHTML = "";
-
   const q = query(collection(db, "posts"), where("userId", "==", uid));
   const snap = await getDocs(q);
 
   snap.forEach(d => {
     const p = d.data();
     const card = document.createElement("div");
-
     card.className = "carousel-card";
     card.onclick = () => {
       sessionStorage.setItem("viewPostId", d.id);
