@@ -95,7 +95,7 @@ async function loadPost() {
   if (post.businessId) {
     await loadBusinessSeller(post.businessId);
   } else {
-    await loadPersonalSeller(post.uid);
+    await loadPersonalSeller(post.userId);
   }
 
   await loadOtherAds(sellerUid);
