@@ -1,9 +1,10 @@
 // ===============================
-//  VIEW POST PAGE LOGIC
+//  VIEW POST PAGE LOGIC (UNIFIED)
+//  No profile page required
 // ===============================
 
 import {
-  getFirestore, doc, getDoc, updateDoc
+  getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import {
@@ -21,25 +22,39 @@ const postPriceEl = document.getElementById("postPrice");
 const postDescEl = document.getElementById("postDescription");
 const postImageEl = document.getElementById("postImage");
 
-const sellerBox = document.getElementById("sellerBox");
-const sellerNameEl = document.getElementById("sellerName");
+// Seller Card
+const sellerCardHeader = document.getElementById("sellerCardHeader");
 const sellerAvatarEl = document.getElementById("sellerAvatar");
+const sellerNameEl = document.getElementById("sellerName");
 const sellerRibbonEl = document.getElementById("sellerRibbon");
-
-const bizInfoSection = document.getElementById("bizInfoSection");
+const sellerBioEl = document.getElementById("sellerBio");
+const sellerAreaEl = document.getElementById("sellerArea");
+const sellerWebsiteEl = document.getElementById("sellerWebsite");
 const bizPhoneMasked = document.getElementById("bizPhoneMasked");
 const revealBizPhoneBtn = document.getElementById("revealBizPhoneBtn");
-const bizWebsiteLink = document.getElementById("bizWebsiteLink");
-const bizAreaValue = document.getElementById("bizAreaValue");
-const bizBioValue = document.getElementById("bizBioValue");
+const followSellerBtn = document.getElementById("followSellerBtn");
 
-const viewProfileBtn = document.getElementById("viewProfileBtn");
+// Other Ads
+const otherAdsCarousel = document.getElementById("otherAdsCarousel");
+
+// Bundle Modal
+const openBundleModalBtn = document.getElementById("openBundleModalBtn");
+const bundleModal = document.getElementById("bundleModal");
+const bundleList = document.getElementById("bundleList");
+const bundleTotalEl = document.getElementById("bundleTotal");
+const sendBundleBtn = document.getElementById("sendBundleBtn");
 
 // -------------------------------
 //  GET POST ID
 // -------------------------------
 const urlParams = new URLSearchParams(window.location.search);
 const postId = urlParams.get("id");
+
+// -------------------------------
+//  BUNDLE STATE
+// -------------------------------
+let bundleItems = [];
+let sellerUid = null;
 
 // -------------------------------
 //  LOAD POST
@@ -63,30 +78,33 @@ async function loadPost() {
   postDescEl.textContent = post.description;
   postImageEl.src = post.imageUrls?.[0] || "/img/placeholder.png";
 
-  // Detect business ad
+  // Detect seller type
+  sellerUid = post.businessId || post.uid;
+
   if (post.businessId) {
     await loadBusinessSeller(post.businessId);
   } else {
     await loadPersonalSeller(post.uid);
   }
+
+  await loadOtherAds(sellerUid);
 }
 
 // -------------------------------
 //  LOAD PERSONAL SELLER
 // -------------------------------
 async function loadPersonalSeller(uid) {
-  bizInfoSection.style.display = "none";
-  sellerRibbonEl.style.display = "none";
-
   const userRef = doc(db, "users", uid);
   const userSnap = await getDoc(userRef);
-
   if (!userSnap.exists()) return;
 
   const user = userSnap.data();
 
-  sellerNameEl.textContent = user.name || "Seller";
+  // Header
+  sellerCardHeader.textContent = "About This Seller";
+  sellerRibbonEl.style.display = "none";
 
+  // Avatar
   if (user.avatarUrl) {
     sellerAvatarEl.style.backgroundImage = `url(${user.avatarUrl})`;
     sellerAvatarEl.textContent = "";
@@ -94,9 +112,14 @@ async function loadPersonalSeller(uid) {
     sellerAvatarEl.textContent = (user.name || "U").charAt(0).toUpperCase();
   }
 
-  viewProfileBtn.onclick = () => {
-    window.location.href = `/seller-profile.html?uid=${uid}`;
-  };
+  sellerNameEl.textContent = user.name || "Seller";
+  sellerBioEl.textContent = user.bio || "This seller has not added a bio.";
+  sellerAreaEl.textContent = user.area || "No area listed";
+
+  // Hide business-only fields
+  sellerWebsiteEl.style.display = "none";
+  revealBizPhoneBtn.style.display = "none";
+  bizPhoneMasked.style.display = "none";
 }
 
 // -------------------------------
@@ -105,16 +128,13 @@ async function loadPersonalSeller(uid) {
 async function loadBusinessSeller(uid) {
   const bizRef = doc(db, "businesses", uid);
   const bizSnap = await getDoc(bizRef);
-
   if (!bizSnap.exists()) return;
 
   const biz = bizSnap.data();
 
-  // Show business UI
-  bizInfoSection.style.display = "block";
+  // Header
+  sellerCardHeader.textContent = "About This Business";
   sellerRibbonEl.style.display = "inline-block";
-
-  sellerNameEl.textContent = biz.businessName || "Business";
 
   // Avatar
   if (biz.avatarUrl) {
@@ -124,27 +144,137 @@ async function loadBusinessSeller(uid) {
     sellerAvatarEl.textContent = (biz.businessName || "B").charAt(0).toUpperCase();
   }
 
-  // Business Info
+  sellerNameEl.textContent = biz.businessName || "Business";
+  sellerBioEl.textContent = biz.bio || "This business has not added a description.";
+  sellerAreaEl.textContent = biz.area || "No area listed";
+
+  // Website
+  if (biz.website) {
+    sellerWebsiteEl.textContent = biz.website;
+    sellerWebsiteEl.href = biz.website;
+    sellerWebsiteEl.style.display = "block";
+  } else {
+    sellerWebsiteEl.style.display = "none";
+  }
+
+  // Phone reveal
   bizPhoneMasked.textContent = "••••••••••";
   revealBizPhoneBtn.style.display = "inline-block";
+  bizPhoneMasked.style.display = "inline-block";
 
   revealBizPhoneBtn.onclick = () => {
     bizPhoneMasked.textContent = biz.phone || "No phone listed";
     revealBizPhoneBtn.style.display = "none";
     incrementBusinessLead(uid);
   };
-
-  bizWebsiteLink.textContent = biz.website || "";
-  bizWebsiteLink.href = biz.website || "#";
-
-  bizAreaValue.textContent = biz.area || "No area listed";
-  bizBioValue.textContent = biz.bio || "This business has not added a description.";
-
-  // View Profile Button
-  viewProfileBtn.onclick = () => {
-    window.location.href = `/seller-profile.html?uid=${uid}`;
-  };
 }
+
+// -------------------------------
+//  LOAD OTHER ADS
+// -------------------------------
+async function loadOtherAds(uid) {
+  otherAdsCarousel.innerHTML = "";
+
+  const postsRef = collection(db, "posts");
+  const q = query(postsRef, where("uid", "==", uid));
+  const snap = await getDocs(q);
+
+  snap.forEach(docSnap => {
+    const p = docSnap.data();
+
+    const card = document.createElement("div");
+    card.className = "carousel-card";
+    card.onclick = () => {
+      window.location.href = `/view-post.html?id=${docSnap.id}`;
+    };
+
+    card.innerHTML = `
+      <img src="${p.imageUrls?.[0] || "/img/placeholder.png"}">
+      <div class="carousel-price">£${p.price}</div>
+    `;
+
+    otherAdsCarousel.appendChild(card);
+  });
+}
+
+// -------------------------------
+//  OPEN BUNDLE MODAL
+// -------------------------------
+openBundleModalBtn.onclick = async () => {
+  bundleModal.style.display = "block";
+  bundleItems = [];
+  bundleList.innerHTML = "";
+  bundleTotalEl.textContent = "£0";
+
+  const postsRef = collection(db, "posts");
+  const q = query(postsRef, where("uid", "==", sellerUid));
+  const snap = await getDocs(q);
+
+  snap.forEach(docSnap => {
+    const p = docSnap.data();
+
+    const row = document.createElement("div");
+    row.className = "bundle-row";
+
+    row.innerHTML = `
+      <img src="${p.imageUrls?.[0] || "/img/placeholder.png"}">
+      <div class="bundle-title">${p.title}</div>
+      <div class="bundle-price">£${p.price}</div>
+      <button class="bundle-add-btn" data-id="${docSnap.id}" data-price="${p.price}">
+        + Add
+      </button>
+    `;
+
+    bundleList.appendChild(row);
+  });
+
+  setupBundleButtons();
+};
+
+// -------------------------------
+//  BUNDLE BUTTON LOGIC
+// -------------------------------
+function setupBundleButtons() {
+  const buttons = document.querySelectorAll(".bundle-add-btn");
+
+  buttons.forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.id;
+      const price = Number(btn.dataset.price);
+
+      const exists = bundleItems.find(i => i.id === id);
+
+      if (exists) {
+        // Remove
+        bundleItems = bundleItems.filter(i => i.id !== id);
+        btn.textContent = "+ Add";
+        btn.classList.remove("added");
+      } else {
+        // Add
+        bundleItems.push({ id, price });
+        btn.textContent = "✓ Added";
+        btn.classList.add("added");
+      }
+
+      updateBundleTotal();
+    };
+  });
+}
+
+function updateBundleTotal() {
+  const total = bundleItems.reduce((sum, item) => sum + item.price, 0);
+  bundleTotalEl.textContent = `£${total}`;
+}
+
+// -------------------------------
+//  SEND BUNDLE MESSAGE
+// -------------------------------
+sendBundleBtn.onclick = () => {
+  if (bundleItems.length === 0) return alert("Select at least one item.");
+
+  alert("Bundle message sent (placeholder).");
+  bundleModal.style.display = "none";
+};
 
 // -------------------------------
 //  INCREMENT BUSINESS LEADS
@@ -152,7 +282,6 @@ async function loadBusinessSeller(uid) {
 async function incrementBusinessLead(uid) {
   const bizRef = doc(db, "businesses", uid);
   const bizSnap = await getDoc(bizRef);
-
   if (!bizSnap.exists()) return;
 
   const current = bizSnap.data().leads || 0;
