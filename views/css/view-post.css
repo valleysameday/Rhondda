@@ -4,8 +4,13 @@
 
 .post-container {
   padding: 15px;
-  max-width: 900px;
+  max-width: 600px;
   margin: auto;
+}
+
+.post-images img {
+  width: 100%;
+  border-radius: 10px;
 }
 
 .post-price {
@@ -25,125 +30,75 @@
   margin: 15px 0;
 }
 
-/* ========================= */
-/* GALLERY LAYOUT (A) */
-/* BIG LEFT, TWO SMALL RIGHT */
-/* ========================= */
-
 .gallery-wrapper {
-  width: 100%;
   display: flex;
-  gap: 12px;
+  gap: 10px;
   position: relative;
-  margin-bottom: 20px;
 }
 
 .gallery-left {
-  width: 70%;
-  overflow: hidden;
-  border-radius: 12px;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 30%;
 }
 
 .gallery-right {
-  width: 30%;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  width: 70%;
 }
 
 .gallery-main {
   width: 100%;
-  height: 420px;
-  object-fit: cover;
-  border-radius: 12px;
+  height: auto;
+  border-radius: 8px;
   cursor: pointer;
-  user-select: none;
 }
 
 .gallery-thumb {
   width: 100%;
-  height: 200px;
+  height: 48%;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: 8px;
   cursor: pointer;
-  user-select: none;
 }
 
-/* Photo count badge */
 .gallery-count {
   position: absolute;
-  top: 12px;
-  left: 12px;
-  background: rgba(0,0,0,0.65);
-  color: #fff;
-  padding: 5px 12px;
+  top: 10px;
+  left: 10px;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  padding: 4px 10px;
   border-radius: 20px;
   font-size: 14px;
-  z-index: 20;
+  z-index: 10;
 }
 
-/* ========================= */
-/* SWIPE SUPPORT */
-/* ========================= */
-
-.gallery-left,
-.gallery-right,
-.gallery-main,
-.gallery-thumb {
-  touch-action: pan-y;
-}
-
-/* ========================= */
-/* FULLSCREEN LIGHTBOX */
-/* ========================= */
-
+/* Lightbox */
 .lightbox {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.92);
+  background: rgba(0,0,0,0.85);
   justify-content: center;
   align-items: center;
-  flex-direction: column;
   z-index: 9999;
-  padding: 20px;
 }
 
 .lightbox-img {
-  max-width: 95%;
-  max-height: 70%;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  user-select: none;
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 10px;
 }
 
 .lightbox-close {
   position: absolute;
-  top: 25px;
-  right: 30px;
-  font-size: 45px;
+  top: 30px;
+  right: 40px;
+  font-size: 40px;
   color: white;
   cursor: pointer;
-  z-index: 10000;
 }
-
-/* ========================= */
-/* AD BLOCK INSIDE LIGHTBOX */
-/* ========================= */
-
-.lightbox-ad {
-  width: 100%;
-  max-width: 600px;
-  background: #fff;
-  padding: 18px;
-  border-radius: 12px;
-  text-align: center;
-  font-size: 1rem;
-  color: #333;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-}
-
 /* ========================= */
 /* SELLER CARD */
 /* ========================= */
@@ -232,6 +187,7 @@
   margin-top: 15px;
 }
 
+
 /* ========================= */
 /* OTHER ADS CAROUSEL */
 /* ========================= */
@@ -266,6 +222,17 @@
   padding: 6px;
   font-weight: bold;
 }
+
+.bundle-btn {
+  width: 100%;
+  padding: 12px;
+  background: #6f42c1;
+  color: #fff;
+  border-radius: 8px;
+  border: none;
+  margin-top: 15px;
+}
+
 
 /* ========================= */
 /* BUNDLE MODAL */
@@ -343,27 +310,4 @@
   border-radius: 8px;
   border: none;
   margin-top: 10px;
-}
-
-/* ========================= */
-/* RESPONSIVE */
-/* ========================= */
-
-@media (max-width: 700px) {
-  .gallery-wrapper {
-    flex-direction: column;
-  }
-
-  .gallery-left,
-  .gallery-right {
-    width: 100%;
-  }
-
-  .gallery-main {
-    height: 300px;
-  }
-
-  .gallery-thumb {
-    height: 150px;
-  }
 }
