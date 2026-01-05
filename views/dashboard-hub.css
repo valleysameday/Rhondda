@@ -156,45 +156,135 @@
   object-fit: cover;
 }
 
-/* SETTINGS */
-.settings-card {
-  background: #fff;
-  padding: 18px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  margin-top: 12px;
-}
+/* SETTINGS — RCT‑X POLISHED */
 
-.settings-card h2 {
-  font-size: 20px;
-  margin-bottom: 16px;
-}
-
-.settings-row {
-  margin-bottom: 16px;
+/* Settings Page Layout */
+.settings-wrapper {
   display: flex;
   flex-direction: column;
+  gap: 18px;
+  margin-top: 10px;
 }
 
-.settings-row label {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 6px;
+/* Section Title */
+.settings-section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 10px 0 4px;
 }
 
-.settings-row input,
-.settings-row textarea {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
+/* Settings Card Enhancements */
+.settings-card {
+  animation: fadeIn 0.3s ease-out;
+  border: 1px solid #e2e8f0;
+}
+
+/* Input Focus */
+.settings-row input:focus,
+.settings-row textarea:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 2px rgba(14,165,233,0.25);
+  outline: none;
+}
+
+/* Readonly Fields */
+.settings-row.readonly span {
+  padding: 10px 0;
+  opacity: 0.7;
   font-size: 15px;
+  color: #475569;
 }
 
-.settings-row textarea {
-  min-height: 90px;
-  resize: vertical;
+/* Save Button */
+.settings-save-btn {
+  background: #0ea5e9;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  width: 100%;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.2s ease;
 }
 
+.settings-save-btn:hover {
+  background: #0284c7;
+}
+
+/* Divider */
+.settings-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 14px 0;
+}
+
+/* Profile Header (Optional) */
+.settings-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.settings-profile-header img {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.settings-profile-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Toggle Switch */
+.settings-toggle {
+  position: relative;
+  width: 46px;
+  height: 24px;
+}
+
+.settings-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.settings-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: #cbd5e1;
+  border-radius: 24px;
+  transition: 0.3s;
+}
+
+.settings-toggle-slider:before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.settings-toggle input:checked + .settings-toggle-slider {
+  background: #0ea5e9;
+}
+
+.settings-toggle input:checked + .settings-toggle-slider:before {
+  transform: translateX(22px);
+}
 /* MODAL */
 .modal-overlay {
   position: fixed;
