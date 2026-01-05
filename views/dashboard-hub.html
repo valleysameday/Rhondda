@@ -1,23 +1,46 @@
-<!-- RCT‑X — Unified Seller Dashboard -->
-<link rel="stylesheet" href="/views/dashboard-hub.css">
+<link rel="stylesheet" href="/index/css/dashboard-hub.css">
+<input type="file" id="avatarUploadInput" accept="image/*" style="display:none;">
 
-<div class="dashboard-container fade-in">
+<div class="dashboard-container">
 
-  <!-- TOP NAVIGATION -->
+  <!-- HEADER -->
+  <header id="dashHeader" class="dash-header">
+    <div>
+      <p id="dashGreeting" class="dash-hello">Shwmae, friend</p>
+      <h1 id="dashTitle">Welcome to RCT‑X</h1>
+      <p id="dashTagline" class="dash-tagline">Let’s get your Rhondda profile looking tidy</p>
+    </div>
+    <div class="dash-header-right">
+      <span id="headerAreaBadge" class="area-badge">Add your area</span>
+      <div class="plan-badges">
+        <span id="planBadge" class="plan-badge free">Free Forever</span>
+        <span id="trialBadge" class="trial-badge" style="display:none;"></span>
+      </div>
+      <button id="logoutBtn" class="logout-btn">Log out</button>
+    </div>
+  </header>
+
+  <!-- TOP NAV -->
   <nav class="top-nav">
-    <button class="top-nav-item active" data-tab="overview">
-      <span class="top-nav-icon">📊</span>
+    <button class="top-nav-item active" data-tab="overviewTab">
+      <span class="top-nav-icon">🏠</span>
       <span class="top-nav-text">Overview</span>
     </button>
-
-    <button class="top-nav-item" data-tab="my-ads">
-      <span class="top-nav-icon">📦</span>
+    <button class="top-nav-item" data-tab="adsTab">
+      <span class="top-nav-icon">📢</span>
       <span class="top-nav-text">My Ads</span>
     </button>
-
-    <button class="top-nav-item" data-tab="settings">
+    <button class="top-nav-item" data-tab="settingsTab">
       <span class="top-nav-icon">⚙️</span>
       <span class="top-nav-text">Settings</span>
+    </button>
+    <button id="sellerPlusTabBtn" class="top-nav-item" data-tab="sellerPlusTab" style="display:none;">
+      <span class="top-nav-icon">⭐</span>
+      <span class="top-nav-text">Seller+</span>
+    </button>
+    <button id="businessTabBtn" class="top-nav-item" data-tab="businessTab" style="display:none;">
+      <span class="top-nav-icon">🏢</span>
+      <span class="top-nav-text">Business</span>
     </button>
   </nav>
 
@@ -25,93 +48,321 @@
   <main class="main-content">
 
     <!-- OVERVIEW TAB -->
-    <div class="tab-content active" data-tab="overview">
-      <header class="content-header">
-        <div>
-          <h1 id="viewTitle">Overview</h1>
-          <div id="planBadge" class="plan-badge free">General</div>
-          <span id="trialBadge" class="trial-badge" style="display:none;"></span>
+    <section id="overviewTab" class="tab-view fade-in">
+
+      <!-- STATS -->
+      <div class="stats-box">
+        <h2>Your stats</h2>
+        <div class="stats-grid">
+          <div class="stat-pill">
+            <span id="statAdsCount" class="stat-number">0</span>
+            <span class="stat-label">Ads posted</span>
+          </div>
+          <div class="stat-pill">
+            <span id="statTotalViews" class="stat-number">0</span>
+            <span class="stat-label">Total views</span>
+          </div>
+          <div class="stat-pill">
+            <span id="statUnlocks" class="stat-number">0</span>
+            <span class="stat-label">Unlocks / Leads</span>
+          </div>
         </div>
-      </header>
+      </div>
 
-      <!-- WIDGET GRID -->
-      <div id="widgetGrid" class="overview-grid"></div>
-
-      <!-- LISTINGS PREVIEW -->
-      <section class="ads-management slide-up">
-        <div class="section-header">
-          <h3>My Recent Listings</h3>
-          <button class="text-link-btn" id="seeAllAdsBtn">See all</button>
+      <!-- PROFILE -->
+      <div class="profile-box widget slide-up">
+        <div class="avatar-section">
+          <div id="avatarClickArea" class="avatar-wrapper">
+            <div id="dashboardAvatar" class="avatar-circle"></div>
+          </div>
+          <p class="avatar-edit-hint">Tap to change photo</p>
         </div>
-        <div id="adsList" class="ads-mini-list"></div>
-      </section>
-    </div>
 
-    <!-- MY ADS TAB -->
-    <div class="tab-content" data-tab="my-ads">
-      <h1>My Ads</h1>
-      <div id="myAdsContainer"></div>
-    </div>
+        <div class="profile-box-header">
+          <h2>Your Profile</h2>
+          <button id="toggleEditProfile" class="edit-profile-btn">Edit profile</button>
+        </div>
+
+        <!-- VIEW MODE -->
+        <div id="profileViewMode" class="profile-view">
+          <div class="profile-line">
+            <span class="profile-label">Name</span>
+            <span id="viewName" class="profile-value">Add your name</span>
+          </div>
+          <div class="profile-line">
+            <span class="profile-label">Phone (private)</span>
+            <span id="viewPhone" class="profile-value">Add your phone</span>
+          </div>
+          <div class="profile-line">
+            <span class="profile-label">Area</span>
+            <span id="viewArea" class="profile-value">Add your area</span>
+          </div>
+          <div class="profile-line profile-line-bio">
+            <span class="profile-label">Bio</span>
+            <p id="viewBio" class="profile-value bio-value">
+              Tell locals a bit about yourself and what you’re selling.
+            </p>
+          </div>
+        </div>
+
+        <!-- EDIT MODE -->
+        <div id="profileEditMode" class="profile-edit" style="display:none;">
+          <div class="profile-row">
+            <label for="profileNameInput">Name</label>
+            <input id="profileNameInput" type="text" placeholder="Your name">
+          </div>
+          <div class="profile-row">
+            <label for="profilePhoneInput">Phone (private)</label>
+            <input id="profilePhoneInput" type="text" placeholder="Your phone number">
+            <small class="hint-text">We never show this publicly without your say‑so.</small>
+          </div>
+          <div class="profile-row" style="position: relative;">
+            <label for="profileAreaInput">Area</label>
+            <input id="profileAreaInput" type="text" placeholder="e.g. Treorchy, Tonypandy, Porth">
+            <div id="areaSuggestions" class="suggestions-box"></div>
+          </div>
+          <div class="profile-row">
+            <label for="profileBioInput">Bio</label>
+            <textarea id="profileBioInput" placeholder="Tell locals who you are and what you sell."></textarea>
+          </div>
+          <div class="profile-edit-actions">
+            <button id="saveProfileBtn" class="dash-save-btn">Save changes</button>
+            <button id="cancelEditProfileBtn" class="cancel-edit-btn">Cancel</button>
+          </div>
+        </div>
+
+        <p id="profileFeedback" class="feedback-text"></p>
+      </div>
+
+      <!-- QUICK UPGRADE -->
+      <div class="widget slide-up">
+        <div class="widget-title">Upgrade your account</div>
+        <p class="widget-sub">Unlock Seller+ or Business tools with a 30‑day free trial. No card needed.</p>
+        <button id="openUpgradeModalBtn" class="dash-save-btn">View plans</button>
+      </div>
+
+    </section>
+
+    <!-- ADS TAB -->
+    <section id="adsTab" class="tab-view" style="display:none;">
+      <div class="content-header">
+        <h2>Your ads</h2>
+        <button id="newPostBtn" class="dash-new-post">
+          <span class="new-post-label">+ Post an Ad</span>
+          <span class="new-post-tag">FREE</span>
+        </button>
+      </div>
+      <div id="userPosts" class="dash-posts-grid"></div>
+    </section>
+
+    <!-- SELLER+ TAB -->
+    <section id="sellerPlusTab" class="tab-view" style="display:none;">
+      <h2 class="section-title">Seller+ tools</h2>
+      <div class="widget">
+        <p class="widget-sub">Here you can add Seller+‑only tools later (boosts, featured slots, etc.).</p>
+      </div>
+    </section>
+
+    <!-- BUSINESS TAB -->
+    <section id="businessTab" class="tab-view" style="display:none;">
+
+      <!-- BUSINESS STATS -->
+      <div class="biz-stats-box">
+        <h2>Your Business Stats</h2>
+        <div class="biz-stats-grid">
+          <div class="biz-stat-pill">
+            <span id="bizStatAdsCount" class="biz-stat-number">0</span>
+            <span class="biz-stat-label">Active Ads</span>
+          </div>
+          <div class="biz-stat-pill">
+            <span id="bizStatTotalViews" class="biz-stat-number">0</span>
+            <span class="biz-stat-label">Total Views</span>
+          </div>
+          <div class="biz-stat-pill">
+            <span id="bizStatLeads" class="biz-stat-number">0</span>
+            <span class="biz-stat-label">Leads</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BUSINESS PROFILE -->
+      <div class="biz-profile-box">
+        <div class="biz-avatar-section">
+          <div id="bizAvatarClickArea" class="biz-avatar-wrapper">
+            <div id="bizDashboardAvatar" class="biz-avatar-circle"></div>
+          </div>
+          <p class="biz-avatar-edit-hint">Tap to change business photo</p>
+        </div>
+
+        <div class="biz-profile-header">
+          <h2>Your Business Profile</h2>
+          <button id="bizToggleEditProfile" class="biz-edit-profile-btn">Edit</button>
+        </div>
+
+        <!-- VIEW -->
+        <div id="bizProfileViewMode" class="biz-profile-view">
+          <div class="biz-profile-line">
+            <span class="biz-profile-label">Business Name</span>
+            <span id="bizViewName" class="biz-profile-value">Add your business name</span>
+          </div>
+          <div class="biz-profile-line">
+            <span class="biz-profile-label">Phone</span>
+            <span id="bizViewPhone" class="biz-profile-value">Add your phone</span>
+          </div>
+          <div class="biz-profile-line">
+            <span class="biz-profile-label">Area</span>
+            <span id="bizViewArea" class="biz-profile-value">Add your area</span>
+          </div>
+          <div class="biz-profile-line">
+            <span class="biz-profile-label">Website</span>
+            <span id="bizViewWebsite" class="biz-profile-value">Add your website</span>
+          </div>
+          <div class="biz-profile-line biz-profile-line-bio">
+            <span class="biz-profile-label">About Your Business</span>
+            <p id="bizViewBio" class="biz-profile-value">
+              Tell customers what you offer and why they should choose you.
+            </p>
+          </div>
+        </div>
+
+        <!-- EDIT -->
+        <div id="bizProfileEditMode" class="biz-profile-edit" style="display:none;">
+          <div class="biz-profile-row">
+            <label>Business Name</label>
+            <input id="bizNameInput" type="text" placeholder="Your business name">
+          </div>
+          <div class="biz-profile-row">
+            <label>Phone</label>
+            <input id="bizPhoneInput" type="text" placeholder="Your phone number">
+          </div>
+          <div class="biz-profile-row" style="position: relative;">
+            <label>Area</label>
+            <input id="bizAreaInput" type="text" placeholder="e.g. Treorchy, Tonypandy">
+            <div id="bizAreaSuggestions" class="biz-suggestions-box"></div>
+          </div>
+          <div class="biz-profile-row">
+            <label>Website</label>
+            <input id="bizWebsiteInput" type="text" placeholder="https://yourbusiness.com">
+          </div>
+          <div class="biz-profile-row">
+            <label>About Your Business</label>
+            <textarea id="bizBioInput" placeholder="Tell customers what you offer"></textarea>
+          </div>
+          <div class="biz-profile-edit-actions">
+            <button id="bizSaveProfileBtn" class="biz-save-btn">Save changes</button>
+            <button id="bizCancelEditProfileBtn" class="biz-cancel-edit-btn">Cancel</button>
+          </div>
+        </div>
+
+        <p id="bizProfileFeedback" class="biz-feedback-text"></p>
+      </div>
+
+      <!-- BUSINESS ADS -->
+      <div class="content-header">
+        <h2 class="biz-section-title">Your Business Ads</h2>
+        <button id="bizNewPostBtn" class="biz-new-post">
+          <span class="biz-new-post-label">+ Create Business Ad</span>
+          <span class="biz-new-post-tag">PREMIUM</span>
+        </button>
+      </div>
+      <div id="bizPosts" class="biz-posts-grid"></div>
+
+    </section>
 
     <!-- SETTINGS TAB -->
-    <div class="tab-content" data-tab="settings">
-      <h1>Settings</h1>
-      <div id="settingsContainer"></div>
-    </div>
+    <section id="settingsTab" class="tab-view" style="display:none;">
+      <h2 class="settings-section-title">Account settings</h2>
+
+      <div class="settings-wrapper">
+
+        <div class="settings-card">
+          <h2>Plan & billing</h2>
+          <div class="settings-row readonly">
+            <label>Current plan</label>
+            <span id="settingsPlanLabel">Free Forever</span>
+          </div>
+          <div class="settings-row readonly">
+            <label>Trial status</label>
+            <span id="settingsTrialLabel">No active trial</span>
+          </div>
+          <button id="settingsChangePlanBtn" class="settings-save-btn">Change plan</button>
+        </div>
+
+        <div class="settings-card">
+          <h2>Profile details</h2>
+          <div class="settings-row">
+            <label>Name</label>
+            <input id="settingsNameInput" type="text" placeholder="Your name">
+          </div>
+          <div class="settings-row">
+            <label>Area</label>
+            <input id="settingsAreaInput" type="text" placeholder="Your area">
+          </div>
+          <div class="settings-row">
+            <label>Bio</label>
+            <textarea id="settingsBioInput" placeholder="Short bio"></textarea>
+          </div>
+          <button id="settingsSaveProfileBtn" class="settings-save-btn">Save profile</button>
+        </div>
+
+      </div>
+    </section>
 
   </main>
 </div>
 
-<!-- UPGRADE / TRIAL MODAL -->
-<div id="upgradeModal" class="modal-overlay" style="display:none;">
+<!-- UPGRADE MODAL -->
+<div id="upgradeModalOverlay" class="modal-overlay" style="display:none;">
   <div class="pricing-modal slide-up">
-    <div class="modal-handle"></div>
-    <button class="close-btn" id="closeUpgradeModalBtn">×</button>
+    <button id="closeUpgradeModalBtn" class="close-btn">&times;</button>
+    <h2>Choose your RCT‑X plan</h2>
+    <p class="widget-sub">Start a 30‑day free trial. No card needed. You can add Stripe later.</p>
 
-    <h2>Upgrade Your Selling</h2>
-    <p class="modal-sub">Unlock more tools & features.</p>
+    <div class="plan-list">
 
-    <div class="tiers-container">
-
-      <div class="tier-card" id="tier-free">
-        <h4>0 Cost "Free Forever"</h4>
-        <div class="price">£0<span>/mo</span></div>
-        <ul class="tier-features">
-          <li>Basic dashboard</li>
-          <li>Standard visibility</li>
-          <li>Online Messaging</li>
+      <div class="plan-card">
+        <h3>Free Forever</h3>
+        <p class="plan-price">£0 / month</p>
+        <ul class="plan-features">
+          <li>Post ads</li>
+          <li>Basic profile</li>
+          <li>Local reach</li>
         </ul>
-        <button class="tier-action-btn" data-plan="free">Current</button>
+        <button class="plan-btn" data-plan="free">Stay on Free</button>
       </div>
 
-      <div class="tier-card featured" id="tier-sellerplus">
-        <div class="ribbon">Popular</div>
-        <h4>Seller+</h4>
-        <div class="price">£3.99<span>/mo</span></div>
-        <p class="daily-hint">Less than 15p/day</p>
-        <ul class="tier-features">
-          <li>Bundle enquiries</li>
-          <li>Online Messaging</li>
-          <li>Verified seller badge</li>
+      <div class="plan-card">
+        <h3>Seller+</h3>
+        <p class="plan-price">£3.99 / month</p>
+        <p class="plan-tagline">30‑day free trial</p>
+        <ul class="plan-features">
+          <li>Everything in Free</li>
+          <li>Seller+ tools</li>
+          <li>Priority placement (future)</li>
         </ul>
-        <button class="tier-action-btn" data-plan="sellerplus">Upgrade</button>
+        <button class="plan-btn primary" data-plan="sellerplus">Start Seller+ trial</button>
       </div>
 
-      <div class="tier-card" id="tier-business">
-        <div class="ribbon ribbon-outline">30‑Day Free Trial</div>
-        <h4>Business</h4>
-        <div class="price">£9.99<span>/mo</span></div>
-        <p class="daily-hint">No card needed</p>
-        <ul class="tier-features">
-          <li>Business ribbon on profile</li>
-          <li>Full performance analytics</li>
-          <li>Bundle enquiries</li>
-          <li>Priority ad support</li>
-          <li>Online Messaging</li>
+      <div class="plan-card">
+        <h3>Business</h3>
+        <p class="plan-price">£7.99 / month</p>
+        <p class="plan-tagline">30‑day free trial</p>
+        <ul class="plan-features">
+          <li>Business profile</li>
+          <li>Business ads & stats</li>
+          <li>Leads tracking</li>
         </ul>
-        <button class="tier-action-btn" data-plan="business">Start Trial</button>
+        <button class="plan-btn primary" data-plan="business">Start Business trial</button>
       </div>
 
     </div>
   </div>
 </div>
+
+<!-- LOGOUT OVERLAY -->
+<div id="logoutOverlay" class="logout-overlay">
+  <div class="logout-card">
+    <p>Logging you out...</p>
+    <small>Please wait</small>
+  </div>
+  </div>
