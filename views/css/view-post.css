@@ -91,7 +91,6 @@
   inset: 0;
   background: rgba(0,0,0,0.95);
   z-index: 9999;
-  display: none;
   flex-direction: column;
   justify-content: center;
   align-items: center;
