@@ -93,18 +93,38 @@ export async function init({ auth: a, db: d }) {
       if (convo.deletedFor?.[user.uid]) continue;
 
       const [u1, u2, postId] = convoId.split("_");
-      const otherId = user.uid === u1 ? u2 : u1;
+const otherId = user.uid === u1 ? u2 : u1;
 
-      const otherSnap = await getDoc(doc(db, "users", otherId));
-      const other = otherSnap.exists() ? otherSnap.data() : { name: "User" };
+/* ============================================================
+   VALIDATE CONVERSATION ID
+============================================================ */
+if (!u1 || !u2 || !postId || postId === "undefined" || postId.length < 3) {
+  console.warn("Deleting malformed conversation:", convoId);
+  await deleteDoc(doc(db, "conversations", convoId));
+  continue;
+}
 
-      let postTitle = "";
-      try {
-        const postSnap = await getDoc(doc(db, "posts", postId));
-        if (postSnap.exists()) postTitle = postSnap.data().title || "";
-      } catch (err) {
-        console.error("Error loading post for chat list:", err);
-      }
+/* ============================================================
+   LOAD OTHER USER
+============================================================ */
+let other = { name: "User" };
+try {
+  const otherSnap = await getDoc(doc(db, "users", otherId));
+  if (otherSnap.exists()) other = otherSnap.data();
+} catch (err) {
+  console.warn("Error loading user for chat list:", err);
+}
+
+/* ============================================================
+   LOAD POST TITLE SAFELY
+============================================================ */
+let postTitle = "";
+try {
+  const postSnap = await getDoc(doc(db, "posts", postId));
+  if (postSnap.exists()) postTitle = postSnap.data().title || "";
+} catch (err) {
+  console.warn("Error loading post for chat list:", err);
+}
 
       const isUnread =
         convo.lastMessageSender && convo.lastMessageSender !== user.uid;
