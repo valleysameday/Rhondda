@@ -6,14 +6,43 @@
 
   <div class="seller-avatar-wrapper">
     <div id="sellerAvatar" class="seller-avatar">U</div>
-    <div id="businessRibbon" class="business-ribbon-badge" style="display:none;"></div>
+    <div id="businessRibbon" class="business-ribbon-badge" style="display:none;">Business</div>
   </div>
 
   <div class="seller-header">
     <h2 id="sellerName"></h2>
     <p id="sellerReliability"></p>
   </div>
-<button id="backToPost">Back</button>
+
+  <!-- ⭐ BUSINESS INFO SECTION (Shown only for business accounts) -->
+  <div id="businessInfoSection" class="business-info-section" style="display:none; padding: 0 20px; margin-top: 10px;">
+
+    <div class="biz-info-line">
+      <span class="biz-info-icon">📞</span>
+      <span id="bizPhoneMasked">••••••••••</span>
+      <button id="revealBizPhoneBtn" class="reveal-btn">Tap to Reveal</button>
+    </div>
+
+    <div class="biz-info-line">
+      <span class="biz-info-icon">🌐</span>
+      <a id="bizWebsiteLink" href="#" target="_blank" class="biz-info-value"></a>
+    </div>
+
+    <div class="biz-info-line">
+      <span class="biz-info-icon">📍</span>
+      <span id="bizAreaValue" class="biz-info-value"></span>
+    </div>
+
+    <div class="biz-info-line biz-info-bio">
+      <span class="biz-info-icon">📝</span>
+      <p id="bizBioValue" class="biz-info-value"></p>
+    </div>
+
+  </div>
+  <!-- END BUSINESS INFO -->
+
+  <button id="backToPost">Back</button>
+
   <div class="seller-stats-grid">
     <div class="stat-card">
       <span id="streakCount" class="stat-value">0</span>
@@ -25,7 +54,7 @@
     </div>
   </div>
 
-  <div class="seller-bio-section">
+  <div class="seller-bio-section" id="personalBioSection">
     <h3>About Seller</h3>
     <p id="sellerBio"></p>
   </div>
