@@ -109,7 +109,11 @@ async function loadPost() {
     postTitleEl.textContent = post.title || "Untitled";
     postPriceEl.textContent = post.price ? `£${post.price}` : "£0";
     postDescEl.textContent = post.description || "No description provided.";
-    postImageEl.src = post.imageUrls?.[0] || "/img/placeholder.png";
+    postImageEl.src =
+  post.imageUrls?.[0] ||
+  post.imageUrl ||
+  post.images?.[0] ||
+  "/images/image-webholder.webp";
 
     // Detect seller type
     sellerUid = post.businessId || post.userId;
