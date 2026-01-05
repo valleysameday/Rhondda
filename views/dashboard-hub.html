@@ -1,40 +1,31 @@
-<!-- UNIFIED SELLER HUB — RHONDDA NOTICEBOARD -->
+<!-- RCT‑X — Unified Seller Dashboard -->
 <link rel="stylesheet" href="/views/dashboard-hub.css">
 
 <div class="dashboard-container fade-in">
 
-  <!-- SIDEBAR / MOBILE NAV -->
-  <aside class="sidebar">
-    <div class="sidebar-brand">Rhondda Hub</div>
+  <!-- TOP NAVIGATION -->
+  <nav class="top-nav">
+    <button class="top-nav-item active" data-tab="overview">
+      <span class="top-nav-icon">📊</span>
+      <span class="top-nav-text">Overview</span>
+    </button>
 
-    <nav class="sidebar-nav" id="sidebarNav">
-      <button class="nav-item active" data-tab="overview">
-        <span class="nav-icon">📊</span>
-        <span class="nav-text">Overview</span>
-      </button>
-      <button class="nav-item" data-tab="my-ads">
-        <span class="nav-icon">📦</span>
-        <span class="nav-text">My Ads</span>
-      </button>
-      <button class="nav-item" data-tab="settings">
-        <span class="nav-icon">⚙️</span>
-        <span class="nav-text">Settings</span>
-      </button>
-    </nav>
+    <button class="top-nav-item" data-tab="my-ads">
+      <span class="top-nav-icon">📦</span>
+      <span class="top-nav-text">My Ads</span>
+    </button>
 
-    <!-- Upgrade / Trial Box -->
-    <div id="sidebarUpgradeBox" class="sidebar-footer">
-      <p id="sidebarPlanLabel">Classic</p>
-      <p id="sidebarTrialLabel" class="trial-label"></p>
-      <button class="upgrade-sidebar-btn" id="upgradeSidebarBtn">Upgrade</button>
-    </div>
-  </aside>
+    <button class="top-nav-item" data-tab="settings">
+      <span class="top-nav-icon">⚙️</span>
+      <span class="top-nav-text">Settings</span>
+    </button>
+  </nav>
 
   <!-- MAIN CONTENT -->
   <main class="main-content">
 
     <!-- OVERVIEW TAB -->
-    <div class="tab-content" data-tab="overview" style="display:block;">
+    <div class="tab-content active" data-tab="overview">
       <header class="content-header">
         <div>
           <h1 id="viewTitle">Overview</h1>
@@ -57,13 +48,13 @@
     </div>
 
     <!-- MY ADS TAB -->
-    <div class="tab-content" data-tab="my-ads" style="display:none;">
+    <div class="tab-content" data-tab="my-ads">
       <h1>My Ads</h1>
       <div id="myAdsContainer"></div>
     </div>
 
     <!-- SETTINGS TAB -->
-    <div class="tab-content" data-tab="settings" style="display:none;">
+    <div class="tab-content" data-tab="settings">
       <h1>Settings</h1>
       <div id="settingsContainer"></div>
     </div>
@@ -81,7 +72,7 @@
     <p class="modal-sub">Unlock more tools & features.</p>
 
     <div class="tiers-container">
-      <!-- Free, Seller+, Business tiers same as before -->
+
       <div class="tier-card" id="tier-free">
         <h4>0 Cost "Free Forever"</h4>
         <div class="price">£0<span>/mo</span></div>
@@ -120,6 +111,7 @@
         </ul>
         <button class="tier-action-btn" data-plan="business">Start Trial</button>
       </div>
+
     </div>
   </div>
 </div>
