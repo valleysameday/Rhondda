@@ -4,9 +4,22 @@
   <!-- ========================= -->
   <!-- AD CONTENT -->
   <!-- ========================= -->
-  <div class="post-images">
-    <img id="postImage" src="/img/placeholder.png">
+<div id="postGallery" class="gallery-wrapper">
+  <div id="galleryCount" class="gallery-count"></div>
+  <div class="gallery-left">
+    <img id="thumb1" class="gallery-thumb" />
+    <img id="thumb2" class="gallery-thumb" />
   </div>
+  <div class="gallery-right">
+    <img id="mainImage" class="gallery-main" />
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox">
+  <span id="lightboxClose" class="lightbox-close">×</span>
+  <img id="lightboxImage" class="lightbox-img" />
+</div>
 
   <h1 id="postTitle"></h1>
   <div class="post-price" id="postPrice"></div>
