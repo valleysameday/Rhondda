@@ -6,7 +6,13 @@
 import { getFirebase } from "/index/js/firebase/init.js";
 
 import {
-  doc, getDoc, updateDoc, collection, query, where, getDocs
+  doc,
+  getDoc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // -------------------------------
@@ -16,10 +22,12 @@ let db, auth, storage;
 
 async function initFirebase() {
   try {
+    console.log("[INIT] Initialising Firebase...");
     const fb = await getFirebase();
     db = fb.db;
     auth = fb.auth;
     storage = fb.storage;
+    console.log("[INIT] Firebase ready:", { db: !!db, auth: !!auth, storage: !!storage });
   } catch (err) {
     console.error("Firebase init failed:", err);
   }
@@ -60,6 +68,7 @@ const sendBundleBtn = document.getElementById("sendBundleBtn");
 // -------------------------------
 const urlParams = new URLSearchParams(window.location.search);
 const postId = urlParams.get("id");
+console.log("[VIEW POST] URL postId:", postId);
 
 // -------------------------------
 //  BUNDLE STATE
@@ -71,179 +80,262 @@ let sellerUid = null;
 //  LOAD POST
 // -------------------------------
 async function loadPost() {
-  if (!postId) return;
+  try {
+    if (!postId) {
+      console.warn("[LOAD POST] No postId in URL");
+      postTitleEl.textContent = "Post Not Found";
+      return;
+    }
 
-  const postRef = doc(db, "posts", postId);
-  const postSnap = await getDoc(postRef);
+    if (!db) {
+      console.error("[LOAD POST] Firestore db is not initialised");
+      postTitleEl.textContent = "Error loading post";
+      return;
+    }
 
-  if (!postSnap.exists()) {
-    postTitleEl.textContent = "Post Not Found";
-    return;
+    console.log("[LOAD POST] Fetching post:", postId);
+    const postRef = doc(db, "posts", postId);
+    const postSnap = await getDoc(postRef);
+
+    if (!postSnap.exists()) {
+      console.warn("[LOAD POST] Post does not exist:", postId);
+      postTitleEl.textContent = "Post Not Found";
+      return;
+    }
+
+    const post = postSnap.data();
+    console.log("[LOAD POST] Post data:", post);
+
+    // Fill post UI
+    postTitleEl.textContent = post.title || "Untitled";
+    postPriceEl.textContent = post.price ? `£${post.price}` : "£0";
+    postDescEl.textContent = post.description || "No description provided.";
+    postImageEl.src = post.imageUrls?.[0] || "/img/placeholder.png";
+
+    // Detect seller type
+    sellerUid = post.businessId || post.userId;
+    console.log("[LOAD POST] sellerUid resolved to:", sellerUid, "businessId:", post.businessId, "userId:", post.userId);
+
+    if (!sellerUid) {
+      console.warn("[LOAD POST] No sellerUid found on post");
+    }
+
+    if (post.businessId) {
+      console.log("[LOAD POST] Loading business seller:", post.businessId);
+      await loadBusinessSeller(post.businessId);
+    } else if (post.userId) {
+      console.log("[LOAD POST] Loading personal seller:", post.userId);
+      await loadPersonalSeller(post.userId);
+    } else {
+      console.warn("[LOAD POST] Post has neither businessId nor userId");
+    }
+
+    if (sellerUid) {
+      await loadOtherAds(sellerUid);
+    } else {
+      console.warn("[LOAD POST] Skipping other ads, sellerUid is null");
+    }
+  } catch (err) {
+    console.error("[LOAD POST] Error:", err);
+    postTitleEl.textContent = "Error loading post";
   }
-
-  const post = postSnap.data();
-
-  // Fill post UI
-  postTitleEl.textContent = post.title;
-  postPriceEl.textContent = `£${post.price}`;
-  postDescEl.textContent = post.description;
-  postImageEl.src = post.imageUrls?.[0] || "/img/placeholder.png";
-
-  // Detect seller type
-  sellerUid = post.businessId || post.userId;
-
-  if (post.businessId) {
-    await loadBusinessSeller(post.businessId);
-  } else {
-    await loadPersonalSeller(post.userId);
-  }
-
-  await loadOtherAds(sellerUid);
 }
 
 // -------------------------------
 //  LOAD PERSONAL SELLER
 // -------------------------------
 async function loadPersonalSeller(uid) {
-  const userRef = doc(db, "users", uid);
-  const userSnap = await getDoc(userRef);
-  if (!userSnap.exists()) return;
+  try {
+    if (!uid) {
+      console.warn("[LOAD PERSONAL SELLER] No uid provided");
+      return;
+    }
 
-  const user = userSnap.data();
+    console.log("[LOAD PERSONAL SELLER] Fetching user:", uid);
+    const userRef = doc(db, "users", uid);
+    const userSnap = await getDoc(userRef);
+    if (!userSnap.exists()) {
+      console.warn("[LOAD PERSONAL SELLER] User not found:", uid);
+      return;
+    }
 
-  sellerCardHeader.textContent = "About This Seller";
-  sellerRibbonEl.style.display = "none";
+    const user = userSnap.data();
+    console.log("[LOAD PERSONAL SELLER] User data:", user);
 
-  // Avatar
-  if (user.avatarUrl) {
-    sellerAvatarEl.style.backgroundImage = `url(${user.avatarUrl})`;
-    sellerAvatarEl.textContent = "";
-  } else {
-    sellerAvatarEl.textContent = (user.name || "U").charAt(0).toUpperCase();
+    sellerCardHeader.textContent = "About This Seller";
+    sellerRibbonEl.style.display = "none";
+
+    // Avatar
+    if (user.avatarUrl) {
+      sellerAvatarEl.style.backgroundImage = `url(${user.avatarUrl})`;
+      sellerAvatarEl.textContent = "";
+    } else {
+      sellerAvatarEl.style.backgroundImage = "";
+      sellerAvatarEl.textContent = (user.name || "U").charAt(0).toUpperCase();
+    }
+
+    sellerNameEl.textContent = user.name || "Seller";
+    sellerBioEl.textContent = user.bio || "This seller has not added a bio.";
+    sellerAreaEl.textContent = user.area || "No area listed";
+
+    // Hide business-only fields
+    sellerWebsiteEl.style.display = "none";
+    revealBizPhoneBtn.style.display = "none";
+    bizPhoneMasked.style.display = "none";
+  } catch (err) {
+    console.error("[LOAD PERSONAL SELLER] Error:", err);
   }
-
-  sellerNameEl.textContent = user.name || "Seller";
-  sellerBioEl.textContent = user.bio || "This seller has not added a bio.";
-  sellerAreaEl.textContent = user.area || "No area listed";
-
-  // Hide business-only fields
-  sellerWebsiteEl.style.display = "none";
-  revealBizPhoneBtn.style.display = "none";
-  bizPhoneMasked.style.display = "none";
 }
 
 // -------------------------------
 //  LOAD BUSINESS SELLER
 // -------------------------------
 async function loadBusinessSeller(uid) {
-  const bizRef = doc(db, "businesses", uid);
-  const bizSnap = await getDoc(bizRef);
-  if (!bizSnap.exists()) return;
+  try {
+    if (!uid) {
+      console.warn("[LOAD BUSINESS SELLER] No uid provided");
+      return;
+    }
 
-  const biz = bizSnap.data();
+    console.log("[LOAD BUSINESS SELLER] Fetching business:", uid);
+    const bizRef = doc(db, "businesses", uid);
+    const bizSnap = await getDoc(bizRef);
+    if (!bizSnap.exists()) {
+      console.warn("[LOAD BUSINESS SELLER] Business not found:", uid);
+      return;
+    }
 
-  sellerCardHeader.textContent = "About This Business";
-  sellerRibbonEl.style.display = "inline-block";
+    const biz = bizSnap.data();
+    console.log("[LOAD BUSINESS SELLER] Business data:", biz);
 
-  // Avatar
-  if (biz.avatarUrl) {
-    sellerAvatarEl.style.backgroundImage = `url(${biz.avatarUrl})`;
-    sellerAvatarEl.textContent = "";
-  } else {
-    sellerAvatarEl.textContent = (biz.businessName || "B").charAt(0).toUpperCase();
+    sellerCardHeader.textContent = "About This Business";
+    sellerRibbonEl.style.display = "inline-block";
+
+    // Avatar
+    if (biz.avatarUrl) {
+      sellerAvatarEl.style.backgroundImage = `url(${biz.avatarUrl})`;
+      sellerAvatarEl.textContent = "";
+    } else {
+      sellerAvatarEl.style.backgroundImage = "";
+      sellerAvatarEl.textContent = (biz.businessName || "B").charAt(0).toUpperCase();
+    }
+
+    sellerNameEl.textContent = biz.businessName || "Business";
+    sellerBioEl.textContent = biz.bio || "This business has not added a description.";
+    sellerAreaEl.textContent = biz.area || "No area listed";
+
+    // Website
+    if (biz.website) {
+      sellerWebsiteEl.textContent = biz.website;
+      sellerWebsiteEl.href = biz.website;
+      sellerWebsiteEl.style.display = "block";
+    } else {
+      sellerWebsiteEl.style.display = "none";
+    }
+
+    // Phone reveal
+    bizPhoneMasked.textContent = "••••••••••";
+    revealBizPhoneBtn.style.display = "inline-block";
+    bizPhoneMasked.style.display = "inline-block";
+
+    revealBizPhoneBtn.onclick = () => {
+      bizPhoneMasked.textContent = biz.phone || "No phone listed";
+      revealBizPhoneBtn.style.display = "none";
+      incrementBusinessLead(uid);
+    };
+  } catch (err) {
+    console.error("[LOAD BUSINESS SELLER] Error:", err);
   }
-
-  sellerNameEl.textContent = biz.businessName || "Business";
-  sellerBioEl.textContent = biz.bio || "This business has not added a description.";
-  sellerAreaEl.textContent = biz.area || "No area listed";
-
-  // Website
-  if (biz.website) {
-    sellerWebsiteEl.textContent = biz.website;
-    sellerWebsiteEl.href = biz.website;
-    sellerWebsiteEl.style.display = "block";
-  } else {
-    sellerWebsiteEl.style.display = "none";
-  }
-
-  // Phone reveal
-  bizPhoneMasked.textContent = "••••••••••";
-  revealBizPhoneBtn.style.display = "inline-block";
-  bizPhoneMasked.style.display = "inline-block";
-
-  revealBizPhoneBtn.onclick = () => {
-    bizPhoneMasked.textContent = biz.phone || "No phone listed";
-    revealBizPhoneBtn.style.display = "none";
-    incrementBusinessLead(uid);
-  };
 }
 
 // -------------------------------
 //  LOAD OTHER ADS
 // -------------------------------
 async function loadOtherAds(uid) {
-  otherAdsCarousel.innerHTML = "";
+  try {
+    console.log("[OTHER ADS] Loading other ads for seller:", uid);
+    otherAdsCarousel.innerHTML = "";
 
-  const postsRef = collection(db, "posts");
-  const q = query(postsRef, where("userId", "==", uid));
-  const snap = await getDocs(q);
+    const postsRef = collection(db, "posts");
+    const q = query(postsRef, where("userId", "==", uid));
+    const snap = await getDocs(q);
 
-  snap.forEach(docSnap => {
-    const p = docSnap.data();
+    console.log("[OTHER ADS] Found posts:", snap.size);
 
-    const card = document.createElement("div");
-    card.className = "carousel-card";
-    card.onclick = () => {
-      window.location.href = `/view-post.html?id=${docSnap.id}`;
-    };
+    snap.forEach(docSnap => {
+      const p = docSnap.data();
+      console.log("[OTHER ADS] Post:", docSnap.id, p);
 
-    card.innerHTML = `
-      <img src="${p.imageUrls?.[0] || "/img/placeholder.png"}">
-      <div class="carousel-price">£${p.price}</div>
-    `;
+      const card = document.createElement("div");
+      card.className = "carousel-card";
+      card.onclick = () => {
+        window.location.href = `/view-post.html?id=${docSnap.id}`;
+      };
 
-    otherAdsCarousel.appendChild(card);
-  });
+      card.innerHTML = `
+        <img src="${p.imageUrls?.[0] || "/img/placeholder.png"}">
+        <div class="carousel-price">£${p.price}</div>
+      `;
+
+      otherAdsCarousel.appendChild(card);
+    });
+  } catch (err) {
+    console.error("[OTHER ADS] Error:", err);
+  }
 }
 
 // -------------------------------
 //  OPEN BUNDLE MODAL
 // -------------------------------
 openBundleModalBtn.onclick = async () => {
-  bundleModal.style.display = "block";
-  bundleItems = [];
-  bundleList.innerHTML = "";
-  bundleTotalEl.textContent = "£0";
+  try {
+    console.log("[BUNDLE] Opening bundle modal for seller:", sellerUid);
+    bundleModal.style.display = "block";
+    bundleItems = [];
+    bundleList.innerHTML = "";
+    bundleTotalEl.textContent = "£0";
 
-  const postsRef = collection(db, "posts");
-  const q = query(postsRef, where("uid", "==", sellerUid));
-  const snap = await getDocs(q);
+    if (!sellerUid) {
+      console.warn("[BUNDLE] No sellerUid, cannot load bundle items");
+      return;
+    }
 
-  snap.forEach(docSnap => {
-    const p = docSnap.data();
+    const postsRef = collection(db, "posts");
+    // IMPORTANT: use userId, not uid
+    const q = query(postsRef, where("userId", "==", sellerUid));
+    const snap = await getDocs(q);
 
-    const row = document.createElement("div");
-    row.className = "bundle-row";
+    console.log("[BUNDLE] Found posts for bundle:", snap.size);
 
-    row.innerHTML = `
-      <img src="${p.imageUrls?.[0] || "/img/placeholder.png"}">
-      <div class="bundle-title">${p.title}</div>
-      <div class="bundle-price">£${p.price}</div>
-      <button class="bundle-add-btn" data-id="${docSnap.id}" data-price="${p.price}">
-        + Add
-      </button>
-    `;
+    snap.forEach(docSnap => {
+      const p = docSnap.data();
 
-    bundleList.appendChild(row);
-  });
+      const row = document.createElement("div");
+      row.className = "bundle-row";
 
-  setupBundleButtons();
+      row.innerHTML = `
+        <img src="${p.imageUrls?.[0] || "/img/placeholder.png"}">
+        <div class="bundle-title">${p.title}</div>
+        <div class="bundle-price">£${p.price}</div>
+        <button class="bundle-add-btn" data-id="${docSnap.id}" data-price="${p.price}">
+          + Add
+        </button>
+      `;
+
+      bundleList.appendChild(row);
+    });
+
+    setupBundleButtons();
+  } catch (err) {
+    console.error("[BUNDLE] Error:", err);
+  }
 };
 
 // -------------------------------
 //  BUNDLE BUTTON LOGIC
 // -------------------------------
 function setupBundleButtons() {
+  console.log("[BUNDLE] Setting up bundle buttons");
   const buttons = document.querySelectorAll(".bundle-add-btn");
 
   buttons.forEach(btn => {
@@ -270,6 +362,7 @@ function setupBundleButtons() {
 
 function updateBundleTotal() {
   const total = bundleItems.reduce((sum, item) => sum + item.price, 0);
+  console.log("[BUNDLE] Updated total:", total);
   bundleTotalEl.textContent = `£${total}`;
 }
 
@@ -277,8 +370,12 @@ function updateBundleTotal() {
 //  SEND BUNDLE MESSAGE
 // -------------------------------
 sendBundleBtn.onclick = () => {
-  if (bundleItems.length === 0) return alert("Select at least one item.");
+  if (bundleItems.length === 0) {
+    alert("Select at least one item.");
+    return;
+  }
 
+  console.log("[BUNDLE] Sending bundle message with items:", bundleItems);
   alert("Bundle message sent (placeholder).");
   bundleModal.style.display = "none";
 };
@@ -287,19 +384,32 @@ sendBundleBtn.onclick = () => {
 //  INCREMENT BUSINESS LEADS
 // -------------------------------
 async function incrementBusinessLead(uid) {
-  const bizRef = doc(db, "businesses", uid);
-  const bizSnap = await getDoc(bizRef);
-  if (!bizSnap.exists()) return;
+  try {
+    console.log("[LEADS] Incrementing lead for business:", uid);
+    const bizRef = doc(db, "businesses", uid);
+    const bizSnap = await getDoc(bizRef);
+    if (!bizSnap.exists()) {
+      console.warn("[LEADS] Business not found:", uid);
+      return;
+    }
 
-  const current = bizSnap.data().leads || 0;
+    const current = bizSnap.data().leads || 0;
 
-  await updateDoc(bizRef, {
-    leads: current + 1
-  });
+    await updateDoc(bizRef, {
+      leads: current + 1
+    });
+
+    console.log("[LEADS] New lead count:", current + 1);
+  } catch (err) {
+    console.error("[LEADS] Error incrementing lead:", err);
+  }
 }
 
 // -------------------------------
 //  INIT
 // -------------------------------
-await initFirebase();
-loadPost();
+(async () => {
+  console.log("[INIT] Starting view-post flow");
+  await initFirebase();
+  await loadPost();
+})();
