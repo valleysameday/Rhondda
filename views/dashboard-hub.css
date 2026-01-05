@@ -983,3 +983,8 @@ body {
     flex-direction: row;
   }
    }
+.stats-hint {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin: -4px 0 10px;
+}
