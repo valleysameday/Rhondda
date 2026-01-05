@@ -1,18 +1,29 @@
 // ===============================
 //  VIEW POST PAGE LOGIC (UNIFIED)
-//  No profile page required
+//  Firebase loaded via getFirebase()
 // ===============================
 
-import {
-  getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirebase } from "/index/js/firebase/init.js";
 
 import {
-  getAuth
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  doc, getDoc, updateDoc, collection, query, where, getDocs
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const db = getFirestore();
-const auth = getAuth();
+// -------------------------------
+//  FIREBASE INIT
+// -------------------------------
+let db, auth, storage;
+
+async function initFirebase() {
+  try {
+    const fb = await getFirebase();
+    db = fb.db;
+    auth = fb.auth;
+    storage = fb.storage;
+  } catch (err) {
+    console.error("Firebase init failed:", err);
+  }
+}
 
 // -------------------------------
 //  DOM ELEMENTS
@@ -100,7 +111,6 @@ async function loadPersonalSeller(uid) {
 
   const user = userSnap.data();
 
-  // Header
   sellerCardHeader.textContent = "About This Seller";
   sellerRibbonEl.style.display = "none";
 
@@ -132,7 +142,6 @@ async function loadBusinessSeller(uid) {
 
   const biz = bizSnap.data();
 
-  // Header
   sellerCardHeader.textContent = "About This Business";
   sellerRibbonEl.style.display = "inline-block";
 
@@ -245,12 +254,10 @@ function setupBundleButtons() {
       const exists = bundleItems.find(i => i.id === id);
 
       if (exists) {
-        // Remove
         bundleItems = bundleItems.filter(i => i.id !== id);
         btn.textContent = "+ Add";
         btn.classList.remove("added");
       } else {
-        // Add
         bundleItems.push({ id, price });
         btn.textContent = "✓ Added";
         btn.classList.add("added");
@@ -294,4 +301,5 @@ async function incrementBusinessLead(uid) {
 // -------------------------------
 //  INIT
 // -------------------------------
+await initFirebase();
 loadPost();
