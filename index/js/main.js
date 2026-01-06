@@ -7,7 +7,7 @@ import { openLoginModal } from '/index/js/auth/loginModal.js';
 import { openSignupModal } from '/index/js/auth/signupModal.js';
 import { openForgotModal } from '/index/js/auth/forgotModal.js';
 
-import { fsLoadUserProfile } from '/index/js/firebase/settings.js';
+import { getUser as fsLoadUserProfile } from '/index/js/firebase/settings.js';
 
 window.openLoginModal = openLoginModal;
 window.openSignupModal = openSignupModal;
