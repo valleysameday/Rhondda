@@ -222,7 +222,7 @@ async function loadPost() {
   postDescEl.textContent = post.description || "No description provided.";
 
   renderGallery(post);
-renderPostDetails(post);
+renderPostDetails(postData);
 
   sellerUid = post.businessId || post.userId;
 
