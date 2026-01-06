@@ -337,3 +337,40 @@
   border: none;
   margin-top: 10px;
 }
+.post-details-card {
+  background: #fff;
+  padding: 16px;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-top: 16px;
+}
+
+.post-details-card h3 {
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.detail-row {
+  margin-bottom: 10px;
+  font-size: .95rem;
+}
+
+.detail-row span {
+  font-weight: 600;
+  color: #333;
+}
+
+.feature-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.feature-badge {
+  background: #f1f5f9;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: .85rem;
+}
