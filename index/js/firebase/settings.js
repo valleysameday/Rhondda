@@ -432,3 +432,67 @@ export async function getPost(id) {
 export async function updatePost(id, data) {
   await updateDoc(doc(db, "posts", id), data);
 }
+import { getFirebase } from "./init.js";
+import { doc, getDoc, collection, query, where, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+let db;
+(async () => { const fb = await getFirebase(); db = fb.db; })();
+
+export async function getPost(postId) {
+  const snap = await getDoc(doc(db, "posts", postId));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+
+export async function getUser(uid) {
+  const snap = await getDoc(doc(db, "users", uid));
+  return snap.exists() ? { uid, ...snap.data() } : null;
+}
+
+export async function getBusiness(uid) {
+  const snap = await getDoc(doc(db, "businesses", uid));
+  return snap.exists() ? { uid, ...snap.data() } : null;
+}
+
+export async function getSellerPosts(uid) {
+  const postsRef = collection(db, "posts");
+  const snaps = [];
+
+  const qUser = query(postsRef, where("userId", "==", uid));
+  const snapUser = await getDocs(qUser);
+  snapUser.forEach(d => snaps.push({ id: d.id, ...d.data() }));
+
+  const qBiz = query(postsRef, where("businessId", "==", uid));
+  const snapBiz = await getDocs(qBiz);
+  snapBiz.forEach(d => { if (!snaps.find(x => x.id === d.id)) snaps.push({ id: d.id, ...d.data() }); });
+
+  return snaps;
+}
+
+export async function incrementLeads(uid) {
+  const bRef = doc(db, "businesses", uid);
+  const snap = await getDoc(bRef);
+  if (!snap.exists()) return;
+
+  const b = snap.data();
+  await updateDoc(bRef, { leads: (b.leads || 0) + 1 });
+}
+
+// toggleFollowSeller(userUid, sellerUid, actuallyToggle = true)
+// if actuallyToggle false → just return if following (for button state)
+export async function toggleFollowSeller(userUid, sellerUid, actuallyToggle = true) {
+  const sellerRef = doc(db, "users", sellerUid);
+  const snap = await getDoc(sellerRef);
+  if (!snap.exists()) return false;
+
+  const followers = snap.data().followers || {};
+  const isFollowing = !!followers[userUid];
+
+  if (actuallyToggle) {
+    if (isFollowing) delete followers[userUid];
+    else followers[userUid] = true;
+    await updateDoc(sellerRef, { followers });
+    return !isFollowing;
+  }
+
+  return isFollowing;
+}
