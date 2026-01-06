@@ -42,7 +42,7 @@ export function openSignupModal(auth) {
 
       await setDoc(doc(db, "users", userCred.user.uid), {
         email,
-        createdAt: Date.now(),
+        createdAt: serverTimestamp(),
         isAdmin: false,
         name: email.split("@")[0]
       });
