@@ -183,67 +183,79 @@ function initPostGate() {
     areaBox.hidden = selectedCategory !== 'property';
   }
 
-  /* ------------------------------
-     SUBMIT POST
-  ------------------------------ */
-  submitBtn.addEventListener('click', async () => {
-    if (!auth.currentUser) return showToast("Please log in to post an ad.", "error");
+/* ------------------------------
+   SUBMIT POST
+------------------------------ */
+submitBtn.addEventListener('click', async () => {
+  if (!auth.currentUser) {
+    return showToast("Please log in to post an ad.", "error");
+  }
 
-    try {
-      const userData = await fsGetUser(auth.currentUser.uid);
-      const isBusiness = userData.isBusiness === true;
+  try {
+    const userData = await fsGetUser(auth.currentUser.uid);
+    const isBusiness = userData.isBusiness === true;
 
-      const featureInputs = document.querySelectorAll('.property-features input:checked');
-      const propertyFeatures = [...featureInputs].map(i => i.dataset.feature);
+    const featureInputs = document.querySelectorAll('.property-features input:checked');
+    const propertyFeatures = [...featureInputs].map(i => i.dataset.feature);
 
-      const post = {
-        userId: auth.currentUser.uid,
-        businessId: isBusiness ? auth.currentUser.uid : null,
-        isBusiness,
-        title: titleInput.value.trim(),
-        description: descInput.value.trim(),
-        category: selectedCategory,
-        createdAt: Date.now(),
-        contact: contactInput.value.trim(),
-        location: locationInput.value.trim(),
-        price: Number(priceInput.value) || null,
-        area: document.getElementById("postArea")?.value.trim() || null,
-        propertyType,
-        rentFrequency,
-        propertyFeatures,
-        condition: document.getElementById("postCondition")?.value || null,
-        delivery: document.getElementById("postDelivery")?.value || null,
-        jobType: document.getElementById("jobType")?.value || null,
-        jobSalary: document.getElementById("jobSalary")?.value || null,
-        jobExperience: document.getElementById("jobExperience")?.value || null,
-        eventDate: document.getElementById("eventDate")?.value || null,
-        eventStart: document.getElementById("eventStart")?.value || null,
-        eventEnd: document.getElementById("eventEnd")?.value || null,
-        eventVenue: document.getElementById("eventVenue")?.value || null,
-        communityType: document.getElementById("communityType")?.value || null,
-        lostLocation: document.getElementById("lostLocation")?.value || null,
-        lostReward: document.getElementById("lostReward")?.value || null,
-        images: []
-      };
+    const post = {
+      userId: auth.currentUser.uid,
+      businessId: isBusiness ? auth.currentUser.uid : null,
+      isBusiness,
+      title: titleInput.value.trim(),
+      description: descInput.value.trim(),
+      category: selectedCategory,
+      createdAt: Date.now(),
+      contact: contactInput.value.trim(),
+      location: locationInput.value.trim(),
+      price: Number(priceInput.value) || null,
+      area: document.getElementById("postArea")?.value.trim() || null,
+      propertyType,
+      rentFrequency,
+      propertyFeatures,
+      condition: document.getElementById("postCondition")?.value || null,
+      delivery: document.getElementById("postDelivery")?.value || null,
+      jobType: document.getElementById("jobType")?.value || null,
+      jobSalary: document.getElementById("jobSalary")?.value || null,
+      jobExperience: document.getElementById("jobExperience")?.value || null,
+      eventDate: document.getElementById("eventDate")?.value || null,
+      eventStart: document.getElementById("eventStart")?.value || null,
+      eventEnd: document.getElementById("eventEnd")?.value || null,
+      eventVenue: document.getElementById("eventVenue")?.value || null,
+      communityType: document.getElementById("communityType")?.value || null,
+      lostLocation: document.getElementById("lostLocation")?.value || null,
+      lostReward: document.getElementById("lostReward")?.value || null,
 
-      if (imagesInput.files.length > 0) {
-        for (let file of imagesInput.files) {
-          const compressed = await compressImage(file);
-          const url = await fsUploadImage(compressed, auth.currentUser.uid);
-          post.images.push(url);
-        }
+      // 🔥 Correct field name
+      images: [],
+
+      // 🔥 Feed.js requires this
+      image: null
+    };
+
+    // Upload images
+    if (imagesInput.files.length > 0) {
+      for (let file of imagesInput.files) {
+        const compressed = await compressImage(file);
+        const url = await fsUploadImage(compressed, auth.currentUser.uid);
+        post.images.push(url);
       }
 
-      await fsAddPost(post);
-      showToast("Your ad is live!", "success");
-      document.querySelector('[data-action="close-screens"]').click();
-      loadView("home");
-
-    } catch (err) {
-      console.error(err);
-      showToast("Something went wrong posting your ad.", "error");
+      // 🔥 Set main image for feed.js
+      post.image = post.images[0];
     }
-  });
+
+    await fsAddPost(post);
+
+    showToast("Your ad is live!", "success");
+    document.querySelector('[data-action="close-screens"]').click();
+    loadView("home");
+
+  } catch (err) {
+    console.error(err);
+    showToast("Something went wrong posting your ad.", "error");
+  }
+});
 
   /* ------------------------------
      IMAGE COMPRESSION
