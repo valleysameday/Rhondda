@@ -148,18 +148,21 @@ export async function initFeed(_, options = {}) {
     }
 
     filtered.forEach(post => {
+
+      // 🔥 SAFE IMAGE FALLBACK LOGIC
+      const image =
+        post.image ||
+        post.imageUrl ||
+        (Array.isArray(post.imageUrls) ? post.imageUrls[0] : null) ||
+        (Array.isArray(post.images) ? post.images[0] : null) ||
+        "/assets/default-thumb.jpg";
+
       const card = document.createElement('article');
-      card.className = `feed-card ${post.type}`;
+      card.className = `feed-card ${post.type || ''}`;
+
       card.innerHTML = `
         <div class="feed-image">
-          const image =
-  post.image ||
-  post.imageUrl ||
-  (Array.isArray(post.imageUrls) ? post.imageUrls[0] : null) ||
-  (Array.isArray(post.images) ? post.images[0] : null) ||
-  "/assets/default-thumb.jpg"; // fallback image
-
-html += `<img src="${image}" alt="${post.title}">`;
+          <img src="${image}" alt="${post.title}">
           ${post.isBusiness && post.type !== "featured" ? `<span class="biz-badge">Business</span>` : ''}
         </div>
 
