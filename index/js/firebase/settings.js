@@ -123,6 +123,31 @@ export async function getSellerPosts(uid) {
   return snaps;
 }
 
+/**
+ * Toggle save/unsave post for a user
+ */
+export async function toggleSavePost({ uid, postId }) {
+  const userRef = doc(db, "users", uid);
+  const snap = await getDoc(userRef);
+
+  if (!snap.exists()) return false;
+
+  const data = snap.data();
+  const saved = data.savedPosts || {};
+
+  const isSaved = !!saved[postId];
+
+  if (isSaved) {
+    delete saved[postId];
+  } else {
+    saved[postId] = true;
+  }
+
+  await updateDoc(userRef, { savedPosts: saved });
+
+  return !isSaved;
+}
+
 /* ============================================================
    USERS
 ============================================================ */
