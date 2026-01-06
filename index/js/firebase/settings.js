@@ -319,3 +319,105 @@ export async function sendMessage(convoId, senderId, text) {
     { merge: true }
   );
 }
+import {
+  doc, getDoc, getDocs, collection,
+  updateDoc, deleteDoc, query, where
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+import { ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+let auth, db, storage;
+
+export function initFirebase({ auth: a, db: d, storage: s }) {
+  auth = a;
+  db = d;
+  storage = s;
+}
+
+// USERS
+export async function getUser(uid) {
+  if (!db || !uid) return null;
+  const snap = await getDoc(doc(db, "users", uid));
+  return snap.exists() ? snap.data() : {};
+}
+
+export async function updateUser(uid, data) {
+  if (!db || !uid || !data) return;
+  await updateDoc(doc(db, "users", uid), data);
+}
+
+// POSTS
+export async function getUserPosts(uid) {
+  if (!db || !uid) return [];
+  const snap = await getDocs(query(collection(db, "posts"), where("userId", "==", uid)));
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+export async function deletePost(post) {
+  if (!db || !storage || !post || !post.id) return;
+
+  const urls = [];
+  if (post.imageUrl) urls.push(post.imageUrl);
+  if (Array.isArray(post.imageUrls)) urls.push(...post.imageUrls);
+
+  for (const url of urls) {
+    try {
+      const path = decodeURIComponent(url.split("/o/")[1].split("?")[0]);
+      await deleteObject(ref(storage, path));
+    } catch {}
+  }
+
+  await updateDoc(doc(db, "posts", post.id), { deleted: true }).catch(async () => {
+    await deleteDoc(doc(db, "posts", post.id));
+  });
+}
+
+// AUTO DELETE OLD POSTS
+export async function autoDeleteOldPosts(uid, limitDays = 14) {
+  const limitMs = limitDays * 24 * 60 * 60 * 1000;
+  const now = Date.now();
+
+  const posts = await getUserPosts(uid);
+  posts.forEach(p => {
+    let createdAtMs = 0;
+    if (typeof p.createdAt === "number") createdAtMs = p.createdAt;
+    else if (p.createdAt?.toMillis) createdAtMs = p.createdAt.toMillis();
+
+    if (createdAtMs && now - createdAtMs > limitMs) deletePost(p);
+  });
+}
+
+// AVATARS
+export async function uploadAvatar(uid, file, type = "user") {
+  if (!storage || !file || !uid) return null;
+
+  const path = type === "user" ? `avatars/${uid}.jpg` : `business-avatars/${uid}.jpg`;
+  const storageRef = ref(storage, path);
+
+  await uploadBytes(storageRef, file);
+  const url = await getDownloadURL(storageRef);
+
+  // update Firestore
+  const coll = type === "user" ? "users" : "businesses";
+  await updateDoc(doc(db, coll, uid), { avatarUrl: url });
+
+  return url;
+}
+
+// BUSINESSES
+export async function getBusiness(uid) {
+  if (!db || !uid) return {};
+  const snap = await getDoc(doc(db, "businesses", uid));
+  return snap.exists() ? snap.data() : {};
+}
+
+export async function updateBusiness(uid, data) {
+  if (!db || !uid || !data) return;
+  await updateDoc(doc(db, "businesses", uid), data);
+}
+
+export async function getBusinessPosts(uid) {
+  if (!db || !uid) return [];
+  const snap = await getDocs(query(collection(db, "posts"), where("businessId", "==", uid)));
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
