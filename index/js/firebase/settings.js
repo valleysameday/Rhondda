@@ -201,3 +201,55 @@ export async function getPost(postId) {
   const snap = await getDoc(doc(db, "posts", postId));
   return snap.exists() ? snap.data() : null;
 }
+import { doc, getDoc, setDoc, deleteDoc, collection, query, where, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+let auth, db;
+
+export function initFirebase({ auth: a, db: d }) {
+  auth = a;
+  db = d;
+}
+
+// Listen to user's conversations in real-time
+export function onUserConversations(userId, callback) {
+  if (!db || !userId) return () => {};
+
+  const convosRef = collection(db, "conversations");
+  const q = query(
+    convosRef,
+    where("participants", "array-contains", userId),
+    orderBy("updatedAt", "desc")
+  );
+
+  return onSnapshot(q, callback);
+}
+
+// Get user data by UID
+export async function getUser(uid) {
+  if (!db || !uid) return null;
+  const snap = await getDoc(doc(db, "users", uid));
+  return snap.exists() ? snap.data() : null;
+}
+
+// Get post data by postId
+export async function getPost(postId) {
+  if (!db || !postId) return null;
+  const snap = await getDoc(doc(db, "posts", postId));
+  return snap.exists() ? snap.data() : null;
+}
+
+// Mark conversation deleted for a user
+export async function markConversationDeleted(convoId, userId, existingDeleted = {}) {
+  if (!db || !convoId || !userId) return;
+  await setDoc(
+    doc(db, "conversations", convoId),
+    { deletedFor: { ...existingDeleted, [userId]: true } },
+    { merge: true }
+  );
+}
+
+// Delete a conversation doc
+export async function deleteConversation(convoId) {
+  if (!db || !convoId) return;
+  await deleteDoc(doc(db, "conversations", convoId));
+}
