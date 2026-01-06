@@ -135,9 +135,96 @@ async function loadPost() {
   postDescEl.textContent = post.description || "No description provided.";
 
   renderGallery(post);
-
+renderPostDetails(postData);
   sellerUid = post.businessId || post.userId;
 
+function renderPostDetails(post) {
+  const box = document.getElementById("postDetails");
+  if (!box) return;
+
+  let html = `<h3>Details</h3>`;
+
+  // PRICE
+  if (post.price) {
+    html += `<div class="detail-row"><span>Price:</span> £${post.price}</div>`;
+  }
+
+  // CONDITION (for sale)
+  if (post.condition) {
+    html += `<div class="detail-row"><span>Condition:</span> ${post.condition}</div>`;
+  }
+
+  // DELIVERY
+  if (post.delivery) {
+    html += `<div class="detail-row"><span>Delivery:</span> ${post.delivery}</div>`;
+  }
+
+  // PROPERTY TYPE
+  if (post.propertyType) {
+    html += `<div class="detail-row"><span>Property:</span> ${post.propertyType}</div>`;
+  }
+
+  // RENT FREQUENCY
+  if (post.rentFrequency) {
+    html += `<div class="detail-row"><span>Rent:</span> ${post.rentFrequency}</div>`;
+  }
+
+  // AREA
+  if (post.area) {
+    html += `<div class="detail-row"><span>Area:</span> ${post.area}</div>`;
+  }
+
+  // PROPERTY FEATURES
+  if (post.propertyFeatures?.length > 0) {
+    html += `<div class="detail-row"><span>Features:</span></div>`;
+    html += `<div class="feature-badges">`;
+    post.propertyFeatures.forEach(f => {
+      html += `<div class="feature-badge">${f}</div>`;
+    });
+    html += `</div>`;
+  }
+
+  // JOB DETAILS
+  if (post.jobType) {
+    html += `<div class="detail-row"><span>Job type:</span> ${post.jobType}</div>`;
+  }
+  if (post.jobSalary) {
+    html += `<div class="detail-row"><span>Salary:</span> ${post.jobSalary}</div>`;
+  }
+  if (post.jobExperience) {
+    html += `<div class="detail-row"><span>Experience:</span> ${post.jobExperience}</div>`;
+  }
+
+  // EVENT DETAILS
+  if (post.eventDate) {
+    html += `<div class="detail-row"><span>Event date:</span> ${post.eventDate}</div>`;
+  }
+  if (post.eventStart) {
+    html += `<div class="detail-row"><span>Starts:</span> ${post.eventStart}</div>`;
+  }
+  if (post.eventEnd) {
+    html += `<div class="detail-row"><span>Ends:</span> ${post.eventEnd}</div>`;
+  }
+  if (post.eventVenue) {
+    html += `<div class="detail-row"><span>Venue:</span> ${post.eventVenue}</div>`;
+  }
+
+  // COMMUNITY
+  if (post.communityType) {
+    html += `<div class="detail-row"><span>Community type:</span> ${post.communityType}</div>`;
+  }
+
+  // LOST & FOUND
+  if (post.lostLocation) {
+    html += `<div class="detail-row"><span>Last seen:</span> ${post.lostLocation}</div>`;
+  }
+  if (post.lostReward) {
+    html += `<div class="detail-row"><span>Reward:</span> ${post.lostReward}</div>`;
+  }
+
+  box.innerHTML = html;
+}
+  
   if (post.businessId) {
     await loadBusinessSeller(post.businessId);
   } else {
