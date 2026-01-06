@@ -1,12 +1,7 @@
 import { loadView } from "/index/js/main.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getSeller, getPost } from "/index/js/firebase/settings.js";
 
-let auth, db;
-
-export async function init({ auth: a, db: d }) {
-  auth = a;
-  db = d;
-
+export async function init() {
   const sellerId = sessionStorage.getItem("bundleSellerId");
   const itemIds = JSON.parse(sessionStorage.getItem("bundleItems") || "[]");
 
@@ -14,10 +9,8 @@ export async function init({ auth: a, db: d }) {
     return loadView("home");
   }
 
-  const sellerSnap = await getDoc(doc(db, "users", sellerId));
-  const seller = sellerSnap.data();
-
-  const sellerIsPremium = seller.isBusiness || seller.isSellerPlus;
+  const seller = await getSeller(sellerId);
+  const sellerIsPremium = seller?.isBusiness || seller?.isSellerPlus;
 
   const listEl = document.getElementById("bundleItemsList");
   const totalsEl = document.getElementById("bundleTotals");
@@ -26,10 +19,9 @@ export async function init({ auth: a, db: d }) {
   let items = [];
 
   for (const id of itemIds) {
-    const snap = await getDoc(doc(db, "posts", id));
-    if (!snap.exists()) continue;
+    const post = await getPost(id);
+    if (!post) continue;
 
-    const post = snap.data();
     items.push(post);
 
     const div = document.createElement("div");
@@ -43,9 +35,7 @@ export async function init({ auth: a, db: d }) {
     `;
     listEl.appendChild(div);
 
-    if (sellerIsPremium) {
-      totalPrice += Number(post.price || 0);
-    }
+    if (sellerIsPremium) totalPrice += Number(post.price || 0);
   }
 
   if (sellerIsPremium) {
@@ -69,7 +59,7 @@ export async function init({ auth: a, db: d }) {
       : buildBasicMessage(items, customMessage);
 
     sessionStorage.setItem("pendingMessage", message);
-    sessionStorage.setItem("activeConversationId", `${auth.currentUser.uid}_${sellerId}`);
+    sessionStorage.setItem("activeConversationId", `${window.currentUser.uid}_${sellerId}`);
 
     loadView("chat", { forceInit: true });
   };
@@ -92,4 +82,4 @@ function buildPremiumMessage(items, total, custom) {
   msg += `\nTotal: £${total}\nSuggested: Collection or Evri from £3.49\n`;
   if (custom) msg += `\n${custom}`;
   return msg;
-    }
+}
