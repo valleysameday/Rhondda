@@ -1,16 +1,6 @@
-import {
-  collection,
-  getDocs,
-  query,
-  orderBy,
-  limit,
-  startAfter,
-  doc,
-  getDoc,
-  setDoc,
-  deleteDoc
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+// feed.js
 
+import { fsFetchFeedPosts, fsToggleSavePost } from "/index/js/firebase/settings.js";
 import { initFeaturedAds } from "/index/js/featured-ads.js";
 import { loadView } from "/index/js/main.js";
 
@@ -19,10 +9,9 @@ let loadingMore = false;
 let reachedEnd = false;
 let currentCategory = "all";
 
-// Keep track of saved posts locally to avoid losing state
 const savedPosts = new Set();
 
-export async function initFeed({ db }, options = {}) {
+export async function initFeed(_, options = {}) {
   console.log("🏠 Home view init");
 
   const postsContainer = document.getElementById('feed');
@@ -61,9 +50,6 @@ export async function initFeed({ db }, options = {}) {
     }
   }
 
-  /* ============================================================
-     BOTTOM LOADER + END MESSAGE
-  ============================================================ */
   function showBottomLoader() {
     if (!document.getElementById("feedBottomLoader")) {
       const loader = document.createElement("div");
@@ -75,8 +61,7 @@ export async function initFeed({ db }, options = {}) {
   }
 
   function hideBottomLoader() {
-    const loader = document.getElementById("feedBottomLoader");
-    if (loader) loader.remove();
+    document.getElementById("feedBottomLoader")?.remove();
   }
 
   function showEndMessage() {
@@ -90,72 +75,22 @@ export async function initFeed({ db }, options = {}) {
   }
 
   /* ============================================================
-     FETCH POSTS (with pagination)
+     FETCH POSTS (UI WRAPPER)
   ============================================================ */
   async function fetchPosts(initial = false) {
     if (reachedEnd) return [];
 
-    let q;
+    const result = await fsFetchFeedPosts({ lastDoc, initial });
 
-    if (initial || !lastDoc) {
-      q = query(
-        collection(db, "posts"),
-        orderBy("createdAt", "desc"),
-        limit(50)
-      );
-    } else {
-      q = query(
-        collection(db, "posts"),
-        orderBy("createdAt", "desc"),
-        startAfter(lastDoc),
-        limit(50)
-      );
-    }
-
-    const snap = await getDocs(q);
-
-    if (snap.docs.length === 0) {
+    if (!result.posts.length) {
       reachedEnd = true;
       return [];
     }
 
-    lastDoc = snap.docs[snap.docs.length - 1];
+    lastDoc = result.lastDoc;
 
-    const posts = snap.docs.map(doc => {
-      const d = doc.data();
-      return {
-        id: doc.id,
-        userId: d.userId,
-        title: d.title,
-        teaser: d.description || "",
-        category: d.category || "misc",
-        categoryLabel: d.categoryLabel || d.category,
-        price: d.price || null,
-        area: d.area || "Rhondda",
-        image: d.images?.[0] || "/images/image-webholder.webp",
-        type: d.isFeatured ? "featured" : "standard",
-        isBusiness: d.isBusiness === true,
-        cta: d.cta || null,
-        rentFrequency: d.rentFrequency || null,
-        bedrooms: d.bedrooms || null,
-        bathrooms: d.bathrooms || null,
-        furnished: d.furnished || null,
-        condition: d.condition || null,
-        delivery: d.delivery || null,
-        jobType: d.jobType || null,
-        jobSalary: d.jobSalary || null,
-        eventDate: d.eventDate || null,
-        eventStart: d.eventStart || null,
-        communityType: d.communityType || null,
-        lostLocation: d.lostLocation || null,
-        lostReward: d.lostReward || null,
-        createdAt: d.createdAt || Date.now()
-      };
-    });
-
-    // Sponsored business card (only on first load)
     if (initial) {
-      posts.push({
+      result.posts.push({
         id: "featured-biz",
         title: "Rhondda Pro Cleaning Services",
         teaser: "Professional home & end-of-tenancy cleaning. Trusted local business.",
@@ -170,7 +105,7 @@ export async function initFeed({ db }, options = {}) {
       });
     }
 
-    return posts;
+    return result.posts;
   }
 
   /* ============================================================
@@ -197,8 +132,7 @@ export async function initFeed({ db }, options = {}) {
     if (!options.append) {
       postsContainer.innerHTML = '';
       hideBottomLoader();
-      const endMsg = document.getElementById("feedEndMessage");
-      if (endMsg) endMsg.remove();
+      document.getElementById("feedEndMessage")?.remove();
     }
 
     const filtered = category === 'all'
@@ -224,7 +158,7 @@ export async function initFeed({ db }, options = {}) {
 
           <div class="feed-meta">
             ${buildMeta(post)}
-            <button class="save-heart ${savedPosts.has(post.id) ? 'saved' : ''}" data-id="${post.id}" title="Save">
+            <button class="save-heart ${savedPosts.has(post.id) ? 'saved' : ''}" data-id="${post.id}">
               ${savedPosts.has(post.id) ? '♥' : '♡'}
             </button>
           </div>
@@ -232,39 +166,21 @@ export async function initFeed({ db }, options = {}) {
           ${post.type === "featured" && post.cta ? `<button class="cta-btn">${post.cta}</button>` : ''}
         </div>
 
-        <button class="report-btn" data-id="${post.id}" title="Report">⚑</button>
+        <button class="report-btn" data-id="${post.id}">⚑</button>
       `;
 
-      // -----------------------------
-      // CARD CLICK
-      // -----------------------------
       card.addEventListener('click', e => {
-        if (
-          e.target.closest('.report-btn') ||
-          e.target.closest('.cta-btn') ||
-          e.target.closest('.save-heart')
-        ) return;
+        if (e.target.closest('.report-btn,.cta-btn,.save-heart')) return;
 
         sessionStorage.setItem("feedScroll", window.scrollY);
         sessionStorage.setItem("feedCategory", currentCategory);
         sessionStorage.setItem("viewPostId", post.id);
-
         loadView("view-post", { forceInit: true });
       });
 
       postsContainer.appendChild(card);
     });
   }
-
-  /* ============================================================
-     REPORT BUTTON
-  ============================================================ */
-  document.addEventListener('click', e => {
-    if (!e.target.classList.contains('report-btn')) return;
-    const reason = prompt("Why are you reporting this post?");
-    if (!reason) return;
-    alert("Thanks — we’ll review this shortly.");
-  });
 
   /* ============================================================
      SAVE BUTTON
@@ -275,32 +191,20 @@ export async function initFeed({ db }, options = {}) {
 
     e.stopPropagation();
 
-    const postId = btn.dataset.id;
     const uid = window.currentUser?.uid;
+    if (!uid) return alert("Please log in to save posts");
 
-    if (!uid) {
-      alert("Please log in to save posts");
-      return;
-    }
+    const postId = btn.dataset.id;
+    const saved = await fsToggleSavePost({ uid, postId });
 
-    const ref = doc(db, "users", uid, "savedPosts", postId);
-    const snap = await getDoc(ref);
+    btn.classList.toggle("saved", saved);
+    btn.textContent = saved ? "♥" : "♡";
 
-    if (snap.exists()) {
-      await deleteDoc(ref);
-      btn.classList.remove("saved");
-      btn.textContent = "♡";
-      savedPosts.delete(postId);
-    } else {
-      await setDoc(ref, { postId, savedAt: Date.now() });
-      btn.classList.add("saved");
-      btn.textContent = "♥";
-      savedPosts.add(postId);
-    }
+    saved ? savedPosts.add(postId) : savedPosts.delete(postId);
   });
 
   /* ============================================================
-     CATEGORY FILTER BUTTONS
+     CATEGORY FILTERS
   ============================================================ */
   categoryBtns.forEach(btn => {
     btn.addEventListener('click', async () => {
@@ -323,54 +227,38 @@ export async function initFeed({ db }, options = {}) {
   window.addEventListener("scroll", async () => {
     if (loadingMore || reachedEnd) return;
 
-    const scrollPos = window.innerHeight + window.scrollY;
-    const bottom = document.body.offsetHeight - 300;
-
-    if (scrollPos >= bottom) {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
       loadingMore = true;
       showBottomLoader();
 
       const morePosts = await fetchPosts(false);
       hideBottomLoader();
 
-      if (morePosts.length > 0) {
-        renderPosts(morePosts, currentCategory, { append: true });
-      } else {
-        reachedEnd = true;
-        showEndMessage();
-      }
+      morePosts.length
+        ? renderPosts(morePosts, currentCategory, { append: true })
+        : showEndMessage();
 
       loadingMore = false;
     }
   });
 
   /* ============================================================
-     INITIAL LOAD (FIXED)
+     INITIAL LOAD
   ============================================================ */
   showSkeletons();
 
   const posts = await fetchPosts(true);
-
-  // Always load ALL posts when returning to feed
   currentCategory = "all";
 
-  // Reset category button UI
   categoryBtns.forEach(b => b.classList.remove('active'));
   document.querySelector('.category-btn[data-category="all"]')?.classList.add('active');
 
-  // Render ALL posts
   renderPosts(posts, "all");
 
-  // Load greeting, weather, and featured ads
-  if (window.loadGreeting) window.loadGreeting();
-  if (window.loadWeather) window.loadWeather();
+  window.loadGreeting?.();
+  window.loadWeather?.();
   initFeaturedAds();
 
-  // Restore scroll
   const savedScroll = sessionStorage.getItem("feedScroll");
-  if (savedScroll) {
-    setTimeout(() => {
-      window.scrollTo(0, parseInt(savedScroll));
-    }, 50);
-  }
+  if (savedScroll) setTimeout(() => window.scrollTo(0, +savedScroll), 50);
 }
