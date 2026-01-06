@@ -152,7 +152,14 @@ export async function initFeed(_, options = {}) {
       card.className = `feed-card ${post.type}`;
       card.innerHTML = `
         <div class="feed-image">
-          <img src="${post.image}" alt="${post.title}">
+          const image =
+  post.image ||
+  post.imageUrl ||
+  (Array.isArray(post.imageUrls) ? post.imageUrls[0] : null) ||
+  (Array.isArray(post.images) ? post.images[0] : null) ||
+  "/assets/default-thumb.jpg"; // fallback image
+
+html += `<img src="${image}" alt="${post.title}">`;
           ${post.isBusiness && post.type !== "featured" ? `<span class="biz-badge">Business</span>` : ''}
         </div>
 
