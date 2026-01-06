@@ -89,7 +89,6 @@ const sellerNameEl = document.getElementById("sellerName");
 const sellerRibbonEl = document.getElementById("sellerRibbon");
 const sellerBioEl = document.getElementById("sellerBio");
 const sellerAreaEl = document.getElementById("sellerArea");
-const sellerWebsiteEl = document.getElementById("sellerWebsite");
 const bizPhoneMasked = document.getElementById("bizPhoneMasked");
 const revealBizPhoneBtn = document.getElementById("revealBizPhoneBtn");
 
@@ -348,7 +347,7 @@ async function loadPersonalSeller(uid) {
   sellerBioEl.textContent = u.bio || "No bio provided.";
   sellerAreaEl.textContent = u.area || "No area";
 
-  sellerWebsiteEl.style.display = "none";
+  
   revealBizPhoneBtn.style.display = "none";
   bizPhoneMasked.style.display = "none";
 
