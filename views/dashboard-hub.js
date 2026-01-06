@@ -388,7 +388,23 @@ async function autoDeleteExpiredPosts(uid) {
 
   snap.forEach(d => {
     const p = d.data();
-    if (p.createdAt && now - p.createdAt.toMillis() > limit) {
+
+    // --- FIX: Handle both Timestamp and number ---
+    let createdAtMs;
+
+    if (typeof p.createdAt === "number") {
+      // Old posts (Date.now)
+      createdAtMs = p.createdAt;
+    } else if (p.createdAt?.toMillis) {
+      // New posts (Firestore Timestamp)
+      createdAtMs = p.createdAt.toMillis();
+    } else {
+      // Missing or invalid timestamp
+      createdAtMs = 0;
+    }
+
+    // --- Delete if older than limit ---
+    if (createdAtMs && now - createdAtMs > limit) {
       deletePostAndImages({ id: d.id, ...p });
     }
   });
