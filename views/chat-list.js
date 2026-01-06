@@ -1,18 +1,6 @@
-import {
-  collection,
-  query,
-  where,
-  onSnapshot,
-  doc,
-  getDoc,
-  deleteDoc,
-  setDoc,
-  orderBy
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
 import { loadView } from "/index/js/main.js";
+import { onUserConversations, getUser, getPost, markConversationDeleted, deleteConversation } from "/index/js/firebase/settings.js";
 
-let auth, db;
 let unsubscribeConversations = null;
 
 /* ============================================================
@@ -47,10 +35,7 @@ function showConfirm(message) {
 /* ============================================================
    INIT CHAT LIST
 ============================================================ */
-export async function init({ auth: a, db: d }) {
-  auth = a;
-  db = d;
-
+export async function init({ auth }) {
   const user = auth.currentUser;
   if (!user) return loadView("home");
 
@@ -59,14 +44,7 @@ export async function init({ auth: a, db: d }) {
 
   if (unsubscribeConversations) unsubscribeConversations();
 
-  const convosRef = collection(db, "conversations");
-  const q = query(
-    convosRef,
-    where("participants", "array-contains", user.uid),
-    orderBy("updatedAt", "desc")
-  );
-
-  unsubscribeConversations = onSnapshot(q, async (snap) => {
+  unsubscribeConversations = onUserConversations(user.uid, async (snap) => {
     chatList.innerHTML = "";
 
     if (snap.empty) {
@@ -78,64 +56,34 @@ export async function init({ auth: a, db: d }) {
       const convo = docSnap.data();
       const convoId = docSnap.id;
 
-      /* ============================================================
-         AUTO DELETE AFTER 10 DAYS
-      ============================================================ */
+      // Auto delete after 10 days
       const TEN_DAYS = 10 * 24 * 60 * 60 * 1000;
       if (Date.now() - convo.updatedAt > TEN_DAYS) {
-        await deleteDoc(doc(db, "conversations", convoId));
+        await deleteConversation(convoId);
         continue;
       }
 
-      /* ============================================================
-         HIDE IF USER DELETED IT
-      ============================================================ */
+      // Hide if user deleted
       if (convo.deletedFor?.[user.uid]) continue;
 
       const [u1, u2, postId] = convoId.split("_");
-const otherId = user.uid === u1 ? u2 : u1;
+      const otherId = user.uid === u1 ? u2 : u1;
 
-/* ============================================================
-   VALIDATE CONVERSATION ID
-============================================================ */
-if (!u1 || !u2 || !postId || postId === "undefined" || postId.length < 3) {
-  console.warn("Deleting malformed conversation:", convoId);
-  await deleteDoc(doc(db, "conversations", convoId));
-  continue;
-}
+      // Validate conversation ID
+      if (!u1 || !u2 || !postId || postId === "undefined" || postId.length < 3) {
+        console.warn("Deleting malformed conversation:", convoId);
+        await deleteConversation(convoId);
+        continue;
+      }
 
-/* ============================================================
-   LOAD OTHER USER
-============================================================ */
-let other = { name: "User" };
-try {
-  const otherSnap = await getDoc(doc(db, "users", otherId));
-  if (otherSnap.exists()) other = otherSnap.data();
-} catch (err) {
-  console.warn("Error loading user for chat list:", err);
-}
+      const other = (await getUser(otherId)) || { name: "User" };
+      const postTitle = (await getPost(postId))?.title || "";
 
-/* ============================================================
-   LOAD POST TITLE SAFELY
-============================================================ */
-let postTitle = "";
-try {
-  const postSnap = await getDoc(doc(db, "posts", postId));
-  if (postSnap.exists()) postTitle = postSnap.data().title || "";
-} catch (err) {
-  console.warn("Error loading post for chat list:", err);
-}
-
-      const isUnread =
-        convo.lastMessageSender && convo.lastMessageSender !== user.uid;
-
+      const isUnread = convo.lastMessageSender && convo.lastMessageSender !== user.uid;
       const initials = other.name
-        ? other.name.split(" ").map((n) => n[0]).join("").toUpperCase()
+        ? other.name.split(" ").map(n => n[0]).join("").toUpperCase()
         : "U";
 
-      /* ============================================================
-         BUILD CHAT ITEM
-      ============================================================ */
       const item = document.createElement("div");
       item.className = "chatlist-item";
       item.title = convo.lastMessage || "";
@@ -150,33 +98,18 @@ try {
         <div class="chatlist-delete" data-id="${convoId}">✕</div>
       `;
 
-      /* ============================================================
-         OPEN CHAT
-      ============================================================ */
+      // Open chat
       item.onclick = () => {
         sessionStorage.setItem("activeConversationId", convoId);
         loadView("chat", { forceInit: true });
       };
 
-      /* ============================================================
-         DELETE CHAT (with custom confirm)
-      ============================================================ */
+      // Delete chat
       item.querySelector(".chatlist-delete").onclick = async (e) => {
         e.stopPropagation();
-
         const ok = await showConfirm("Delete this chat?");
         if (!ok) return;
-
-        await setDoc(
-          doc(db, "conversations", convoId),
-          {
-            deletedFor: {
-              ...(convo.deletedFor || {}),
-              [user.uid]: true
-            }
-          },
-          { merge: true }
-        );
+        await markConversationDeleted(convoId, user.uid, convo.deletedFor);
       };
 
       chatList.appendChild(item);
@@ -189,57 +122,17 @@ try {
 }
 
 /* ============================================================
-   CONFIRM MODAL CSS (inject automatically)
+   CONFIRM MODAL CSS
 ============================================================ */
 const style = document.createElement("style");
 style.textContent = `
-.confirm-modal {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-.confirm-box {
-  background: #fff;
-  padding: 20px;
-  width: 80%;
-  max-width: 300px;
-  border-radius: 10px;
-  text-align: center;
-}
-.confirm-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
-}
-.confirm-buttons button {
-  flex: 1;
-  margin: 0 5px;
-  padding: 10px;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-}
-#confirmYes {
-  background: #d9534f;
-  color: white;
-}
-#confirmNo {
-  background: #ccc;
-}
-.chatlist-delete {
-  margin-left: auto;
-  font-size: 22px;
-  cursor: pointer;
-  padding: 10px;
-  color: #888;
-}
-.chatlist-delete:hover {
-  color: red;
-}
+.confirm-modal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:9999; }
+.confirm-box { background:#fff; padding:20px; width:80%; max-width:300px; border-radius:10px; text-align:center; }
+.confirm-buttons { display:flex; justify-content:space-between; margin-top:15px; }
+.confirm-buttons button { flex:1; margin:0 5px; padding:10px; border:none; border-radius:6px; font-size:16px; }
+#confirmYes { background:#d9534f; color:white; }
+#confirmNo { background:#ccc; }
+.chatlist-delete { margin-left:auto; font-size:22px; cursor:pointer; padding:10px; color:#888; }
+.chatlist-delete:hover { color:red; }
 `;
 document.head.appendChild(style);
