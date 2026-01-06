@@ -421,3 +421,14 @@ export async function getBusinessPosts(uid) {
   const snap = await getDocs(query(collection(db, "posts"), where("businessId", "==", uid)));
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
+import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { db } from "./init.js"; // your initialized Firebase DB
+
+export async function getPost(id) {
+  const snap = await getDoc(doc(db, "posts", id));
+  return snap.exists() ? snap.data() : null;
+}
+
+export async function updatePost(id, data) {
+  await updateDoc(doc(db, "posts", id), data);
+}
