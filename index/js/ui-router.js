@@ -116,4 +116,16 @@ export function initUIRouter() {
     }
     loadView("admin-dashboard");
   });
+/* =====================================================
+   ⭐ FIX NAVIGATION BUTTONS
+===================================================== */
+document.getElementById("openChatList")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  loadView("chat-list", { forceInit: true });
+});
+
+document.getElementById("openAccountModal")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  loadView("dashboard-hub", { forceInit: true });
+});
 }
