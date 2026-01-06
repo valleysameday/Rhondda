@@ -1,69 +1,62 @@
-import { doc, getDoc, updateDoc } from 
-  "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
 import { loadView } from "/index/js/main.js";
+import { getPost, updatePost } from "/index/js/firebase/settings.js";
 
-let auth, db;
-
-export async function init({ auth: a, db: d }) {
-  auth = a;
-  db = d;
-
+export async function init() {
   const id = window.editingPostId;
-  if (!id) return loadView("home");
-
   const feedback = document.getElementById("editFeedback");
 
+  if (!id) {
+    loadView("home");
+    return;
+  }
+
+  // Load existing post
+  let post;
   try {
-    const snap = await getDoc(doc(db, "posts", id));
-    if (!snap.exists()) {
+    post = await getPost(id);
+    if (!post) {
       feedback.textContent = "Post not found.";
       return;
     }
 
-    const p = snap.data();
-
-    document.getElementById("editTitle").value = p.title || "";
-    document.getElementById("editDescription").value = p.description || "";
-    document.getElementById("editCategory").value = p.category || "";
+    document.getElementById("editTitle").value = post.title || "";
+    document.getElementById("editDescription").value = post.description || "";
+    document.getElementById("editCategory").value = post.category || "";
 
   } catch (err) {
+    console.error("Error loading post:", err);
     feedback.textContent = "Error loading post.";
     return;
   }
 
-document.getElementById("savePostBtn").onclick = async () => {
-  const title = document.getElementById("editTitle").value.trim();
-  const description = document.getElementById("editDescription").value.trim();
-  const category = document.getElementById("editCategory").value;
+  // Save post
+  document.getElementById("savePostBtn").onclick = async () => {
+    const title = document.getElementById("editTitle").value.trim();
+    const description = document.getElementById("editDescription").value.trim();
+    const category = document.getElementById("editCategory").value;
 
-  if (!title || !description) {
-    feedback.textContent = "Title and description are required.";
-    return;
-  }
+    if (!title || !description) {
+      feedback.textContent = "Title and description are required.";
+      return;
+    }
+    if (!category) {
+      feedback.textContent = "Please select a category.";
+      return;
+    }
 
-  if (!category) {
-    feedback.textContent = "Please select a category.";
-    return;
-  }
+    feedback.textContent = "Saving...";
 
-  feedback.textContent = "Saving...";
+    try {
+      await updatePost(id, { title, description, category });
+      feedback.textContent = "✅ Saved!";
+      setTimeout(() => loadView("business-dashboard"), 400);
+    } catch (err) {
+      console.error("Error updating post:", err);
+      feedback.textContent = "Error saving changes.";
+    }
+  };
 
-  try {
-    await updateDoc(doc(db, "posts", id), {
-      title,
-      description,
-      category
-    });
-
-    feedback.textContent = "Saved!";
-    setTimeout(() => loadView("business-dashboard"), 400);
-
-  } catch (err) {
-    feedback.textContent = "Error saving changes.";
-  }
-};
-
+  // Cancel editing
   document.getElementById("cancelEditBtn").onclick = () => {
     loadView("business-dashboard");
   };
