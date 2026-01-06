@@ -1,19 +1,17 @@
 import { getFirebase } from '/index/js/firebase/init.js';
 import { initUIRouter } from '/index/js/ui-router.js';
-import '/index/js/post-gate.js';
 import { AI } from "/index/js/ai/assistant.js";
 
 import { openLoginModal } from '/index/js/auth/loginModal.js';
 import { openSignupModal } from '/index/js/auth/signupModal.js';
 import { openForgotModal } from '/index/js/auth/forgotModal.js';
 
-import { getUser as fsLoadUserProfile } from '/index/js/firebase/settings.js';
-
 window.openLoginModal = openLoginModal;
 window.openSignupModal = openSignupModal;
 window.openForgotModal = openForgotModal;
 
 let auth, db, storage;
+let settingsModule = null;
 
 /* =====================================================
    GLOBAL TIME FORMATTER
@@ -82,16 +80,27 @@ export async function loadView(view, options = {}) {
 /* =====================================================
    APP INIT
 ===================================================== */
-getFirebase().then(fb => {
+getFirebase().then(async fb => {
 
+  // 1️⃣ Firebase ready
   auth = fb.auth;
   db = fb.db;
   storage = fb.storage;
+
+  // 2️⃣ Load settings.js AFTER Firebase is ready
+  settingsModule = await import("/index/js/firebase/settings.js");
+
+  // 3️⃣ Initialise Firestore helpers
+  settingsModule.initFirebase({ auth, db, storage });
+
+  // 4️⃣ Map fsLoadUserProfile → getUser
+  const fsLoadUserProfile = settingsModule.getUser;
 
   window.currentUser = null;
   window.currentUserData = null;
   window.authReady = false;
 
+  // 5️⃣ Auth listener
   auth.onAuthStateChanged(async user => {
 
     window.currentUser = user || null;
@@ -126,6 +135,7 @@ getFirebase().then(fb => {
     window.authReady = true;
   });
 
+  // 6️⃣ Start the app AFTER Firebase + settings.js are ready
   const start = () => {
     initUIRouter();
     loadView("home");
@@ -134,4 +144,7 @@ getFirebase().then(fb => {
   document.readyState === "loading"
     ? document.addEventListener("DOMContentLoaded", start)
     : start();
+
+  // 7️⃣ Load post-gate.js LAST (after Firebase init)
+  await import('/index/js/post-gate.js');
 });
