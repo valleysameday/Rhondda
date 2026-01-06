@@ -116,27 +116,6 @@ let galleryImages = [];
 let currentImageIndex = 0;
 let bundleItems = [];
 
-// -------------------------------
-//  LOAD POST
-// -------------------------------
-async function loadPost() {
-  if (!postId) return;
-
-  const postSnap = await getDoc(doc(db, "posts", postId));
-  if (!postSnap.exists()) {
-    postTitleEl.textContent = "Post Not Found";
-    return;
-  }
-
-  const post = postSnap.data();
-
-  postTitleEl.textContent = post.title || "Untitled";
-  postPriceEl.textContent = post.price ? `£${post.price}` : "£0";
-  postDescEl.textContent = post.description || "No description provided.";
-
-  renderGallery(post);
-renderPostDetails(postData);
-  sellerUid = post.businessId || post.userId;
 
 function renderPostDetails(post) {
   const box = document.getElementById("postDetails");
@@ -224,6 +203,29 @@ function renderPostDetails(post) {
 
   box.innerHTML = html;
 }
+// -------------------------------
+//  LOAD POST
+// -------------------------------
+async function loadPost() {
+  if (!postId) return;
+
+  const postSnap = await getDoc(doc(db, "posts", postId));
+  if (!postSnap.exists()) {
+    postTitleEl.textContent = "Post Not Found";
+    return;
+  }
+
+  const post = postSnap.data();
+
+  postTitleEl.textContent = post.title || "Untitled";
+  postPriceEl.textContent = post.price ? `£${post.price}` : "£0";
+  postDescEl.textContent = post.description || "No description provided.";
+
+  renderGallery(post);
+renderPostDetails(posts);
+
+  sellerUid = post.businessId || post.userId;
+
   
   if (post.businessId) {
     await loadBusinessSeller(post.businessId);
