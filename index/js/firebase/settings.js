@@ -178,3 +178,26 @@ export async function fsUploadImage(file, uid) {
   await ref.put(file);
   return await ref.getDownloadURL();
 }
+// Firestore logic for bundle.js
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+let auth, db;
+
+export function initFirebase({ auth: a, db: d }) {
+  auth = a;
+  db = d;
+}
+
+// Get seller data by UID
+export async function getSeller(sellerId) {
+  if (!db || !sellerId) return null;
+  const snap = await getDoc(doc(db, "users", sellerId));
+  return snap.exists() ? snap.data() : null;
+}
+
+// Get post data by post ID
+export async function getPost(postId) {
+  if (!db || !postId) return null;
+  const snap = await getDoc(doc(db, "posts", postId));
+  return snap.exists() ? snap.data() : null;
+}
