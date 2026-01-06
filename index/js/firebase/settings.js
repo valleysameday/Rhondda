@@ -99,3 +99,42 @@ export async function fsToggleSavePost({ uid, postId }) {
     return true; // now saved
   }
 }
+
+
+/* =====================================================
+   USER PROFILE (USED BY main.js)
+===================================================== */
+
+import {
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+/**
+ * Load & normalise user profile
+ */
+export async function fsLoadUserProfile(uid) {
+  let snap = await getDoc(doc(db, "users", uid));
+
+  // Retry once if doc not created yet
+  if (!snap.exists()) {
+    await new Promise(r => setTimeout(r, 200));
+    snap = await getDoc(doc(db, "users", uid));
+  }
+
+  if (!snap.exists()) return {};
+
+  const data = snap.data();
+
+  // Defaults
+  if (!data.plan) data.plan = "free";
+
+  // Business trial expiry
+  const trial = data.businessTrial;
+  if (trial?.active && Date.now() > trial.expiresAt) {
+    data.plan = "free";
+    data.businessTrial.active = false;
+  }
+
+  return data;
+}
