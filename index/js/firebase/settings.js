@@ -253,3 +253,69 @@ export async function deleteConversation(convoId) {
   if (!db || !convoId) return;
   await deleteDoc(doc(db, "conversations", convoId));
 }
+import {
+  collection,
+  doc,
+  getDoc,
+  addDoc,
+  setDoc,
+  onSnapshot,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+let auth, db;
+
+export function initFirebase({ auth: a, db: d }) {
+  auth = a;
+  db = d;
+}
+
+// Get user info by UID
+export async function getUser(uid) {
+  if (!db || !uid) return null;
+  const snap = await getDoc(doc(db, "users", uid));
+  return snap.exists() ? snap.data() : null;
+}
+
+// Get post info by postId
+export async function getPost(postId) {
+  if (!db || !postId) return null;
+  const snap = await getDoc(doc(db, "posts", postId));
+  return snap.exists() ? snap.data() : null;
+}
+
+// Listen to messages in a conversation in real-time
+export function onConversationMessages(convoId, callback) {
+  if (!db || !convoId) return () => {};
+
+  const messagesRef = collection(db, "conversations", convoId, "messages");
+  const q = query(messagesRef, orderBy("createdAt"));
+
+  return onSnapshot(q, callback);
+}
+
+// Send a message in a conversation
+export async function sendMessage(convoId, senderId, text) {
+  if (!db || !convoId || !senderId || !text) return;
+
+  const now = Date.now();
+  const messagesRef = collection(db, "conversations", convoId, "messages");
+
+  await addDoc(messagesRef, {
+    senderId,
+    text,
+    createdAt: now,
+    seen: false
+  });
+
+  await setDoc(
+    doc(db, "conversations", convoId),
+    {
+      lastMessage: text,
+      lastMessageSender: senderId,
+      updatedAt: now
+    },
+    { merge: true }
+  );
+}
