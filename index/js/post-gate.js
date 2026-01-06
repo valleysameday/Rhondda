@@ -1,5 +1,9 @@
 import { getFirebase } from '/index/js/firebase/init.js';
-import { fsGetUser, fsAddPost, fsUploadImage } from '/index/js/firebase/settings.js';
+import {
+  getUser as t,
+  addPost as r,
+  uploadPostImage as l
+} from "/index/js/firebase/settings.js";
 
 let auth, db, storage;
 let selectedCategory = null;
