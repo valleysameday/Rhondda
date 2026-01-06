@@ -138,3 +138,43 @@ export async function fsLoadUserProfile(uid) {
 
   return data;
 }
+
+/* =====================================================
+   POST GATE FIRESTORE HELPERS
+===================================================== */
+
+import {
+  collection,
+  addDoc,
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { db, storage } from "./settings.js";
+
+/**
+ * Get user info
+ */
+export async function fsGetUser(uid) {
+  const snap = await getDoc(doc(db, "users", uid));
+  return snap.exists() ? snap.data() : {};
+}
+
+/**
+ * Add a new post to Firestore
+ * @param {object} post
+ */
+export async function fsAddPost(post) {
+  return await addDoc(collection(db, "posts"), post);
+}
+
+/**
+ * Upload a single image to Firebase Storage
+ * @param {File} file
+ * @param {string} uid
+ */
+export async function fsUploadImage(file, uid) {
+  const path = `posts/${uid}/${Date.now()}-${file.name}`;
+  const ref = storage.ref(path);
+  await ref.put(file);
+  return await ref.getDownloadURL();
+}
