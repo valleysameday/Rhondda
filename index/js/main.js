@@ -2,27 +2,26 @@ import { getFirebase } from '/index/js/firebase/init.js';
 import { initUIRouter } from '/index/js/ui-router.js';
 import '/index/js/post-gate.js';
 import { AI } from "/index/js/ai/assistant.js";
+
 import { openLoginModal } from '/index/js/auth/loginModal.js';
 import { openSignupModal } from '/index/js/auth/signupModal.js';
 import { openForgotModal } from '/index/js/auth/forgotModal.js';
+
+import { fsLoadUserProfile } from '/index/js/firebase/settings.js';
 
 window.openLoginModal = openLoginModal;
 window.openSignupModal = openSignupModal;
 window.openForgotModal = openForgotModal;
 
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
 let auth, db, storage;
 
 /* =====================================================
-   GLOBAL TIME FORMATTER (Used everywhere)
+   GLOBAL TIME FORMATTER
 ===================================================== */
 window.timeAgo = function(timestamp) {
   if (!timestamp) return "";
 
-  const now = Date.now();
-  const diff = now - timestamp;
-
+  const diff = Date.now() - timestamp;
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
@@ -38,30 +37,19 @@ window.timeAgo = function(timestamp) {
 };
 
 /* =====================================================
-   SPA VIEW LOADER (FIXED)
+   SPA VIEW LOADER
 ===================================================== */
 export async function loadView(view, options = {}) {
-// Always reload the feed fresh
-if (view === "home") {
-  options.forceInit = true;
-}
+  if (view === "home") options.forceInit = true;
   if (window.currentView === view && !options.forceInit) return;
+
   window.currentView = view;
 
   const app = document.getElementById("app");
-  if (!app) return console.log("❌ #app missing");
+  if (!app) return;
 
-  // Remove old dashboard containers
-  if (view === "dashboard-hub") {
-    document.querySelectorAll('[id^="view-dashboard"]').forEach(el => {
-      if (el.id !== "view-dashboard-hub") el.remove();
-    });
-  }
-
-  // Hide all views
   app.querySelectorAll(".view").forEach(v => v.hidden = true);
 
-  // Create container if missing
   let target = document.getElementById(`view-${view}`);
   if (!target) {
     target = document.createElement("div");
@@ -71,34 +59,18 @@ if (view === "home") {
     app.appendChild(target);
   }
 
-  // Force dashboard-hub to reload fresh
-  if (view === "dashboard-hub") {
-    delete target.dataset.loaded;
-  }
+  if (options.forceInit) delete target.dataset.loaded;
 
-  const shouldReload = options.forceInit || !target.dataset.loaded;
-
-  if (shouldReload) {
-    const html = await fetch(`/views/${view}.html`).then(r => r.text());
-    target.innerHTML = html;
+  if (!target.dataset.loaded) {
+    target.innerHTML = await fetch(`/views/${view}.html`).then(r => r.text());
     target.dataset.loaded = "true";
 
     try {
-      // Admin protection
-      if (view === "admin-dashboard" && !window.currentUserData?.isAdmin) {
-        return loadView("home");
-      }
-
-      // Dashboard special import
-      let mod;
-      if (view === "dashboard-hub") {
-        mod = await import(`/views/dashboard-hub.js?cache=${Date.now()}`);
-      } else {
-        mod = await import(`/views/${view}.js?cache=${Date.now()}`);
-      }
+      const mod = view === "dashboard-hub"
+        ? await import(`/views/dashboard-hub.js?${Date.now()}`)
+        : await import(`/views/${view}.js?${Date.now()}`);
 
       mod.init?.({ auth, db, storage });
-
     } catch (err) {
       console.error("❌ View JS error:", err);
     }
@@ -110,7 +82,7 @@ if (view === "home") {
 /* =====================================================
    APP INIT
 ===================================================== */
-getFirebase().then(async fb => {
+getFirebase().then(fb => {
 
   auth = fb.auth;
   db = fb.db;
@@ -120,16 +92,12 @@ getFirebase().then(async fb => {
   window.currentUserData = null;
   window.authReady = false;
 
-  /* =====================================================
-     AUTH STATE LISTENER
-  ====================================================== */
   auth.onAuthStateChanged(async user => {
 
     window.currentUser = user || null;
     window.currentUserData = null;
     window.authReady = false;
 
-    // Update account dot
     const statusDot = document.getElementById("accountStatusDot");
     if (statusDot) {
       statusDot.style.background = user ? "green" : "red";
@@ -142,32 +110,13 @@ getFirebase().then(async fb => {
     }
 
     try {
-      let snap = await getDoc(doc(db, "users", user.uid));
+      window.currentUserData = await fsLoadUserProfile(user.uid);
 
-      // Retry if Firestore doc not created yet
-      if (!snap.exists()) {
-        await new Promise(r => setTimeout(r, 200));
-        snap = await getDoc(doc(db, "users", user.uid));
-      }
-
-      window.currentUserData = snap.exists() ? snap.data() : {};
-
-      // Normalise plan
-      if (!window.currentUserData.plan) {
-        window.currentUserData.plan = "free";
-      }
-
-      // Business trial expiry check
-      const trial = window.currentUserData.businessTrial;
-      if (trial?.active && Date.now() > trial.expiresAt) {
-        window.currentUserData.plan = "free";
-        window.currentUserData.businessTrial.active = false;
-      }
-
-      // Admin button visibility
       const adminBtn = document.getElementById("openAdminDashboard");
       if (adminBtn) {
-        adminBtn.style.display = window.currentUserData?.isAdmin ? "inline-block" : "none";
+        adminBtn.style.display = window.currentUserData?.isAdmin
+          ? "inline-block"
+          : "none";
       }
 
     } catch (e) {
@@ -177,62 +126,8 @@ getFirebase().then(async fb => {
     window.authReady = true;
   });
 
-  /* =====================================================
-     START APP
-  ====================================================== */
   const start = () => {
-
     initUIRouter();
-
-    // Login / Signup / Forgot
-    document.querySelectorAll('[data-value="login"]').forEach(btn =>
-      btn.onclick = e => { e.preventDefault(); openLoginModal(auth, db); }
-    );
-
-    document.querySelectorAll('[data-value="signup"]').forEach(btn =>
-      btn.onclick = e => { e.preventDefault(); openSignupModal(auth); }
-    );
-
-    document.querySelectorAll('[data-value="forgot"]').forEach(btn =>
-      btn.onclick = e => { e.preventDefault(); openForgotModal(auth); }
-    );
-
-    // Chat list
-    document.getElementById("openChatList")?.addEventListener("click", e => {
-      e.preventDefault();
-      if (!auth.currentUser) {
-        sessionStorage.setItem("redirectAfterLogin", "chat-list");
-        openLoginModal(auth, db);
-        return;
-      }
-      loadView("chat-list");
-    });
-
-    // Account button → unified dashboard
-    document.getElementById("openAccountModal")?.addEventListener("click", e => {
-      e.preventDefault();
-
-      if (!window.currentUser) {
-        openLoginModal(auth, db);
-        return;
-      }
-
-      const waitForAuth = () => {
-        if (!window.authReady) return requestAnimationFrame(waitForAuth);
-        loadView("dashboard-hub", { forceInit: true });
-      };
-
-      waitForAuth();
-    });
-
-    // Admin dashboard
-    document.getElementById("openAdminDashboard")?.addEventListener("click", e => {
-      if (!e.isTrusted) return;
-      if (!window.currentUserData?.isAdmin) return alert("Admin access only");
-      loadView("admin-dashboard");
-    });
-
-    // Default view
     loadView("home");
   };
 
