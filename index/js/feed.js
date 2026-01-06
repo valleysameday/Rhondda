@@ -1,6 +1,9 @@
 // feed.js
 
-import { fsFetchFeedPosts, fsToggleSavePost } from "/index/js/firebase/settings.js";
+import { 
+  fetchFeedPosts as fsFetchFeedPosts, 
+  toggleSavePost as fsToggleSavePost 
+} from "/index/js/firebase/settings.js";
 import { initFeaturedAds } from "/index/js/featured-ads.js";
 import { loadView } from "/index/js/main.js";
 
