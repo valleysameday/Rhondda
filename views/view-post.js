@@ -129,6 +129,23 @@ mainImage.parentElement.appendChild(magnifyBtn);
 magnifyBtn.onclick = () => openLightbox(currentIndex);
 
 /* ===============================
+   LOGIN CHECK HELPER
+================================ */
+function requireLogin(auth, callback) {
+  if (auth.currentUser) {
+    callback();
+    return;
+  }
+
+  showToast("Please log in to continue");
+
+  setTimeout(() => {
+    const loginModal = document.getElementById("login");
+    if (loginModal) loginModal.style.display = "flex";
+  }, 3000);
+}
+
+/* ===============================
    INIT
 ================================ */
 export async function init({ auth }) {
@@ -172,16 +189,22 @@ function bindActions(auth, post) {
 
   /* SEND QUICK ENQUIRY */
   sendQuickMessageBtn.onclick = () => {
-    const msg = quickMessage.value.trim();
-    if (!msg) return showToast("Please enter a message.");
-    showToast("Message sent to the seller");
+    requireLogin(auth, () => {
+      const msg = quickMessage.value.trim();
+      if (!msg) return showToast("Please enter a message.");
+      showToast("Message sent to the seller");
+    });
   };
 
   /* PHONE BUTTON */
   if (post.phone) {
     callBtn.style.display = "inline-block";
-    callBtn.href = `tel:${post.phone}`;
-    callBtn.onclick = () => incrementLeads(sellerUid);
+    callBtn.onclick = () => {
+      requireLogin(auth, () => {
+        incrementLeads(sellerUid);
+        window.location.href = `tel:${post.phone}`;
+      });
+    };
   } else {
     callBtn.style.display = "none";
   }
@@ -189,19 +212,23 @@ function bindActions(auth, post) {
   /* WHATSAPP BUTTON */
   if (post.phone && post.whatsappAllowed) {
     whatsappBtn.style.display = "inline-block";
-    whatsappBtn.href = `https://wa.me/${post.phone.replace(/\D/g, "")}`;
-    whatsappBtn.onclick = () => incrementLeads(sellerUid);
+    whatsappBtn.onclick = () => {
+      requireLogin(auth, () => {
+        incrementLeads(sellerUid);
+        window.location.href = `https://wa.me/${post.phone.replace(/\D/g, "")}`;
+      });
+    };
   } else {
     whatsappBtn.style.display = "none";
   }
 
   /* FOLLOW BUTTON */
-  if (auth.currentUser) {
-    followBtn.onclick = async () => {
+  followBtn.onclick = () => {
+    requireLogin(auth, async () => {
       const following = await toggleFollowSeller(auth.currentUser.uid, sellerUid, true);
       followBtn.textContent = following ? "Following" : "Follow Seller";
-    };
-  }
+    });
+  };
 }
 
 /* ===============================
