@@ -21,8 +21,6 @@ const priceEl = document.getElementById("postPrice");
 const descEl = document.getElementById("postDescription");
 
 const mainImage = document.getElementById("mainImage");
-const thumb1 = document.getElementById("thumb1");
-const thumb2 = document.getElementById("thumb2");
 const galleryCount = document.getElementById("galleryCount");
 
 const messageBtn = document.getElementById("messageSellerBtn");
@@ -61,6 +59,7 @@ function prevImage() {
 
 function updateLightbox() {
   lightboxImg.src = galleryImages[currentIndex];
+  galleryCount.textContent = `${currentIndex + 1} / ${galleryImages.length} photo${galleryImages.length !== 1 ? "s" : ""}`;
 }
 
 /* Close lightbox */
@@ -115,22 +114,14 @@ function renderPost(post) {
   descEl.textContent = post.description || "No description provided.";
 
   // Collect all images
-  galleryImages =
-    [...(post.imageUrls || []), post.imageUrl, ...(post.images || [])].filter(Boolean);
-
+  galleryImages = [...(post.imageUrls || []), post.imageUrl, ...(post.images || [])].filter(Boolean);
   if (!galleryImages.length) galleryImages = ["/images/image-webholder.webp"];
 
+  // Show first image as main
+  mainImage.src = galleryImages[0];
   galleryCount.textContent = `${galleryImages.length} photo${galleryImages.length !== 1 ? "s" : ""}`;
 
-  // Update main image + thumbnails
-  mainImage.src = galleryImages[0];
-  thumb1.src = galleryImages[1] || galleryImages[0];
-  thumb2.src = galleryImages[2] || galleryImages[0];
-
-  // Click handlers
   mainImage.onclick = () => openLightbox(0);
-  thumb1.onclick = () => openLightbox(1);
-  thumb2.onclick = () => openLightbox(2);
 }
 
 /* ===============================
