@@ -434,4 +434,8 @@ if (messageSellerBtn) {
 
     loadView("chat", { forceInit: true });
   };
-    }
+export function init({ auth }) {
+  loadViewPost({ currentUser: auth.currentUser });
+} 
+
+
