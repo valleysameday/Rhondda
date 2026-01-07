@@ -135,10 +135,47 @@ getFirebase().then(async fb => {
     window.authReady = true;
   });
 
-  // 6️⃣ Start the app AFTER Firebase + settings.js are ready
+  /* =====================================================
+     START APP + UI EVENT HANDLERS
+  ===================================================== */
   const start = () => {
     initUIRouter();
     loadView("home");
+
+    /* ============================
+       LOGIN BUTTON → OPEN MODAL
+    ============================ */
+    document.addEventListener("click", e => {
+      if (e.target.closest("#auth-logged-out")) {
+        openLoginModal();
+      }
+    });
+
+    /* ============================
+       LOGO → RETURN HOME
+    ============================ */
+    document.addEventListener("click", e => {
+      if (e.target.closest(".rctx-logo")) {
+        loadView("home", { forceInit: true });
+        window.scrollTo(0, 0);
+      }
+    });
+
+    /* ============================
+       VEHICLES SUB‑CATEGORY TOGGLE
+    ============================ */
+    const subVehicles = document.getElementById("sub-vehicles");
+
+    document.addEventListener("click", e => {
+      const isVehicles = e.target.closest("#cat-vehicles");
+      const isCategory = e.target.closest(".rctx-tabs");
+
+      if (isVehicles) {
+        subVehicles.classList.remove("hidden");
+      } else if (isCategory) {
+        subVehicles.classList.add("hidden");
+      }
+    });
   };
 
   document.readyState === "loading"
