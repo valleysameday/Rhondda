@@ -43,52 +43,51 @@ header img.logo {
 }
 
 /* ========================= */
-/* GREETING + WEATHER COMBINED */
+/* FULL-WIDTH GREETING + WEATHER */
 /* ========================= */
 
 .greeting-weather {
-  margin: 15px auto;
-  padding: 10px 16px;
-  background: #005f5f; /* darker teal */
-  border-radius: 14px;
-  width: fit-content;
-  max-width: 90%;
-  color: #fff;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  width: 100%;
+  background: #1f2a33; /* darker, modern charcoal blue */
+  color: #ffffff;
+  padding: 18px 20px; /* balanced, not too much */
+  box-sizing: border-box;
+  text-align: left;
+  margin: 0 0 15px 0;
 }
 
 /* Greeting text */
+.greeting-lines {
+  margin-bottom: 10px;
+}
+
 .greeting-welsh {
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   font-weight: 700;
   display: block;
-  margin-bottom: 4px;
   color: #ffffff;
 }
 
 .greeting-english {
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 500;
   display: block;
-  margin-bottom: 8px;
-  color: #e8e8e8;
+  color: #e6e6e6;
 }
 
-/* Weather box inside */
+/* Weather box */
 .weather-box {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
+  gap: 8px;
 
-  background: rgba(255,255,255,0.15);
-  padding: 6px 12px; /* tighter padding */
+  background: rgba(255,255,255,0.12);
+  padding: 8px 14px;
   border-radius: 10px;
 }
 
 .weather-emoji {
-  font-size: 1.4rem;
+  font-size: 1.5rem;
 }
 
 .weather-text {
@@ -96,7 +95,6 @@ header img.logo {
   font-weight: 600;
   color: #ffffff;
 }
-
 
 /* =====================================================
    CATEGORIES
