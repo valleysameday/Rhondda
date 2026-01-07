@@ -10,6 +10,8 @@ import {
 ================================ */
 let postId = null;
 let sellerUid = null;
+let galleryImages = [];
+let currentIndex = 0;
 
 /* ===============================
    DOM
@@ -25,6 +27,30 @@ const messageBtn = document.getElementById("messageSellerBtn");
 const callBtn = document.getElementById("callSellerBtn");
 const whatsappBtn = document.getElementById("whatsappSellerBtn");
 const followBtn = document.getElementById("followSellerBtn");
+
+/* ===============================
+   LIGHTBOX
+================================ */
+const lightbox = document.getElementById("lightbox");
+const lightboxImg = document.getElementById("lightboxImage");
+const lightboxClose = document.getElementById("lightboxClose");
+
+function openLightbox(index = 0) {
+  currentIndex = index;
+  lightboxImg.src = galleryImages[currentIndex];
+  lightbox.classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+
+function closeLightbox() {
+  lightbox.classList.remove("active");
+  document.body.style.overflow = "";
+}
+
+if (lightboxClose) lightboxClose.onclick = closeLightbox;
+lightbox?.addEventListener("click", e => {
+  if (e.target === lightbox) closeLightbox();
+});
 
 /* ===============================
    INIT
@@ -54,9 +80,14 @@ function renderPost(post) {
   priceEl.textContent = post.price ? `£${post.price}` : "Free";
   descEl.textContent = post.description || "No description provided.";
 
-  const images = post.imageUrls || post.images || [];
-  galleryCount.textContent = `${images.length} photo${images.length !== 1 ? "s" : ""}`;
-  mainImage.src = images[0] || "/images/image-webholder.webp";
+  galleryImages =
+    post.imageUrls?.length ? post.imageUrls :
+    post.images?.length ? post.images :
+    ["/images/image-webholder.webp"];
+
+  galleryCount.textContent = `${galleryImages.length} photo${galleryImages.length !== 1 ? "s" : ""}`;
+  mainImage.src = galleryImages[0];
+  mainImage.onclick = () => openLightbox(0);
 }
 
 /* ===============================
@@ -83,11 +114,7 @@ function bindActions(auth, post) {
 
   if (followBtn && auth.currentUser) {
     followBtn.onclick = async () => {
-      const following = await toggleFollowSeller(
-        auth.currentUser.uid,
-        sellerUid,
-        true
-      );
+      const following = await toggleFollowSeller(auth.currentUser.uid, sellerUid, true);
       followBtn.textContent = following ? "Following" : "Follow Seller";
     };
   }
