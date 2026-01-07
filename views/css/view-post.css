@@ -10,31 +10,35 @@
 }
 
 /* ========================= */
-/* MAIN IMAGE (FULL WIDTH WITH BREATHING SPACE) */
+/* MAIN IMAGE (CENTERED WITH PADDING) */
 /* ========================= */
 
 .post-images {
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  padding: 8px 0; /* subtle breathing space */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 15px 0; /* Breathing space top and bottom */
   background: #fff;
+  position: relative;
 }
 
 .gallery-main {
-  width: calc(100% - 16px); /* full width minus padding */
+  width: 92%; /* Creates padding on left/right */
+  max-width: 800px; /* Limits size on large screens */
   margin: 0 auto;
   max-height: 420px;
   height: auto;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: 12px;
   cursor: pointer;
+  display: block;
 }
 
 /* IMAGE COUNT BADGE */
 .gallery-count {
   position: absolute;
-  bottom: 16px;
-  right: 16px;
+  bottom: 25px; /* Adjusted for image padding */
+  right: 8%;    /* Aligned with image edge */
   background: rgba(0, 0, 0, 0.65);
   color: #fff;
   padding: 6px 12px;
@@ -67,23 +71,24 @@
 }
 
 /* ========================= */
-/* QUICK ENQUIRY BOX */
+/* QUICK ENQUIRY BOX (SLIMMED) */
 /* ========================= */
 
 .quick-enquiry {
   margin: 15px;
   display: flex;
   flex-direction: column;
+  align-items: center; /* Centers the slimmer box */
   gap: 10px;
 }
 
 .quick-message {
-  width: 100%;
-  min-height: 90px;
-  padding: 12px;
-  border-radius: 10px;
+  width: 85%; /* Slimmer width */
+  min-height: 45px; /* Slimmer height */
+  padding: 10px;
+  border-radius: 8px;
   border: 1px solid #ddd;
-  font-size: 1rem;
+  font-size: 0.95rem;
   resize: vertical;
   color: #333;
 }
