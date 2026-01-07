@@ -21,6 +21,8 @@ const priceEl = document.getElementById("postPrice");
 const descEl = document.getElementById("postDescription");
 
 const mainImage = document.getElementById("mainImage");
+const thumb1 = document.getElementById("thumb1");
+const thumb2 = document.getElementById("thumb2");
 const galleryCount = document.getElementById("galleryCount");
 
 const messageBtn = document.getElementById("messageSellerBtn");
@@ -48,18 +50,17 @@ function closeLightbox() {
 }
 
 function nextImage() {
-  currentIndex = (currentIndex + 1) % galleryImages.length;
+  if (currentIndex < galleryImages.length - 1) currentIndex++;
   updateLightbox();
 }
 
 function prevImage() {
-  currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+  if (currentIndex > 0) currentIndex--;
   updateLightbox();
 }
 
 function updateLightbox() {
   lightboxImg.src = galleryImages[currentIndex];
-  galleryCount.textContent = `${currentIndex + 1} / ${galleryImages.length} photo${galleryImages.length !== 1 ? "s" : ""}`;
 }
 
 /* Close lightbox */
@@ -76,7 +77,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape") closeLightbox();
 });
 
-/* Touch swipe for mobile */
+/* Touch swipe for lightbox */
 let startX = 0;
 lightbox?.addEventListener("touchstart", e => startX = e.touches[0].clientX, { passive: true });
 lightbox?.addEventListener("touchend", e => {
@@ -84,6 +85,50 @@ lightbox?.addEventListener("touchend", e => {
   if (diff > 50) prevImage();
   if (diff < -50) nextImage();
 });
+
+/* ===============================
+   SWIPE ON MAIN IMAGE (VIEW POST)
+================================ */
+let mainStartX = 0;
+
+function updateMainImage(index) {
+  if (index < 0) index = 0;
+  if (index >= galleryImages.length) index = galleryImages.length - 1;
+  currentIndex = index;
+  mainImage.src = galleryImages[currentIndex];
+  galleryCount.textContent = `${currentIndex + 1} / ${galleryImages.length}`;
+  thumb1.src = galleryImages[currentIndex + 1] || galleryImages[currentIndex];
+  thumb2.src = galleryImages[currentIndex + 2] || galleryImages[currentIndex];
+}
+
+mainImage.addEventListener("touchstart", e => mainStartX = e.touches[0].clientX, { passive: true });
+mainImage.addEventListener("touchend", e => {
+  const diff = e.changedTouches[0].clientX - mainStartX;
+  if (diff > 50) updateMainImage(currentIndex - 1);
+  if (diff < -50) updateMainImage(currentIndex + 1);
+});
+
+/* Optional desktop click left/right halves */
+mainImage.addEventListener("click", e => {
+  const rect = mainImage.getBoundingClientRect();
+  if (e.clientX < rect.left + rect.width / 2) updateMainImage(currentIndex - 1);
+  else updateMainImage(currentIndex + 1);
+});
+
+/* Magnify button overlay */
+const magnifyBtn = document.createElement("div");
+magnifyBtn.textContent = "🔍";
+magnifyBtn.style.position = "absolute";
+magnifyBtn.style.bottom = "8px";
+magnifyBtn.style.right = "8px";
+magnifyBtn.style.fontSize = "24px";
+magnifyBtn.style.cursor = "pointer";
+magnifyBtn.style.color = "#fff";
+magnifyBtn.style.textShadow = "0 0 4px rgba(0,0,0,0.8)";
+mainImage.parentElement.style.position = "relative";
+mainImage.parentElement.appendChild(magnifyBtn);
+
+magnifyBtn.onclick = () => openLightbox(currentIndex);
 
 /* ===============================
    INIT
@@ -117,11 +162,15 @@ function renderPost(post) {
   galleryImages = [...(post.imageUrls || []), post.imageUrl, ...(post.images || [])].filter(Boolean);
   if (!galleryImages.length) galleryImages = ["/images/image-webholder.webp"];
 
-  // Show first image as main
-  mainImage.src = galleryImages[0];
-  galleryCount.textContent = `${galleryImages.length} photo${galleryImages.length !== 1 ? "s" : ""}`;
+  galleryCount.textContent = `1 / ${galleryImages.length}`;
 
-  mainImage.onclick = () => openLightbox(0);
+  // Update main image + thumbnails
+  updateMainImage(0);
+
+  // Click handlers to open lightbox
+  mainImage.onclick = () => openLightbox(currentIndex);
+  thumb1.onclick = () => openLightbox(currentIndex + 1);
+  thumb2.onclick = () => openLightbox(currentIndex + 2);
 }
 
 /* ===============================
