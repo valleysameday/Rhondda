@@ -25,10 +25,9 @@
 .gallery-main {
   width: 92%;
   max-width: 800px;
-  margin: 0 auto;
-  max-height: 420px;
-  height: auto;
-  object-fit: cover;
+  height: 420px;          /* FIXED HEIGHT */
+  object-fit: cover;      /* crops nicely */
+  object-position: center;
   border-radius: 12px;
   cursor: pointer;
   display: block;
