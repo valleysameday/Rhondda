@@ -3,7 +3,7 @@
 <div class="post-container">
 
   <!-- ========================= -->
-  <!-- MAIN IMAGE (TAP TO SWIPE) -->
+  <!-- MAIN IMAGE -->
   <!-- ========================= -->
   <div class="post-images">
     <img id="mainImage" class="gallery-main" />
@@ -18,12 +18,26 @@
   <p id="postDescription"></p>
 
   <!-- ========================= -->
-  <!-- ACTION BUTTONS -->
+  <!-- QUICK ENQUIRY BOX
+       (replaces Message Seller)
+  ========================= -->
+  <div class="quick-enquiry">
+    <textarea id="quickMessage" class="quick-message">
+Hi, is this still available?
+    </textarea>
+
+    <button id="sendQuickMessageBtn" class="action-btn primary">
+      Send Enquiry
+    </button>
+  </div>
+
   <!-- ========================= -->
+  <!-- CONTACT BUTTONS
+       (shown only if seller has phone / WhatsApp)
+  ========================= -->
   <div class="post-actions">
-    <button id="messageSellerBtn" class="action-btn primary">💬 Message</button>
-    <a id="callSellerBtn" class="action-btn" href="#">📞 Call</a>
-    <a id="whatsappSellerBtn" class="action-btn" href="#" target="_blank">💚 WhatsApp</a>
+    <a id="callSellerBtn" class="action-btn" href="#" style="display:none;">📞 Call</a>
+    <a id="whatsappSellerBtn" class="action-btn" href="#" target="_blank" style="display:none;">💚 WhatsApp</a>
   </div>
 
   <!-- ========================= -->
@@ -34,7 +48,7 @@
 </div>
 
 <!-- ========================= -->
-<!-- LIGHTBOX WITH AD -->
+<!-- LIGHTBOX -->
 <!-- ========================= -->
 <div id="lightbox" class="lightbox">
   <span id="lightboxClose" class="lightbox-close">×</span>
@@ -43,7 +57,6 @@
     <img id="lightboxImage" class="lightbox-img" />
   </div>
 
-  <!-- AD SLOT -->
   <div id="lightboxBottom">
     <img src="/images/ad-placeholder.jpg" alt="Advertisement" />
   </div>
