@@ -21,14 +21,14 @@ const priceEl = document.getElementById("postPrice");
 const descEl = document.getElementById("postDescription");
 
 const mainImage = document.getElementById("mainImage");
-const thumb1 = document.getElementById("thumb1");
-const thumb2 = document.getElementById("thumb2");
 const galleryCount = document.getElementById("galleryCount");
 
-const messageBtn = document.getElementById("messageSellerBtn");
 const callBtn = document.getElementById("callSellerBtn");
 const whatsappBtn = document.getElementById("whatsappSellerBtn");
 const followBtn = document.getElementById("followSellerBtn");
+
+const quickMessage = document.getElementById("quickMessage");
+const sendQuickMessageBtn = document.getElementById("sendQuickMessageBtn");
 
 /* ===============================
    LIGHTBOX
@@ -87,7 +87,7 @@ lightbox?.addEventListener("touchend", e => {
 });
 
 /* ===============================
-   SWIPE ON MAIN IMAGE (VIEW POST)
+   SWIPE ON MAIN IMAGE
 ================================ */
 let mainStartX = 0;
 
@@ -95,10 +95,9 @@ function updateMainImage(index) {
   if (index < 0) index = 0;
   if (index >= galleryImages.length) index = galleryImages.length - 1;
   currentIndex = index;
+
   mainImage.src = galleryImages[currentIndex];
   galleryCount.textContent = `${currentIndex + 1} / ${galleryImages.length}`;
-  thumb1.src = galleryImages[currentIndex + 1] || galleryImages[currentIndex];
-  thumb2.src = galleryImages[currentIndex + 2] || galleryImages[currentIndex];
 }
 
 mainImage.addEventListener("touchstart", e => mainStartX = e.touches[0].clientX, { passive: true });
@@ -108,14 +107,14 @@ mainImage.addEventListener("touchend", e => {
   if (diff < -50) updateMainImage(currentIndex + 1);
 });
 
-/* Optional desktop click left/right halves */
+/* Desktop click left/right */
 mainImage.addEventListener("click", e => {
   const rect = mainImage.getBoundingClientRect();
   if (e.clientX < rect.left + rect.width / 2) updateMainImage(currentIndex - 1);
   else updateMainImage(currentIndex + 1);
 });
 
-/* Magnify button overlay */
+/* Magnify button */
 const magnifyBtn = document.createElement("div");
 magnifyBtn.textContent = "🔍";
 magnifyBtn.style.position = "absolute";
@@ -164,41 +163,88 @@ function renderPost(post) {
 
   galleryCount.textContent = `1 / ${galleryImages.length}`;
 
-  // Update main image + thumbnails
   updateMainImage(0);
 
-  // Click handlers to open lightbox
   mainImage.onclick = () => openLightbox(currentIndex);
-  thumb1.onclick = () => openLightbox(currentIndex + 1);
-  thumb2.onclick = () => openLightbox(currentIndex + 2);
 }
 
 /* ===============================
    ACTIONS
 ================================ */
 function bindActions(auth, post) {
-  if (messageBtn) {
-    messageBtn.onclick = () => {
-      if (!auth.currentUser) return alert("Please log in to message sellers");
-      sessionStorage.setItem("viewPostId", postId);
-      loadView("chat");
+
+  /* ============================
+     QUICK ENQUIRY SEND
+  ============================ */
+  if (sendQuickMessageBtn) {
+    sendQuickMessageBtn.onclick = () => {
+      const msg = quickMessage.value.trim();
+      if (!msg) return showToast("Please enter a message.");
+
+      showToast("Message sent to the seller");
     };
   }
 
-  if (callBtn && post.phone) {
-    callBtn.href = `tel:${post.phone}`;
-    callBtn.onclick = () => incrementLeads(sellerUid);
+  /* ============================
+     PHONE BUTTON
+  ============================ */
+  if (callBtn) {
+    if (post.phone) {
+      callBtn.style.display = "inline-block";
+      callBtn.href = `tel:${post.phone}`;
+      callBtn.onclick = () => incrementLeads(sellerUid);
+    } else {
+      callBtn.style.display = "none";
+    }
   }
 
-  if (whatsappBtn && post.phone) {
-    whatsappBtn.href = `https://wa.me/${post.phone.replace(/\D/g, "")}`;
-    whatsappBtn.onclick = () => incrementLeads(sellerUid);
+  /* ============================
+     WHATSAPP BUTTON
+  ============================ */
+  if (whatsappBtn) {
+    if (post.phone && post.whatsappAllowed) {
+      whatsappBtn.style.display = "inline-block";
+      whatsappBtn.href = `https://wa.me/${post.phone.replace(/\D/g, "")}`;
+      whatsappBtn.onclick = () => incrementLeads(sellerUid);
+    } else {
+      whatsappBtn.style.display = "none";
+    }
   }
 
+  /* ============================
+     FOLLOW BUTTON
+  ============================ */
   if (followBtn && auth.currentUser) {
     followBtn.onclick = async () => {
       const following = await toggleFollowSeller(auth.currentUser.uid, sellerUid, true);
       followBtn.textContent = following ? "Following" : "Follow Seller";
     };
   }
+}
+
+/* ===============================
+   TOAST
+================================ */
+function showToast(msg) {
+  const t = document.createElement("div");
+  t.textContent = msg;
+  t.style.position = "fixed";
+  t.style.bottom = "20px";
+  t.style.left = "50%";
+  t.style.transform = "translateX(-50%)";
+  t.style.background = "rgba(0,0,0,0.85)";
+  t.style.color = "#fff";
+  t.style.padding = "12px 18px";
+  t.style.borderRadius = "8px";
+  t.style.fontSize = "15px";
+  t.style.zIndex = "999999";
+  t.style.opacity = "0";
+  t.style.transition = "opacity 0.3s ease";
+  document.body.appendChild(t);
+
+  setTimeout(() => t.style.opacity = "1", 10);
+  setTimeout(() => {
+    t.style.opacity = "0";
+    setTimeout(() => t.remove(), 300);
+  }, 2000);
 }
