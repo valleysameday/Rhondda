@@ -138,6 +138,27 @@ function updateMainImage(index) {
   if (index < 0) index = 0;
   if (index >= galleryImages.length) index = galleryImages.length - 1;
 
+/* =====================================================
+   MAIN IMAGE SWIPE (RESTORED)
+===================================================== */
+let startX = 0;
+
+mainImage.addEventListener("touchstart", function (e) {
+  startX = e.touches[0].clientX;
+}, { passive: true });
+
+mainImage.addEventListener("touchend", function (e) {
+  const diff = e.changedTouches[0].clientX - startX;
+
+  if (diff > 50) {
+    updateMainImage(currentIndex - 1); // swipe right → previous
+  }
+
+  if (diff < -50) {
+    updateMainImage(currentIndex + 1); // swipe left → next
+  }
+});
+  
   currentIndex = index;
   mainImage.src = galleryImages[currentIndex];
   galleryCount.textContent = `${currentIndex + 1} / ${galleryImages.length}`;
