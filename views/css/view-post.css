@@ -3,28 +3,29 @@
 /* ========================= */
 
 .post-container {
-  padding: 15px;
-  max-width: 600px;
+  padding: 0; /* remove default padding to make images touch edges */
+  max-width: 100%;
   margin: auto;
+  background: #fff;
 }
 
 /* Full-width image strip */
 .post-images {
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  margin-top: -15px; /* cancels .post-container padding */
 }
 
 /* ========================= */
-/* IMAGE GALLERY GRID */
+/* IMAGE GALLERY GRID (3 IMAGES TOUCHING SIDES) */
 /* ========================= */
 
 .gallery-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 2px;
-  padding: 0;
+  gap: 0; /* no gaps between images */
+  width: 100%;
+  height: 400px; /* fixed height or adjust as needed */
   position: relative;
 }
 
@@ -33,7 +34,6 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 10px;
   cursor: pointer;
 }
 
@@ -41,12 +41,10 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 10px;
   cursor: pointer;
 }
 
 /* IMAGE COUNT BADGE */
-
 .gallery-count {
   position: absolute;
   bottom: 16px;
@@ -63,22 +61,50 @@
 /* ========================= */
 /* PRICE & ACTIONS */
 /* ========================= */
-
 .post-price {
   font-size: 1.6rem;
   font-weight: bold;
-  margin: 10px 0;
+  margin: 15px;
 }
 
-.message-btn {
-  width: 100%;
-  padding: 14px;
+.post-actions {
+  display: flex;
+  gap: 10px;
+  margin: 15px;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  font-size: 1rem;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  color: #fff;
+}
+
+.action-btn.primary {
   background: #007bff;
+}
+
+.action-btn:not(.primary) {
+  background: #6c757d;
+}
+
+/* ========================= */
+/* FOLLOW BUTTON */
+/* ========================= */
+.follow-btn {
+  width: calc(100% - 30px);
+  margin: 0 15px 20px;
+  padding: 12px;
+  background: #28a745;
   color: #fff;
   border-radius: 8px;
   border: none;
-  font-size: 1.1rem;
-  margin: 15px 0;
+  font-size: 1rem;
 }
 
 /* ========================= */
@@ -100,9 +126,15 @@
   display: flex;
 }
 
-.lightbox-img {
-  max-width: 100%;
+.lightbox-inner {
+  max-width: 90%;
   max-height: 80%;
+}
+
+.lightbox-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   border-radius: 10px;
 }
 
@@ -118,259 +150,29 @@
 /* Bottom ad/container */
 #lightboxBottom {
   width: 100%;
-  padding: 15px;
+  padding: 10px;
   background: rgba(0,0,0,0.85);
-  color: #fff;
   text-align: center;
   position: absolute;
   bottom: 0;
-  left: 0;
+}
+
+#lightboxBottom img {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
 }
 
 /* ========================= */
-/* SELLER CARD */
+/* POST CONTENT */
 /* ========================= */
-
-.seller-card {
-  margin-top: 25px;
-  border-radius: 10px;
-  overflow: hidden;
-  background: #fff;
-  border: 1px solid #ddd;
-}
-
-.seller-card-header {
-  background: #f0f0f0;
-  padding: 12px 15px;
-  font-weight: bold;
-  font-size: 1.1rem;
-  border-bottom: 1px solid #ddd;
-}
-
-.seller-card-body {
-  padding: 15px;
-}
-
-.seller-top {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.seller-avatar {
-  width: 55px;
-  height: 55px;
-  background: #ccc;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: #fff;
-  background-size: cover;
-  background-position: center;
-}
-
-.seller-name {
-  font-size: 1.2rem;
+#postTitle {
+  margin: 15px;
+  font-size: 1.6rem;
   font-weight: bold;
 }
 
-.business-ribbon {
-  background: #ff9800;
-  color: #fff;
-  padding: 3px 8px;
-  border-radius: 5px;
-  font-size: 0.8rem;
-  margin-left: 5px;
-}
-
-.seller-bio {
-  margin: 12px 0;
+#postDescription {
+  margin: 15px;
   color: #444;
-}
-
-.seller-details div {
-  margin: 6px 0;
-}
-
-.reveal-btn {
-  margin-left: 10px;
-  padding: 3px 8px;
-  font-size: 0.8rem;
-  background: #007bff;
-  color: #fff;
-  border-radius: 5px;
-  border: none;
-}
-
-.follow-btn {
-  width: 100%;
-  padding: 10px;
-  background: #28a745;
-  color: #fff;
-  border-radius: 8px;
-  border: none;
-  margin-top: 15px;
-}
-
-/* ========================= */
-/* OTHER ADS CAROUSEL */
-/* ========================= */
-
-.other-ads-section {
-  margin-top: 30px;
-}
-
-.carousel {
-  display: flex;
-  overflow-x: auto;
-  gap: 12px;
-  padding-bottom: 10px;
-}
-
-.carousel-card {
-  min-width: 120px;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #fff;
-  border: 1px solid #ddd;
-  cursor: pointer;
-}
-
-.carousel-card img {
-  width: 100%;
-  height: 90px;
-  object-fit: cover;
-}
-
-.carousel-price {
-  padding: 6px;
-  font-weight: bold;
-}
-
-.bundle-btn {
-  width: 100%;
-  padding: 12px;
-  background: #6f42c1;
-  color: #fff;
-  border-radius: 8px;
-  border: none;
-  margin-top: 15px;
-}
-
-/* ========================= */
-/* BUNDLE MODAL */
-/* ========================= */
-
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  padding: 20px;
-}
-
-.modal-content {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 500px;
-  margin: auto;
-}
-
-.bundle-list {
-  max-height: 300px;
-  overflow-y: auto;
-  margin: 15px 0;
-}
-
-.bundle-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.bundle-row img {
-  width: 60px;
-  height: 60px;
-  border-radius: 6px;
-  object-fit: cover;
-}
-
-.bundle-add-btn {
-  margin-left: auto;
-  padding: 6px 10px;
-  background: #007bff;
-  color: #fff;
-  border-radius: 6px;
-  border: none;
-}
-
-.bundle-add-btn.added {
-  background: #28a745;
-}
-
-.bundle-total {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-.send-bundle-btn {
-  width: 100%;
-  padding: 12px;
-  background: #28a745;
-  color: #fff;
-  border-radius: 8px;
-  border: none;
-}
-
-.close-modal {
-  width: 100%;
-  padding: 10px;
-  background: #ccc;
-  border-radius: 8px;
-  border: none;
-  margin-top: 10px;
-}
-.post-details-card {
-  background: #fff;
-  padding: 16px;
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  margin-top: 16px;
-}
-
-.post-details-card h3 {
-  margin-bottom: 12px;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.detail-row {
-  margin-bottom: 10px;
-  font-size: .95rem;
-}
-
-.detail-row span {
-  font-weight: 600;
-  color: #333;
-}
-
-.feature-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.feature-badge {
-  background: #f1f5f9;
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: .85rem;
 }
