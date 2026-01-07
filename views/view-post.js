@@ -1,4 +1,3 @@
-import { loadView } from "/index/js/main.js";
 import {
   getPost,
   toggleFollowSeller,
@@ -14,7 +13,7 @@ let galleryImages = [];
 let currentIndex = 0;
 
 /* ===============================
-   DOM
+   DOM ELEMENTS
 ================================ */
 const titleEl = document.getElementById("postTitle");
 const priceEl = document.getElementById("postPrice");
@@ -94,8 +93,8 @@ let mainStartX = 0;
 function updateMainImage(index) {
   if (index < 0) index = 0;
   if (index >= galleryImages.length) index = galleryImages.length - 1;
-  currentIndex = index;
 
+  currentIndex = index;
   mainImage.src = galleryImages[currentIndex];
   galleryCount.textContent = `${currentIndex + 1} / ${galleryImages.length}`;
 }
@@ -143,26 +142,24 @@ export async function init({ auth }) {
     return;
   }
 
-  sellerUid = post.userId || post.businessId;
+  sellerUid = post.userId;
 
   renderPost(post);
   bindActions(auth, post);
 }
 
 /* ===============================
-   RENDER
+   RENDER POST
 ================================ */
 function renderPost(post) {
   titleEl.textContent = post.title || "Untitled";
   priceEl.textContent = post.price ? `£${post.price}` : "Free";
   descEl.textContent = post.description || "No description provided.";
 
-  // Collect all images
   galleryImages = [...(post.imageUrls || []), post.imageUrl, ...(post.images || [])].filter(Boolean);
   if (!galleryImages.length) galleryImages = ["/images/image-webholder.webp"];
 
   galleryCount.textContent = `1 / ${galleryImages.length}`;
-
   updateMainImage(0);
 
   mainImage.onclick = () => openLightbox(currentIndex);
@@ -173,48 +170,33 @@ function renderPost(post) {
 ================================ */
 function bindActions(auth, post) {
 
-  /* ============================
-     QUICK ENQUIRY SEND
-  ============================ */
-  if (sendQuickMessageBtn) {
-    sendQuickMessageBtn.onclick = () => {
-      const msg = quickMessage.value.trim();
-      if (!msg) return showToast("Please enter a message.");
+  /* SEND QUICK ENQUIRY */
+  sendQuickMessageBtn.onclick = () => {
+    const msg = quickMessage.value.trim();
+    if (!msg) return showToast("Please enter a message.");
+    showToast("Message sent to the seller");
+  };
 
-      showToast("Message sent to the seller");
-    };
+  /* PHONE BUTTON */
+  if (post.phone) {
+    callBtn.style.display = "inline-block";
+    callBtn.href = `tel:${post.phone}`;
+    callBtn.onclick = () => incrementLeads(sellerUid);
+  } else {
+    callBtn.style.display = "none";
   }
 
-  /* ============================
-     PHONE BUTTON
-  ============================ */
-  if (callBtn) {
-    if (post.phone) {
-      callBtn.style.display = "inline-block";
-      callBtn.href = `tel:${post.phone}`;
-      callBtn.onclick = () => incrementLeads(sellerUid);
-    } else {
-      callBtn.style.display = "none";
-    }
+  /* WHATSAPP BUTTON */
+  if (post.phone && post.whatsappAllowed) {
+    whatsappBtn.style.display = "inline-block";
+    whatsappBtn.href = `https://wa.me/${post.phone.replace(/\D/g, "")}`;
+    whatsappBtn.onclick = () => incrementLeads(sellerUid);
+  } else {
+    whatsappBtn.style.display = "none";
   }
 
-  /* ============================
-     WHATSAPP BUTTON
-  ============================ */
-  if (whatsappBtn) {
-    if (post.phone && post.whatsappAllowed) {
-      whatsappBtn.style.display = "inline-block";
-      whatsappBtn.href = `https://wa.me/${post.phone.replace(/\D/g, "")}`;
-      whatsappBtn.onclick = () => incrementLeads(sellerUid);
-    } else {
-      whatsappBtn.style.display = "none";
-    }
-  }
-
-  /* ============================
-     FOLLOW BUTTON
-  ============================ */
-  if (followBtn && auth.currentUser) {
+  /* FOLLOW BUTTON */
+  if (auth.currentUser) {
     followBtn.onclick = async () => {
       const following = await toggleFollowSeller(auth.currentUser.uid, sellerUid, true);
       followBtn.textContent = following ? "Following" : "Follow Seller";
