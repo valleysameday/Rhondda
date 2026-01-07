@@ -438,4 +438,4 @@ export function init({ auth }) {
   loadViewPost({ currentUser: auth.currentUser });
 } 
 
-
+}
