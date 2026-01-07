@@ -93,7 +93,19 @@ getFirebase().then(async fb => {
   // 3️⃣ Initialise Firestore helpers
   settingsModule.initFirebase({ auth, db, storage });
 
-  // 4️⃣ Map fsLoadUserProfile → getUser
+getFirebase().then(async fb => {
+
+  auth = fb.auth;
+  db = fb.db;
+  storage = fb.storage;
+
+  // ⭐ SINGLE SOURCE OF TRUTH
+  window.firebaseAuth = auth;
+  window.firebaseDb = db;
+  window.firebaseStorage = storage;
+   
+   
+   // 4️⃣ Map fsLoadUserProfile → getUser
   const fsLoadUserProfile = settingsModule.getUser;
 
   window.currentUser = null;
