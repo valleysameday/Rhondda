@@ -70,13 +70,17 @@ export async function init({ auth }) {
    RENDER SELLER
 ===================================================== */
 function renderSeller(seller) {
-  sellerNameEl.textContent = seller?.name || "Seller";
+  sellerNameEl.textContent = seller && seller.name
+  ? seller.name
+  : "Seller";
 
-  sellerPostingSinceEl.textContent = seller?.createdAt
+sellerPostingSinceEl.textContent =
+  seller && seller.createdAt
     ? `Posting since ${new Date(seller.createdAt).toLocaleDateString("en-GB")}`
     : "Posting since unknown";
 
-  sellerLastActiveEl.textContent = seller?.lastActive
+sellerLastActiveEl.textContent =
+  seller && seller.lastActive
     ? `Active ${new Date(seller.lastActive).toLocaleDateString("en-GB")}`
     : "Active recently";
 }
