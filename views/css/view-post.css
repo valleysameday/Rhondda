@@ -48,6 +48,16 @@
   pointer-events: none;
 }
 
+/* Posted time under image */
+.post-time {
+  font-size: 1.1rem;      /* readable */
+  font-weight: 500;
+  color: #444;
+  margin: 10px 15px 20px; /* left aligned with page content */
+  text-align: left;       /* ensure left alignment */
+  width: auto;            /* not full width */
+}
+
 /* ========================= */
 /* POST CONTENT */
 /* ========================= */
@@ -234,13 +244,4 @@
   max-width: 100%;
   height: auto;
   display: inline-block;
-}
-/* Posted time under image */
-.post-time {
-  font-size: 1.1rem;      /* readable */
-  font-weight: 500;
-  color: #444;
-  margin: 10px 15px 20px; /* left aligned with page content */
-  text-align: left;       /* ensure left alignment */
-  width: auto;            /* not full width */
 }
