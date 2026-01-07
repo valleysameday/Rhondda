@@ -50,15 +50,24 @@ header img.logo {
   width: 100%;
   background: #1f2a33; /* darker, modern charcoal blue */
   color: #ffffff;
-  padding: 18px 20px; /* balanced, not too much */
+  padding: 18px 20px;
   box-sizing: border-box;
-  text-align: left;
+
+  /* ⭐ Centre everything */
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
   margin: 0 0 15px 0;
 }
 
 /* Greeting text */
 .greeting-lines {
   margin-bottom: 10px;
+
+  /* ⭐ Centre greeting block */
+  text-align: center;
 }
 
 .greeting-welsh {
@@ -77,13 +86,17 @@ header img.logo {
 
 /* Weather box */
 .weather-box {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center; /* ⭐ Centre inside the badge */
   gap: 8px;
 
   background: rgba(255,255,255,0.12);
   padding: 8px 14px;
   border-radius: 10px;
+
+  /* ⭐ Centre the badge itself */
+  margin: 0 auto;
 }
 
 .weather-emoji {
