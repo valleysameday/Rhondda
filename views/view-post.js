@@ -1,7 +1,8 @@
 import {
   getPost,
   toggleFollowSeller,
-  incrementLeads
+  incrementLeads,
+  getUser
 } from "/index/js/firebase/settings.js";
 
 /* ===============================
@@ -25,6 +26,10 @@ const galleryCount = document.getElementById("galleryCount");
 const callBtn = document.getElementById("callSellerBtn");
 const whatsappBtn = document.getElementById("whatsappSellerBtn");
 const followBtn = document.getElementById("followSellerBtn");
+
+const sellerNameEl = document.getElementById("sellerName");
+const sellerPostingSinceEl = document.getElementById("sellerPostingSince");
+const sellerLastActiveEl = document.getElementById("sellerLastActive");
 
 const quickMessage = document.getElementById("quickMessage");
 const sendQuickMessageBtn = document.getElementById("sendQuickMessageBtn");
@@ -161,8 +166,34 @@ export async function init({ auth }) {
 
   sellerUid = post.userId;
 
+  const seller = await getUser(sellerUid);
+  renderSellerInfo(seller);
+
   renderPost(post);
   bindActions(auth, post);
+}
+
+/* ===============================
+   RENDER SELLER INFO
+================================ */
+function renderSellerInfo(seller) {
+  sellerNameEl.textContent = seller.name || "Seller";
+
+  // Posting since
+  if (seller.createdAt) {
+    const date = new Date(seller.createdAt).toLocaleDateString("en-GB");
+    sellerPostingSinceEl.textContent = `Posting since ${date}`;
+  } else {
+    sellerPostingSinceEl.textContent = "Posting since unknown";
+  }
+
+  // Last active
+  if (seller.lastActive) {
+    const last = new Date(seller.lastActive).toLocaleDateString("en-GB");
+    sellerLastActiveEl.textContent = `Active ${last}`;
+  } else {
+    sellerLastActiveEl.textContent = "Active recently";
+  }
 }
 
 /* ===============================
@@ -226,7 +257,7 @@ function bindActions(auth, post) {
   followBtn.onclick = () => {
     requireLogin(auth, async () => {
       const following = await toggleFollowSeller(auth.currentUser.uid, sellerUid, true);
-      followBtn.textContent = following ? "Following" : "Follow Seller";
+      followBtn.textContent = following ? "Following" : "Follow";
     });
   };
 }
