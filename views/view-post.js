@@ -132,39 +132,36 @@ function renderPost(post) {
 }
 
 /* =====================================================
-   IMAGE GALLERY
+   IMAGE GALLERY — MAIN VIEWPORT
 ===================================================== */
 function updateMainImage(index) {
   if (index < 0) index = 0;
   if (index >= galleryImages.length) index = galleryImages.length - 1;
 
-/* =====================================================
-   MAIN IMAGE SWIPE (RESTORED)
-===================================================== */
-let startX = 0;
-
-mainImage.addEventListener("touchstart", function (e) {
-  startX = e.touches[0].clientX;
-}, { passive: true });
-
-mainImage.addEventListener("touchend", function (e) {
-  const diff = e.changedTouches[0].clientX - startX;
-
-  if (diff > 50) {
-    updateMainImage(currentIndex - 1); // swipe right → previous
-  }
-
-  if (diff < -50) {
-    updateMainImage(currentIndex + 1); // swipe left → next
-  }
-});
-  
   currentIndex = index;
   mainImage.src = galleryImages[currentIndex];
   galleryCount.textContent = `${currentIndex + 1} / ${galleryImages.length}`;
 }
 
-/* CLICK IMAGE → OPEN LIGHTBOX */
+/* -------------------------------
+   MAIN IMAGE SWIPE
+-------------------------------- */
+let swipeStartX = 0;
+
+mainImage.addEventListener("touchstart", function (e) {
+  swipeStartX = e.touches[0].clientX;
+}, { passive: true });
+
+mainImage.addEventListener("touchend", function (e) {
+  const diff = e.changedTouches[0].clientX - swipeStartX;
+
+  if (diff > 50) updateMainImage(currentIndex - 1);   // swipe right
+  if (diff < -50) updateMainImage(currentIndex + 1);  // swipe left
+});
+
+/* -------------------------------
+   TAP → OPEN LIGHTBOX
+-------------------------------- */
 mainImage.addEventListener("click", function () {
   openLightbox(currentIndex);
 });
@@ -173,8 +170,6 @@ mainImage.addEventListener("click", function () {
    LIGHTBOX
 ===================================================== */
 function openLightbox(index) {
-  if (!lightbox || !lightboxImg) return;
-
   currentIndex = index;
   lightboxImg.src = galleryImages[currentIndex];
   lightbox.style.display = "flex";
@@ -182,31 +177,47 @@ function openLightbox(index) {
 }
 
 function closeLightbox() {
-  if (!lightbox) return;
-
   lightbox.style.display = "none";
   document.body.style.overflow = "";
 }
 
-/* Close actions */
 if (lightboxClose) {
   lightboxClose.addEventListener("click", closeLightbox);
 }
 
-if (lightbox) {
-  lightbox.addEventListener("click", function (e) {
-    if (e.target === lightbox) closeLightbox();
-  });
-}
+lightbox.addEventListener("click", function (e) {
+  if (e.target === lightbox) closeLightbox();
+});
 
-/* Tap image in lightbox → next */
-if (lightboxImg) {
-  lightboxImg.addEventListener("click", function () {
-    currentIndex++;
-    if (currentIndex >= galleryImages.length) currentIndex = 0;
-    lightboxImg.src = galleryImages[currentIndex];
-  });
-}
+/* -------------------------------
+   LIGHTBOX TAP → NEXT IMAGE
+-------------------------------- */
+lightboxImg.addEventListener("click", function () {
+  currentIndex++;
+  if (currentIndex >= galleryImages.length) currentIndex = 0;
+  lightboxImg.src = galleryImages[currentIndex];
+});
+
+/* -------------------------------
+   LIGHTBOX SWIPE
+-------------------------------- */
+let lightboxStartX = 0;
+
+lightboxImg.addEventListener("touchstart", function (e) {
+  lightboxStartX = e.touches[0].clientX;
+}, { passive: true });
+
+lightboxImg.addEventListener("touchend", function (e) {
+  const diff = e.changedTouches[0].clientX - lightboxStartX;
+
+  if (diff > 50) currentIndex--;   // swipe right
+  if (diff < -50) currentIndex++;  // swipe left
+
+  if (currentIndex < 0) currentIndex = galleryImages.length - 1;
+  if (currentIndex >= galleryImages.length) currentIndex = 0;
+
+  lightboxImg.src = galleryImages[currentIndex];
+});
 
 /* =====================================================
    ACTIONS
