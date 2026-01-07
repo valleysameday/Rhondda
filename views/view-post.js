@@ -206,7 +206,9 @@ if (lightbox) {
 // -------------------------------
 //  LOAD POST & SELLER
 // -------------------------------
-export async function loadViewPost(auth, db) {
+export function init({ auth, db }) {
+  loadViewPost(auth, db);
+}
   if (!postId) return;
 
   const post = await getPost(postId);
@@ -434,8 +436,8 @@ if (messageSellerBtn) {
 
     loadView("chat", { forceInit: true });
   };
-export function init({ auth }) {
+}
+  
+  export function init({ auth }) {
   loadViewPost({ currentUser: auth.currentUser });
 } 
-
-}
