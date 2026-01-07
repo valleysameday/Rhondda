@@ -48,7 +48,7 @@ header img.logo {
 
 .greeting-weather {
   width: 100%;
-  background: #1f2a33; /* darker, modern charcoal blue */
+  background: #02174d; /* darker, modern charcoal blue */
   color: #ffffff;
   padding: 18px 20px;
   box-sizing: border-box;
@@ -64,7 +64,7 @@ header img.logo {
 
 /* Greeting text */
 .greeting-lines {
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 
   /* ⭐ Centre greeting block */
   text-align: center;
