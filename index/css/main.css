@@ -42,53 +42,59 @@ header img.logo {
     filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.1));
 }
 
-/* =====================================================
-   WEATHER SNIPPET (2026 SLIM & MODERN)
-===================================================== */
-.weather-snippet {
-    /* 2026 Transformative Teal: Organic and Digital mix */
-    background: #008080; 
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    
-    /* Slimmer vertical padding (Reduced from 20px to 8px) */
-    padding: 8px 24px; 
-    margin: 12px auto;
-    
-    /* Modern 2026 Pill-shape (Increased from 12px) */
-    border-radius: 50px; 
-    
-    /* Inset width makes it feel like a "floating" badge */
-    width: fit-content;
-    min-width: 280px;
-    
-    border: none;
-    box-shadow: 0 4px 15px rgba(0, 128, 128, 0.2);
+/* ========================= */
+/* GREETING + WEATHER COMBINED */
+/* ========================= */
+
+.greeting-weather {
+  margin: 15px auto;
+  padding: 10px 16px;
+  background: #005f5f; /* darker teal */
+  border-radius: 14px;
+  width: fit-content;
+  max-width: 90%;
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Greeting text */
+.greeting-welsh {
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 4px;
+  color: #ffffff;
+}
+
+.greeting-english {
+  font-size: 1rem;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 8px;
+  color: #e8e8e8;
+}
+
+/* Weather box inside */
+.weather-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  background: rgba(255,255,255,0.15);
+  padding: 6px 12px; /* tighter padding */
+  border-radius: 10px;
 }
 
 .weather-emoji {
-    /* Scaled down for a slimmer profile */
-    font-size: 1.6rem; 
+  font-size: 1.4rem;
 }
 
-.weather-info {
-    /* Slightly smaller font to keep it on one line */
-    font-size: 1rem; 
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-@media (min-width: 1024px) {
-    .weather-snippet { 
-        padding: 10px 32px; 
-        margin: 18px auto;
-    }
-    .weather-info { 
-        font-size: 1.1rem; 
-    }
+.weather-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
 }
 
 
@@ -320,23 +326,6 @@ header img.logo {
   border-radius: 10px;
 }
 
-
-.greeting-snippet {
-  margin: 12px 0 6px;
-  font-size: 18px;
-  font-weight: 600;
-  padding: 0 12px;
-}
-
-.greeting-welsh {
-  display: block;
-  color: #444;
-}
-
-.greeting-english {
-  display: block;
-  color: #000;
-}
 .icon-status-wrap {
   position: relative;
   display: inline-block;
