@@ -32,17 +32,18 @@ const sellerNameEl = document.getElementById("sellerName");
 const sellerPostingSinceEl = document.getElementById("sellerPostingSince");
 const sellerLastActiveEl = document.getElementById("sellerLastActive");
 
+/* LIGHTBOX */
+const lightbox = document.getElementById("lightbox");
+const lightboxImg = document.getElementById("lightboxImage");
+const lightboxClose = document.getElementById("lightboxClose");
+
 /* =====================================================
    LOGIN GUARD
 ===================================================== */
 function requireLogin(auth, cb) {
-  if (auth.currentUser) {
-    cb();
-    return;
-  }
+  if (auth.currentUser) return cb();
 
   showToast("Please log in to contact the seller");
-
   setTimeout(() => {
     const login = document.getElementById("login");
     if (login) login.style.display = "flex";
@@ -63,9 +64,10 @@ export async function init({ auth }) {
     return;
   }
 
-  sellerUid = post.userId;
+  sellerUid = post.userId || post.businessId;
 
   const seller = await getUser(sellerUid);
+
   renderSeller(seller);
   renderPost(post);
   bindActions(auth, post);
@@ -75,17 +77,16 @@ export async function init({ auth }) {
    RENDER SELLER
 ===================================================== */
 function renderSeller(seller) {
-  sellerNameEl.textContent =
-    seller && seller.name ? seller.name : "Seller";
+  sellerNameEl.textContent = seller && seller.name ? seller.name : "Seller";
 
   sellerPostingSinceEl.textContent =
     seller && seller.createdAt
-      ? "Posting since " + new Date(seller.createdAt).toLocaleDateString("en-GB")
+      ? `Posting since ${new Date(seller.createdAt).toLocaleDateString("en-GB")}`
       : "Posting since unknown";
 
   sellerLastActiveEl.textContent =
     seller && seller.lastActive
-      ? "Active " + new Date(seller.lastActive).toLocaleDateString("en-GB")
+      ? `Active ${new Date(seller.lastActive).toLocaleDateString("en-GB")}`
       : "Active recently";
 }
 
@@ -94,16 +95,15 @@ function renderSeller(seller) {
 ===================================================== */
 function formatPostTime(ts) {
   if (!ts) return "";
-
   const diff = Date.now() - new Date(ts).getTime();
   const mins = Math.floor(diff / 60000);
   const hrs = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
 
-  if (mins < 60) return "Posted " + mins + " minutes ago";
-  if (hrs < 24) return "Posted " + hrs + " hours ago";
+  if (mins < 60) return `Posted ${mins} minutes ago`;
+  if (hrs < 24) return `Posted ${hrs} hours ago`;
   if (days === 1) return "Posted yesterday";
-  return "Posted " + days + " days ago";
+  return `Posted ${days} days ago`;
 }
 
 /* =====================================================
@@ -111,26 +111,18 @@ function formatPostTime(ts) {
 ===================================================== */
 function renderPost(post) {
   titleEl.textContent = post.title || "Untitled";
-  priceEl.textContent = post.price ? "£" + post.price : "Free";
+  priceEl.textContent = post.price ? `£${post.price}` : "Free";
   descEl.textContent = post.description || "No description provided.";
 
   if (post.createdAt) {
     postTimeEl.textContent = formatPostTime(post.createdAt);
   }
 
-  galleryImages = [];
-
-  if (Array.isArray(post.imageUrls)) {
-    galleryImages = galleryImages.concat(post.imageUrls);
-  }
-
-  if (post.imageUrl) {
-    galleryImages.push(post.imageUrl);
-  }
-
-  if (Array.isArray(post.images)) {
-    galleryImages = galleryImages.concat(post.images);
-  }
+  galleryImages = [
+    ...(post.imageUrls || []),
+    post.imageUrl,
+    ...(post.images || [])
+  ].filter(Boolean);
 
   if (!galleryImages.length) {
     galleryImages = ["/images/image-webholder.webp"];
@@ -148,63 +140,98 @@ function updateMainImage(index) {
 
   currentIndex = index;
   mainImage.src = galleryImages[currentIndex];
-  galleryCount.textContent =
-    currentIndex + 1 + " / " + galleryImages.length;
+  galleryCount.textContent = `${currentIndex + 1} / ${galleryImages.length}`;
 }
 
+/* CLICK IMAGE → OPEN LIGHTBOX */
 mainImage.addEventListener("click", function () {
-  updateMainImage(currentIndex + 1);
+  openLightbox(currentIndex);
 });
+
+/* =====================================================
+   LIGHTBOX
+===================================================== */
+function openLightbox(index) {
+  if (!lightbox || !lightboxImg) return;
+
+  currentIndex = index;
+  lightboxImg.src = galleryImages[currentIndex];
+  lightbox.style.display = "flex";
+  document.body.style.overflow = "hidden";
+}
+
+function closeLightbox() {
+  if (!lightbox) return;
+
+  lightbox.style.display = "none";
+  document.body.style.overflow = "";
+}
+
+/* Close actions */
+if (lightboxClose) {
+  lightboxClose.addEventListener("click", closeLightbox);
+}
+
+if (lightbox) {
+  lightbox.addEventListener("click", function (e) {
+    if (e.target === lightbox) closeLightbox();
+  });
+}
+
+/* Tap image in lightbox → next */
+if (lightboxImg) {
+  lightboxImg.addEventListener("click", function () {
+    currentIndex++;
+    if (currentIndex >= galleryImages.length) currentIndex = 0;
+    lightboxImg.src = galleryImages[currentIndex];
+  });
+}
 
 /* =====================================================
    ACTIONS
 ===================================================== */
 function bindActions(auth, post) {
 
-  /* ---------- CALL ---------- */
+  /* CALL */
   if (post.phone) {
     callBtn.style.display = "inline-flex";
     callBtn.onclick = function () {
       requireLogin(auth, async function () {
-        callBtn.disabled = true;
-
         await trackContactClick({
-          postId: postId,
-          sellerUid: sellerUid,
+          postId,
+          sellerUid,
           viewerUid: auth.currentUser.uid,
           type: "call"
         });
 
-        window.location.href = "tel:" + post.phone;
+        window.location.href = `tel:${post.phone}`;
       });
     };
   } else {
     callBtn.style.display = "none";
   }
 
-  /* ---------- WHATSAPP ---------- */
+  /* WHATSAPP */
   if (post.phone && post.whatsappAllowed) {
     whatsappBtn.style.display = "inline-flex";
     whatsappBtn.onclick = function () {
       requireLogin(auth, async function () {
-        whatsappBtn.disabled = true;
-
         await trackContactClick({
-          postId: postId,
-          sellerUid: sellerUid,
+          postId,
+          sellerUid,
           viewerUid: auth.currentUser.uid,
           type: "whatsapp"
         });
 
         const clean = post.phone.replace(/\D/g, "");
-        window.location.href = "https://wa.me/" + clean;
+        window.location.href = `https://wa.me/${clean}`;
       });
     };
   } else {
     whatsappBtn.style.display = "none";
   }
 
-  /* ---------- FOLLOW ---------- */
+  /* FOLLOW */
   followBtn.onclick = function () {
     requireLogin(auth, async function () {
       const following = await toggleFollowSeller(
@@ -223,29 +250,25 @@ function bindActions(auth, post) {
 function showToast(msg) {
   const el = document.createElement("div");
   el.textContent = msg;
-  el.style.position = "fixed";
-  el.style.bottom = "20px";
-  el.style.left = "50%";
-  el.style.transform = "translateX(-50%)";
-  el.style.background = "rgba(0,0,0,0.85)";
-  el.style.color = "#fff";
-  el.style.padding = "12px 18px";
-  el.style.borderRadius = "8px";
-  el.style.fontSize = "15px";
-  el.style.zIndex = "999999";
-  el.style.opacity = "0";
-  el.style.transition = "opacity .3s";
-
+  el.style.cssText = `
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,0.85);
+    color:#fff;
+    padding:12px 18px;
+    border-radius:8px;
+    font-size:15px;
+    z-index:999999;
+    opacity:0;
+    transition:opacity .3s;
+  `;
   document.body.appendChild(el);
 
-  setTimeout(function () {
-    el.style.opacity = "1";
-  }, 10);
-
-  setTimeout(function () {
+  requestAnimationFrame(() => (el.style.opacity = "1"));
+  setTimeout(() => {
     el.style.opacity = "0";
-    setTimeout(function () {
-      el.remove();
-    }, 300);
+    setTimeout(() => el.remove(), 300);
   }, 2000);
 }
