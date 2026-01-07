@@ -1,116 +1,53 @@
 <link rel="stylesheet" href="/views/css/view-post.css">
+
 <div class="post-container">
 
   <!-- ========================= -->
-  <!-- AD CONTENT -->
+  <!-- IMAGES -->
   <!-- ========================= -->
-<div class="post-images">
-  <div id="postGallery" class="gallery-grid">
-
-    <!-- BIG IMAGE (LEFT) -->
-    <img id="mainImage" class="gallery-main" />
-
-    <!-- SMALL IMAGES (RIGHT) -->
-    <img id="thumb1" class="gallery-thumb" />
-    <img id="thumb2" class="gallery-thumb" />
-
-    <!-- IMAGE COUNT BADGE -->
-    <div id="galleryCount" class="gallery-count"></div>
-
+  <div class="post-images">
+    <div class="gallery-grid">
+      <img id="mainImage" class="gallery-main" />
+      <div id="galleryCount" class="gallery-count"></div>
+    </div>
   </div>
-</div>
-<div id="postDetails" class="post-details-card"></div>
+
+  <!-- ========================= -->
+  <!-- POST CONTENT -->
+  <!-- ========================= -->
   <h1 id="postTitle"></h1>
   <div class="post-price" id="postPrice"></div>
   <p id="postDescription"></p>
 
-  <button class="message-btn">Message Seller</button>
-
-
   <!-- ========================= -->
-  <!-- SELLER CARD -->
+  <!-- ACTION BUTTONS -->
   <!-- ========================= -->
-  <section class="seller-card">
-
-    <div class="seller-card-header" id="sellerCardHeader">
-      <!-- Auto-filled: About This Seller / Business -->
-    </div>
-
-    <div class="seller-card-body">
-
-      <div class="seller-top">
-        <div id="sellerAvatar" class="seller-avatar"></div>
-
-        <div class="seller-info">
-          <div id="sellerName" class="seller-name"></div>
-          <span id="sellerRibbon" class="business-ribbon">Business</span>
-        </div>
-      </div>
-
-      <p id="sellerBio" class="seller-bio"></p>
-
-      <div class="seller-details">
-        <div><strong>📍 Area:</strong> <span id="sellerArea"></span></div>
-
-        <div id="sellerWebsiteWrapper">
-          <strong>🌐 Website:</strong>
-          <a id="sellerWebsite" href="#" target="_blank"></a>
-        </div>
-
-        <div id="sellerPhoneWrapper">
-          <strong>📞 Phone:</strong>
-          <span id="bizPhoneMasked"></span>
-          <button id="revealBizPhoneBtn" class="reveal-btn">Tap to Reveal</button>
-        </div>
-      </div>
-
-      <button id="followSellerBtn" class="follow-btn">Follow Seller</button>
-
-    </div>
-  </section>
-
-
-  <!-- ========================= -->
-  <!-- OTHER ADS SECTION -->
-  <!-- ========================= -->
-  <section class="other-ads-section">
-    <h2>Other Ads by This Seller</h2>
-
-    <div id="otherAdsCarousel" class="carousel"></div>
-
-    <button id="openBundleModalBtn" class="bundle-btn">
-      View All Ads & Bundle
-    </button>
-  </section>
-
-
-  <!-- ========================= -->
-  <!-- BUNDLE MODAL -->
-  <!-- ========================= -->
-  <div id="bundleModal" class="modal">
-    <div class="modal-content">
-
-      <h2>Bundle Items</h2>
-
-      <div id="bundleList" class="bundle-list"></div>
-
-      <div class="bundle-total">
-        Total: <span id="bundleTotal">£0</span>
-      </div>
-
-      <button id="sendBundleBtn" class="send-bundle-btn">Send Bundle Enquiry</button>
-
-      <button class="close-modal" onclick="bundleModal.style.display='none'">Close</button>
-    </div>
+  <div class="post-actions">
+    <button id="messageSellerBtn" class="action-btn primary">💬 Message</button>
+    <a id="callSellerBtn" class="action-btn" href="#">📞 Call</a>
+    <a id="whatsappSellerBtn" class="action-btn" href="#" target="_blank">💚 WhatsApp</a>
   </div>
-<!-- LIGHTBOX -->
-<div id="lightbox" class="lightbox">
-  <span id="lightboxClose" class="lightbox-close">×</span>
-  <div class="lightbox-content">
-    <img id="lightboxImage" class="lightbox-img" />
-    <img id="lightboxAdImage" class="lightbox-ad-image" src="/images/ad-placeholder.jpg" />
-  </div>
-<div id="lightboxBottom"></div>
+
+  <!-- ========================= -->
+  <!-- FOLLOW -->
+  <!-- ========================= -->
+  <button id="followSellerBtn" class="follow-btn">➕ Follow Seller</button>
 
 </div>
+
+<!-- ========================= -->
+<!-- LIGHTBOX WITH AD -->
+<!-- ========================= -->
+<div id="lightbox" class="lightbox">
+  <span id="lightboxClose" class="lightbox-close">×</span>
+  <div class="lightbox-inner">
+    <img id="lightboxImage" class="lightbox-img" />
+  </div>
+
+  <!-- AD SLOT -->
+  <div id="lightboxBottom">
+    <img src="/images/ad-placeholder.jpg" alt="Advertisement" />
+  </div>
+</div>
+
 <script type="module" src="/views/view-post.js"></script>
