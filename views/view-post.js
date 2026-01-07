@@ -37,7 +37,7 @@ const lightboxClose = document.getElementById("lightboxClose");
 
 function openLightbox(index = 0) {
   currentIndex = index;
-  lightboxImg.src = galleryImages[currentIndex];
+  updateLightbox();
   lightbox.classList.add("active");
   document.body.style.overflow = "hidden";
 }
@@ -47,9 +47,41 @@ function closeLightbox() {
   document.body.style.overflow = "";
 }
 
+function nextImage() {
+  currentIndex = (currentIndex + 1) % galleryImages.length;
+  updateLightbox();
+}
+
+function prevImage() {
+  currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+  updateLightbox();
+}
+
+function updateLightbox() {
+  lightboxImg.src = galleryImages[currentIndex];
+}
+
+/* Close lightbox */
 if (lightboxClose) lightboxClose.onclick = closeLightbox;
 lightbox?.addEventListener("click", e => {
   if (e.target === lightbox) closeLightbox();
+});
+
+/* Keyboard navigation */
+document.addEventListener("keydown", e => {
+  if (!lightbox.classList.contains("active")) return;
+  if (e.key === "ArrowRight") nextImage();
+  if (e.key === "ArrowLeft") prevImage();
+  if (e.key === "Escape") closeLightbox();
+});
+
+/* Touch swipe for mobile */
+let startX = 0;
+lightbox?.addEventListener("touchstart", e => startX = e.touches[0].clientX, { passive: true });
+lightbox?.addEventListener("touchend", e => {
+  const diff = e.changedTouches[0].clientX - startX;
+  if (diff > 50) prevImage();
+  if (diff < -50) nextImage();
 });
 
 /* ===============================
@@ -80,6 +112,7 @@ function renderPost(post) {
   priceEl.textContent = post.price ? `£${post.price}` : "Free";
   descEl.textContent = post.description || "No description provided.";
 
+  // Collect all images
   galleryImages =
     post.imageUrls?.length ? post.imageUrls :
     post.images?.length ? post.images :
@@ -87,6 +120,8 @@ function renderPost(post) {
 
   galleryCount.textContent = `${galleryImages.length} photo${galleryImages.length !== 1 ? "s" : ""}`;
   mainImage.src = galleryImages[0];
+
+  // Open lightbox on click
   mainImage.onclick = () => openLightbox(0);
 }
 
