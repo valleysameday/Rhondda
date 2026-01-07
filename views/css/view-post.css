@@ -245,3 +245,9 @@
   height: auto;
   display: inline-block;
 }
+.enquiry-heading {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin: 20px 15px 8px; /* aligns with your post text margins */
+}
