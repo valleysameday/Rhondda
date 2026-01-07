@@ -124,19 +124,46 @@
 }
 
 /* ========================= */
-/* FOLLOW BUTTON */
+/* SELLER INFO */
 /* ========================= */
 
-.follow-btn {
-  width: calc(100% - 30px);
-  margin: 0 15px 20px;
-  padding: 12px;
+/* SELLER INFO BAR */
+.seller-info-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 15px;
+  padding: 12px 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+
+.seller-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.seller-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.seller-stats {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Smaller, subtle follow button */
+.follow-btn-small {
+  padding: 8px 14px;
   background: #28a745;
   color: #fff;
-  border-radius: 8px;
   border: none;
-  font-size: 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 /* ========================= */
