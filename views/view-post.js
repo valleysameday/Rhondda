@@ -36,11 +36,16 @@ const sellerLastActiveEl = document.getElementById("sellerLastActive");
    LOGIN GUARD
 ===================================================== */
 function requireLogin(auth, cb) {
-  if (auth.currentUser) return cb();
+  if (auth.currentUser) {
+    cb();
+    return;
+  }
 
   showToast("Please log in to contact the seller");
+
   setTimeout(() => {
-    document.getElementById("login")?.style.display = "flex";
+    const login = document.getElementById("login");
+    if (login) login.style.display = "flex";
   }, 1200);
 }
 
@@ -70,19 +75,18 @@ export async function init({ auth }) {
    RENDER SELLER
 ===================================================== */
 function renderSeller(seller) {
-  sellerNameEl.textContent = seller && seller.name
-  ? seller.name
-  : "Seller";
+  sellerNameEl.textContent =
+    seller && seller.name ? seller.name : "Seller";
 
-sellerPostingSinceEl.textContent =
-  seller && seller.createdAt
-    ? `Posting since ${new Date(seller.createdAt).toLocaleDateString("en-GB")}`
-    : "Posting since unknown";
+  sellerPostingSinceEl.textContent =
+    seller && seller.createdAt
+      ? "Posting since " + new Date(seller.createdAt).toLocaleDateString("en-GB")
+      : "Posting since unknown";
 
-sellerLastActiveEl.textContent =
-  seller && seller.lastActive
-    ? `Active ${new Date(seller.lastActive).toLocaleDateString("en-GB")}`
-    : "Active recently";
+  sellerLastActiveEl.textContent =
+    seller && seller.lastActive
+      ? "Active " + new Date(seller.lastActive).toLocaleDateString("en-GB")
+      : "Active recently";
 }
 
 /* =====================================================
@@ -90,15 +94,16 @@ sellerLastActiveEl.textContent =
 ===================================================== */
 function formatPostTime(ts) {
   if (!ts) return "";
+
   const diff = Date.now() - new Date(ts).getTime();
   const mins = Math.floor(diff / 60000);
   const hrs = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
 
-  if (mins < 60) return `Posted ${mins} minutes ago`;
-  if (hrs < 24) return `Posted ${hrs} hours ago`;
+  if (mins < 60) return "Posted " + mins + " minutes ago";
+  if (hrs < 24) return "Posted " + hrs + " hours ago";
   if (days === 1) return "Posted yesterday";
-  return `Posted ${days} days ago`;
+  return "Posted " + days + " days ago";
 }
 
 /* =====================================================
@@ -106,18 +111,26 @@ function formatPostTime(ts) {
 ===================================================== */
 function renderPost(post) {
   titleEl.textContent = post.title || "Untitled";
-  priceEl.textContent = post.price ? `£${post.price}` : "Free";
+  priceEl.textContent = post.price ? "£" + post.price : "Free";
   descEl.textContent = post.description || "No description provided.";
 
   if (post.createdAt) {
     postTimeEl.textContent = formatPostTime(post.createdAt);
   }
 
-  galleryImages = [
-    ...(post.imageUrls || []),
-    post.imageUrl,
-    ...(post.images || [])
-  ].filter(Boolean);
+  galleryImages = [];
+
+  if (Array.isArray(post.imageUrls)) {
+    galleryImages = galleryImages.concat(post.imageUrls);
+  }
+
+  if (post.imageUrl) {
+    galleryImages.push(post.imageUrl);
+  }
+
+  if (Array.isArray(post.images)) {
+    galleryImages = galleryImages.concat(post.images);
+  }
 
   if (!galleryImages.length) {
     galleryImages = ["/images/image-webholder.webp"];
@@ -135,10 +148,11 @@ function updateMainImage(index) {
 
   currentIndex = index;
   mainImage.src = galleryImages[currentIndex];
-  galleryCount.textContent = `${currentIndex + 1} / ${galleryImages.length}`;
+  galleryCount.textContent =
+    currentIndex + 1 + " / " + galleryImages.length;
 }
 
-mainImage.addEventListener("click", () => {
+mainImage.addEventListener("click", function () {
   updateMainImage(currentIndex + 1);
 });
 
@@ -150,18 +164,18 @@ function bindActions(auth, post) {
   /* ---------- CALL ---------- */
   if (post.phone) {
     callBtn.style.display = "inline-flex";
-    callBtn.onclick = () => {
-      requireLogin(auth, async () => {
+    callBtn.onclick = function () {
+      requireLogin(auth, async function () {
         callBtn.disabled = true;
 
         await trackContactClick({
-          postId,
-          sellerUid,
+          postId: postId,
+          sellerUid: sellerUid,
           viewerUid: auth.currentUser.uid,
           type: "call"
         });
 
-        window.location.href = `tel:${post.phone}`;
+        window.location.href = "tel:" + post.phone;
       });
     };
   } else {
@@ -171,19 +185,19 @@ function bindActions(auth, post) {
   /* ---------- WHATSAPP ---------- */
   if (post.phone && post.whatsappAllowed) {
     whatsappBtn.style.display = "inline-flex";
-    whatsappBtn.onclick = () => {
-      requireLogin(auth, async () => {
+    whatsappBtn.onclick = function () {
+      requireLogin(auth, async function () {
         whatsappBtn.disabled = true;
 
         await trackContactClick({
-          postId,
-          sellerUid,
+          postId: postId,
+          sellerUid: sellerUid,
           viewerUid: auth.currentUser.uid,
           type: "whatsapp"
         });
 
         const clean = post.phone.replace(/\D/g, "");
-        window.location.href = `https://wa.me/${clean}`;
+        window.location.href = "https://wa.me/" + clean;
       });
     };
   } else {
@@ -191,8 +205,8 @@ function bindActions(auth, post) {
   }
 
   /* ---------- FOLLOW ---------- */
-  followBtn.onclick = () => {
-    requireLogin(auth, async () => {
+  followBtn.onclick = function () {
+    requireLogin(auth, async function () {
       const following = await toggleFollowSeller(
         auth.currentUser.uid,
         sellerUid,
@@ -209,25 +223,29 @@ function bindActions(auth, post) {
 function showToast(msg) {
   const el = document.createElement("div");
   el.textContent = msg;
-  el.style.cssText = `
-    position:fixed;
-    bottom:20px;
-    left:50%;
-    transform:translateX(-50%);
-    background:rgba(0,0,0,0.85);
-    color:#fff;
-    padding:12px 18px;
-    border-radius:8px;
-    font-size:15px;
-    z-index:999999;
-    opacity:0;
-    transition:opacity .3s;
-  `;
+  el.style.position = "fixed";
+  el.style.bottom = "20px";
+  el.style.left = "50%";
+  el.style.transform = "translateX(-50%)";
+  el.style.background = "rgba(0,0,0,0.85)";
+  el.style.color = "#fff";
+  el.style.padding = "12px 18px";
+  el.style.borderRadius = "8px";
+  el.style.fontSize = "15px";
+  el.style.zIndex = "999999";
+  el.style.opacity = "0";
+  el.style.transition = "opacity .3s";
+
   document.body.appendChild(el);
 
-  requestAnimationFrame(() => (el.style.opacity = "1"));
-  setTimeout(() => {
+  setTimeout(function () {
+    el.style.opacity = "1";
+  }, 10);
+
+  setTimeout(function () {
     el.style.opacity = "0";
-    setTimeout(() => el.remove(), 300);
+    setTimeout(function () {
+      el.remove();
+    }, 300);
   }, 2000);
 }
