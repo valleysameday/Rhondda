@@ -3,44 +3,30 @@
 /* ========================= */
 
 .post-container {
-  padding: 0; /* remove default padding to make images touch edges */
+  padding: 0;
   max-width: 100%;
   margin: auto;
   background: #fff;
 }
 
-/* Full-width image strip */
+/* ========================= */
+/* MAIN IMAGE (FULL WIDTH WITH BREATHING SPACE) */
+/* ========================= */
+
 .post-images {
   width: 100vw;
   margin-left: calc(50% - 50vw);
-}
-
-/* ========================= */
-/* IMAGE GALLERY GRID (3 IMAGES TOUCHING SIDES) */
-/* ========================= */
-
-.gallery-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 0; /* no gaps between images */
-  width: 100%;
-  height: 400px; /* fixed height or adjust as needed */
-  position: relative;
+  padding: 8px 0; /* subtle breathing space */
+  background: #fff;
 }
 
 .gallery-main {
-  grid-row: 1 / span 2;
-  width: 100%;
-  height: 100%;
+  width: calc(100% - 16px); /* full width minus padding */
+  margin: 0 auto;
+  max-height: 420px;
+  height: auto;
   object-fit: cover;
-  cursor: pointer;
-}
-
-.gallery-thumb {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  border-radius: 6px;
   cursor: pointer;
 }
 
@@ -59,13 +45,52 @@
 }
 
 /* ========================= */
-/* PRICE & ACTIONS */
+/* POST CONTENT */
 /* ========================= */
+
+#postTitle {
+  margin: 15px;
+  font-size: 1.6rem;
+  font-weight: bold;
+}
+
 .post-price {
   font-size: 1.6rem;
   font-weight: bold;
   margin: 15px;
 }
+
+#postDescription {
+  margin: 15px;
+  color: #444;
+  line-height: 1.5;
+}
+
+/* ========================= */
+/* QUICK ENQUIRY BOX */
+/* ========================= */
+
+.quick-enquiry {
+  margin: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.quick-message {
+  width: 100%;
+  min-height: 90px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  resize: vertical;
+  color: #333;
+}
+
+/* ========================= */
+/* ACTION BUTTONS */
+/* ========================= */
 
 .post-actions {
   display: flex;
@@ -96,6 +121,7 @@
 /* ========================= */
 /* FOLLOW BUTTON */
 /* ========================= */
+
 .follow-btn {
   width: calc(100% - 30px);
   margin: 0 15px 20px;
@@ -105,6 +131,7 @@
   border-radius: 8px;
   border: none;
   font-size: 1rem;
+  cursor: pointer;
 }
 
 /* ========================= */
@@ -161,18 +188,4 @@
   max-width: 100%;
   height: auto;
   display: inline-block;
-}
-
-/* ========================= */
-/* POST CONTENT */
-/* ========================= */
-#postTitle {
-  margin: 15px;
-  font-size: 1.6rem;
-  font-weight: bold;
-}
-
-#postDescription {
-  margin: 15px;
-  color: #444;
 }
