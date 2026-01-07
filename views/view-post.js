@@ -34,6 +34,9 @@ const sellerLastActiveEl = document.getElementById("sellerLastActive");
 const quickMessage = document.getElementById("quickMessage");
 const sendQuickMessageBtn = document.getElementById("sendQuickMessageBtn");
 
+/* NEW: Posted time element */
+const postTimeEl = document.getElementById("postTime");
+
 /* ===============================
    LIGHTBOX
 ================================ */
@@ -179,7 +182,6 @@ export async function init({ auth }) {
 function renderSellerInfo(seller) {
   sellerNameEl.textContent = seller.name || "Seller";
 
-  // Posting since
   if (seller.createdAt) {
     const date = new Date(seller.createdAt).toLocaleDateString("en-GB");
     sellerPostingSinceEl.textContent = `Posting since ${date}`;
@@ -187,7 +189,6 @@ function renderSellerInfo(seller) {
     sellerPostingSinceEl.textContent = "Posting since unknown";
   }
 
-  // Last active
   if (seller.lastActive) {
     const last = new Date(seller.lastActive).toLocaleDateString("en-GB");
     sellerLastActiveEl.textContent = `Active ${last}`;
@@ -197,12 +198,37 @@ function renderSellerInfo(seller) {
 }
 
 /* ===============================
+   FORMAT POST TIME
+================================ */
+function formatPostTime(timestamp) {
+  if (!timestamp) return "";
+
+  const now = Date.now();
+  const posted = new Date(timestamp).getTime();
+  const diff = now - posted;
+
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+
+  if (minutes < 60) return `Posted ${minutes} minutes ago`;
+  if (hours < 24) return `Posted ${hours} hours ago`;
+  if (days === 1) return "Posted yesterday";
+  return `Posted ${days} days ago`;
+}
+
+/* ===============================
    RENDER POST
 ================================ */
 function renderPost(post) {
   titleEl.textContent = post.title || "Untitled";
   priceEl.textContent = post.price ? `£${post.price}` : "Free";
   descEl.textContent = post.description || "No description provided.";
+
+  /* NEW: Set posted time */
+  if (post.createdAt) {
+    postTimeEl.textContent = formatPostTime(post.createdAt);
+  }
 
   galleryImages = [...(post.imageUrls || []), post.imageUrl, ...(post.images || [])].filter(Boolean);
   if (!galleryImages.length) galleryImages = ["/images/image-webholder.webp"];
@@ -218,7 +244,6 @@ function renderPost(post) {
 ================================ */
 function bindActions(auth, post) {
 
-  /* SEND QUICK ENQUIRY */
   sendQuickMessageBtn.onclick = () => {
     requireLogin(auth, () => {
       const msg = quickMessage.value.trim();
@@ -227,7 +252,6 @@ function bindActions(auth, post) {
     });
   };
 
-  /* PHONE BUTTON */
   if (post.phone) {
     callBtn.style.display = "inline-block";
     callBtn.onclick = () => {
@@ -240,7 +264,6 @@ function bindActions(auth, post) {
     callBtn.style.display = "none";
   }
 
-  /* WHATSAPP BUTTON */
   if (post.phone && post.whatsappAllowed) {
     whatsappBtn.style.display = "inline-block";
     whatsappBtn.onclick = () => {
@@ -253,7 +276,6 @@ function bindActions(auth, post) {
     whatsappBtn.style.display = "none";
   }
 
-  /* FOLLOW BUTTON */
   followBtn.onclick = () => {
     requireLogin(auth, async () => {
       const following = await toggleFollowSeller(auth.currentUser.uid, sellerUid, true);
