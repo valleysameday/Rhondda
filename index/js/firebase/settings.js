@@ -389,3 +389,20 @@ export async function fsReportService(serviceId, reason) {
     createdAt: serverTimestamp()
   });
 }
+export async function fsGetUserServices(uid) {
+  console.log("👔 fsGetUserServices()", uid);
+
+  if (!db || !uid) return [];
+
+  const q = query(
+    collection(db, "services"),
+    where("ownerUid", "==", uid),
+    where("isActive", "==", true)
+  );
+
+  const snap = await getDocs(q);
+
+  console.log(`📦 ${snap.docs.length} services found for user`);
+
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
