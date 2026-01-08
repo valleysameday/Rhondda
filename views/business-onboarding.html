@@ -1,4 +1,102 @@
-<div class="onboarding-placeholder">
-  <h2>Business Onboarding Placeholder</h2>
-  <p>This screen will be built next.</p>
+<div class="onboarding-container">
+
+  <!-- STEP 1 — WELCOME -->
+  <section class="onboarding-step" id="step-welcome">
+    <h1>List Your Business on RCT‑X</h1>
+    <p>Join hundreds of trusted local businesses across the Rhondda. It only takes a few minutes.</p>
+    <button class="onboarding-next" data-next="step-postcode">Get Started</button>
+  </section>
+
+  <!-- STEP 2 — POSTCODE CHECK -->
+  <section class="onboarding-step hidden" id="step-postcode">
+    <h2>Where are you based?</h2>
+    <p>We currently support businesses in the Rhondda Valleys.</p>
+
+    <input type="text" id="onboardingPostcode" placeholder="Enter your postcode (CF41, CF42, CF43, CF44)">
+    <p class="postcode-error hidden" id="postcodeError">Sorry, we only support Rhondda postcodes.</p>
+
+    <button class="onboarding-next" data-next="step-hints">Continue</button>
+    <button class="onboarding-back" data-back="step-welcome">Back</button>
+  </section>
+
+  <!-- STEP 3 — HELPFUL HINTS -->
+  <section class="onboarding-step hidden" id="step-hints">
+    <h2>Before we begin…</h2>
+    <ul class="hints-list">
+      <li>Use a clear business name — it helps customers find you.</li>
+      <li>Add real photos — they build trust instantly.</li>
+      <li>Write a friendly description — keep it local and personal.</li>
+      <li>Include your service area — Rhondda is full of tight communities.</li>
+      <li>Add your phone number — most customers prefer calling.</li>
+    </ul>
+
+    <button class="onboarding-next" data-next="step-details">Start Listing</button>
+    <button class="onboarding-back" data-back="step-postcode">Back</button>
+  </section>
+
+  <!-- STEP 4 — BUSINESS DETAILS -->
+  <section class="onboarding-step hidden" id="step-details">
+    <h2>Your Business Details</h2>
+
+    <input type="text" id="bizName" placeholder="Business Name">
+    <select id="bizCategory">
+      <option value="">Select Category</option>
+      <option value="plumber">Plumber</option>
+      <option value="cleaner">Cleaner</option>
+      <option value="gardener">Gardener</option>
+      <option value="tutor">Tutor</option>
+      <option value="mechanic">Mechanic</option>
+      <option value="beauty">Beauty</option>
+      <option value="handyman">Handyman</option>
+      <option value="removals">Removals</option>
+      <option value="webdesign">Web Design</option>
+    </select>
+
+    <textarea id="bizDescription" placeholder="Describe your business…"></textarea>
+
+    <input type="text" id="bizPhone" placeholder="Phone Number">
+    <input type="text" id="bizWebsite" placeholder="Website (optional)">
+    <input type="text" id="bizTown" placeholder="Town (e.g. Treorchy)">
+    <input type="text" id="bizArea" placeholder="Service Area (e.g. Rhondda Valleys)">
+
+    <button class="onboarding-next" data-next="step-photos">Next</button>
+    <button class="onboarding-back" data-back="step-hints">Back</button>
+  </section>
+
+  <!-- STEP 5 — PHOTOS -->
+  <section class="onboarding-step hidden" id="step-photos">
+    <h2>Photos & Logo</h2>
+
+    <label class="upload-label">Upload Logo
+      <input type="file" id="bizLogo" accept="image/*">
+    </label>
+
+    <label class="upload-label">Upload Photos (up to 6)
+      <input type="file" id="bizPhotos" accept="image/*" multiple>
+    </label>
+
+    <div id="photoPreview" class="photo-preview"></div>
+
+    <button class="onboarding-next" data-next="step-preview">Preview Listing</button>
+    <button class="onboarding-back" data-back="step-details">Back</button>
+  </section>
+
+  <!-- STEP 6 — PREVIEW -->
+  <section class="onboarding-step hidden" id="step-preview">
+    <h2>Preview Your Listing</h2>
+
+    <div id="previewContainer"></div>
+
+    <button class="onboarding-next" id="submitListingBtn">Publish Listing</button>
+    <button class="onboarding-back" data-back="step-photos">Back</button>
+  </section>
+
+  <!-- STEP 7 — SUCCESS -->
+  <section class="onboarding-step hidden" id="step-success">
+    <h2>Your Business is Live!</h2>
+    <p>Your listing is now visible in the RCT‑X Services Directory.</p>
+
+    <button id="goToMyBusiness">Go to My Business</button>
+  </section>
+
 </div>
