@@ -269,7 +269,13 @@ categoryBtns.forEach(btn => {
     window.addEventListener("scroll", async () => {
       if (loadingMore || reachedEnd) return;
 
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
+    if (!scrollBound) {
+  setTimeout(() => {
+    window.addEventListener("scroll", handleScroll);
+  }, 300);
+
+  scrollBound = true;
+    } {
         loadingMore = true;
         showBottomLoader();
 
