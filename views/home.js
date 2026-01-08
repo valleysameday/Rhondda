@@ -3,26 +3,25 @@ import { initFeed } from "/index/js/feed.js";
 export function init({ db }) {
   console.log("🏠 Home view init");
 
-  // Wait until the #feed element exists in the DOM
-  const feedContainer = document.getElementById("feed");
-  const startFeed = () => {
-    if (feedContainer) {
-      initFeed({ db }); // ✅ pass db
+  const tryStart = () => {
+    const feed = document.getElementById("feed");
+    if (feed) {
+      console.log("✅ Feed found, starting feed");
+      initFeed({ db });
+      return true;
     }
+    return false;
   };
 
-  if (feedContainer) {
-    startFeed();
-  } else {
-    const observer = new MutationObserver((mutations, obs) => {
-      const feed = document.getElementById("feed");
-      if (feed) {
-        console.log("✅ #feed detected, initializing feed");
-        initFeed({ db });
-        obs.disconnect();
-      }
-    });
+  // Try immediately
+  if (tryStart()) return;
 
-    observer.observe(document.body, { childList: true, subtree: true });
-  }
+  // Otherwise observe ONLY the home view container
+  const homeView = document.getElementById("view-home");
+
+  const observer = new MutationObserver(() => {
+    if (tryStart()) observer.disconnect();
+  });
+
+  observer.observe(homeView, { childList: true, subtree: true });
 }
