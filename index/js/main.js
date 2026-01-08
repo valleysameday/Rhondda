@@ -155,7 +155,14 @@ getFirebase().then(async fb => {
     initUIRouter();
     loadView("home");
 
-    // LOGIN BUTTON → OPEN MODAL
+<!-- ================= SIDE MENU ================= -->
+<div id="sideMenu" class="side-menu hidden">
+  <div class="menu-content">
+    <button class="close-menu">&times;</button>
+    <div id="menuOptions"></div>
+  </div>
+</div>
+     // LOGIN BUTTON → OPEN MODAL
     document.addEventListener("click", e => {
       if (e.target.closest("#auth-logged-out")) {
         openLoginModal(auth, db);
@@ -200,7 +207,19 @@ getFirebase().then(async fb => {
     ? document.addEventListener("DOMContentLoaded", start)
     : start();
 
-  // POST AD BUTTON → LOGIN CHECK → OPEN CORRECT MODAL
+// MENU BUTTON → OPEN SIDE MENU
+document.addEventListener("click", e => {
+  if (e.target.closest("[title='Menu']")) {
+    renderSideMenu();
+    document.getElementById("sideMenu").classList.remove("hidden");
+  }
+
+  if (e.target.closest(".close-menu")) {
+    document.getElementById("sideMenu").classList.add("hidden");
+  }
+});
+   
+   // POST AD BUTTON → LOGIN CHECK → OPEN CORRECT MODAL
   document.addEventListener("click", e => {
     if (e.target.closest("#post-ad-btn")) {
 
