@@ -7,8 +7,8 @@ import { openLoginModal } from '/index/js/auth/loginModal.js';
 import { openSignupModal } from '/index/js/auth/signupModal.js';
 import { openForgotModal } from '/index/js/auth/forgotModal.js';
 
-import { initViewServices } from "/views/services/view-services.js";
-import { initViewService } from "/views/services/view-service.js";
+import { initViewServices } from "/views/view-services.js";
+import { initViewService } from "/views/view-service.js";
 
 const viewRegistry = {
   "view-services": initViewServices,
