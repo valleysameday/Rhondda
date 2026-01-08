@@ -1,35 +1,46 @@
 /* =====================================================
-   FEED GRID (Balanced 2-Column Mobile)
+   FEED GRID (2-Column Mobile, Multi-Column Desktop)
 ===================================================== */
 #feed {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 4px;        /* small gap between cards */
-  padding: 4px;    /* small padding so cards aren't literally glued to screen edges */
+  grid-template-columns: repeat(2, 1fr); /* Forced 2-columns on mobile */
+  gap: 8px;        /* Tight gap to reduce white space on small screens */
+  padding: 8px;
+  max-width: 1400px; /* Expands to fill desktop screens */
+  margin: 0 auto;
 }
 
-@media (min-width: 900px) {
+/* Tablet: 3 Columns */
+@media (min-width: 768px) {
   #feed {
-    grid-template-columns: 1fr; /* List view on Desktop */
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 12px;   /* restore normal padding on desktop */
+    grid-template-columns: repeat(3, 1fr);
     gap: 12px;
   }
 }
+
+/* Desktop: 4 Columns (Eliminates excessive side margins) */
+@media (min-width: 1100px) {
+  #feed {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding: 20px;
+  }
+}
+
 /* =====================================================
-   BASE CARD
+   BASE CARD (Compact & Uniform)
 ===================================================== */
 .feed-card {
   display: flex;
   flex-direction: column;
   background: #ffffff;
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
   position: relative;
   border: 1px solid #e5e7eb;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  height: 100%; /* Keeps cards in a row aligned */
 }
 
 /* Haptic feel when tapping card */
@@ -38,11 +49,11 @@
 }
 
 /* =====================================================
-   IMAGE & BADGES (Prevents "Long Cards")
+   IMAGE & BADGES
 ===================================================== */
 .feed-image {
   width: 100%;
-  aspect-ratio: 16 / 9; /* Keeps cards compact and uniform */
+  aspect-ratio: 4 / 3; /* Uniform image sizes prevent "jagged" grid rows */
   background: #f3f4f6;
   position: relative;
   overflow: hidden;
@@ -69,8 +80,7 @@
 }
 
 /* =====================================================
-   INTERACTIVE BUTTONS (Heart & Report)
-   Z-index 10+ ensures they work separate from the card click
+   INTERACTIVE BUTTONS
 ===================================================== */
 .save-heart {
   position: absolute;
@@ -86,7 +96,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: #94a3b8;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
@@ -95,17 +105,16 @@
 
 .save-heart.saved {
   color: #ef4444;
-  background: #fff;
 }
 
 .report-btn {
   position: absolute;
-  bottom: 8px;
+  top: 40px; /* Moved slightly so it doesn't overlap heart */
   right: 8px;
   z-index: 10;
   background: rgba(255, 255, 255, 0.7);
   border: none;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   padding: 4px;
   border-radius: 4px;
   color: #94a3b8;
@@ -113,35 +122,35 @@
   opacity: 0.6;
 }
 
-.report-btn:hover { opacity: 1; color: #ef4444; }
-
 /* =====================================================
    CONTENT & TYPOGRAPHY
 ===================================================== */
 .feed-content {
-  padding: 8px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  flex-grow: 1; /* Pushes meta/price to the bottom */
 }
 
 .feed-title {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: #111827;
   line-height: 1.3;
-  /* Maintain height consistency */
+  margin-bottom: 8px;
+  /* Maintain height consistency across grid */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  height: 1.3em; 
+  min-height: 2.6em; 
 }
 
 .feed-meta {
+  margin-top: auto; /* Aligns meta to bottom of card */
   display: flex;
-  flex-direction: column; /* Stacked looks cleaner in 2-column grid */
-  gap: 4px;
+  flex-direction: column;
+  gap: 2px;
   font-size: 0.75rem;
   color: #6b7280;
 }
@@ -149,12 +158,10 @@
 .post-price {
   font-size: 1.1rem;
   font-weight: 800;
-  color: #059669; /* 2026 Rich Green */
-  margin-bottom: 2px;
+  color: #059669; /* Rich 2026 Emerald */
 }
 
 .post-time {
-  font-weight: 500;
   opacity: 0.8;
 }
 
@@ -164,24 +171,19 @@
 .feed-card.featured {
   border: 1px solid #bfdbfe;
   background: #f8faff;
-  grid-column: span 2; /* Featured spans full width */
-}
-
-@media (min-width: 900px) {
-  .feed-card.featured { grid-column: span 1; }
+  grid-column: span 2; /* Featured spans 2 columns on all devices */
 }
 
 .cta-btn {
-  margin-top: 8px;
+  margin-top: 10px;
   background: #2563eb;
   color: white;
   border: none;
-  padding: 10px;
+  padding: 8px;
   border-radius: 8px;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   cursor: pointer;
-  z-index: 5;
 }
 
 /* =====================================================
@@ -214,4 +216,5 @@
   50% { opacity: 1; }
   100% { opacity: 0.5; }
 }
+
 .skeleton-card { animation: shimmer 1.5s infinite linear; }
