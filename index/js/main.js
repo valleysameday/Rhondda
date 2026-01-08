@@ -6,18 +6,17 @@ import { openLoginModal } from '/index/js/auth/loginModal.js';
 import { openSignupModal } from '/index/js/auth/signupModal.js';
 import { openForgotModal } from '/index/js/auth/forgotModal.js';
 
-// Expose modals globally for inline HTML usage
+// Expose modals globally
 window.openLoginModal = openLoginModal;
 window.openSignupModal = openSignupModal;
 window.openForgotModal = openForgotModal;
 
-// Firebase globals
 let auth, db, storage;
 let settingsModule = null;
 
-// =====================================================
-// GLOBAL TIME FORMATTER
-// =====================================================
+/* =====================================================
+   GLOBAL TIME FORMATTER
+===================================================== */
 window.timeAgo = function(timestamp) {
   if (!timestamp) return "";
 
@@ -36,9 +35,9 @@ window.timeAgo = function(timestamp) {
   return `${days} days ago`;
 };
 
-// =====================================================
-// SPA VIEW LOADER
-// =====================================================
+/* =====================================================
+   SPA VIEW LOADER
+===================================================== */
 export async function loadView(view, options = {}) {
   if (view === "home") options.forceInit = true;
   if (window.currentView === view && !options.forceInit) return;
@@ -47,10 +46,8 @@ export async function loadView(view, options = {}) {
   const app = document.getElementById("app");
   if (!app) return;
 
-  // Hide all views
   app.querySelectorAll(".view").forEach(v => v.hidden = true);
 
-  // Get or create target view container
   let target = document.getElementById(`view-${view}`);
   if (!target) {
     target = document.createElement("div");
@@ -62,7 +59,6 @@ export async function loadView(view, options = {}) {
 
   if (options.forceInit) delete target.dataset.loaded;
 
-  // Load HTML and JS if not already loaded
   if (!target.dataset.loaded) {
     target.innerHTML = await fetch(`/views/${view}.html`).then(r => r.text());
     target.dataset.loaded = "true";
@@ -81,12 +77,58 @@ export async function loadView(view, options = {}) {
   target.hidden = false;
 }
 
-// =====================================================
-// APP INITIALIZATION
-// =====================================================
+/* =====================================================
+   SIDEBAR MENU RENDERER
+===================================================== */
+function renderSideMenu() {
+  const menu = document.getElementById("menuOptions");
+  if (!menu) return;
+
+  menu.innerHTML = "";
+
+  const isLoggedIn = !!auth.currentUser;
+
+  const options = isLoggedIn
+    ? [
+        { label: "Home", action: () => loadView("home") },
+        { label: "Post an Ad", action: () => document.getElementById("post-ad-btn")?.click() },
+        { label: "Messages", action: () => loadView("chat-list") },
+        { label: "Favourites", action: () => loadView("favourites") },
+        { label: "My Details", action: () => loadView("account-details") },
+        { label: "Stats", action: () => loadView("stats") },
+        { label: "Help & Contact", action: () => loadView("help") },
+        { label: "Logout", action: () => auth.signOut() }
+      ]
+    : [
+        { label: "Home", action: () => loadView("home") },
+        { label: "Post an Ad", action: () => openLoginModal() },
+        { label: "Stats", action: () => openLoginModal() },
+        { label: "Help & Contact", action: () => loadView("help") },
+        { label: "Login", action: () => openLoginModal() }
+      ];
+
+  options.forEach(opt => {
+    const item = document.createElement("div");
+    item.className = "menu-item";
+    item.innerHTML = `
+      <span>${opt.label}</span>
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    `;
+    item.addEventListener("click", () => {
+      document.getElementById("sideMenu")?.classList.add("hidden");
+      opt.action();
+    });
+    menu.appendChild(item);
+  });
+}
+
+/* =====================================================
+   APP INITIALIZATION
+===================================================== */
 getFirebase().then(async fb => {
 
-  // 1️⃣ Firebase ready
   auth = fb.auth;
   db = fb.db;
   storage = fb.storage;
@@ -95,7 +137,6 @@ getFirebase().then(async fb => {
   window.firebaseDb = db;
   window.firebaseStorage = storage;
 
-  // 2️⃣ Load settings.js AFTER Firebase is ready
   settingsModule = await import("/index/js/firebase/settings.js");
   settingsModule.initFirebase({ auth, db, storage });
   const fsLoadUserProfile = settingsModule.getUser;
@@ -104,22 +145,20 @@ getFirebase().then(async fb => {
   window.currentUserData = null;
   window.authReady = false;
 
-  // =====================================================
-  // AUTH STATE LISTENER
-  // =====================================================
+  /* =====================================================
+     AUTH LISTENER
+  ===================================================== */
   auth.onAuthStateChanged(async user => {
     window.currentUser = user || null;
     window.currentUserData = null;
     window.authReady = false;
 
-    // Update status dot
     const statusDot = document.getElementById("accountStatusDot");
     if (statusDot) {
       statusDot.style.background = user ? "green" : "red";
       statusDot.classList.toggle("logged-out", !user);
     }
 
-    // Header buttons
     const loginBtn = document.getElementById("auth-logged-out");
     const inboxBtn = document.getElementById("auth-messages");
 
@@ -150,19 +189,19 @@ getFirebase().then(async fb => {
     window.authReady = true;
   });
 
-  // =====================================================
-  // APP START
-  // =====================================================
+  /* =====================================================
+     START APP
+  ===================================================== */
   const start = () => {
     initUIRouter();
     loadView("home");
 
-    // LOGIN BUTTON → OPEN MODAL
+    // LOGIN BUTTON
     document.addEventListener("click", e => {
       if (e.target.closest("#auth-logged-out")) openLoginModal(auth, db);
     });
 
-    // LOGO → RETURN HOME
+    // LOGO → HOME
     document.addEventListener("click", e => {
       if (e.target.closest(".rctx-logo")) {
         loadView("home", { forceInit: true });
@@ -170,7 +209,7 @@ getFirebase().then(async fb => {
       }
     });
 
-    // INBOX BUTTON → OPEN CHAT LIST
+    // INBOX → CHAT LIST
     document.addEventListener("click", e => {
       if (e.target.closest("#auth-messages")) {
         const chatView = document.getElementById("view-chat-list");
@@ -180,7 +219,7 @@ getFirebase().then(async fb => {
       }
     });
 
-    // VEHICLES SUB‑CATEGORY TOGGLE
+    // VEHICLES SUBCATEGORY
     const subVehicles = document.getElementById("sub-vehicles");
     document.addEventListener("click", e => {
       const isVehicles = e.target.closest("#cat-vehicles");
@@ -190,7 +229,7 @@ getFirebase().then(async fb => {
       else if (isCategory) subVehicles?.classList.add("hidden");
     });
 
-    // POST AD BUTTON → LOGIN CHECK → OPEN MODAL
+    // POST AD BUTTON
     document.addEventListener("click", e => {
       if (!e.target.closest("#post-ad-btn")) return;
 
@@ -214,7 +253,7 @@ getFirebase().then(async fb => {
       dots[0]?.classList.add("active");
     });
 
-    // MENU BUTTON → OPEN SIDE MENU
+    // MENU BUTTON → SIDEBAR
     document.addEventListener("click", e => {
       if (e.target.closest("[title='Menu']")) {
         renderSideMenu();
@@ -231,7 +270,5 @@ getFirebase().then(async fb => {
     ? document.addEventListener("DOMContentLoaded", start)
     : start();
 
-  // LOAD POST-GATE LAST
   await import('/index/js/post-gate.js');
-
 });
