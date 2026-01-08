@@ -1,4 +1,5 @@
 <link rel="stylesheet" href="/views/css/details.css">
+
 <div class="account-details-page">
 
   <h2 class="section-title">My Details</h2>
@@ -38,22 +39,24 @@
     <button id="changePassword" class="primary-btn">Change Password</button>
   </div>
 
-  <h2 class="section-title">Two‑Step Verification</h2>
-
-  <!-- 2FA -->
-  <div class="settings-section">
-    <label>Phone Number for 2FA</label>
-    <input id="acc-2fa-phone" type="text" placeholder="+447...">
-
-    <button id="enable2FA" class="primary-btn">Enable 2FA</button>
-    <button id="disable2FA" class="danger-btn">Disable 2FA</button>
-  </div>
-
-  <h2 class="section-title">Danger Zone</h2>
+  <h2 class="section-title danger">Danger Zone</h2>
 
   <!-- DEACTIVATE ACCOUNT -->
   <div class="settings-section">
     <button id="deactivateAccount" class="danger-btn">Deactivate My Account</button>
   </div>
 
+</div>
+
+<!-- CONFIRMATION MODAL -->
+<div id="confirmModal" class="confirm-modal hidden">
+  <div class="confirm-box">
+    <h3 id="confirmTitle">Are you sure?</h3>
+    <p id="confirmMessage">Please confirm this action.</p>
+
+    <div class="confirm-actions">
+      <button id="confirmCancel" class="secondary-btn">Cancel</button>
+      <button id="confirmYes" class="primary-btn">Yes, Continue</button>
+    </div>
+  </div>
 </div>
