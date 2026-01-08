@@ -227,6 +227,11 @@ if (ENABLE_SPONSORED_AD && initial) {
 ============================================================ */
 categoryBtns.forEach(btn => {
   btn.addEventListener("click", async () => {
+    // SERVICES CATEGORY → LOAD SERVICES DIRECTORY VIEW
+if (btn.dataset.category === "services") {
+  loadView("view-services", { forceInit: true });
+  return;
+}
 
     // Highlight active
     categoryBtns.forEach(b => b.classList.remove("active"));
