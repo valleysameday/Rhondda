@@ -1,5 +1,5 @@
 // ============================================
-//  FIRESTORE HELPERS (CLEAN & OPTIMIZED)
+//  FIRESTORE HELPERS (CLEAN, OPTIMIZED & LOGGED)
 // ============================================
 
 import {
@@ -35,9 +35,17 @@ let auth, db, storage;
    INIT FIREBASE
 ============================================================ */
 export function initFirebase({ auth: a, db: d, storage: s }) {
+  console.log("🔥 initFirebase called");
+
   auth = a;
   db = d;
   storage = s;
+
+  console.log("✅ Firebase injected", {
+    auth: !!auth,
+    db: !!db,
+    storage: !!storage
+  });
 }
 
 /* ============================================================
@@ -45,12 +53,17 @@ export function initFirebase({ auth: a, db: d, storage: s }) {
 ============================================================ */
 
 export async function fetchFeedPosts({ lastDoc = null, limitCount = 50 } = {}) {
+  console.log("📥 fetchFeedPosts()", { lastDoc, limitCount });
+
   const postsRef = collection(db, "posts");
   const q = lastDoc
     ? query(postsRef, orderBy("createdAt", "desc"), startAfter(lastDoc), limit(limitCount))
     : query(postsRef, orderBy("createdAt", "desc"), limit(limitCount));
 
   const snap = await getDocs(q);
+
+  console.log(`✅ ${snap.docs.length} posts loaded`);
+
   return {
     posts: snap.docs.map(d => ({ id: d.id, ...d.data() })),
     lastDoc: snap.docs[snap.docs.length - 1] || null
@@ -58,21 +71,34 @@ export async function fetchFeedPosts({ lastDoc = null, limitCount = 50 } = {}) {
 }
 
 export async function getPost(postId) {
+  console.log("📄 getPost()", postId);
+
   if (!db || !postId) return null;
   const snap = await getDoc(doc(db, "posts", postId));
-  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+
+  if (!snap.exists()) {
+    console.warn("⚠️ Post not found", postId);
+    return null;
+  }
+
+  return { id: snap.id, ...snap.data() };
 }
 
 export async function addPost(post) {
+  console.log("➕ addPost()", post);
   return await addDoc(collection(db, "posts"), post);
 }
 
 export async function updatePost(postId, data) {
+  console.log("✏️ updatePost()", postId, data);
+
   if (!db || !postId || !data) return;
   await updateDoc(doc(db, "posts", postId), data);
 }
 
 export async function deletePost(post) {
+  console.log("🗑 deletePost()", post?.id);
+
   if (!db || !storage || !post?.id) return;
 
   const urls = [
@@ -83,8 +109,11 @@ export async function deletePost(post) {
   for (const url of urls) {
     try {
       const path = decodeURIComponent(url.split("/o/")[1].split("?")[0]);
+      console.log("🧹 deleting storage file:", path);
       await deleteObject(ref(storage, path));
-    } catch {}
+    } catch (err) {
+      console.warn("⚠️ Failed deleting image", err);
+    }
   }
 
   await updateDoc(doc(db, "posts", post.id), { deleted: true }).catch(() =>
@@ -93,6 +122,8 @@ export async function deletePost(post) {
 }
 
 export async function getSellerPosts(uid) {
+  console.log("📦 getSellerPosts()", uid);
+
   if (!db || !uid) return [];
 
   const postsRef = collection(db, "posts");
@@ -106,10 +137,13 @@ export async function getSellerPosts(uid) {
     if (!snaps.find(x => x.id === d.id)) snaps.push({ id: d.id, ...d.data() });
   });
 
+  console.log(`✅ ${snaps.length} seller posts found`);
   return snaps;
 }
 
 export async function toggleSavePost({ uid, postId }) {
+  console.log("⭐ toggleSavePost()", { uid, postId });
+
   const refUser = doc(db, "users", uid);
   const snap = await getDoc(refUser);
   if (!snap.exists()) return false;
@@ -118,6 +152,8 @@ export async function toggleSavePost({ uid, postId }) {
   saved[postId] ? delete saved[postId] : saved[postId] = true;
 
   await updateDoc(refUser, { savedPosts: saved });
+
+  console.log("✅ savedPosts updated");
   return !!saved[postId];
 }
 
@@ -126,17 +162,24 @@ export async function toggleSavePost({ uid, postId }) {
 ============================================================ */
 
 export async function getUser(uid) {
+  console.log("👤 getUser()", uid);
+
   if (!db || !uid) return null;
   const snap = await getDoc(doc(db, "users", uid));
+
   return snap.exists() ? { uid, ...snap.data() } : null;
 }
 
 export async function updateUser(uid, data) {
+  console.log("✏️ updateUser()", uid, data);
+
   if (!db || !uid || !data) return;
   await updateDoc(doc(db, "users", uid), data);
 }
 
 export async function toggleFollowSeller(userUid, sellerUid, actuallyToggle = true) {
+  console.log("➕ toggleFollowSeller()", { userUid, sellerUid });
+
   const sellerRef = doc(db, "users", sellerUid);
   const snap = await getDoc(sellerRef);
   if (!snap.exists()) return false;
@@ -153,20 +196,16 @@ export async function toggleFollowSeller(userUid, sellerUid, actuallyToggle = tr
 }
 
 /* ============================================================
-   LEADS / CONTACT COUNTERS (DEDUPED)
+   LEADS / CONTACT COUNTERS
 ============================================================ */
 
 const DEDUPE_MINUTES = 5;
 
-export async function trackContactClick({
-  postId,
-  sellerUid,
-  viewerUid,
-  type // "call" | "whatsapp"
-}) {
+export async function trackContactClick({ postId, sellerUid, viewerUid, type }) {
+  console.log("📞 trackContactClick()", { postId, sellerUid, viewerUid, type });
+
   if (!db || !postId || !sellerUid || !viewerUid || !type) return;
 
-  // ⏱️ Deduplication window
   const since = Timestamp.fromMillis(Date.now() - DEDUPE_MINUTES * 60 * 1000);
 
   const q = query(
@@ -178,9 +217,11 @@ export async function trackContactClick({
   );
 
   const snap = await getDocs(q);
-  if (!snap.empty) return; // ❌ already counted
+  if (!snap.empty) {
+    console.log("⛔ Duplicate lead ignored");
+    return;
+  }
 
-  // ✅ Record lead (truth)
   await addDoc(collection(db, "leads"), {
     postId,
     sellerUid,
@@ -189,17 +230,13 @@ export async function trackContactClick({
     createdAt: serverTimestamp()
   });
 
-  // ✅ Update cached post counters
-  const postRef = doc(db, "posts", postId);
+  await updateDoc(doc(db, "posts", postId), {
+    "stats.contacts": increment(1),
+    ...(type === "call" && { "stats.calls": increment(1) }),
+    ...(type === "whatsapp" && { "stats.whatsapp": increment(1) })
+  });
 
-  const updates = {
-    "stats.contacts": increment(1)
-  };
-
-  if (type === "call") updates["stats.calls"] = increment(1);
-  if (type === "whatsapp") updates["stats.whatsapp"] = increment(1);
-
-  await updateDoc(postRef, updates);
+  console.log("✅ Lead recorded");
 }
 
 /* ============================================================
@@ -207,6 +244,8 @@ export async function trackContactClick({
 ============================================================ */
 
 export async function uploadAvatar(uid, file, type = "user") {
+  console.log("🖼 uploadAvatar()", uid);
+
   if (!storage || !file || !uid) return null;
 
   const path = type === "user"
@@ -221,14 +260,22 @@ export async function uploadAvatar(uid, file, type = "user") {
     avatarUrl: url
   });
 
+  console.log("✅ Avatar uploaded");
   return url;
 }
 
 export async function uploadPostImage(file, uid) {
+  console.log("🖼 uploadPostImage()", uid);
+
   if (!storage || !file || !uid) return null;
+
   const refPath = ref(storage, `posts/${uid}/${Date.now()}-${file.name}`);
   await uploadBytes(refPath, file);
-  return await getDownloadURL(refPath);
+
+  const url = await getDownloadURL(refPath);
+  console.log("✅ Post image uploaded");
+
+  return url;
 }
 
 /* ============================================================
@@ -236,6 +283,8 @@ export async function uploadPostImage(file, uid) {
 ============================================================ */
 
 export function onUserConversations(userId, cb) {
+  console.log("💬 onUserConversations()", userId);
+
   if (!db || !userId) return () => {};
   const q = query(
     collection(db, "conversations"),
@@ -246,6 +295,8 @@ export function onUserConversations(userId, cb) {
 }
 
 export function onConversationMessages(convoId, cb) {
+  console.log("📨 onConversationMessages()", convoId);
+
   if (!db || !convoId) return () => {};
   return onSnapshot(
     query(collection(db, "conversations", convoId, "messages"), orderBy("createdAt")),
@@ -254,9 +305,12 @@ export function onConversationMessages(convoId, cb) {
 }
 
 export async function sendMessage(convoId, senderId, text) {
+  console.log("✉️ sendMessage()", { convoId, senderId });
+
   if (!db || !convoId || !senderId || !text) return;
 
   const now = Date.now();
+
   await addDoc(collection(db, "conversations", convoId, "messages"), {
     senderId,
     text,
@@ -269,82 +323,64 @@ export async function sendMessage(convoId, senderId, text) {
     { lastMessage: text, lastMessageSender: senderId, updatedAt: now },
     { merge: true }
   );
+
+  console.log("✅ Message sent");
 }
+
 /* ============================================================
    SERVICES
 ============================================================ */
 
-/**
- * Get ALL active services (for directory load)
- */
 export async function fsGetAllServices() {
-  if (!db) return [];
-
-  const q = query(
+  console.log("🛠 fsGetAllServices()");
+  const snap = await getDocs(query(
     collection(db, "services"),
     where("isActive", "==", true),
     orderBy("createdAt", "desc")
-  );
-
-  const snap = await getDocs(q);
+  ));
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-/**
- * Search services by name, category, or description
- */
 export async function fsSearchServices(term) {
-  if (!db || !term) return [];
+  console.log("🔍 fsSearchServices()", term);
 
-  const q = query(
+  if (!term) return [];
+  const snap = await getDocs(query(
     collection(db, "services"),
     where("isActive", "==", true)
-  );
-
-  const snap = await getDocs(q);
+  ));
 
   const lower = term.toLowerCase();
-
   return snap.docs
     .map(d => ({ id: d.id, ...d.data() }))
-    .filter(svc =>
-      (svc.businessName || "").toLowerCase().includes(lower) ||
-      (svc.category || "").toLowerCase().includes(lower) ||
-      (svc.description || "").toLowerCase().includes(lower)
+    .filter(s =>
+      (s.businessName || "").toLowerCase().includes(lower) ||
+      (s.category || "").toLowerCase().includes(lower) ||
+      (s.description || "").toLowerCase().includes(lower)
     );
 }
 
-/**
- * Filter services by category
- */
 export async function fsFilterServices(category) {
-  if (!db || !category) return [];
+  console.log("🏷 fsFilterServices()", category);
 
-  const q = query(
+  if (!category) return [];
+  const snap = await getDocs(query(
     collection(db, "services"),
     where("isActive", "==", true),
     where("category", "==", category)
-  );
-
-  const snap = await getDocs(q);
+  ));
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-/**
- * Get a single service by ID
- */
 export async function fsGetServiceById(serviceId) {
-  if (!db || !serviceId) return null;
+  console.log("📄 fsGetServiceById()", serviceId);
 
   const snap = await getDoc(doc(db, "services", serviceId));
   return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 }
 
-/**
- * Report a service listing
- */
 export async function fsReportService(serviceId, reason) {
-  if (!db || !serviceId || !reason) return;
+  console.log("🚨 fsReportService()", serviceId, reason);
 
   await addDoc(collection(db, "serviceReports"), {
     serviceId,
