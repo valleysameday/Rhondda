@@ -39,19 +39,8 @@ export async function initFeed(_, options = {}) {
 
   const postsContainer = document.getElementById("feed");
   const categoryBtns = document.querySelectorAll(".category-btn");
-  const businessCheckbox = document.getElementById("isBusinessAccount");
-  const businessBenefits = document.getElementById("businessBenefits");
 
   if (!postsContainer) return console.warn("Feed container not found");
-
-  /* ============================================================
-     BUSINESS CHECKBOX TOGGLE
-  ============================================================ */
-  if (businessCheckbox && businessBenefits) {
-    businessCheckbox.addEventListener("change", () => {
-      businessBenefits.style.display = businessCheckbox.checked ? "block" : "none";
-    });
-  }
 
   /* ============================================================
      SKELETON LOADING
@@ -112,21 +101,24 @@ export async function initFeed(_, options = {}) {
 
     lastDoc = result.lastDoc;
 
-    if (initial) {
-      result.posts.push({
-        id: "featured-biz",
-        title: "Rhondda Pro Cleaning Services",
-        teaser: "Professional home & end-of-tenancy cleaning. Trusted local business.",
-        category: "business",
-        categoryLabel: "Sponsored",
-        area: "Rhondda Valleys",
-        image: "/images/business-cleaning.jpg",
-        type: "featured",
-        isBusiness: true,
-        cta: "Get a Quote",
-        createdAt: Date.now()
-      });
-    }
+ /// ← AD LOGIC...///
+    const ENABLE_SPONSORED_AD = false; // ← flip to true to activate
+
+if (ENABLE_SPONSORED_AD && initial) {
+  result.posts.push({
+    id: "featured-biz",
+    title: "Rhondda Pro Cleaning Services",
+    teaser: "Professional home & end-of-tenancy cleaning. Trusted local business.",
+    category: "business",
+    categoryLabel: "Sponsored",
+    area: "Rhondda Valleys",
+    image: "/images/business-cleaning.jpg",
+    type: "featured",
+    isBusiness: true,
+    cta: "Get a Quote",
+    createdAt: Date.now()
+  });
+}
 
     return result.posts;
   }
@@ -180,7 +172,6 @@ export async function initFeed(_, options = {}) {
       card.innerHTML = `
         <div class="feed-image">
           <img src="${image}" alt="${post.title}">
-          ${post.isBusiness && post.type !== "featured" ? `<span class="biz-badge">Business</span>` : ""}
         </div>
 
         <div class="feed-content">
@@ -192,8 +183,6 @@ export async function initFeed(_, options = {}) {
               ${savedPosts.has(post.id) ? "♥" : "♡"}
             </button>
           </div>
-
-          ${post.type === "featured" && post.cta ? `<button class="cta-btn">${post.cta}</button>` : ""}
         </div>
 
         <button class="report-btn" data-id="${post.id}">⚑</button>
