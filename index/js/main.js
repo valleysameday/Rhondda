@@ -1,6 +1,6 @@
+// ========================== main.js ==========================
 import { getFirebase } from '/index/js/firebase/init.js';
 import { initUIRouter } from '/index/js/ui-router.js';
-import { AI } from "/index/js/ai/assistant.js";
 
 import { openLoginModal } from '/index/js/auth/loginModal.js';
 import { openSignupModal } from '/index/js/auth/signupModal.js';
@@ -42,7 +42,6 @@ export async function loadView(view, options = {}) {
   if (window.currentView === view && !options.forceInit) return;
 
   window.currentView = view;
-
   const app = document.getElementById("app");
   if (!app) return;
 
@@ -87,25 +86,18 @@ getFirebase().then(async fb => {
   db = fb.db;
   storage = fb.storage;
 
+  // ⭐ SINGLE SOURCE OF TRUTH
+  window.firebaseAuth = auth;
+  window.firebaseDb = db;
+  window.firebaseStorage = storage;
+
   // 2️⃣ Load settings.js AFTER Firebase is ready
   settingsModule = await import("/index/js/firebase/settings.js");
 
   // 3️⃣ Initialise Firestore helpers
   settingsModule.initFirebase({ auth, db, storage });
 
-getFirebase().then(async fb => {
-
-  auth = fb.auth;
-  db = fb.db;
-  storage = fb.storage;
-
-  // ⭐ SINGLE SOURCE OF TRUTH
-  window.firebaseAuth = auth;
-  window.firebaseDb = db;
-  window.firebaseStorage = storage;
-   
-   
-   // 4️⃣ Map fsLoadUserProfile → getUser
+  // 4️⃣ Map fsLoadUserProfile → getUser
   const fsLoadUserProfile = settingsModule.getUser;
 
   window.currentUser = null;
@@ -154,18 +146,14 @@ getFirebase().then(async fb => {
     initUIRouter();
     loadView("home");
 
-    /* ============================
-       LOGIN BUTTON → OPEN MODAL
-    ============================ */
+    // LOGIN BUTTON → OPEN MODAL
     document.addEventListener("click", e => {
       if (e.target.closest("#auth-logged-out")) {
-        openLoginModal();
+        openLoginModal(auth, db);
       }
     });
 
-    /* ============================
-       LOGO → RETURN HOME
-    ============================ */
+    // LOGO → RETURN HOME
     document.addEventListener("click", e => {
       if (e.target.closest(".rctx-logo")) {
         loadView("home", { forceInit: true });
@@ -173,11 +161,8 @@ getFirebase().then(async fb => {
       }
     });
 
-    /* ============================
-       VEHICLES SUB‑CATEGORY TOGGLE
-    ============================ */
+    // VEHICLES SUB‑CATEGORY TOGGLE
     const subVehicles = document.getElementById("sub-vehicles");
-
     document.addEventListener("click", e => {
       const isVehicles = e.target.closest("#cat-vehicles");
       const isCategory = e.target.closest(".rctx-tabs");
@@ -194,6 +179,6 @@ getFirebase().then(async fb => {
     ? document.addEventListener("DOMContentLoaded", start)
     : start();
 
-  // 7️⃣ Load post-gate.js LAST (after Firebase init)
+  // LOAD POST-GATE LAST
   await import('/index/js/post-gate.js');
 });
