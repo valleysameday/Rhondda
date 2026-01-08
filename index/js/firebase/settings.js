@@ -406,3 +406,54 @@ export async function fsGetUserServices(uid) {
 
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
+export async function fsAddService(data) {
+  console.log("➕ fsAddService()", data);
+
+  if (!db || !data) return null;
+
+  const docRef = await addDoc(collection(db, "services"), {
+    ...data,
+    createdAt: Date.now(),
+    isActive: true
+  });
+
+  console.log("✅ Service created:", docRef.id);
+  return docRef.id;
+}
+export async function fsUpdateService(serviceId, data) {
+  console.log("✏️ fsUpdateService()", serviceId, data);
+
+  if (!db || !serviceId || !data) return false;
+
+  await updateDoc(doc(db, "services", serviceId), data);
+
+  console.log("✅ Service updated");
+  return true;
+}
+export async function fsDeleteService(serviceId) {
+  console.log("🗑 fsDeleteService()", serviceId);
+
+  if (!db || !serviceId) return false;
+
+  await updateDoc(doc(db, "services", serviceId), {
+    isActive: false,
+    deletedAt: Date.now()
+  });
+
+  console.log("⚠️ Service marked inactive");
+  return true;
+}
+export async function fsUploadServiceImage(serviceId, file, index = 0) {
+  console.log("🖼 fsUploadServiceImage()", { serviceId, index });
+
+  if (!storage || !file || !serviceId) return null;
+
+  const path = `services/${serviceId}/photo-${index}.jpg`;
+  const refPath = ref(storage, path);
+
+  await uploadBytes(refPath, file);
+  const url = await getDownloadURL(refPath);
+
+  console.log("✅ Uploaded:", url);
+  return url;
+}
