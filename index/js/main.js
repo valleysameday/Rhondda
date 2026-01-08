@@ -6,16 +6,18 @@ import { openLoginModal } from '/index/js/auth/loginModal.js';
 import { openSignupModal } from '/index/js/auth/signupModal.js';
 import { openForgotModal } from '/index/js/auth/forgotModal.js';
 
+// Expose modals globally for inline HTML usage
 window.openLoginModal = openLoginModal;
 window.openSignupModal = openSignupModal;
 window.openForgotModal = openForgotModal;
 
+// Firebase globals
 let auth, db, storage;
 let settingsModule = null;
 
-/* =====================================================
-   GLOBAL TIME FORMATTER
-===================================================== */
+// =====================================================
+// GLOBAL TIME FORMATTER
+// =====================================================
 window.timeAgo = function(timestamp) {
   if (!timestamp) return "";
 
@@ -34,9 +36,9 @@ window.timeAgo = function(timestamp) {
   return `${days} days ago`;
 };
 
-/* =====================================================
-   SPA VIEW LOADER
-===================================================== */
+// =====================================================
+// SPA VIEW LOADER
+// =====================================================
 export async function loadView(view, options = {}) {
   if (view === "home") options.forceInit = true;
   if (window.currentView === view && !options.forceInit) return;
@@ -45,8 +47,10 @@ export async function loadView(view, options = {}) {
   const app = document.getElementById("app");
   if (!app) return;
 
+  // Hide all views
   app.querySelectorAll(".view").forEach(v => v.hidden = true);
 
+  // Get or create target view container
   let target = document.getElementById(`view-${view}`);
   if (!target) {
     target = document.createElement("div");
@@ -58,6 +62,7 @@ export async function loadView(view, options = {}) {
 
   if (options.forceInit) delete target.dataset.loaded;
 
+  // Load HTML and JS if not already loaded
   if (!target.dataset.loaded) {
     target.innerHTML = await fetch(`/views/${view}.html`).then(r => r.text());
     target.dataset.loaded = "true";
@@ -76,9 +81,9 @@ export async function loadView(view, options = {}) {
   target.hidden = false;
 }
 
-/* =====================================================
-   APP INIT
-===================================================== */
+// =====================================================
+// APP INITIALIZATION
+// =====================================================
 getFirebase().then(async fb => {
 
   // 1️⃣ Firebase ready
@@ -92,31 +97,29 @@ getFirebase().then(async fb => {
 
   // 2️⃣ Load settings.js AFTER Firebase is ready
   settingsModule = await import("/index/js/firebase/settings.js");
-
-  // 3️⃣ Initialise Firestore helpers
   settingsModule.initFirebase({ auth, db, storage });
-
-  // 4️⃣ Map fsLoadUserProfile → getUser
   const fsLoadUserProfile = settingsModule.getUser;
 
   window.currentUser = null;
   window.currentUserData = null;
   window.authReady = false;
 
-  // 5️⃣ Auth listener
+  // =====================================================
+  // AUTH STATE LISTENER
+  // =====================================================
   auth.onAuthStateChanged(async user => {
-
     window.currentUser = user || null;
     window.currentUserData = null;
     window.authReady = false;
 
+    // Update status dot
     const statusDot = document.getElementById("accountStatusDot");
     if (statusDot) {
       statusDot.style.background = user ? "green" : "red";
       statusDot.classList.toggle("logged-out", !user);
     }
 
-    // HEADER BUTTONS
+    // Header buttons
     const loginBtn = document.getElementById("auth-logged-out");
     const inboxBtn = document.getElementById("auth-messages");
 
@@ -127,7 +130,6 @@ getFirebase().then(async fb => {
       return;
     }
 
-    // Logged IN
     loginBtn?.classList.add("hidden");
     inboxBtn?.classList.remove("hidden");
 
@@ -148,25 +150,16 @@ getFirebase().then(async fb => {
     window.authReady = true;
   });
 
-  /* =====================================================
-     START APP + UI EVENT HANDLERS
-  ===================================================== */
+  // =====================================================
+  // APP START
+  // =====================================================
   const start = () => {
     initUIRouter();
     loadView("home");
 
-<!-- ================= SIDE MENU ================= -->
-<div id="sideMenu" class="side-menu hidden">
-  <div class="menu-content">
-    <button class="close-menu">&times;</button>
-    <div id="menuOptions"></div>
-  </div>
-</div>
-     // LOGIN BUTTON → OPEN MODAL
+    // LOGIN BUTTON → OPEN MODAL
     document.addEventListener("click", e => {
-      if (e.target.closest("#auth-logged-out")) {
-        openLoginModal(auth, db);
-      }
+      if (e.target.closest("#auth-logged-out")) openLoginModal(auth, db);
     });
 
     // LOGO → RETURN HOME
@@ -180,10 +173,8 @@ getFirebase().then(async fb => {
     // INBOX BUTTON → OPEN CHAT LIST
     document.addEventListener("click", e => {
       if (e.target.closest("#auth-messages")) {
-
         const chatView = document.getElementById("view-chat-list");
         if (chatView) delete chatView.dataset.loaded;
-
         loadView("chat-list", { forceInit: true });
         window.scrollTo(0, 0);
       }
@@ -195,33 +186,13 @@ getFirebase().then(async fb => {
       const isVehicles = e.target.closest("#cat-vehicles");
       const isCategory = e.target.closest(".rctx-tabs");
 
-      if (isVehicles) {
-        subVehicles.classList.remove("hidden");
-      } else if (isCategory) {
-        subVehicles.classList.add("hidden");
-      }
+      if (isVehicles) subVehicles?.classList.remove("hidden");
+      else if (isCategory) subVehicles?.classList.add("hidden");
     });
-  };
 
-  document.readyState === "loading"
-    ? document.addEventListener("DOMContentLoaded", start)
-    : start();
-
-// MENU BUTTON → OPEN SIDE MENU
-document.addEventListener("click", e => {
-  if (e.target.closest("[title='Menu']")) {
-    renderSideMenu();
-    document.getElementById("sideMenu").classList.remove("hidden");
-  }
-
-  if (e.target.closest(".close-menu")) {
-    document.getElementById("sideMenu").classList.add("hidden");
-  }
-});
-   
-   // POST AD BUTTON → LOGIN CHECK → OPEN CORRECT MODAL
-  document.addEventListener("click", e => {
-    if (e.target.closest("#post-ad-btn")) {
+    // POST AD BUTTON → LOGIN CHECK → OPEN MODAL
+    document.addEventListener("click", e => {
+      if (!e.target.closest("#post-ad-btn")) return;
 
       if (!auth.currentUser) {
         openLoginModal();
@@ -239,11 +210,28 @@ document.addEventListener("click", e => {
       steps.forEach(s => s.classList.remove("active"));
       dots.forEach(d => d.classList.remove("active"));
 
-      steps[0].classList.add("active");
-      dots[0].classList.add("active");
-    }
-  });
+      steps[0]?.classList.add("active");
+      dots[0]?.classList.add("active");
+    });
+
+    // MENU BUTTON → OPEN SIDE MENU
+    document.addEventListener("click", e => {
+      if (e.target.closest("[title='Menu']")) {
+        renderSideMenu();
+        document.getElementById("sideMenu")?.classList.remove("hidden");
+      }
+
+      if (e.target.closest(".close-menu")) {
+        document.getElementById("sideMenu")?.classList.add("hidden");
+      }
+    });
+  };
+
+  document.readyState === "loading"
+    ? document.addEventListener("DOMContentLoaded", start)
+    : start();
 
   // LOAD POST-GATE LAST
   await import('/index/js/post-gate.js');
+
 });
