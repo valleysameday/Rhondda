@@ -1,4 +1,5 @@
 // ========================== main.js ==========================
+
 import { getFirebase } from '/index/js/firebase/init.js';
 import { initUIRouter } from '/index/js/ui-router.js';
 
@@ -17,7 +18,7 @@ let settingsModule = null;
 /* =====================================================
    GLOBAL TIME FORMATTER
 ===================================================== */
-window.timeAgo = function(timestamp) {
+window.timeAgo = function (timestamp) {
   if (!timestamp) return "";
 
   const diff = Date.now() - timestamp;
@@ -43,9 +44,11 @@ export async function loadView(view, options = {}) {
   if (window.currentView === view && !options.forceInit) return;
 
   window.currentView = view;
+
   const app = document.getElementById("app");
   if (!app) return;
 
+  // Hide all views
   app.querySelectorAll(".view").forEach(v => v.hidden = true);
 
   let target = document.getElementById(`view-${view}`);
@@ -64,16 +67,13 @@ export async function loadView(view, options = {}) {
     target.dataset.loaded = "true";
 
     try {
-      const mod = await import(`/views/${view}.js?${Date.now()}`);
+      const mod = await import(`/views/${view}.js`);
       mod.init?.({ auth, db, storage });
 
-      // ✅ If it's home, call initFeed directly after HTML is loaded
+      // 🔥 IMPORTANT: Home feed must be manually initialised
       if (view === "home") {
-        const feed = document.getElementById("feed");
-        if (feed) {
-          const { initFeed } = await import("/index/js/feed.js");
-          initFeed({ db });
-        }
+        const { initFeed } = await import("/index/js/feed.js");
+        initFeed({ db });
       }
 
     } catch (err) {
