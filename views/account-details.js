@@ -1,16 +1,3 @@
-import {
-  updateEmail,
-  updatePassword,
-  EmailAuthProvider,
-  reauthenticateWithCredential
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-import {
-  doc,
-  updateDoc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
 export async function init({ auth, db }) {
   console.log("⚙️ My Details init");
 
@@ -18,6 +5,9 @@ export async function init({ auth, db }) {
   if (!user) return;
 
   const uid = user.uid;
+
+  // Firestore helpers from your global Firebase instance
+  const { doc, getDoc, updateDoc } = db.constructor;
 
   // Load Firestore profile
   const userRef = doc(db, "users", uid);
@@ -78,9 +68,9 @@ export async function init({ auth, db }) {
         const pass = document.getElementById("acc-email-pass").value;
 
         try {
-          const cred = EmailAuthProvider.credential(user.email, pass);
-          await reauthenticateWithCredential(user, cred);
-          await updateEmail(user, newEmail);
+          const cred = auth.EmailAuthProvider.credential(user.email, pass);
+          await auth.reauthenticateWithCredential(user, cred);
+          await auth.updateEmail(user, newEmail);
           alert("Email updated");
         } catch (err) {
           alert("Email update failed: " + err.message);
@@ -101,9 +91,9 @@ export async function init({ auth, db }) {
         const newPass = document.getElementById("acc-new-pass").value;
 
         try {
-          const cred = EmailAuthProvider.credential(user.email, oldPass);
-          await reauthenticateWithCredential(user, cred);
-          await updatePassword(user, newPass);
+          const cred = auth.EmailAuthProvider.credential(user.email, oldPass);
+          await auth.reauthenticateWithCredential(user, cred);
+          await auth.updatePassword(user, newPass);
           alert("Password updated");
         } catch (err) {
           alert("Password update failed: " + err.message);
