@@ -222,22 +222,45 @@ if (ENABLE_SPONSORED_AD && initial) {
     saved ? savedPosts.add(postId) : savedPosts.delete(postId);
   });
 
-  /* ============================================================
-     CATEGORY FILTERS
-  ============================================================ */
-  categoryBtns.forEach(btn => {
-    btn.addEventListener("click", async () => {
-      categoryBtns.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
+/* ============================================================
+   CATEGORY FILTERS
+============================================================ */
+categoryBtns.forEach(btn => {
+  btn.addEventListener("click", async () => {
 
-      currentCategory = btn.dataset.category;
-      resetFeedState();
+    // Highlight active
+    categoryBtns.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
 
-      showSkeletons();
-      const posts = await fetchPosts(true);
-      renderPosts(posts, currentCategory);
-    });
+    // ============================
+    // SHOW/HIDE SUB‑CATEGORY BARS
+    // ============================
+
+    // Vehicles
+    if (btn.dataset.category === "vehicles") {
+      document.getElementById("sub-vehicles")?.classList.remove("hidden");
+    } else {
+      document.getElementById("sub-vehicles")?.classList.add("hidden");
+    }
+
+    // Property
+    if (btn.dataset.category === "property") {
+      document.getElementById("sub-property")?.classList.remove("hidden");
+    } else {
+      document.getElementById("sub-property")?.classList.add("hidden");
+    }
+
+    // ============================
+    // LOAD POSTS
+    // ============================
+    currentCategory = btn.dataset.category;
+    resetFeedState();
+
+    showSkeletons();
+    const posts = await fetchPosts(true);
+    renderPosts(posts, currentCategory);
   });
+});
 
   /* ============================================================
      INFINITE SCROLL (BOUND ONCE 🔥)
