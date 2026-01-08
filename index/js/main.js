@@ -111,14 +111,16 @@ function renderSideMenu() {
         { label: "Messages", action: () => loadView("chat-list") },
         { label: "Favourites", action: () => loadView("favourites") },
         { label: "My Details", action: () => loadView("account-details") },
-        { label: "Stats", action: () => loadView("stats") },
+      { label: "List My Business", action: () => handleListMyBusiness() },
+      { label: "Stats", action: () => loadView("stats") },
         { label: "Help & Contact", action: () => loadView("help") },
         { label: "Logout", action: () => auth.signOut() }
       ]
     : [
         { label: "Home", action: () => loadView("home") },
         { label: "Post an Ad", action: () => openLoginModal() },
-        { label: "Stats", action: () => openLoginModal() },
+     { label: "List My Business", action: () => openLoginModal() },
+      { label: "Stats", action: () => openLoginModal() },
         { label: "Help & Contact", action: () => loadView("help") },
         { label: "Login", action: () => openLoginModal() }
       ];
@@ -139,7 +141,25 @@ function renderSideMenu() {
     menu.appendChild(item);
   });
 }
+async function handleListMyBusiness() {
+  const user = auth.currentUser;
 
+  if (!user) {
+    openLoginModal();
+    return;
+  }
+
+  // Check if user already has a business listing
+  const services = await settingsModule.fsGetUserServices(user.uid);
+
+  if (!services.length) {
+    // No listings → start onboarding
+    loadView("business-onboarding", { forceInit: true });
+  } else {
+    // Has listings → open manage popup
+    openManageMyBusinessPopup(services);
+  }
+}
 /* =====================================================
    APP INITIALIZATION
 ===================================================== */
