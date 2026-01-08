@@ -86,7 +86,6 @@ getFirebase().then(async fb => {
   db = fb.db;
   storage = fb.storage;
 
-  // ⭐ SINGLE SOURCE OF TRUTH
   window.firebaseAuth = auth;
   window.firebaseDb = db;
   window.firebaseStorage = storage;
@@ -117,10 +116,20 @@ getFirebase().then(async fb => {
       statusDot.classList.toggle("logged-out", !user);
     }
 
+    // HEADER BUTTONS
+    const loginBtn = document.getElementById("auth-logged-out");
+    const inboxBtn = document.getElementById("auth-messages");
+
     if (!user) {
+      loginBtn?.classList.remove("hidden");
+      inboxBtn?.classList.add("hidden");
       window.authReady = true;
       return;
     }
+
+    // Logged IN
+    loginBtn?.classList.add("hidden");
+    inboxBtn?.classList.remove("hidden");
 
     try {
       window.currentUserData = await fsLoadUserProfile(user.uid);
@@ -161,6 +170,18 @@ getFirebase().then(async fb => {
       }
     });
 
+    // INBOX BUTTON → OPEN CHAT LIST
+    document.addEventListener("click", e => {
+      if (e.target.closest("#auth-messages")) {
+
+        const chatView = document.getElementById("view-chat-list");
+        if (chatView) delete chatView.dataset.loaded;
+
+        loadView("chat-list", { forceInit: true });
+        window.scrollTo(0, 0);
+      }
+    });
+
     // VEHICLES SUB‑CATEGORY TOGGLE
     const subVehicles = document.getElementById("sub-vehicles");
     document.addEventListener("click", e => {
@@ -179,34 +200,31 @@ getFirebase().then(async fb => {
     ? document.addEventListener("DOMContentLoaded", start)
     : start();
 
-// POST AD BUTTON → LOGIN CHECK → OPEN CORRECT MODAL
-document.addEventListener("click", e => {
-  if (e.target.closest("#post-ad-btn")) {
+  // POST AD BUTTON → LOGIN CHECK → OPEN CORRECT MODAL
+  document.addEventListener("click", e => {
+    if (e.target.closest("#post-ad-btn")) {
 
-    // 1️⃣ If not logged in → open login modal
-    if (!auth.currentUser) {
-      openLoginModal();
-      return;
+      if (!auth.currentUser) {
+        openLoginModal();
+        return;
+      }
+
+      document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
+
+      const postModal = document.getElementById("posts-grid");
+      postModal.style.display = "flex";
+
+      const steps = document.querySelectorAll("#posts-grid .post-step");
+      const dots = document.querySelectorAll("#posts-grid .dot");
+
+      steps.forEach(s => s.classList.remove("active"));
+      dots.forEach(d => d.classList.remove("active"));
+
+      steps[0].classList.add("active");
+      dots[0].classList.add("active");
     }
+  });
 
-    // 2️⃣ If logged in → open the post modal
-    document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
-
-    const postModal = document.getElementById("posts-grid");
-    postModal.style.display = "flex";
-
-    // Reset post flow to step 1
-    const steps = document.querySelectorAll("#posts-grid .post-step");
-    const dots = document.querySelectorAll("#posts-grid .dot");
-
-    steps.forEach(s => s.classList.remove("active"));
-    dots.forEach(d => d.classList.remove("active"));
-
-    steps[0].classList.add("active");
-    dots[0].classList.add("active");
-  }
-});
-   
-   // LOAD POST-GATE LAST
+  // LOAD POST-GATE LAST
   await import('/index/js/post-gate.js');
 });
