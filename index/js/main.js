@@ -179,6 +179,29 @@ getFirebase().then(async fb => {
     ? document.addEventListener("DOMContentLoaded", start)
     : start();
 
-  // LOAD POST-GATE LAST
+// POST AD BUTTON → OPEN POST MODAL
+document.addEventListener("click", e => {
+  if (e.target.closest("#post-ad-btn")) {
+
+    // Hide all other modals
+    document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
+
+    // Show the post modal
+    const postModal = document.getElementById("posts-grid");
+    postModal.style.display = "flex";
+
+    // Reset post flow to step 1
+    const steps = document.querySelectorAll("#posts-grid .post-step");
+    const dots = document.querySelectorAll("#posts-grid .dot");
+
+    steps.forEach(s => s.classList.remove("active"));
+    dots.forEach(d => d.classList.remove("active"));
+
+    steps[0].classList.add("active");
+    dots[0].classList.add("active");
+  }
+});
+   
+   // LOAD POST-GATE LAST
   await import('/index/js/post-gate.js');
 });
