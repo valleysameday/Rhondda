@@ -179,14 +179,19 @@ getFirebase().then(async fb => {
     ? document.addEventListener("DOMContentLoaded", start)
     : start();
 
-// POST AD BUTTON → OPEN POST MODAL
+// POST AD BUTTON → LOGIN CHECK → OPEN CORRECT MODAL
 document.addEventListener("click", e => {
   if (e.target.closest("#post-ad-btn")) {
 
-    // Hide all other modals
+    // 1️⃣ If not logged in → open login modal
+    if (!auth.currentUser) {
+      openLoginModal();
+      return;
+    }
+
+    // 2️⃣ If logged in → open the post modal
     document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
 
-    // Show the post modal
     const postModal = document.getElementById("posts-grid");
     postModal.style.display = "flex";
 
