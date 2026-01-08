@@ -1,0 +1,158 @@
+.onboarding-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px 16px 80px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #0f172a;
+}
+
+.onboarding-step {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px 16px 24px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.onboarding-step + .onboarding-step {
+  margin-top: 16px;
+}
+
+.onboarding-step.hidden {
+  display: none;
+}
+
+.onboarding-step h1,
+.onboarding-step h2 {
+  margin: 0 0 8px;
+  color: #0f172a;
+}
+
+.onboarding-step p {
+  margin: 0 0 12px;
+  color: #4b5563;
+  font-size: 0.95rem;
+}
+
+.onboarding-step input,
+.onboarding-step select,
+.onboarding-step textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.onboarding-step input:focus,
+.onboarding-step select:focus,
+.onboarding-step textarea:focus {
+  border-color: #0f766e;
+  box-shadow: 0 0 0 1px rgba(15, 118, 110, 0.15);
+}
+
+.onboarding-step textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Buttons */
+
+.onboarding-next,
+.onboarding-back,
+#submitListingBtn,
+#goToMyBusiness {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: none;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.onboarding-next,
+#submitListingBtn,
+#goToMyBusiness {
+  background: #0f766e;
+  color: #ffffff;
+}
+
+.onboarding-back {
+  background: #e5e7eb;
+  color: #374151;
+  margin-left: 8px;
+}
+
+/* Hints */
+
+.hints-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 16px;
+}
+
+.hints-list li {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #f1f5f9;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}
+
+/* Postcode error */
+
+.postcode-error {
+  color: #b91c1c;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+
+/* Uploads */
+
+.upload-label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.upload-label input[type="file"] {
+  display: block;
+  margin-top: 6px;
+}
+
+/* Photo preview */
+
+.photo-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.preview-logo {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  object-fit: cover;
+  border: 2px solid #0f766e;
+}
+
+.preview-photo {
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+}
+
+/* Success */
+
+#step-success p {
+  margin-bottom: 16px;
+}
