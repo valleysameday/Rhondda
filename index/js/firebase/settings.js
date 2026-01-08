@@ -269,7 +269,7 @@ export async function sendMessage(convoId, senderId, text) {
     { lastMessage: text, lastMessageSender: senderId, updatedAt: now },
     { merge: true }
   );
-
+}
 /* ============================================================
    SERVICES
 ============================================================ */
@@ -352,5 +352,4 @@ export async function fsReportService(serviceId, reason) {
     reporterUid: auth?.currentUser?.uid || null,
     createdAt: serverTimestamp()
   });
-}
 }
