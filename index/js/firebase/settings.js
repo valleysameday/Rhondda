@@ -269,4 +269,88 @@ export async function sendMessage(convoId, senderId, text) {
     { lastMessage: text, lastMessageSender: senderId, updatedAt: now },
     { merge: true }
   );
+
+/* ============================================================
+   SERVICES
+============================================================ */
+
+/**
+ * Get ALL active services (for directory load)
+ */
+export async function fsGetAllServices() {
+  if (!db) return [];
+
+  const q = query(
+    collection(db, "services"),
+    where("isActive", "==", true),
+    orderBy("createdAt", "desc")
+  );
+
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
+
+/**
+ * Search services by name, category, or description
+ */
+export async function fsSearchServices(term) {
+  if (!db || !term) return [];
+
+  const q = query(
+    collection(db, "services"),
+    where("isActive", "==", true)
+  );
+
+  const snap = await getDocs(q);
+
+  const lower = term.toLowerCase();
+
+  return snap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .filter(svc =>
+      (svc.businessName || "").toLowerCase().includes(lower) ||
+      (svc.category || "").toLowerCase().includes(lower) ||
+      (svc.description || "").toLowerCase().includes(lower)
+    );
+}
+
+/**
+ * Filter services by category
+ */
+export async function fsFilterServices(category) {
+  if (!db || !category) return [];
+
+  const q = query(
+    collection(db, "services"),
+    where("isActive", "==", true),
+    where("category", "==", category)
+  );
+
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+/**
+ * Get a single service by ID
+ */
+export async function fsGetServiceById(serviceId) {
+  if (!db || !serviceId) return null;
+
+  const snap = await getDoc(doc(db, "services", serviceId));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+
+/**
+ * Report a service listing
+ */
+export async function fsReportService(serviceId, reason) {
+  if (!db || !serviceId || !reason) return;
+
+  await addDoc(collection(db, "serviceReports"), {
+    serviceId,
+    reason,
+    reporterUid: auth?.currentUser?.uid || null,
+    createdAt: serverTimestamp()
+  });
+}
+
