@@ -286,7 +286,9 @@ a { text-decoration: none; }
   background: #f8f9fa; /* Light contrast from the main background */
   padding: 10px 0;
 }
-
+.featured-ads {
+  min-height: 220px;
+}
 .featured-track {
   display: flex;
   gap: 12px;
