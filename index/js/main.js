@@ -64,11 +64,18 @@ export async function loadView(view, options = {}) {
     target.dataset.loaded = "true";
 
     try {
-      const mod = view === "dashboard-hub"
-        ? await import(`/views/dashboard-hub.js?${Date.now()}`)
-        : await import(`/views/${view}.js?${Date.now()}`);
-
+      const mod = await import(`/views/${view}.js?${Date.now()}`);
       mod.init?.({ auth, db, storage });
+
+      // ✅ If it's home, call initFeed directly after HTML is loaded
+      if (view === "home") {
+        const feed = document.getElementById("feed");
+        if (feed) {
+          const { initFeed } = await import("/index/js/feed.js");
+          initFeed({ db });
+        }
+      }
+
     } catch (err) {
       console.error("❌ View JS error:", err);
     }
