@@ -3,13 +3,13 @@ import {
   updatePassword,
   EmailAuthProvider,
   reauthenticateWithCredential
-} from "firebase/auth";
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 import {
   doc,
   updateDoc,
   getDoc
-} from "firebase/firestore";
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 export async function init({ auth, db }) {
   console.log("⚙️ My Details init");
@@ -55,7 +55,7 @@ export async function init({ auth, db }) {
   }
 
   /* =====================================================
-     SAVE PROFILE (Firestore)
+     SAVE PROFILE
   ===================================================== */
   document.getElementById("saveProfile").addEventListener("click", async () => {
     await updateDoc(userRef, {
