@@ -2,10 +2,7 @@ import {
   updateEmail,
   updatePassword,
   EmailAuthProvider,
-  reauthenticateWithCredential,
-  PhoneAuthProvider,
-  multiFactor,
-  PhoneMultiFactorGenerator
+  reauthenticateWithCredential
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import {
@@ -27,129 +24,106 @@ export async function init({ auth, db }) {
   const snap = await getDoc(userRef);
   const data = snap.data() || {};
 
-  // Fill fields
+  // Auto-fill fields
   document.getElementById("acc-name").value = data.name || "";
   document.getElementById("acc-phone").value = data.phone || "";
   document.getElementById("acc-email").value = user.email || "";
-  document.getElementById("acc-2fa-phone").value = data.twoFAphone || "";
 
-  /* ============================
+  /* =====================================================
+     CONFIRMATION MODAL LOGIC
+  ===================================================== */
+  const modal = document.getElementById("confirmModal");
+  const title = document.getElementById("confirmTitle");
+  const message = document.getElementById("confirmMessage");
+  const btnYes = document.getElementById("confirmYes");
+  const btnCancel = document.getElementById("confirmCancel");
+
+  function confirmAction(titleText, msg, callback) {
+    title.innerText = titleText;
+    message.innerText = msg;
+
+    modal.classList.remove("hidden");
+
+    btnYes.onclick = () => {
+      modal.classList.add("hidden");
+      callback();
+    };
+
+    btnCancel.onclick = () => {
+      modal.classList.add("hidden");
+    };
+  }
+
+  /* =====================================================
      SAVE PROFILE (Firestore)
-  ============================ */
+  ===================================================== */
   document.getElementById("saveProfile").addEventListener("click", async () => {
-    const name = document.getElementById("acc-name").value.trim();
-    const phone = document.getElementById("acc-phone").value.trim();
-
-    await updateDoc(userRef, { name, phone });
+    await updateDoc(userRef, {
+      name: document.getElementById("acc-name").value.trim(),
+      phone: document.getElementById("acc-phone").value.trim()
+    });
 
     alert("Profile updated");
   });
 
-  /* ============================
-     CHANGE EMAIL (Auth)
-  ============================ */
-  document.getElementById("changeEmail").addEventListener("click", async () => {
-    const newEmail = document.getElementById("acc-email").value.trim();
-    const pass = document.getElementById("acc-email-pass").value;
+  /* =====================================================
+     CHANGE EMAIL
+  ===================================================== */
+  document.getElementById("changeEmail").addEventListener("click", () => {
+    confirmAction(
+      "Confirm Email Change",
+      "Are you sure you want to update your email?",
+      async () => {
+        const newEmail = document.getElementById("acc-email").value.trim();
+        const pass = document.getElementById("acc-email-pass").value;
 
-    if (!newEmail || !pass) {
-      alert("Enter email + password");
-      return;
-    }
-
-    try {
-      const cred = EmailAuthProvider.credential(user.email, pass);
-      await reauthenticateWithCredential(user, cred);
-      await updateEmail(user, newEmail);
-
-      alert("Email updated");
-    } catch (err) {
-      console.error(err);
-      alert("Email update failed: " + err.message);
-    }
+        try {
+          const cred = EmailAuthProvider.credential(user.email, pass);
+          await reauthenticateWithCredential(user, cred);
+          await updateEmail(user, newEmail);
+          alert("Email updated");
+        } catch (err) {
+          alert("Email update failed: " + err.message);
+        }
+      }
+    );
   });
 
-  /* ============================
-     CHANGE PASSWORD (Auth)
-  ============================ */
-  document.getElementById("changePassword").addEventListener("click", async () => {
-    const oldPass = document.getElementById("acc-old-pass").value;
-    const newPass = document.getElementById("acc-new-pass").value;
+  /* =====================================================
+     CHANGE PASSWORD
+  ===================================================== */
+  document.getElementById("changePassword").addEventListener("click", () => {
+    confirmAction(
+      "Confirm Password Change",
+      "Are you sure you want to change your password?",
+      async () => {
+        const oldPass = document.getElementById("acc-old-pass").value;
+        const newPass = document.getElementById("acc-new-pass").value;
 
-    if (!oldPass || !newPass) {
-      alert("Enter old + new password");
-      return;
-    }
-
-    try {
-      const cred = EmailAuthProvider.credential(user.email, oldPass);
-      await reauthenticateWithCredential(user, cred);
-      await updatePassword(user, newPass);
-
-      alert("Password updated");
-    } catch (err) {
-      console.error(err);
-      alert("Password update failed: " + err.message);
-    }
+        try {
+          const cred = EmailAuthProvider.credential(user.email, oldPass);
+          await reauthenticateWithCredential(user, cred);
+          await updatePassword(user, newPass);
+          alert("Password updated");
+        } catch (err) {
+          alert("Password update failed: " + err.message);
+        }
+      }
+    );
   });
 
-  /* ============================
-     ENABLE 2FA (SMS)
-  ============================ */
-  document.getElementById("enable2FA").addEventListener("click", async () => {
-    const phone = document.getElementById("acc-2fa-phone").value.trim();
-    if (!phone) return alert("Enter phone number");
-
-    try {
-      const session = await multiFactor(user).getSession();
-      const phoneOpts = { phoneNumber: phone, session };
-
-      const provider = new PhoneAuthProvider(auth);
-      const verificationId = await provider.verifyPhoneNumber(phoneOpts, window.recaptchaVerifier);
-
-      const code = prompt("Enter the SMS code");
-      const cred = PhoneAuthProvider.credential(verificationId, code);
-
-      await multiFactor(user).enroll(cred, "SMS 2FA");
-
-      await updateDoc(userRef, { twoFAphone: phone });
-
-      alert("2FA enabled");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to enable 2FA: " + err.message);
-    }
-  });
-
-  /* ============================
-     DISABLE 2FA
-  ============================ */
-  document.getElementById("disable2FA").addEventListener("click", async () => {
-    try {
-      const enrolled = multiFactor(user).enrolledFactors;
-      if (enrolled.length === 0) return alert("2FA is not enabled");
-
-      await multiFactor(user).unenroll(enrolled[0]);
-
-      await updateDoc(userRef, { twoFAphone: "" });
-
-      alert("2FA disabled");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to disable 2FA: " + err.message);
-    }
-  });
-
-  /* ============================
+  /* =====================================================
      DEACTIVATE ACCOUNT
-  ============================ */
-  document.getElementById("deactivateAccount").addEventListener("click", async () => {
-    if (!confirm("Are you sure you want to deactivate your account?")) return;
-
-    await updateDoc(userRef, { deactivated: true });
-
-    auth.signOut();
-
-    alert("Your account has been deactivated");
+  ===================================================== */
+  document.getElementById("deactivateAccount").addEventListener("click", () => {
+    confirmAction(
+      "Deactivate Account",
+      "Are you sure you want to deactivate your account?",
+      async () => {
+        await updateDoc(userRef, { deactivated: true });
+        auth.signOut();
+        alert("Your account has been deactivated");
+      }
+    );
   });
 }
