@@ -1,4 +1,4 @@
-// feed.js
+// ========================== feed.js ==========================
 
 import { 
   fetchFeedPosts as fsFetchFeedPosts, 
@@ -7,20 +7,40 @@ import {
 import { initFeaturedAds } from "/index/js/featured-ads.js";
 import { loadView } from "/index/js/main.js";
 
+/* ============================================================
+   MODULE STATE (PERSISTS UNLESS RESET)
+============================================================ */
 let lastDoc = null;
 let loadingMore = false;
 let reachedEnd = false;
 let currentCategory = "all";
+let scrollBound = false;
 
 const savedPosts = new Set();
 
+/* ============================================================
+   STATE RESET (🔥 FIX)
+============================================================ */
+function resetFeedState() {
+  lastDoc = null;
+  loadingMore = false;
+  reachedEnd = false;
+  currentCategory = "all";
+}
+
+/* ============================================================
+   INIT FEED
+============================================================ */
 export async function initFeed(_, options = {}) {
   console.log("🏠 Home view init");
 
-  const postsContainer = document.getElementById('feed');
-  const categoryBtns = document.querySelectorAll('.category-btn');
-  const businessCheckbox = document.getElementById('isBusinessAccount');
-  const businessBenefits = document.getElementById('businessBenefits');
+  // 🔥 CRITICAL FIX
+  resetFeedState();
+
+  const postsContainer = document.getElementById("feed");
+  const categoryBtns = document.querySelectorAll(".category-btn");
+  const businessCheckbox = document.getElementById("isBusinessAccount");
+  const businessBenefits = document.getElementById("businessBenefits");
 
   if (!postsContainer) return console.warn("Feed container not found");
 
@@ -28,8 +48,8 @@ export async function initFeed(_, options = {}) {
      BUSINESS CHECKBOX TOGGLE
   ============================================================ */
   if (businessCheckbox && businessBenefits) {
-    businessCheckbox.addEventListener('change', () => {
-      businessBenefits.style.display = businessCheckbox.checked ? 'block' : 'none';
+    businessCheckbox.addEventListener("change", () => {
+      businessBenefits.style.display = businessCheckbox.checked ? "block" : "none";
     });
   }
 
@@ -78,7 +98,7 @@ export async function initFeed(_, options = {}) {
   }
 
   /* ============================================================
-     FETCH POSTS (UI WRAPPER)
+     FETCH POSTS
   ============================================================ */
   async function fetchPosts(initial = false) {
     if (reachedEnd) return [];
@@ -118,7 +138,7 @@ export async function initFeed(_, options = {}) {
     let html = "";
 
     if (p.price) {
-      const freq = p.rentFrequency ? ` ${p.rentFrequency.toUpperCase()}` : '';
+      const freq = p.rentFrequency ? ` ${p.rentFrequency.toUpperCase()}` : "";
       html += `<span class="post-price">£${p.price}${freq}</span>`;
     }
 
@@ -131,16 +151,15 @@ export async function initFeed(_, options = {}) {
   /* ============================================================
      RENDER POSTS
   ============================================================ */
-  function renderPosts(posts, category = 'all', options = {}) {
+  function renderPosts(posts, category = "all", options = {}) {
     if (!options.append) {
-      postsContainer.innerHTML = '';
+      postsContainer.innerHTML = "";
       hideBottomLoader();
       document.getElementById("feedEndMessage")?.remove();
     }
 
-    const filtered = category === 'all'
-      ? posts
-      : posts.filter(p => p.category === category);
+    const filtered =
+      category === "all" ? posts : posts.filter(p => p.category === category);
 
     if (!filtered.length && !options.append) {
       postsContainer.innerHTML = `<p class="empty-feed">No posts yet</p>`;
@@ -148,8 +167,6 @@ export async function initFeed(_, options = {}) {
     }
 
     filtered.forEach(post => {
-
-      // 🔥 SAFE IMAGE FALLBACK LOGIC
       const image =
         post.image ||
         post.imageUrl ||
@@ -157,13 +174,13 @@ export async function initFeed(_, options = {}) {
         (Array.isArray(post.images) ? post.images[0] : null) ||
         "/assets/default-thumb.jpg";
 
-      const card = document.createElement('article');
-      card.className = `feed-card ${post.type || ''}`;
+      const card = document.createElement("article");
+      card.className = `feed-card ${post.type || ""}`;
 
       card.innerHTML = `
         <div class="feed-image">
           <img src="${image}" alt="${post.title}">
-          ${post.isBusiness && post.type !== "featured" ? `<span class="biz-badge">Business</span>` : ''}
+          ${post.isBusiness && post.type !== "featured" ? `<span class="biz-badge">Business</span>` : ""}
         </div>
 
         <div class="feed-content">
@@ -171,19 +188,19 @@ export async function initFeed(_, options = {}) {
 
           <div class="feed-meta">
             ${buildMeta(post)}
-            <button class="save-heart ${savedPosts.has(post.id) ? 'saved' : ''}" data-id="${post.id}">
-              ${savedPosts.has(post.id) ? '♥' : '♡'}
+            <button class="save-heart ${savedPosts.has(post.id) ? "saved" : ""}" data-id="${post.id}">
+              ${savedPosts.has(post.id) ? "♥" : "♡"}
             </button>
           </div>
 
-          ${post.type === "featured" && post.cta ? `<button class="cta-btn">${post.cta}</button>` : ''}
+          ${post.type === "featured" && post.cta ? `<button class="cta-btn">${post.cta}</button>` : ""}
         </div>
 
         <button class="report-btn" data-id="${post.id}">⚑</button>
       `;
 
-      card.addEventListener('click', e => {
-        if (e.target.closest('.report-btn,.cta-btn,.save-heart')) return;
+      card.addEventListener("click", e => {
+        if (e.target.closest(".report-btn,.cta-btn,.save-heart")) return;
 
         sessionStorage.setItem("feedScroll", window.scrollY);
         sessionStorage.setItem("feedCategory", currentCategory);
@@ -220,13 +237,12 @@ export async function initFeed(_, options = {}) {
      CATEGORY FILTERS
   ============================================================ */
   categoryBtns.forEach(btn => {
-    btn.addEventListener('click', async () => {
-      categoryBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+    btn.addEventListener("click", async () => {
+      categoryBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
 
       currentCategory = btn.dataset.category;
-      reachedEnd = false;
-      lastDoc = null;
+      resetFeedState();
 
       showSkeletons();
       const posts = await fetchPosts(true);
@@ -235,25 +251,29 @@ export async function initFeed(_, options = {}) {
   });
 
   /* ============================================================
-     INFINITE SCROLL
+     INFINITE SCROLL (BOUND ONCE 🔥)
   ============================================================ */
-  window.addEventListener("scroll", async () => {
-    if (loadingMore || reachedEnd) return;
+  if (!scrollBound) {
+    window.addEventListener("scroll", async () => {
+      if (loadingMore || reachedEnd) return;
 
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
-      loadingMore = true;
-      showBottomLoader();
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
+        loadingMore = true;
+        showBottomLoader();
 
-      const morePosts = await fetchPosts(false);
-      hideBottomLoader();
+        const morePosts = await fetchPosts(false);
+        hideBottomLoader();
 
-      morePosts.length
-        ? renderPosts(morePosts, currentCategory, { append: true })
-        : showEndMessage();
+        morePosts.length
+          ? renderPosts(morePosts, currentCategory, { append: true })
+          : showEndMessage();
 
-      loadingMore = false;
-    }
-  });
+        loadingMore = false;
+      }
+    });
+
+    scrollBound = true;
+  }
 
   /* ============================================================
      INITIAL LOAD
@@ -263,8 +283,8 @@ export async function initFeed(_, options = {}) {
   const posts = await fetchPosts(true);
   currentCategory = "all";
 
-  categoryBtns.forEach(b => b.classList.remove('active'));
-  document.querySelector('.category-btn[data-category="all"]')?.classList.add('active');
+  categoryBtns.forEach(b => b.classList.remove("active"));
+  document.querySelector('.category-btn[data-category="all"]')?.classList.add("active");
 
   renderPosts(posts, "all");
 
