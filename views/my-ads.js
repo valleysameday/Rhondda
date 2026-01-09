@@ -1,20 +1,14 @@
-import {
-  collection,
-  query,
-  where,
-  orderBy,
-  getDocs
-} from "/index/js/firebase/init.js";
+import { getSellerPosts } from "/index/js/firebase/settings.js";
 
-export function init({ auth, db }) {
-  loadMyAds(auth, db);
+export function init({ auth }) {
+  loadMyAds(auth);
 
   document.getElementById("myAdsCreateBtn")?.addEventListener("click", () => {
     document.getElementById("post-ad-btn")?.click();
   });
 }
 
-async function loadMyAds(auth, db) {
+async function loadMyAds(auth) {
   if (!auth.currentUser) {
     showToast("Please log in to view your ads.", "error");
     return;
@@ -25,15 +19,10 @@ async function loadMyAds(auth, db) {
 
   list.innerHTML = "";
 
-  const q = query(
-    collection(db, "posts"),
-    where("userId", "==", auth.currentUser.uid),
-    orderBy("createdAt", "desc")
-  );
+  // ⭐ Use your existing helper
+  const posts = await getSellerPosts(auth.currentUser.uid);
 
-  const snap = await getDocs(q);
-
-  if (snap.empty) {
+  if (!posts.length) {
     list.classList.add("hidden");
     empty.classList.remove("hidden");
     return;
@@ -42,9 +31,7 @@ async function loadMyAds(auth, db) {
   empty.classList.add("hidden");
   list.classList.remove("hidden");
 
-  snap.forEach(doc => {
-    const p = doc.data();
-
+  posts.forEach(p => {
     const item = document.createElement("div");
     item.className = "my-ad-item";
 
