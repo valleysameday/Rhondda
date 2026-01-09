@@ -161,12 +161,14 @@ export async function loadView(view, options = {}) {
   }
 
   target.hidden = false;
-
+document.querySelectorAll(".sub-tabs").forEach(el =>
+  el.classList.add("hidden")
+);
   /* ===============================
      ACCOUNT HEADER VISIBILITY LOGIC
   =============================== */
   const accountHeader = document.getElementById("accountHeader");
-  const categoryBars = document.querySelectorAll(".rctx-tabs");
+  const categoryBars = document.querySelectorAll(".main-tabs");
 
   const accountViews = [
     "my-ads",
