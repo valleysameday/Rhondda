@@ -646,3 +646,26 @@ a { text-decoration: none; }
 .view-my-ads {
   padding-top: 60px; /* keeps spacing under header */
 }
+/* Desktop improvements */
+@media (min-width: 900px) {
+
+  #accountHeader {
+    padding: 12px 0;
+  }
+
+  .account-tabs.icon-only {
+    gap: 20px;
+    padding: 12px 24px;
+    justify-content: center; /* full width, centered */
+  }
+
+  .account-tabs.icon-only button {
+    padding: 14px;
+    border-radius: 12px;
+  }
+
+  .account-tabs.icon-only svg {
+    width: 26px;
+    height: 26px;
+  }
+}
