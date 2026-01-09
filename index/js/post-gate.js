@@ -1,10 +1,9 @@
 // ============================================
-// POST GATE (FULL – ALIGNED WITH CATEGORY FLOW)
+// POST GATE (FULL – SIMPLE PREVIEW FLOW)
 // ============================================
 
 import { getFirebase } from '/index/js/firebase/init.js';
 import {
-  getUser,
   addPost,
   uploadPostImage
 } from "/index/js/firebase/settings.js";
@@ -79,6 +78,18 @@ function initPostGate() {
 
   const propertyBtns = [...document.querySelectorAll('[data-property-type]')];
   const rentBtns = [...document.querySelectorAll('[data-rent-frequency]')];
+
+  // Photos
+  const addPhotosBtn = document.getElementById('addPhotosBtn');
+  const imagePreview = document.getElementById('imagePreview');
+  let selectedImages = [];
+
+  // Preview modal
+  const previewModal = document.getElementById("postPreviewModal");
+  const previewBody = document.getElementById("postPreview");
+  const previewClose = previewModal?.querySelector(".preview-close");
+  const previewOverlay = previewModal?.querySelector(".preview-overlay");
+  const confirmPostBtn = document.getElementById("confirmPostBtn");
 
   /* ==============================
      STEP 1 – CATEGORY SELECTION
@@ -192,7 +203,10 @@ function initPostGate() {
      PRICE VISIBILITY / LABEL
   ============================== */
   function updatePriceVisibility() {
-    priceBox.hidden = selectedCategory === 'free' || selectedCategory === 'jobs' || selectedCategory === 'community';
+    priceBox.hidden =
+      selectedCategory === 'free' ||
+      selectedCategory === 'jobs' ||
+      selectedCategory === 'community';
   }
 
   function updatePriceLabel() {
@@ -210,64 +224,165 @@ function initPostGate() {
     }
   }
 
-/* ==============================
-   SUBMIT POST (CLEAN VERSION)
-============================== */
-submitBtn.addEventListener('click', async () => {
+  /* ==============================
+     IMAGE PICKER / PREVIEW
+  ============================== */
+  if (addPhotosBtn && imagesInput && imagePreview) {
+    addPhotosBtn.addEventListener('click', () => imagesInput.click());
 
-  if (!auth.currentUser) {
-    return showToast("Please log in to post an ad.", "error");
-  }
+    imagesInput.addEventListener('change', () => {
+      const newFiles = [...imagesInput.files];
 
-  try {
-    const features = [...document.querySelectorAll('.property-features input:checked')]
-      .map(i => i.dataset.feature);
-
-    const post = {
-      userId: auth.currentUser.uid,
-
-      category: selectedCategory,
-      subCategory: selectedSubCategory,
-
-      title: titleInput.value.trim(),
-      description: descInput.value.trim(),
-      createdAt: Date.now(),
-
-      contact: contactInput.value.trim(),
-      location: locationInput.value.trim(),
-
-      price: Number(priceInput.value) || null,
-      area: document.getElementById("postArea")?.value || null,
-
-      propertyType,
-      rentFrequency,
-      propertyFeatures: features,
-
-      images: [],
-      image: null
-    };
-
-    // Upload images
-    if (imagesInput.files.length) {
-      for (const file of imagesInput.files) {
-        const compressed = await compressImage(file);
-        const url = await uploadPostImage(compressed, auth.currentUser.uid);
-        post.images.push(url);
+      if (selectedImages.length + newFiles.length > 6) {
+        showToast("Max 6 images allowed", "error");
+        return;
       }
-      post.image = post.images[0];
-    }
 
-    await addPost(post);
-
-    showToast("Your ad is live!", "success");
-    document.querySelector('[data-action="close-screens"]').click();
-    loadView("home");
-
-  } catch (err) {
-    console.error(err);
-    showToast("Failed to post ad.", "error");
+      selectedImages.push(...newFiles);
+      renderImagePreview();
+    });
   }
-});
+
+  function renderImagePreview() {
+    imagePreview.innerHTML = "";
+
+    selectedImages.forEach((file, index) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "preview-thumb-wrapper";
+
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(file);
+      img.className = "preview-thumb";
+
+      const del = document.createElement("button");
+      del.className = "delete-thumb";
+      del.textContent = "×";
+      del.onclick = () => {
+        selectedImages.splice(index, 1);
+        renderImagePreview();
+      };
+
+      wrapper.appendChild(img);
+      wrapper.appendChild(del);
+      imagePreview.appendChild(wrapper);
+    });
+  }
+
+  /* ==============================
+     PREVIEW MODAL
+  ============================== */
+  function openPreviewModal() {
+    if (!previewModal) return;
+    generatePostPreview();
+    previewModal.classList.remove("hidden");
+  }
+
+  function closePreviewModal() {
+    if (!previewModal) return;
+    previewModal.classList.add("hidden");
+  }
+
+  if (previewClose) previewClose.addEventListener("click", closePreviewModal);
+  if (previewOverlay) previewOverlay.addEventListener("click", closePreviewModal);
+
+  function generatePostPreview() {
+    if (!previewBody) return;
+
+    const imagesHTML = selectedImages
+      .map(f => `<img src="${URL.createObjectURL(f)}">`)
+      .join("");
+
+    previewBody.innerHTML = `
+      <h2>${titleInput.value.trim()}</h2>
+      <p>${descInput.value.trim()}</p>
+
+      <p><strong>Location:</strong> ${locationInput.value.trim() || "—"}</p>
+      <p><strong>Price:</strong> £${priceInput.value || "—"}</p>
+
+      <div class="preview-images">
+        ${imagesHTML}
+      </div>
+    `;
+  }
+
+  /* ==============================
+     POST BUTTON → OPEN PREVIEW
+  ============================== */
+  submitBtn.addEventListener('click', () => {
+    if (!auth.currentUser) {
+      return showToast("Please log in to post an ad.", "error");
+    }
+    openPreviewModal();
+  });
+
+  /* ==============================
+     CONFIRM & POST (WITH SPINNER)
+  ============================== */
+  if (confirmPostBtn) {
+    confirmPostBtn.addEventListener('click', async () => {
+
+      if (!auth.currentUser) {
+        showToast("Please log in to post an ad.", "error");
+        return;
+      }
+
+      confirmPostBtn.disabled = true;
+      const originalText = confirmPostBtn.textContent;
+      confirmPostBtn.textContent = "Uploading…";
+
+      try {
+        const features = [...document.querySelectorAll('.property-features input:checked')]
+          .map(i => i.dataset.feature);
+
+        const post = {
+          userId: auth.currentUser.uid,
+
+          category: selectedCategory,
+          subCategory: selectedSubCategory,
+
+          title: titleInput.value.trim(),
+          description: descInput.value.trim(),
+          createdAt: Date.now(),
+
+          contact: contactInput.value.trim(),
+          location: locationInput.value.trim(),
+
+          price: Number(priceInput.value) || null,
+          area: document.getElementById("postArea")?.value || null,
+
+          propertyType,
+          rentFrequency,
+          propertyFeatures: features,
+
+          images: [],
+          image: null
+        };
+
+        for (const file of selectedImages) {
+          const compressed = await compressImage(file);
+          const url = await uploadPostImage(compressed, auth.currentUser.uid);
+          post.images.push(url);
+        }
+
+        post.image = post.images[0] || null;
+
+        await addPost(post);
+
+        showToast("Your ad is live!", "success");
+        closePreviewModal();
+        document.querySelector('[data-action="close-screens"]').click();
+        loadView("home");
+
+      } catch (err) {
+        console.error(err);
+        showToast("Failed to post ad.", "error");
+      }
+
+      confirmPostBtn.disabled = false;
+      confirmPostBtn.textContent = originalText;
+    });
+  }
+
   /* ==============================
      IMAGE COMPRESSION
   ============================== */
