@@ -16,6 +16,77 @@ const viewRegistry = {
   // …existing views
 };
 
+window.openManageMyBusinessPopup = function(services) {
+  const popup = document.getElementById("manageBusinessPopup");
+  const grid = document.getElementById("manageBusinessGrid");
+  const closeBtn = document.getElementById("closeManagePopup");
+
+  grid.innerHTML = "";
+
+  // Render existing listings
+  services.forEach(s => {
+    const card = document.createElement("div");
+    card.className = "manage-card";
+
+    card.innerHTML = `
+      <img src="${s.logoUrl || '/assets/default-logo.png'}">
+      <h4>${s.name || s.businessName}</h4>
+      <p>${s.category}</p>
+
+      <button class="btn-edit">Edit</button>
+      <button class="btn-delete">Delete</button>
+    `;
+
+    // Edit
+    card.querySelector(".btn-edit").addEventListener("click", () => {
+      loadView("business-onboarding", { forceInit: true, editService: s });
+      popup.classList.add("hidden");
+    });
+
+    // Delete
+    card.querySelector(".btn-delete").addEventListener("click", async () => {
+      if (!confirm("Delete this listing?")) return;
+
+      await settingsModule.fsDeleteService(s.id);
+      alert("Listing deleted");
+      popup.classList.add("hidden");
+    });
+
+    grid.appendChild(card);
+  });
+
+  // Add New Listing Card
+  const addCard = document.createElement("div");
+  addCard.className = "manage-card add-card";
+
+  const userHasTwo = services.length >= 2;
+
+  addCard.innerHTML = userHasTwo
+    ? `
+      <span>🔒</span>
+      <p>Upgrade to add more listings</p>
+    `
+    : `
+      <span>+</span>
+      <p>Add New Business</p>
+    `;
+
+  if (!userHasTwo) {
+    addCard.addEventListener("click", () => {
+      loadView("business-onboarding", { forceInit: true });
+      popup.classList.add("hidden");
+    });
+  } else {
+    addCard.classList.add("locked");
+  }
+
+  grid.appendChild(addCard);
+
+  // Show popup
+  popup.classList.remove("hidden");
+
+  closeBtn.addEventListener("click", () => popup.classList.add("hidden"));
+};
 // Expose modals globally
 window.openLoginModal = openLoginModal;
 window.openSignupModal = openSignupModal;
