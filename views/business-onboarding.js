@@ -29,6 +29,9 @@ export function init({ auth: a, db: d, storage: s }) {
   console.log("📘 Business Onboarding Loaded");
 
   setupNavigation();
+  document.querySelector('[data-next="step-preview"]').addEventListener("click", () => {
+  generatePreview();
+});
   setupPostcodeCheck();
   setupPhotoPreview();
   setupSubmit();
@@ -251,5 +254,53 @@ async function uploadPhotos(id) {
     urls.push(url);
   }
 
+
+ function generatePreview() {
+  const container = document.getElementById("previewContainer");
+  container.innerHTML = "";
+
+  const name = document.getElementById("bizName").value.trim();
+  const category = document.getElementById("bizCategory").value.trim();
+  const desc = document.getElementById("bizDescription").value.trim();
+  const phone = document.getElementById("bizPhone").value.trim();
+  const website = document.getElementById("bizWebsite").value.trim();
+  const town = document.getElementById("bizTown").value.trim();
+  const area = document.getElementById("bizArea").value.trim();
+
+  const logoUrl = logoFile ? URL.createObjectURL(logoFile) : "/assets/default-logo.png";
+
+  let photosHtml = "";
+  photoFiles.forEach(f => {
+    photosHtml += `<img src="${URL.createObjectURL(f)}" class="preview-photo-large">`;
+  });
+
+  container.innerHTML = `
+    <div class="service-card-preview">
+
+      <div class="service-card-header">
+        <img src="${logoUrl}" class="service-card-logo">
+        <div>
+          <h3>${name}</h3>
+          <p>${category} • ${town}</p>
+        </div>
+      </div>
+
+      <p class="service-card-desc">${desc}</p>
+
+      <div class="service-card-gallery">
+        ${photosHtml}
+      </div>
+
+      <div class="service-card-contact">
+        <p><strong>Phone:</strong> ${phone}</p>
+        ${website ? `<p><strong>Website:</strong> ${website}</p>` : ""}
+        <p><strong>Service Area:</strong> ${area}</p>
+      </div>
+
+    </div>
+  `;
+ } 
+  
+  
   return urls;
 }
