@@ -573,6 +573,66 @@ a { text-decoration: none; }
 }
 
 
+
+/* ===============================
+   ACCOUNT ICON BAR
+=============================== */
+#accountHeader {
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  padding: 6px 0;
+}
+
+/* Wrapper for the icons */
+.account-tabs.icon-only {
+  display: flex;
+  gap: 14px;
+  padding: 8px 12px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  scrollbar-width: none; /* Firefox */
+}
+
+.account-tabs.icon-only::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Each icon button */
+.account-tabs.icon-only button {
+  background: #f5f5f5;
+  border: none;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s;
+}
+
+/* Hover effect */
+.account-tabs.icon-only button:hover {
+  background: #e0e0e0;
+}
+
+/* Active (current view) */
+.account-tabs.icon-only button.active {
+  background: #333;
+  color: #fff;
+}
+
+.account-tabs.icon-only button.active svg {
+  stroke: #fff;
+}
+
+/* SVG icons */
+.account-tabs.icon-only svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+}
+
 /* Hide marketplace UI when inside My Ads */
 .view-my-ads .category-bar,
 .view-my-ads .search-bar,
