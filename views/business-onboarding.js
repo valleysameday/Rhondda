@@ -16,25 +16,31 @@ import {
   uploadBytes,
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
 let auth, db, storage;
+let editingService = null; // holds service being edited (if any)
+let isSubmitting = false;
 
 // ===============================================
 // INIT
 // ===============================================
-export function init({ auth: a, db: d, storage: s }) {
+export function init({ auth: a, db: d, storage: s, editService = null }) {
   auth = a;
   db = d;
   storage = s;
+  editingService = editService;
 
-  console.log("📘 Business Onboarding Loaded");
+  console.log("📘 Business Onboarding Loaded", editingService ? "(edit mode)" : "(new)");
 
   setupNavigation();
-  document.querySelector('[data-next="step-preview"]').addEventListener("click", () => {
-  generatePreview();
-});
   setupPostcodeCheck();
   setupPhotoPreview();
   setupSubmit();
+  setupPreviewTrigger();
+
+  if (editingService) {
+    populateEditMode(editingService);
+  }
 }
 
 // ===============================================
@@ -57,9 +63,14 @@ function setupNavigation() {
 }
 
 function showStep(id) {
-  document.querySelectorAll(".onboarding-step").forEach(step => step.classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
-  window.scrollTo(0, 0);
+  document.querySelectorAll(".onboarding-step").forEach(step => {
+    step.classList.add("hidden");
+    step.classList.remove("step-active");
+  });
+  const target = document.getElementById(id);
+  target.classList.remove("hidden");
+  target.classList.add("step-active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 // ===============================================
@@ -78,11 +89,13 @@ function setupPostcodeCheck() {
 
     if (!allowed.includes(prefix)) {
       error.classList.remove("hidden");
+      input.classList.add("field-error");
       e.stopImmediatePropagation();
       return;
     }
 
     error.classList.add("hidden");
+    input.classList.remove("field-error");
   });
 }
 
@@ -97,17 +110,19 @@ function setupPhotoPreview() {
   const photosInput = document.getElementById("bizPhotos");
   const preview = document.getElementById("photoPreview");
 
+  if (!logoInput || !photosInput) return;
+
   logoInput.addEventListener("change", e => {
     logoFile = e.target.files[0] || null;
-    renderPreview();
+    renderThumbPreview();
   });
 
   photosInput.addEventListener("change", e => {
     photoFiles = Array.from(e.target.files).slice(0, 6);
-    renderPreview();
+    renderThumbPreview();
   });
 
-  function renderPreview() {
+  function renderThumbPreview() {
     preview.innerHTML = "";
 
     if (logoFile) {
@@ -127,19 +142,47 @@ function setupPhotoPreview() {
 }
 
 // ===============================================
+// PREVIEW TRIGGER
+// ===============================================
+function setupPreviewTrigger() {
+  const btn = document.querySelector('[data-next="step-preview"]');
+  if (!btn) return;
+
+  btn.addEventListener("click", () => {
+    const valid = validateFormFields();
+    if (!valid) return;
+    generatePreview();
+  });
+}
+
+// ===============================================
 // SUBMIT LISTING
 // ===============================================
 function setupSubmit() {
   const btn = document.getElementById("submitListingBtn");
+  if (!btn) return;
 
   btn.addEventListener("click", async () => {
+    if (isSubmitting) return;
     const user = auth.currentUser;
     if (!user) return alert("You must be logged in.");
 
     const data = collectFormData();
     if (!data) return;
 
-    const listingId = await saveListing(user.uid, data);
+    isSubmitting = true;
+    setButtonLoading(btn, true);
+
+    let listingId = null;
+
+    if (editingService && editingService.id) {
+      listingId = await updateListing(editingService.id, data);
+    } else {
+      listingId = await saveListing(user.uid, data);
+    }
+
+    setButtonLoading(btn, false);
+    isSubmitting = false;
 
     if (!listingId) {
       alert("Something went wrong saving your listing.");
@@ -148,25 +191,60 @@ function setupSubmit() {
 
     showStep("step-success");
 
-    document.getElementById("goToMyBusiness").addEventListener("click", () => {
-      loadView("view-service", { forceInit: true, serviceId: listingId });
-    });
+    const goBtn = document.getElementById("goToMyBusiness");
+    if (goBtn) {
+      goBtn.onclick = () => {
+        loadView("view-service", { forceInit: true, serviceId: listingId });
+      };
+    }
   });
 }
 
+function setButtonLoading(btn, isLoading) {
+  if (isLoading) {
+    btn.dataset.originalText = btn.textContent;
+    btn.textContent = "Saving…";
+    btn.classList.add("btn-loading");
+    btn.disabled = true;
+  } else {
+    btn.textContent = btn.dataset.originalText || "Publish Listing";
+    btn.classList.remove("btn-loading");
+    btn.disabled = false;
+  }
+}
+
 // ===============================================
-// COLLECT FORM DATA
+// COLLECT FORM DATA + VALIDATION
 // ===============================================
 function collectFormData() {
-  const name = document.getElementById("bizName").value.trim();
-  const category = document.getElementById("bizCategory").value.trim();
-  const desc = document.getElementById("bizDescription").value.trim();
-  const phone = document.getElementById("bizPhone").value.trim();
-  const website = document.getElementById("bizWebsite").value.trim();
-  const town = document.getElementById("bizTown").value.trim();
-  const area = document.getElementById("bizArea").value.trim();
+  const nameEl = document.getElementById("bizName");
+  const categoryEl = document.getElementById("bizCategory");
+  const descEl = document.getElementById("bizDescription");
+  const phoneEl = document.getElementById("bizPhone");
+  const websiteEl = document.getElementById("bizWebsite");
+  const townEl = document.getElementById("bizTown");
+  const areaEl = document.getElementById("bizArea");
 
-  if (!name || !category || !desc || !phone || !town) {
+  const name = nameEl.value.trim();
+  const category = categoryEl.value.trim();
+  const desc = descEl.value.trim();
+  const phone = phoneEl.value.trim();
+  const website = websiteEl.value.trim();
+  const town = townEl.value.trim();
+  const area = areaEl.value.trim();
+
+  // reset errors
+  [nameEl, categoryEl, descEl, phoneEl, townEl].forEach(el => el.classList.remove("field-error"));
+
+  let hasError = false;
+
+  if (!name) { nameEl.classList.add("field-error"); hasError = true; }
+  if (!category) { categoryEl.classList.add("field-error"); hasError = true; }
+  if (!desc) { descEl.classList.add("field-error"); hasError = true; }
+  if (!phone) { phoneEl.classList.add("field-error"); hasError = true; }
+  if (!town) { townEl.classList.add("field-error"); hasError = true; }
+
+  if (hasError) {
     alert("Please fill in all required fields.");
     return null;
   }
@@ -179,13 +257,18 @@ function collectFormData() {
     website,
     town,
     area,
-    createdAt: Date.now(),
+    createdAt: editingService?.createdAt || Date.now(),
     isActive: true
   };
 }
 
+function validateFormFields() {
+  const data = collectFormData();
+  return !!data;
+}
+
 // ===============================================
-// SAVE LISTING TO FIRESTORE
+// SAVE NEW LISTING
 // ===============================================
 async function saveListing(uid, data) {
   try {
@@ -195,19 +278,18 @@ async function saveListing(uid, data) {
       ...data,
       ownerUid: uid,
       slug,
-      logoUrl: null,
-      photoUrls: []
+      logoUrl: editingService?.logoUrl || null,
+      photoUrls: editingService?.photoUrls || []
     });
 
     const id = docRef.id;
 
-    // Upload images
     const logoUrl = await uploadLogo(id);
     const photoUrls = await uploadPhotos(id);
 
     await updateDoc(doc(db, "services", id), {
-      logoUrl,
-      photoUrls
+      logoUrl: logoUrl || editingService?.logoUrl || null,
+      photoUrls: photoUrls.length ? photoUrls : (editingService?.photoUrls || [])
     });
 
     return id;
@@ -219,11 +301,36 @@ async function saveListing(uid, data) {
 }
 
 // ===============================================
+// UPDATE EXISTING LISTING
+// ===============================================
+async function updateListing(serviceId, data) {
+  try {
+    const slug = createSlug(data);
+
+    const logoUrl = await uploadLogo(serviceId);
+    const photoUrls = await uploadPhotos(serviceId);
+
+    await updateDoc(doc(db, "services", serviceId), {
+      ...data,
+      slug,
+      logoUrl: logoUrl || editingService?.logoUrl || null,
+      photoUrls: photoUrls.length ? photoUrls : (editingService?.photoUrls || [])
+    });
+
+    return serviceId;
+
+  } catch (err) {
+    console.error("❌ Failed to update listing:", err);
+    return null;
+  }
+}
+
+// ===============================================
 // SLUG GENERATION
 // ===============================================
 function createSlug(data) {
   const clean = str =>
-    str.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    (str || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
   return `${clean(data.category)}/${clean(data.town)}/${clean(data.name)}`;
 }
@@ -254,9 +361,15 @@ async function uploadPhotos(id) {
     urls.push(url);
   }
 
+  return urls;
+}
 
- function generatePreview() {
+// ===============================================
+// PREVIEW GENERATION
+// ===============================================
+function generatePreview() {
   const container = document.getElementById("previewContainer");
+  if (!container) return;
   container.innerHTML = "";
 
   const name = document.getElementById("bizName").value.trim();
@@ -267,12 +380,20 @@ async function uploadPhotos(id) {
   const town = document.getElementById("bizTown").value.trim();
   const area = document.getElementById("bizArea").value.trim();
 
-  const logoUrl = logoFile ? URL.createObjectURL(logoFile) : "/assets/default-logo.png";
+  const logoUrl = logoFile
+    ? URL.createObjectURL(logoFile)
+    : (editingService?.logoUrl || "/assets/default-logo.png");
 
   let photosHtml = "";
-  photoFiles.forEach(f => {
-    photosHtml += `<img src="${URL.createObjectURL(f)}" class="preview-photo-large">`;
-  });
+  if (photoFiles.length) {
+    photoFiles.forEach(f => {
+      photosHtml += `<img src="${URL.createObjectURL(f)}" class="preview-photo-large">`;
+    });
+  } else if (editingService?.photoUrls?.length) {
+    editingService.photoUrls.forEach(u => {
+      photosHtml += `<img src="${u}" class="preview-photo-large">`;
+    });
+  }
 
   container.innerHTML = `
     <div class="service-card-preview">
@@ -299,8 +420,23 @@ async function uploadPhotos(id) {
 
     </div>
   `;
- } 
-  
-  
-  return urls;
+}
+
+// ===============================================
+// EDIT MODE POPULATION
+// ===============================================
+function populateEditMode(service) {
+  document.getElementById("bizName").value = service.name || service.businessName || "";
+  document.getElementById("bizCategory").value = service.category || "";
+  document.getElementById("bizDescription").value = service.description || "";
+  document.getElementById("bizPhone").value = service.phone || "";
+  document.getElementById("bizWebsite").value = service.website || "";
+  document.getElementById("bizTown").value = service.town || "";
+  document.getElementById("bizArea").value = service.area || "";
+
+  const btn = document.getElementById("submitListingBtn");
+  if (btn) btn.textContent = "Save Changes";
+
+  // optional: jump straight to details step in edit mode
+  showStep("step-details");
 }
