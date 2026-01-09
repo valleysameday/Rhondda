@@ -194,6 +194,7 @@ if (accountViews.includes(view)) {
 document.querySelectorAll(".account-tabs button").forEach(btn => {
   btn.classList.toggle("active", btn.dataset.view === view);
 });
+}
 /* =====================================================
    SIDEBAR MENU RENDERER
 ===================================================== */
