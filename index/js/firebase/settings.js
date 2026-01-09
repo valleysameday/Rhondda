@@ -96,6 +96,39 @@ export async function updatePost(postId, data) {
   await updateDoc(doc(db, "posts", postId), data);
 }
 
+/* ============================================================
+   RENEW & UNPUBLISH POSTS
+============================================================ */
+
+// Reset timestamp + reactivate
+export async function renewPost(postId) {
+  console.log("🔄 renewPost()", postId);
+
+  if (!db || !postId) return;
+
+  await updateDoc(doc(db, "posts", postId), {
+    createdAt: Date.now(),
+    status: "active"
+  });
+
+  console.log("✅ Post renewed");
+}
+
+// Mark as expired (auto-unpublish)
+export async function unpublishPost(postId) {
+  console.log("⛔ unpublishPost()", postId);
+
+  if (!db || !postId) return;
+
+  await updateDoc(doc(db, "posts", postId), {
+    status: "expired"
+  });
+
+  console.log("⚠️ Post marked expired");
+}
+
+
+
 export async function deletePost(post) {
   console.log("🗑 deletePost()", post?.id);
 
