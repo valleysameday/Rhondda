@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="/index/css/index-cards.css">
 <link rel="stylesheet" href="/index/css/modals.css">
 <link rel="stylesheet" href="/views/css/services.css">
+<link rel="stylesheet" href="/views/css/manage-business.css">
 </head>
 
 <body>
@@ -499,7 +500,21 @@
     </p>
   </div>
 </footer>
+<!-- ============================
+     MANAGE MY BUSINESS POPUP
+============================= -->
+<div id="manageBusinessPopup" class="manage-popup hidden">
+  <div class="manage-popup-inner">
 
+    <div class="manage-popup-header">
+      <h2>My Business Listings</h2>
+      <button id="closeManagePopup" class="close-manage">&times;</button>
+    </div>
+
+    <div id="manageBusinessGrid" class="manage-grid"></div>
+
+  </div>
+</div>
 <!-- SPA + App Logic -->
 <script type="module" src="/index/js/main.js"></script>
 </body>
