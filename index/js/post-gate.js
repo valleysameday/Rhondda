@@ -210,69 +210,64 @@ function initPostGate() {
     }
   }
 
-  /* ==============================
-     SUBMIT POST
-  ============================== */
-  submitBtn.addEventListener('click', async () => {
+/* ==============================
+   SUBMIT POST (CLEAN VERSION)
+============================== */
+submitBtn.addEventListener('click', async () => {
 
-    if (!auth.currentUser) {
-      return showToast("Please log in to post an ad.", "error");
-    }
+  if (!auth.currentUser) {
+    return showToast("Please log in to post an ad.", "error");
+  }
 
-    try {
-      const user = await getUser(auth.currentUser.uid);
-      const isBusiness = user?.isBusiness === true;
+  try {
+    const features = [...document.querySelectorAll('.property-features input:checked')]
+      .map(i => i.dataset.feature);
 
-      const features = [...document.querySelectorAll('.property-features input:checked')]
-        .map(i => i.dataset.feature);
+    const post = {
+      userId: auth.currentUser.uid,
 
-      const post = {
-        userId: auth.currentUser.uid,
-        businessId: isBusiness ? auth.currentUser.uid : null,
-        isBusiness,
+      category: selectedCategory,
+      subCategory: selectedSubCategory,
 
-        category: selectedCategory,
-        subCategory: selectedSubCategory,
+      title: titleInput.value.trim(),
+      description: descInput.value.trim(),
+      createdAt: Date.now(),
 
-        title: titleInput.value.trim(),
-        description: descInput.value.trim(),
-        createdAt: Date.now(),
+      contact: contactInput.value.trim(),
+      location: locationInput.value.trim(),
 
-        contact: contactInput.value.trim(),
-        location: locationInput.value.trim(),
+      price: Number(priceInput.value) || null,
+      area: document.getElementById("postArea")?.value || null,
 
-        price: Number(priceInput.value) || null,
-        area: document.getElementById("postArea")?.value || null,
+      propertyType,
+      rentFrequency,
+      propertyFeatures: features,
 
-        propertyType,
-        rentFrequency,
-        propertyFeatures: features,
+      images: [],
+      image: null
+    };
 
-        images: [],
-        image: null
-      };
-
-      if (imagesInput.files.length) {
-        for (const file of imagesInput.files) {
-          const compressed = await compressImage(file);
-          const url = await uploadPostImage(compressed, auth.currentUser.uid);
-          post.images.push(url);
-        }
-        post.image = post.images[0];
+    // Upload images
+    if (imagesInput.files.length) {
+      for (const file of imagesInput.files) {
+        const compressed = await compressImage(file);
+        const url = await uploadPostImage(compressed, auth.currentUser.uid);
+        post.images.push(url);
       }
-
-      await addPost(post);
-
-      showToast("Your ad is live!", "success");
-      document.querySelector('[data-action="close-screens"]').click();
-      loadView("home");
-
-    } catch (err) {
-      console.error(err);
-      showToast("Failed to post ad.", "error");
+      post.image = post.images[0];
     }
-  });
 
+    await addPost(post);
+
+    showToast("Your ad is live!", "success");
+    document.querySelector('[data-action="close-screens"]').click();
+    loadView("home");
+
+  } catch (err) {
+    console.error(err);
+    showToast("Failed to post ad.", "error");
+  }
+});
   /* ==============================
      IMAGE COMPRESSION
   ============================== */
