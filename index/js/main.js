@@ -129,14 +129,13 @@ export async function loadView(view, options = {}) {
   if (!app) return;
 
   // Hide all views
-  app.querySelectorAll(".view").forEach(v => v.hidden = true);
+  app.querySelectorAll(".view").forEach(v => (v.hidden = true));
 
   let target = document.getElementById(`view-${view}`);
   if (!target) {
     target = document.createElement("div");
     target.id = `view-${view}`;
-    target.className = "view";
-    target.classList.add(`view-${view}`);
+    target.className = "view view-" + view;
     target.hidden = true;
     app.appendChild(target);
   }
@@ -156,44 +155,42 @@ export async function loadView(view, options = {}) {
         const { initFeed } = await import("/index/js/feed.js");
         initFeed({ db });
       }
-
     } catch (err) {
       console.error("❌ View JS error:", err);
     }
   }
 
   target.hidden = false;
-// ===============================
-// ACCOUNT HEADER VISIBILITY LOGIC
-// ===============================
-const accountHeader = document.getElementById("accountHeader");
 
-// All category bars (main + subcategories)
-const categoryBars = document.querySelectorAll(".rctx-tabs");
+  /* ===============================
+     ACCOUNT HEADER VISIBILITY LOGIC
+  =============================== */
+  const accountHeader = document.getElementById("accountHeader");
+  const categoryBars = document.querySelectorAll(".rctx-tabs");
 
-// Views that should show the account header
-const accountViews = [
-  "my-ads",
-  "favourites",
-  "list-business",
-  "chat-list",
-  "account-details",
-  "stats"
-];
+  const accountViews = [
+    "my-ads",
+    "favourites",
+    "list-business",
+    "chat-list",
+    "account-details",
+    "stats"
+  ];
 
-if (accountViews.includes(view)) {
-  accountHeader?.classList.remove("hidden");
-  categoryBars.forEach(el => el.classList.add("hidden"));
-} else {
-  accountHeader?.classList.add("hidden");
-  categoryBars.forEach(el => el.classList.remove("hidden"));
+  if (accountViews.includes(view)) {
+    accountHeader?.classList.remove("hidden");
+    categoryBars.forEach(el => el.classList.add("hidden"));
+  } else {
+    accountHeader?.classList.add("hidden");
+    categoryBars.forEach(el => el.classList.remove("hidden"));
+  }
+
+  // Highlight active account tab
+  document.querySelectorAll(".account-tabs button").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.view === view);
+  });
 }
 
-// Highlight active icon
-document.querySelectorAll(".account-tabs button").forEach(btn => {
-  btn.classList.toggle("active", btn.dataset.view === view);
-});
-}
 /* =====================================================
    SIDEBAR MENU RENDERER
 ===================================================== */
@@ -211,18 +208,18 @@ function renderSideMenu() {
         { label: "Post an Ad", action: () => document.getElementById("post-ad-btn")?.click() },
         { label: "Messages", action: () => loadView("chat-list") },
         { label: "Favourites", action: () => loadView("favourites") },
-      { label: "My Ads", action: () => loadView("my-ads") },
-      { label: "My Details", action: () => loadView("account-details") },
-      { label: "List My Business", action: () => handleListMyBusiness() },
-      { label: "Stats", action: () => loadView("stats") },
+        { label: "My Ads", action: () => loadView("my-ads") },
+        { label: "My Details", action: () => loadView("account-details") },
+        { label: "List My Business", action: () => handleListMyBusiness() },
+        { label: "Stats", action: () => loadView("stats") },
         { label: "Help & Contact", action: () => loadView("help") },
         { label: "Logout", action: () => auth.signOut() }
       ]
     : [
         { label: "Home", action: () => loadView("home") },
         { label: "Post an Ad", action: () => openLoginModal() },
-     { label: "List My Business", action: () => openLoginModal() },
-      { label: "Stats", action: () => openLoginModal() },
+        { label: "List My Business", action: () => openLoginModal() },
+        { label: "Stats", action: () => openLoginModal() },
         { label: "Help & Contact", action: () => loadView("help") },
         { label: "Login", action: () => openLoginModal() }
       ];
@@ -236,13 +233,19 @@ function renderSideMenu() {
         <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
       </svg>
     `;
+
     item.addEventListener("click", () => {
       document.getElementById("sideMenu")?.classList.add("hidden");
       opt.action();
     });
+
     menu.appendChild(item);
   });
 }
+
+/* =====================================================
+   LIST MY BUSINESS HANDLER
+===================================================== */
 async function handleListMyBusiness() {
   const user = auth.currentUser;
 
@@ -251,14 +254,11 @@ async function handleListMyBusiness() {
     return;
   }
 
-  // Check if user already has a business listing
   const services = await settingsModule.fsGetUserServices(user.uid);
 
   if (!services.length) {
-    // No listings → start onboarding
     loadView("business-onboarding", { forceInit: true });
   } else {
-    // Has listings → open manage popup
     openManageMyBusinessPopup(services);
   }
 }
