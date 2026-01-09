@@ -326,7 +326,7 @@ function initPostGate() {
         return;
       }
 
-      confirmPostBtn.disabled = true;
+      confirmPostBtn.classList.add("loading");
       const originalText = confirmPostBtn.textContent;
       confirmPostBtn.textContent = "Uploading…";
 
@@ -378,8 +378,8 @@ function initPostGate() {
         showToast("Failed to post ad.", "error");
       }
 
-      confirmPostBtn.disabled = false;
-      confirmPostBtn.textContent = originalText;
+      confirmPostBtn.classList.remove("loading");
+confirmPostBtn.textContent = originalText;
     });
   }
 
