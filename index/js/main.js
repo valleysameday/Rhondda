@@ -136,6 +136,7 @@ export async function loadView(view, options = {}) {
     target = document.createElement("div");
     target.id = `view-${view}`;
     target.className = "view";
+    target.classList.add(`view-${view}`);
     target.hidden = true;
     app.appendChild(target);
   }
