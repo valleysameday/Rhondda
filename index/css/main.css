@@ -571,3 +571,18 @@ a { text-decoration: none; }
   font-weight: bold;
   margin-top: 4px;
 }
+
+
+/* Hide marketplace UI when inside My Ads */
+.view-my-ads .category-bar,
+.view-my-ads .search-bar,
+.view-my-ads .filters-bar,
+.view-my-ads .home-header,
+.view-my-ads .home-categories {
+  display: none !important;
+}
+
+/* Give My Ads a clean account-style layout */
+.view-my-ads {
+  padding-top: 60px; /* keeps spacing under header */
+}
