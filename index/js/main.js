@@ -100,12 +100,7 @@ let settingsModule = null;
 ===================================================== */
 window.timeAgo = function (timestamp) {
   if (!timestamp) return "";
-window.daysSince = function (timestamp) {
-  if (!timestamp) return 999; // treat missing timestamps as expired
 
-  const diff = Date.now() - timestamp;
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
-};
   const diff = Date.now() - timestamp;
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
@@ -119,6 +114,16 @@ window.daysSince = function (timestamp) {
   if (hours < 24) return `${hours} hours ago`;
   if (days === 1) return "Yesterday";
   return `${days} days ago`;
+};
+
+/* =====================================================
+   DAYS SINCE (for expiry logic)
+===================================================== */
+window.daysSince = function (timestamp) {
+  if (!timestamp) return 999; // treat missing timestamps as expired
+
+  const diff = Date.now() - timestamp;
+  return Math.floor(diff / (1000 * 60 * 60 * 24));
 };
 
 /* =====================================================
