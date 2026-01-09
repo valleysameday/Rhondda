@@ -57,8 +57,19 @@ export async function fetchFeedPosts({ lastDoc = null, limitCount = 50 } = {}) {
 
   const postsRef = collection(db, "posts");
   const q = lastDoc
-    ? query(postsRef, orderBy("createdAt", "desc"), startAfter(lastDoc), limit(limitCount))
-    : query(postsRef, orderBy("createdAt", "desc"), limit(limitCount));
+  ? query(
+      postsRef,
+      where("status", "==", "active"),
+      orderBy("createdAt", "desc"),
+      startAfter(lastDoc),
+      limit(limitCount)
+    )
+  : query(
+      postsRef,
+      where("status", "==", "active"),
+      orderBy("createdAt", "desc"),
+      limit(limitCount)
+    );
 
   const snap = await getDocs(q);
 
@@ -85,8 +96,12 @@ export async function getPost(postId) {
 }
 
 export async function addPost(post) {
-  console.log("➕ addPost()", post);
-  return await addDoc(collection(db, "posts"), post);
+  return await addDoc(collection(db, "posts"), {
+    ...post,
+    status: "active",
+    createdAt: Date.now(),
+    views: 0
+  });
 }
 
 export async function updatePost(postId, data) {
