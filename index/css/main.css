@@ -523,3 +523,51 @@ a { text-decoration: none; }
 .site-footer {
   margin-top: auto;
 }
+
+
+.my-ads-container {
+  padding: 20px;
+}
+
+.my-ads-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #444;
+}
+
+.my-ads-empty h3 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.my-ads-empty p {
+  margin: 6px 0;
+}
+
+.my-ads-list {
+  padding: 10px;
+}
+
+.my-ad-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.my-ad-thumb {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.my-ad-info h4 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.my-ad-info .price {
+  font-weight: bold;
+  margin-top: 4px;
+}
