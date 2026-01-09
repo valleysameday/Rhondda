@@ -156,3 +156,67 @@
 #step-success p {
   margin-bottom: 16px;
 }
+/* ============================
+   PREVIEW CARD (matches directory)
+============================ */
+
+.service-card-preview {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  margin-top: 10px;
+}
+
+.service-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.service-card-logo {
+  width: 70px;
+  height: 70px;
+  border-radius: 14px;
+  object-fit: cover;
+  border: 2px solid #0f766e;
+}
+
+.service-card-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #0f172a;
+}
+
+.service-card-header p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.service-card-desc {
+  margin: 12px 0;
+  font-size: 0.95rem;
+  color: #334155;
+}
+
+.service-card-gallery {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.preview-photo-large {
+  width: 90px;
+  height: 90px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+}
+
+.service-card-contact p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+  color: #334155;
+}
