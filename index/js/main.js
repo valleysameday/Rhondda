@@ -168,7 +168,7 @@ document.querySelectorAll(".sub-tabs").forEach(el =>
      ACCOUNT HEADER VISIBILITY LOGIC
   =============================== */
   const accountHeader = document.getElementById("accountHeader");
-  const categoryBars = document.querySelectorAll(".main-tabs");
+  const categoryBars = document.querySelectorAll(".main-tabs, .rctx-search");
 
   const accountViews = [
     "my-ads",
