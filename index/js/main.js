@@ -310,6 +310,33 @@ getFirebase().then(async fb => {
       if (e.target.closest("#auth-logged-out")) openLoginModal(auth, db);
     });
 
+
+   const accountHeader = document.getElementById("accountHeader");
+const marketplaceUI = document.getElementById("marketplaceUI");
+
+const accountViews = [
+  "my-ads",
+  "favourites",
+  "list-business",
+  "chat-list",
+  "account-details",
+  "stats"
+];
+
+if (accountViews.includes(view)) {
+  accountHeader.classList.remove("hidden");
+  marketplaceUI.classList.add("hidden");
+} else {
+  accountHeader.classList.add("hidden");
+  marketplaceUI.classList.remove("hidden");
+}
+
+// highlight active icon
+document.querySelectorAll(".account-tabs button").forEach(btn => {
+  btn.classList.toggle("active", btn.dataset.view === view);
+}); 
+    
+    
     // LOGO → HOME
     document.addEventListener("click", e => {
       if (e.target.closest(".rctx-logo")) {
