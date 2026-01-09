@@ -379,6 +379,18 @@ getFirebase().then(async fb => {
         return;
       }
 
+// ACCOUNT TABS → LOAD VIEW
+document.addEventListener("click", e => {
+  const btn = e.target.closest(".account-tabs button");
+  if (!btn) return;
+
+  const view = btn.dataset.view;
+  if (view) {
+    loadView(view);
+    window.scrollTo(0, 0);
+  }
+});
+      
       document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
 
       const postModal = document.getElementById("posts-grid");
