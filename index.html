@@ -78,43 +78,7 @@
 <button id="openAdminDashboard" style="display:none;">Admin</button>
 </header>
 
-<!-- CATEGORY TABS -->
-<nav class="rctx-tabs">
-  <button class="category-btn active" data-category="all">All Ads</button>
-  <button class="category-btn" data-category="free">Freebies</button>
-  <button class="category-btn" data-category="jobs">Jobs & Gigs</button>
-  <button class="category-btn" data-category="property">Property</button>
-  <button class="category-btn" data-category="vehicles" id="cat-vehicles">Cars & Vehicles</button>
-  <button class="category-btn" data-category="homegarden">Home & Garden</button>
-  <button class="category-btn" data-category="pets">Pet Supplies</button>
-  <button class="category-btn" data-category="services">Services</button>
-  <button class="category-btn" data-category="community">Community</button>
-</nav>
-
-<!-- SUB‑CATEGORY TABS (Hidden until Cars & Vehicles is selected) -->
-<nav id="sub-vehicles" class="rctx-tabs sub-tabs hidden">
-  <button class="category-btn active" data-category="cars">Cars</button>
-  <button class="category-btn" data-category="vans">Vans</button>
-  <button class="category-btn" data-category="motorbikes">Motorbikes</button>
-  <button class="category-btn" data-category="parts">Parts</button>
-  <button class="category-btn" data-category="othervehicles">Other</button>
-</nav>
-<!-- SUB‑CATEGORY TABS (Hidden until Property is selected) -->
-<nav id="sub-property" class="rctx-tabs sub-tabs hidden">
-  <button class="category-btn active" data-category="property-sale">For Sale</button>
-  <button class="category-btn" data-category="property-rent">To Rent</button>
-</nav>
-  <!-- ================= SIDE MENU ================= -->
-<div id="sideMenu" class="side-menu hidden">
-  <div class="menu-content">
-    <button class="close-menu">&times;</button>
-    <div id="menuOptions"></div>
-  </div>
-</div>
-  
-
-  
- <!-- ACCOUNT HEADER (shows only on account pages) -->
+<!-- ACCOUNT HEADER (shows only on account pages) -->
 <div id="accountHeader" class="hidden">
 
   <div class="account-tabs icon-only">
@@ -166,7 +130,41 @@
 
   </div>
 
-</div> 
+</div>
+  
+  <!-- CATEGORY TABS -->
+<nav class="rctx-tabs">
+  <button class="category-btn active" data-category="all">All Ads</button>
+  <button class="category-btn" data-category="free">Freebies</button>
+  <button class="category-btn" data-category="jobs">Jobs & Gigs</button>
+  <button class="category-btn" data-category="property">Property</button>
+  <button class="category-btn" data-category="vehicles" id="cat-vehicles">Cars & Vehicles</button>
+  <button class="category-btn" data-category="homegarden">Home & Garden</button>
+  <button class="category-btn" data-category="pets">Pet Supplies</button>
+  <button class="category-btn" data-category="services">Services</button>
+  <button class="category-btn" data-category="community">Community</button>
+</nav>
+
+<!-- SUB‑CATEGORY TABS (Hidden until Cars & Vehicles is selected) -->
+<nav id="sub-vehicles" class="rctx-tabs sub-tabs hidden">
+  <button class="category-btn active" data-category="cars">Cars</button>
+  <button class="category-btn" data-category="vans">Vans</button>
+  <button class="category-btn" data-category="motorbikes">Motorbikes</button>
+  <button class="category-btn" data-category="parts">Parts</button>
+  <button class="category-btn" data-category="othervehicles">Other</button>
+</nav>
+<!-- SUB‑CATEGORY TABS (Hidden until Property is selected) -->
+<nav id="sub-property" class="rctx-tabs sub-tabs hidden">
+  <button class="category-btn active" data-category="property-sale">For Sale</button>
+  <button class="category-btn" data-category="property-rent">To Rent</button>
+</nav>
+  <!-- ================= SIDE MENU ================= -->
+<div id="sideMenu" class="side-menu hidden">
+  <div class="menu-content">
+    <button class="close-menu">&times;</button>
+    <div id="menuOptions"></div>
+  </div>
+</div>
   <!-- ================= MAIN (SPA CONTAINER) ================= -->
 <main id="app">
   <div id="view-home" class="view"></div>
