@@ -164,7 +164,36 @@ export async function loadView(view, options = {}) {
 
   target.hidden = false;
 }
+// ===============================
+// ACCOUNT HEADER VISIBILITY LOGIC
+// ===============================
+const accountHeader = document.getElementById("accountHeader");
 
+// All category bars (main + subcategories)
+const categoryBars = document.querySelectorAll(".rctx-tabs");
+
+// Views that should show the account header
+const accountViews = [
+  "my-ads",
+  "favourites",
+  "list-business",
+  "chat-list",
+  "account-details",
+  "stats"
+];
+
+if (accountViews.includes(view)) {
+  accountHeader?.classList.remove("hidden");
+  categoryBars.forEach(el => el.classList.add("hidden"));
+} else {
+  accountHeader?.classList.add("hidden");
+  categoryBars.forEach(el => el.classList.remove("hidden"));
+}
+
+// Highlight active icon
+document.querySelectorAll(".account-tabs button").forEach(btn => {
+  btn.classList.toggle("active", btn.dataset.view === view);
+});
 /* =====================================================
    SIDEBAR MENU RENDERER
 ===================================================== */
@@ -309,32 +338,6 @@ getFirebase().then(async fb => {
     document.addEventListener("click", e => {
       if (e.target.closest("#auth-logged-out")) openLoginModal(auth, db);
     });
-
-
-   const accountHeader = document.getElementById("accountHeader");
-const marketplaceUI = document.getElementById("marketplaceUI");
-
-const accountViews = [
-  "my-ads",
-  "favourites",
-  "list-business",
-  "chat-list",
-  "account-details",
-  "stats"
-];
-
-if (accountViews.includes(view)) {
-  accountHeader.classList.remove("hidden");
-  marketplaceUI.classList.add("hidden");
-} else {
-  accountHeader.classList.add("hidden");
-  marketplaceUI.classList.remove("hidden");
-}
-
-// highlight active icon
-document.querySelectorAll(".account-tabs button").forEach(btn => {
-  btn.classList.toggle("active", btn.dataset.view === view);
-}); 
     
     
     // LOGO → HOME
