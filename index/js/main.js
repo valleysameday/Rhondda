@@ -163,7 +163,6 @@ export async function loadView(view, options = {}) {
   }
 
   target.hidden = false;
-}
 // ===============================
 // ACCOUNT HEADER VISIBILITY LOGIC
 // ===============================
