@@ -130,6 +130,7 @@ window.daysSince = function (timestamp) {
    SPA VIEW LOADER
 ===================================================== */
 export async function loadView(view, options = {}) {
+  window.currentViewOptions = options;
   if (view === "home") options.forceInit = true;
   if (window.currentView === view && !options.forceInit) return;
 
