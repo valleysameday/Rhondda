@@ -6,6 +6,15 @@ import {
   deletePost
 } from "/index/js/firebase/settings.js";
 
+import {
+  collection,
+  doc,
+  setDoc,
+  addDoc
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+import { firebaseDb } from "/index/js/firebase/init.js";
+
 /* =====================================================
    STATE
 ===================================================== */
@@ -78,15 +87,15 @@ export async function init({ auth }) {
    RENDER SELLER
 ===================================================== */
 function renderSeller(seller) {
-  sellerNameEl.textContent = seller && seller.name ? seller.name : "Seller";
+  sellerNameEl.textContent = seller?.name || "Seller";
 
   sellerPostingSinceEl.textContent =
-    seller && seller.createdAt
+    seller?.createdAt
       ? `Posting since ${new Date(seller.createdAt).toLocaleDateString("en-GB")}`
       : "Posting since unknown";
 
   sellerLastActiveEl.textContent =
-    seller && seller.lastActive
+    seller?.lastActive
       ? `Active ${new Date(seller.lastActive).toLocaleDateString("en-GB")}`
       : "Active recently";
 }
@@ -133,7 +142,7 @@ function renderPost(post) {
 }
 
 /* =====================================================
-   IMAGE GALLERY — MAIN VIEWPORT
+   IMAGE GALLERY
 ===================================================== */
 function updateMainImage(index) {
   if (index < 0) index = 0;
@@ -144,28 +153,7 @@ function updateMainImage(index) {
   galleryCount.textContent = `${currentIndex + 1} / ${galleryImages.length}`;
 }
 
-/* -------------------------------
-   MAIN IMAGE SWIPE
--------------------------------- */
-let swipeStartX = 0;
-
-mainImage.addEventListener("touchstart", function (e) {
-  swipeStartX = e.touches[0].clientX;
-}, { passive: true });
-
-mainImage.addEventListener("touchend", function (e) {
-  const diff = e.changedTouches[0].clientX - swipeStartX;
-
-  if (diff > 50) updateMainImage(currentIndex - 1);   // swipe right
-  if (diff < -50) updateMainImage(currentIndex + 1);  // swipe left
-});
-
-/* -------------------------------
-   TAP → OPEN LIGHTBOX
--------------------------------- */
-mainImage.addEventListener("click", function () {
-  openLightbox(currentIndex);
-});
+mainImage.addEventListener("click", () => openLightbox(currentIndex));
 
 /* =====================================================
    LIGHTBOX
@@ -182,43 +170,7 @@ function closeLightbox() {
   document.body.style.overflow = "";
 }
 
-if (lightboxClose) {
-  lightboxClose.addEventListener("click", closeLightbox);
-}
-
-lightbox.addEventListener("click", function (e) {
-  if (e.target === lightbox) closeLightbox();
-});
-
-/* -------------------------------
-   LIGHTBOX TAP → NEXT IMAGE
--------------------------------- */
-lightboxImg.addEventListener("click", function () {
-  currentIndex++;
-  if (currentIndex >= galleryImages.length) currentIndex = 0;
-  lightboxImg.src = galleryImages[currentIndex];
-});
-
-/* -------------------------------
-   LIGHTBOX SWIPE
--------------------------------- */
-let lightboxStartX = 0;
-
-lightboxImg.addEventListener("touchstart", function (e) {
-  lightboxStartX = e.touches[0].clientX;
-}, { passive: true });
-
-lightboxImg.addEventListener("touchend", function (e) {
-  const diff = e.changedTouches[0].clientX - lightboxStartX;
-
-  if (diff > 50) currentIndex--;   // swipe right
-  if (diff < -50) currentIndex++;  // swipe left
-
-  if (currentIndex < 0) currentIndex = galleryImages.length - 1;
-  if (currentIndex >= galleryImages.length) currentIndex = 0;
-
-  lightboxImg.src = galleryImages[currentIndex];
-});
+lightboxClose.addEventListener("click", closeLightbox);
 
 /* =====================================================
    ACTIONS
@@ -275,6 +227,86 @@ function bindActions(auth, post) {
       followBtn.textContent = following ? "Following" : "Follow";
     });
   };
+
+  /* SEND QUICK MESSAGE (NO REDIRECT) */
+  const sendQuickMessageBtn = document.getElementById("sendQuickMessageBtn");
+  const quickMessageInput = document.getElementById("quickMessage");
+
+  if (sendQuickMessageBtn) {
+    sendQuickMessageBtn.onclick = async () => {
+      requireLogin(auth, async () => {
+        const text = quickMessageInput.value.trim();
+        if (!text) {
+          showToast("Message cannot be empty");
+          return;
+        }
+
+        try {
+          const uid = auth.currentUser.uid;
+          const convoId = [uid, sellerUid].sort().join("_");
+
+          await setDoc(
+            doc(firebaseDb, "conversations", convoId),
+            {
+              participants: [uid, sellerUid],
+              updatedAt: Date.now(),
+              lastMessage: text,
+              lastMessageSender: uid
+            },
+            { merge: true }
+          );
+
+          await addDoc(
+            collection(firebaseDb, "conversations", convoId, "messages"),
+            {
+              senderId: uid,
+              text,
+              createdAt: Date.now(),
+              seen: false
+            }
+          );
+
+          showToast("Message sent");
+          quickMessageInput.value = "";
+
+        } catch (err) {
+          console.error("Message send failed", err);
+          showToast("Failed to send message");
+        }
+      });
+    };
+  }
+
+  /* DELETE POST */
+  const deleteBtn = document.getElementById("deletePostBtn");
+  if (deleteBtn) {
+    const isOwner = auth.currentUser && auth.currentUser.uid === sellerUid;
+
+    if (!isOwner) {
+      deleteBtn.style.display = "none";
+    } else {
+      deleteBtn.style.display = "inline-flex";
+      deleteBtn.onclick = async () => {
+        const ok = confirm("Are you sure you want to delete this ad?");
+        if (!ok) return;
+
+        try {
+          const fullPost = await getPost(postId);
+          await deletePost(fullPost);
+
+          showToast("Ad deleted");
+
+          import("/index/js/main.js").then(({ loadView }) => {
+            loadView("my-ads", { forceInit: true });
+          });
+
+        } catch (err) {
+          console.error("Delete failed", err);
+          showToast("Failed to delete ad");
+        }
+      };
+    }
+  }
 }
 
 /* =====================================================
