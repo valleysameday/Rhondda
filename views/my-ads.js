@@ -1,5 +1,5 @@
 import { getSellerPosts, deletePost, renewPost } from "/index/js/firebase/settings.js";
-
+import { loadView } from "/index/js/main.js";
 export function init({ auth }) {
   loadMyAds(auth);
 
