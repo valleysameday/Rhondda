@@ -9,10 +9,14 @@ export async function init({ auth, db, storage }) {
     return;
   }
 
+  let failCount = 0;
+  const feedback = document.getElementById("editFeedback");
+
   // Load post data
   const post = await getPost(postId);
   if (!post) {
-    console.warn("❌ Post not found");
+    feedback.textContent = "Unable to load this ad. Please try again.";
+    feedback.className = "edit-feedback error";
     return;
   }
 
@@ -23,13 +27,38 @@ export async function init({ auth, db, storage }) {
 
   // Save button
   document.getElementById("savePostBtn").addEventListener("click", async () => {
-    await updatePost(postId, {
-      title: document.getElementById("editTitle").value,
-      description: document.getElementById("editDescription").value,
-      category: document.getElementById("editCategory").value
-    });
+    feedback.textContent = "";
+    feedback.className = "edit-feedback";
 
-    loadView("my-ads", { forceInit: true });
+    try {
+      await updatePost(postId, {
+        title: document.getElementById("editTitle").value,
+        description: document.getElementById("editDescription").value,
+        category: document.getElementById("editCategory").value
+      });
+
+      feedback.textContent = "Your ad has been updated successfully.";
+      feedback.className = "edit-feedback success";
+
+      setTimeout(() => {
+        loadView("my-ads", { forceInit: true });
+      }, 800);
+
+    } catch (err) {
+      failCount++;
+      feedback.textContent = "Failed to update your ad. Please try again.";
+      feedback.className = "edit-feedback error";
+
+      // After 3 failures → show contact button
+      if (failCount >= 3) {
+        const btn = document.createElement("button");
+        btn.textContent = "Contact Support";
+        btn.className = "edit-contact-btn";
+        btn.addEventListener("click", () => loadView("contact", { forceInit: true }));
+        feedback.appendChild(document.createElement("br"));
+        feedback.appendChild(btn);
+      }
+    }
   });
 
   // Cancel button
