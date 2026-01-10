@@ -2,8 +2,12 @@ import {
   getPost,
   getUser,
   toggleFollowSeller,
-  trackContactClick
+  trackContactClick,
+  updatePost,
+  toggleSavePost
 } from "/index/js/firebase/settings.js";
+
+import { loadView } from "/index/js/main.js";
 
 /* =====================================================
    STATE
@@ -20,6 +24,10 @@ const titleEl = document.getElementById("postTitle");
 const priceEl = document.getElementById("postPrice");
 const descEl = document.getElementById("postDescription");
 const postTimeEl = document.getElementById("postTime");
+const postViewsEl = document.getElementById("postViews");
+
+const postCategoryEl = document.getElementById("postCategory");
+const postAreaEl = document.getElementById("postArea");
 
 const mainImage = document.getElementById("mainImage");
 const galleryCount = document.getElementById("galleryCount");
@@ -32,23 +40,15 @@ const sellerNameEl = document.getElementById("sellerName");
 const sellerPostingSinceEl = document.getElementById("sellerPostingSince");
 const sellerLastActiveEl = document.getElementById("sellerLastActive");
 
+const saveBtn = document.getElementById("saveBtn");
+const shareBtn = document.getElementById("shareBtn");
+const reportBtn = document.getElementById("reportBtn");
+const moreFromSellerBtn = document.getElementById("moreFromSellerBtn");
+
 /* LIGHTBOX */
 const lightbox = document.getElementById("lightbox");
 const lightboxImg = document.getElementById("lightboxImage");
 const lightboxClose = document.getElementById("lightboxClose");
-
-/* =====================================================
-   LOGIN GUARD
-===================================================== */
-function requireLogin(auth, cb) {
-  if (auth.currentUser) return cb();
-
-  showToast("Please log in to contact the seller");
-  setTimeout(() => {
-    const login = document.getElementById("login");
-    if (login) login.style.display = "flex";
-  }, 1200);
-}
 
 /* =====================================================
    INIT
@@ -71,21 +71,26 @@ export async function init({ auth }) {
   renderSeller(seller);
   renderPost(post);
   bindActions(auth, post);
+
+  // Increment views
+  await updatePost(postId, {
+    "stats.views": (post.stats?.views || 0) + 1
+  });
 }
 
 /* =====================================================
    RENDER SELLER
 ===================================================== */
 function renderSeller(seller) {
-  sellerNameEl.textContent = seller && seller.name ? seller.name : "Seller";
+  sellerNameEl.textContent = seller?.name || "Seller";
 
   sellerPostingSinceEl.textContent =
-    seller && seller.createdAt
+    seller?.createdAt
       ? `Posting since ${new Date(seller.createdAt).toLocaleDateString("en-GB")}`
       : "Posting since unknown";
 
   sellerLastActiveEl.textContent =
-    seller && seller.lastActive
+    seller?.lastActive
       ? `Active ${new Date(seller.lastActive).toLocaleDateString("en-GB")}`
       : "Active recently";
 }
@@ -114,9 +119,11 @@ function renderPost(post) {
   priceEl.textContent = post.price ? `£${post.price}` : "Free";
   descEl.textContent = post.description || "No description provided.";
 
-  if (post.createdAt) {
-    postTimeEl.textContent = formatPostTime(post.createdAt);
-  }
+  postTimeEl.textContent = post.createdAt ? formatPostTime(post.createdAt) : "";
+  postViewsEl.textContent = `${post.stats?.views || 0} views`;
+
+  postCategoryEl.textContent = post.category || "General";
+  postAreaEl.textContent = post.area || "Rhondda";
 
   galleryImages = [
     ...(post.imageUrls || []),
@@ -132,7 +139,7 @@ function renderPost(post) {
 }
 
 /* =====================================================
-   IMAGE GALLERY — MAIN VIEWPORT
+   IMAGE GALLERY
 ===================================================== */
 function updateMainImage(index) {
   if (index < 0) index = 0;
@@ -143,32 +150,9 @@ function updateMainImage(index) {
   galleryCount.textContent = `${currentIndex + 1} / ${galleryImages.length}`;
 }
 
-/* -------------------------------
-   MAIN IMAGE SWIPE
--------------------------------- */
-let swipeStartX = 0;
+mainImage.addEventListener("click", () => openLightbox(currentIndex));
 
-mainImage.addEventListener("touchstart", function (e) {
-  swipeStartX = e.touches[0].clientX;
-}, { passive: true });
-
-mainImage.addEventListener("touchend", function (e) {
-  const diff = e.changedTouches[0].clientX - swipeStartX;
-
-  if (diff > 50) updateMainImage(currentIndex - 1);   // swipe right
-  if (diff < -50) updateMainImage(currentIndex + 1);  // swipe left
-});
-
-/* -------------------------------
-   TAP → OPEN LIGHTBOX
--------------------------------- */
-mainImage.addEventListener("click", function () {
-  openLightbox(currentIndex);
-});
-
-/* =====================================================
-   LIGHTBOX
-===================================================== */
+/* LIGHTBOX */
 function openLightbox(index) {
   currentIndex = index;
   lightboxImg.src = galleryImages[currentIndex];
@@ -181,48 +165,42 @@ function closeLightbox() {
   document.body.style.overflow = "";
 }
 
-if (lightboxClose) {
-  lightboxClose.addEventListener("click", closeLightbox);
-}
-
-lightbox.addEventListener("click", function (e) {
-  if (e.target === lightbox) closeLightbox();
-});
-
-/* -------------------------------
-   LIGHTBOX TAP → NEXT IMAGE
--------------------------------- */
-lightboxImg.addEventListener("click", function () {
-  currentIndex++;
-  if (currentIndex >= galleryImages.length) currentIndex = 0;
-  lightboxImg.src = galleryImages[currentIndex];
-});
-
-/* -------------------------------
-   LIGHTBOX SWIPE
--------------------------------- */
-let lightboxStartX = 0;
-
-lightboxImg.addEventListener("touchstart", function (e) {
-  lightboxStartX = e.touches[0].clientX;
-}, { passive: true });
-
-lightboxImg.addEventListener("touchend", function (e) {
-  const diff = e.changedTouches[0].clientX - lightboxStartX;
-
-  if (diff > 50) currentIndex--;   // swipe right
-  if (diff < -50) currentIndex++;  // swipe left
-
-  if (currentIndex < 0) currentIndex = galleryImages.length - 1;
-  if (currentIndex >= galleryImages.length) currentIndex = 0;
-
-  lightboxImg.src = galleryImages[currentIndex];
-});
+lightboxClose.addEventListener("click", closeLightbox);
 
 /* =====================================================
    ACTIONS
 ===================================================== */
 function bindActions(auth, post) {
+
+  /* SHARE */
+  shareBtn.onclick = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: post.title,
+        text: "Check out this item on RCT‑X",
+        url: window.location.href
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      showToast("Link copied");
+    }
+  };
+
+  /* SAVE */
+  saveBtn.onclick = async () => {
+    const saved = await toggleSavePost(auth.currentUser.uid, postId);
+    saveBtn.textContent = saved ? "♥" : "♡";
+  };
+
+  /* REPORT */
+  reportBtn.onclick = () => {
+    loadView("report", { postId });
+  };
+
+  /* MORE FROM SELLER */
+  moreFromSellerBtn.onclick = () => {
+    loadView("seller-ads", { sellerUid });
+  };
 
   /* CALL */
   if (post.phone) {
@@ -263,7 +241,7 @@ function bindActions(auth, post) {
     whatsappBtn.style.display = "none";
   }
 
-  /* FOLLOW */
+  /* FOLLOW SELLER */
   followBtn.onclick = function () {
     requireLogin(auth, async function () {
       const following = await toggleFollowSeller(
@@ -274,6 +252,38 @@ function bindActions(auth, post) {
       followBtn.textContent = following ? "Following" : "Follow";
     });
   };
+
+  /* QUICK MESSAGE */
+  const sendQuickMessageBtn = document.getElementById("sendQuickMessageBtn");
+  sendQuickMessageBtn.onclick = function () {
+    requireLogin(auth, async function () {
+      const msg = document.getElementById("quickMessage").value.trim();
+      if (!msg) return showToast("Message cannot be empty");
+
+      // Open chat view with prefilled message
+      sessionStorage.setItem("chatPrefill", JSON.stringify({
+        sellerUid,
+        postId,
+        message: msg
+      }));
+
+      loadView("chat", { sellerUid, postId });
+    });
+  };
+}
+
+/* =====================================================
+   LOGIN GUARD
+===================================================== */
+function requireLogin(auth, cb) {
+  if (auth.currentUser) return cb();
+
+  showToast("Please log in to continue");
+
+  setTimeout(() => {
+    const login = document.getElementById("login");
+    if (login) login.style.display = "flex";
+  }, 800);
 }
 
 /* =====================================================
