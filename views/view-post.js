@@ -13,8 +13,6 @@ import {
   addDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-import { firebaseDb } from "/index/js/firebase/init.js";
-
 /* =====================================================
    STATE
 ===================================================== */
@@ -246,7 +244,7 @@ function bindActions(auth, post) {
           const convoId = [uid, sellerUid].sort().join("_");
 
           await setDoc(
-            doc(firebaseDb, "conversations", convoId),
+            doc(window.firebaseDb, "conversations", convoId),
             {
               participants: [uid, sellerUid],
               updatedAt: Date.now(),
@@ -257,7 +255,7 @@ function bindActions(auth, post) {
           );
 
           await addDoc(
-            collection(firebaseDb, "conversations", convoId, "messages"),
+            collection(window.firebaseDb, "conversations", convoId, "messages"),
             {
               senderId: uid,
               text,
