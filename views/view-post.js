@@ -2,7 +2,8 @@ import {
   getPost,
   getUser,
   toggleFollowSeller,
-  trackContactClick
+  trackContactClick,
+  deletePost
 } from "/index/js/firebase/settings.js";
 
 /* =====================================================
