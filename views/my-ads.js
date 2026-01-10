@@ -74,7 +74,7 @@ async function loadMyAds(auth) {
 
     // EDIT
     item.querySelector(".edit-btn")?.addEventListener("click", () => {
-      loadView("edit-post", { postId: p.id, forceInit: true });
+      loadView("post-edit", { postId: p.id, forceInit: true });
     });
 
     // DELETE
