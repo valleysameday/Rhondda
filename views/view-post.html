@@ -3,55 +3,102 @@
 <div class="post-container">
 
   <!-- ========================= -->
-  <!-- MAIN IMAGE -->
+  <!-- MAIN IMAGE + SHARE + SAVE -->
   <!-- ========================= -->
   <div class="post-images">
+    <button id="saveBtn" class="save-btn">♡</button>
+    <button id="shareBtn" class="share-btn">↗ Share</button>
+
     <img id="mainImage" class="gallery-main" />
     <div id="galleryCount" class="gallery-count"></div>
   </div>
-<div id="postTime" class="post-time"></div>
+
+  <div id="postTime" class="post-time"></div>
+
   <!-- ========================= -->
-  <!-- POST CONTENT -->
+  <!-- META -->
+  <!-- ========================= -->
+  <div class="post-meta">
+    <span id="postCategory"></span> • <span id="postArea"></span>
+  </div>
+
+  <!-- ========================= -->
+  <!-- TITLE + PRICE -->
   <!-- ========================= -->
   <h1 id="postTitle"></h1>
   <div class="post-price" id="postPrice"></div>
-  <p id="postDescription"></p>
-
-<div class="enquiry-box">
-  <div class="enquiry-title">Pop seller a message</div>
-
-  <textarea id="quickMessage" class="quick-message">
-Hi, is this still available? Thanks!
-  </textarea>
-
-  <button id="sendQuickMessageBtn" class="action-btn primary">
-    Send
-  </button>
-</div>
+  <div id="postViews" class="post-views"></div>
 
   <!-- ========================= -->
-  <!-- CONTACT BUTTONS
-       (shown only if seller has phone / WhatsApp)
-  ========================= -->
+  <!-- DESCRIPTION -->
+  <!-- ========================= -->
+  <p id="postDescription"></p>
+
+  <!-- ========================= -->
+  <!-- QUICK MESSAGE -->
+  <!-- ========================= -->
+  <div class="enquiry-box">
+    <div class="enquiry-title">Pop seller a message</div>
+
+    <textarea id="quickMessage" class="quick-message">
+Hi, is this still available? Thanks!
+    </textarea>
+
+    <button id="sendQuickMessageBtn" class="action-btn primary">
+      Send
+    </button>
+  </div>
+
+  <!-- ========================= -->
+  <!-- CONTACT BUTTONS -->
+  <!-- ========================= -->
   <div class="post-actions">
     <a id="callSellerBtn" class="action-btn" href="#" style="display:none;">📞 Call</a>
     <a id="whatsappSellerBtn" class="action-btn" href="#" target="_blank" style="display:none;">💚 WhatsApp</a>
   </div>
 
-<!-- ========================= -->
-<!-- SELLER INFO + FOLLOW -->
-<!-- ========================= -->
-<div class="seller-info-bar">
-  <div class="seller-meta">
-    <div id="sellerName" class="seller-name"></div>
-    <div class="seller-stats">
-      <span id="sellerPostingSince"></span>
-      •
-      <span id="sellerLastActive"></span>
+  <!-- ========================= -->
+  <!-- SELLER INFO -->
+  <!-- ========================= -->
+  <div class="seller-info-bar">
+    <div class="seller-meta">
+      <div id="sellerName" class="seller-name"></div>
+      <div class="seller-stats">
+        <span id="sellerPostingSince"></span> • <span id="sellerLastActive"></span>
+      </div>
     </div>
+
+    <button id="followSellerBtn" class="follow-btn-small">Follow</button>
   </div>
 
-  <button id="followSellerBtn" class="follow-btn-small">Follow</button>
+  <!-- ========================= -->
+  <!-- MORE FROM SELLER -->
+  <!-- ========================= -->
+  <div class="more-from-seller">
+    <button id="moreFromSellerBtn" class="action-btn secondary">
+      More from this seller
+    </button>
+  </div>
+
+  <!-- ========================= -->
+  <!-- SAFETY TIPS -->
+  <!-- ========================= -->
+  <div class="safety-box">
+    <h3>Stay Safe</h3>
+    <ul>
+      <li>Meet in a public place</li>
+      <li>Check the item before paying</li>
+      <li>Never send money in advance</li>
+    </ul>
+  </div>
+
+  <!-- ========================= -->
+  <!-- REPORT -->
+  <!-- ========================= -->
+  <div class="report-section">
+    <button id="reportBtn" class="report-btn">⚑ Report this ad</button>
+  </div>
+
 </div>
 
 <!-- ========================= -->
