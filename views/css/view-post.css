@@ -10,7 +10,7 @@
 }
 
 /* ========================= */
-/* MAIN IMAGE */
+/* MAIN IMAGE (CENTERED WITH PADDING) */
 /* ========================= */
 
 .post-images {
@@ -25,15 +25,16 @@
 .gallery-main {
   width: 92%;
   max-width: 800px;
-  max-height: 300px;
+  max-height: 300px;   /* 🔥 keeps it from being huge */
   height: auto;
-  object-fit: cover;
+  object-fit: cover;   /* keeps it tidy */
   object-position: center;
   border-radius: 12px;
   cursor: pointer;
   display: block;
 }
 
+/* IMAGE COUNT BADGE */
 .gallery-count {
   position: absolute;
   bottom: 25px;
@@ -47,32 +48,14 @@
   pointer-events: none;
 }
 
-/* SHARE + SAVE BUTTONS */
-.share-btn,
-.save-btn {
-  position: absolute;
-  top: 15px;
-  background: rgba(0,0,0,0.55);
-  color: #fff;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 14px;
-  border: none;
-  cursor: pointer;
-  backdrop-filter: blur(4px);
-}
-
-.share-btn { right: 15px; }
-.save-btn { left: 15px; }
-
-/* ========================= */
-/* META */
-/* ========================= */
-
-.post-meta {
-  margin: 10px 15px;
-  font-size: 0.9rem;
-  color: #666;
+/* Posted time under image */
+.post-time {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #444;
+  margin: 10px 15px 20px;
+  text-align: left;
+  width: auto;
 }
 
 /* ========================= */
@@ -91,12 +74,6 @@
   margin: 15px;
 }
 
-.post-views {
-  margin: -10px 15px 15px;
-  font-size: 0.9rem;
-  color: #777;
-}
-
 #postDescription {
   margin: 15px;
   color: #444;
@@ -104,7 +81,7 @@
 }
 
 /* ========================= */
-/* ENQUIRY BOX */
+/* ENQUIRY BOX (NEW CLEAN BOX) */
 /* ========================= */
 
 .enquiry-box {
@@ -122,9 +99,10 @@
   font-size: 1.05rem;
   font-weight: 600;
   color: #333;
+  margin-bottom: 4px;
 }
 
-.quick-message {
+.enquiry-box .quick-message {
   width: 100%;
   min-height: 55px;
   padding: 10px;
@@ -134,6 +112,17 @@
   resize: vertical;
   color: #333;
   background: #fff;
+}
+
+.enquiry-box .action-btn.primary {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #007bff;
+  color: #fff;
+  text-align: center;
+  cursor: pointer;
 }
 
 /* ========================= */
@@ -162,12 +151,7 @@
   background: #007bff;
 }
 
-.action-btn.secondary {
-  background: #e9ecef;
-  color: #333;
-}
-
-.action-btn:not(.primary):not(.secondary) {
+.action-btn:not(.primary) {
   background: #6c757d;
 }
 
@@ -194,11 +178,14 @@
   font-size: 1.1rem;
   font-weight: 700;
   color: #111;
+  letter-spacing: -0.01em;
+  margin-bottom: 2px;
 }
 
 .seller-stats {
   font-size: 0.85rem;
   color: #757575;
+  font-weight: 400;
   display: flex;
   gap: 6px;
 }
@@ -212,61 +199,18 @@
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.follow-btn-small:hover {
+  background: #22c55e;
+  color: #fff;
+  border-color: #22c55e;
 }
 
 /* ========================= */
-/* MORE FROM SELLER */
-/* ========================= */
-
-.more-from-seller {
-  margin: 20px 15px;
-}
-
-/* ========================= */
-/* SAFETY BOX */
-/* ========================= */
-
-.safety-box {
-  margin: 25px 15px;
-  padding: 15px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-}
-
-.safety-box h3 {
-  margin-bottom: 10px;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.safety-box ul {
-  margin: 0;
-  padding-left: 18px;
-  color: #555;
-  font-size: 0.9rem;
-}
-
-/* ========================= */
-/* REPORT */
-/* ========================= */
-
-.report-section {
-  margin: 25px 15px;
-  text-align: center;
-}
-
-.report-btn {
-  background: none;
-  border: none;
-  color: #d00;
-  font-size: 0.95rem;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-/* ========================= */
-/* LIGHTBOX */
+/* LIGHTBOX FULL-SCREEN */
 /* ========================= */
 
 .lightbox {
@@ -278,6 +222,10 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.lightbox.active {
+  display: flex;
 }
 
 .lightbox-inner {
@@ -313,4 +261,5 @@
 #lightboxBottom img {
   max-width: 100%;
   height: auto;
+  display: inline-block;
 }
