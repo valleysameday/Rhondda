@@ -135,7 +135,6 @@ if (ENABLE_SPONSORED_AD && initial) {
     }
 
     html += `<span>📍 ${p.area}</span>`;
-    html += `<span class="post-time">${window.timeAgo(p.createdAt)}</span>`;
 
     return html;
   }
@@ -170,26 +169,28 @@ if (ENABLE_SPONSORED_AD && initial) {
       card.className = `feed-card ${post.type || ""}`;
 
       card.innerHTML = `
-        <div class="feed-image">
-          <img src="${image}" alt="${post.title}">
-        </div>
+  <div class="feed-image">
+    <img src="${image}" alt="${post.title}">
+  </div>
 
-        <div class="feed-content">
-          <h3 class="feed-title">${post.title}</h3>
+  <div class="feed-content">
 
-          <div class="feed-meta">
-            ${buildMeta(post)}
-            <button class="save-heart ${savedPosts.has(post.id) ? "saved" : ""}" data-id="${post.id}">
-              ${savedPosts.has(post.id) ? "♥" : "♡"}
-            </button>
-          </div>
-        </div>
+    <div class="price-heart-row">
+      <span class="post-price">£${post.price || ""}</span>
+      <button class="save-heart ${savedPosts.has(post.id) ? "saved" : ""}" data-id="${post.id}">
+        ${savedPosts.has(post.id) ? "♥" : "♡"}
+      </button>
+    </div>
 
-        <button class="report-btn" data-id="${post.id}">⚑</button>
-      `;
+    <h3 class="feed-title">${post.title}</h3>
+
+    <div class="feed-area">📍 ${post.area || ""}</div>
+
+  </div>
+`;
 
       card.addEventListener("click", e => {
-        if (e.target.closest(".report-btn,.cta-btn,.save-heart")) return;
+        if (e.target.closest(" .save-heart")) return;
 
         sessionStorage.setItem("feedScroll", window.scrollY);
         sessionStorage.setItem("feedCategory", currentCategory);
