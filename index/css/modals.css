@@ -1,201 +1,127 @@
-/* --- EYE-FRIENDLY & HIGH-CONTRAST THEME (NO PINK) --- */
+/* --- 2026 FULL-SCREEN PROFESSIONAL & ACCESSIBLE THEME --- */
 
-/* 1. Base Body & Full Screen Overlay Logic */
-body.modal-open {
-    overflow: hidden;
-}
-
+/* 1. Deep Background Blur (Full Screen Takeover) */
 body.modal-open main {
-    filter: blur(5px); /* Stronger blur for full focus */
-    opacity: .3;
+    filter: blur(12px); /* Deep blur for total content focus */
+    opacity: 0.2;       /* Significant dimming to avoid background distraction */
     pointer-events: none;
-    transition: filter 0.3s ease;
+    transition: filter 0.4s ease;
 }
 
-/* 2. Modal Container - Full Viewport Coverage */
+/* 2. Modal Overlay - Dark Slate Backdrop */
 .modal {
     position: fixed;
     inset: 0;
     display: none;
     align-items: center;
     justify-content: center;
-    background: rgba(15, 23, 42, 0.85); /* Deep Slate backdrop */
-    backdrop-filter: blur(8px);
+    background: rgba(15, 23, 42, 0.9); /* Deep Navy/Slate 2026 Standard */
+    backdrop-filter: blur(10px);
     z-index: 9999;
 }
 
-.modal.active {
-    display: flex;
-}
+.modal.active { display: flex; }
 
-/* 3. Modal Box - Accessible & Large Text */
+/* 3. Modal Box - Clean, High Contrast, & Spacious */
 .modal-content {
     background: #ffffff;
     width: 95%;
-    max-width: 500px; /* Slightly wider for better reading */
-    padding: 32px;
-    border-radius: 12px;
+    max-width: 520px; /* Wider for easier line-length reading */
+    padding: 40px;    /* Extra breathing room for the eyes */
+    border-radius: 16px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     position: relative;
-    animation: popIn 0.25s ease-out;
+    animation: slideUp 0.3s ease-out;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    font-family: system-ui, -apple-system, sans-serif;
+    gap: 24px;
+    /* Using 2026 recommended fonts for high legibility */
+    font-family: "Inter", "Atkinson Hyperlegible", system-ui, sans-serif;
+    color: #1e293b;
+    line-height: 1.6; /* Scientific standard for reading comfort */
 }
 
-/* 4. Close Button */
-.modal .close {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    font-size: 28px;
-    cursor: pointer;
-    color: #64748b;
-    transition: color 0.2s ease;
-}
-
-.modal .close:hover {
-    color: #0f172a;
-}
-
-/* 5. Inputs & Forms - High Visibility */
+/* 4. Large, Clear Inputs (No Pink) */
 .modal-content input, 
 .modal-content textarea, 
 .modal-content select {
     width: 100%;
-    padding: 16px;
-    border-radius: 10px;
-    border: 2px solid #e2e8f0;
-    font-size: 16px; /* Prevents iOS auto-zoom */
-    background: #f8fafc;
-    color: #1e293b;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 18px;
+    border-radius: 12px;
+    border: 2px solid #cbd5e1;
+    font-size: 17px; /* Increased for better clarity */
+    background: #f1f5f9;
+    color: #0f172a;
     transition: all 0.2s ease;
 }
 
+/* Professional Blue Focus State */
 .modal-content input:focus, 
-.modal-content textarea:focus, 
-.modal-content select:focus {
+.modal-content textarea:focus {
     outline: none;
-    border-color: #2563eb; /* Professional Blue */
-    background: #fff;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    border-color: #2563eb; 
+    background: #ffffff;
+    box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.15);
 }
 
-/* 6. Buttons - Neutral & Solid (No Gradients) */
+/* 5. Buttons - Solid & Action-Oriented */
 .modal-content button {
-    padding: 16px 0;
-    border-radius: 10px;
+    padding: 18px;
+    border-radius: 12px;
     font-size: 16px;
     font-weight: 700;
-    background: #1e293b; /* Deep Navy */
+    background: #1e293b; /* Strong Slate Navy */
     color: #ffffff;
     cursor: pointer;
     border: none;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .modal-content button:hover {
     background: #0f172a;
-    transform: translateY(-1px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
-/* 7. Category Grids & Selection Buttons */
-.category-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-}
-
-.category-grid button,
-.property-type button,
-.rent-frequency button {
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
-    color: #475569;
-    padding: 14px;
-}
-
-/* Active State - Blue instead of Pink */
-.property-type button.active, 
-.rent-frequency button.active, 
-.category-grid button.active {
+/* Active Category Highlights - High Visibility Blue */
+.category-grid button.active, 
+.property-type button.active {
     background: #2563eb !important;
-    border-color: #2563eb !important;
     color: #ffffff !important;
+    border-color: #2563eb !important;
 }
 
-/* 8. Progress Indicators */
-.post-progress .dot {
-    width: 10px;
-    height: 10px;
-    background: #e2e8f0;
-}
-
-.post-progress .dot.active {
-    background: #2563eb;
-}
-
-/* 9. Switches (Toggles) */
-.slider {
-    background-color: #cbd5e1;
-}
-
+/* 6. Eye-Friendly Toggles & Sliders */
 input:checked + .slider {
     background-color: #2563eb;
 }
 
-/* 10. Business/Info Boxes */
+/* 7. Info Boxes - Muted Gray (Anti-Strain) */
 .business-benefits {
-    background: #f1f5f9;
-    border: 1px solid #cbd5e1;
-    color: #334155;
-    padding: 16px;
-    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 15px;
 }
 
-.business-benefits h4 {
-    color: #0f172a;
-    margin-bottom: 8px;
-}
+.business-benefits h4 { color: #1e293b; margin-bottom: 10px; }
 
-/* 11. Toasts (Notifications) */
-.toast.success { background: #059669; }
-.toast.error { background: #dc2626; }
-
-/* 12. Responsive Adjustments */
-@media (max-width: 480px) {
+/* 8. Full-Screen Mobile Optimization */
+@media (max-width: 600px) {
     .modal-content {
         width: 100%;
         height: 100%;
-        border-radius: 0;
         max-width: none;
-        padding: 24px;
+        border-radius: 0;
+        padding: 30px 20px;
+        justify-content: center;
     }
 }
 
 /* Animations */
-@keyframes popIn {
-    from { transform: scale(0.97); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-@keyframes slideIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Utility */
-.ghost-btn {
-    background: #f1f5f9 !important;
-    color: #475569 !important;
-    border: 1px solid #e2e8f0 !important;
-}
-
-.modal-switch span {
-    color: #2563eb;
-    font-weight: 700;
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
