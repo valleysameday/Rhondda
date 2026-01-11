@@ -425,6 +425,10 @@ document.addEventListener("click", e => {
     });
   };
 
+
+const postGate = await import('/index/js/post-gate.js');
+postGate.initPostGate();
+  
   document.readyState === "loading"
     ? document.addEventListener("DOMContentLoaded", start)
     : start();
