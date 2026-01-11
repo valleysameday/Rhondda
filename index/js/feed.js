@@ -184,11 +184,12 @@ if (ENABLE_SPONSORED_AD && initial) {
 
     <h3 class="feed-title">${post.title}</h3>
 
-    <div class="feed-area">📍 ${post.area || ""}</div>
+    <div class="feed-area">
+      ${post.area ? `📍 ${post.area}` : "📍 Rhondda"} 
+    </div>
 
   </div>
 `;
-
       card.addEventListener("click", e => {
         if (e.target.closest(" .save-heart")) return;
 
