@@ -105,6 +105,14 @@ export async function addPost(post) {
   });
 }
 
+export async function getUserFavourites(uid) {
+  const snap = await getDoc(doc(db, "users", uid));
+  if (!snap.exists()) return [];
+
+  const saved = snap.data().savedPosts || {};
+  return Object.keys(saved);
+}
+
 export async function updatePost(postId, data) {
   console.log("✏️ updatePost()", postId, data);
 
