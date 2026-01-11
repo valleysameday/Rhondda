@@ -1,64 +1,72 @@
-    <link rel="stylesheet" href="/views/css/view-post.css">
+<link rel="stylesheet" href="/views/css/view-post.css">
 
+<div class="post-container">
 
-<div class="view-post-layout">
-    <!-- LEFT: Visual & Info -->
-    <div class="main-content">
-        <div class="gallery-wrapper">
-            <div id="gallery" class="image-stage">
-                <img id="mainImage" class="active-slide" src="" alt="Listing Image">
-                <div id="galleryCount" class="badge-count"></div>
-                <div class="gallery-nav-btns">
-                    <button id="prevImg" class="nav-arrow">←</button>
-                    <button id="nextImg" class="nav-arrow">→</button>
-                </div>
-            </div>
-        </div>
+  <!-- ========================= -->
+  <!-- MAIN IMAGE -->
+  <!-- ========================= -->
+  <div class="post-images">
+    <img id="mainImage" class="gallery-main" />
+    <div id="galleryCount" class="gallery-count"></div>
+  </div>
+<div id="postTime" class="post-time"></div>
+  <!-- ========================= -->
+  <!-- POST CONTENT -->
+  <!-- ========================= -->
+  <h1 id="postTitle"></h1>
+  <div class="post-price" id="postPrice"></div>
+  <p id="postDescription"></p>
 
-        <div class="details-card">
-            <div class="top-meta">
-                <span id="postTime" class="timestamp"></span>
-                <button class="share-btn">Share</button>
-            </div>
-            <h1 id="postTitle" class="item-title"></h1>
-            <div id="postDescription" class="item-description"></div>
-        </div>
-    </div>
+<div class="enquiry-box">
+  <div class="enquiry-title">Pop seller a message</div>
 
-    <!-- RIGHT: Sticky Action Center -->
-    <aside class="sidebar-actions">
-        <div class="price-box">
-            <span id="postPrice" class="price-value"></span>
-        </div>
+  <textarea id="quickMessage" class="quick-message">
+Hi, is this still available? Thanks!
+  </textarea>
 
-        <div class="seller-card">
-            
-                <div id="sellerInitial" class="avatar-circle"></div>
-                <div class="seller-text">
-                    <h3 id="sellerName"></h3>
-                    <p id="sellerPostingSince" class="sub-text"></p>
-                </div>
-            </div>
-            <button id="followSellerBtn" class="follow-outline">Follow Seller</button>
-        </div>
-
-        <div class="contact-card">
-            <div class="enquiry-title">Send a quick message</div>
-            <textarea id="quickMessage" class="modern-input" placeholder="Is this still available?"></textarea>
-            <button id="sendQuickMessageBtn" class="btn-primary">Send Message</button>
-            
-            <div class="contact-grid">
-                <a id="callSellerBtn" class="btn-secondary" style="display:none;">Call</a>
-                <a id="whatsappSellerBtn" class="btn-whatsapp" style="display:none;">WhatsApp</a>
-            </div>
-        </div>
-    </aside>
+  <button id="sendQuickMessageBtn" class="action-btn primary">
+    Send
+  </button>
 </div>
 
-<!-- Lightbox remains for full-screen zoom -->
+  <!-- ========================= -->
+  <!-- CONTACT BUTTONS
+       (shown only if seller has phone / WhatsApp)
+  ========================= -->
+  <div class="post-actions">
+    <a id="callSellerBtn" class="action-btn" href="#" style="display:none;">📞 Call</a>
+    <a id="whatsappSellerBtn" class="action-btn" href="#" target="_blank" style="display:none;">💚 WhatsApp</a>
+  </div>
+
+<!-- ========================= -->
+<!-- SELLER INFO + FOLLOW -->
+<!-- ========================= -->
+<div class="seller-info-bar">
+  <div class="seller-meta">
+    <div id="sellerName" class="seller-name"></div>
+    <div class="seller-stats">
+      <span id="sellerPostingSince"></span>
+      •
+      <span id="sellerLastActive"></span>
+    </div>
+  </div>
+
+  <button id="followSellerBtn" class="follow-btn-small">Follow</button>
+</div>
+
+<!-- ========================= -->
+<!-- LIGHTBOX -->
+<!-- ========================= -->
 <div id="lightbox" class="lightbox">
-    <span id="lightboxClose" class="close-lightbox">&times;</span>
-    <img id="lightboxImage" src="" class="zoom-img">
+  <span id="lightboxClose" class="lightbox-close">×</span>
+
+  <div class="lightbox-inner">
+    <img id="lightboxImage" class="lightbox-img" />
+  </div>
+
+  <div id="lightboxBottom">
+    <img src="/images/imageAdd.jpg" alt="Advertisement" />
+  </div>
 </div>
 
 <script type="module" src="/views/view-post.js"></script>
