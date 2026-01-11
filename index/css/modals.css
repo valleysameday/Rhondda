@@ -1,273 +1,201 @@
-/* ============================================
-   FULL-SCREEN POSTING MODAL
-============================================ */
-#posts-grid {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
+/* --- EYE-FRIENDLY & HIGH-CONTRAST THEME (NO PINK) --- */
 
-  display: none; /* JS sets to flex */
-  flex-direction: column;
-
-  background: #ffffff;
-  z-index: 9999;
-
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-
-  padding: 20px;
-  box-sizing: border-box;
-  font-family: system-ui, sans-serif;
+/* 1. Base Body & Full Screen Overlay Logic */
+body.modal-open {
+    overflow: hidden;
 }
 
-/* Prevent background scroll */
-body.posting-open {
-  overflow: hidden;
+body.modal-open main {
+    filter: blur(5px); /* Stronger blur for full focus */
+    opacity: .3;
+    pointer-events: none;
+    transition: filter 0.3s ease;
 }
 
-/* ============================================
-   HEADERS & TITLES
-============================================ */
-#posts-grid h2,
-#posts-grid h3 {
-  margin: 0 0 12px;
-  font-weight: 600;
-  color: #111;
+/* 2. Modal Container - Full Viewport Coverage */
+.modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.85); /* Deep Slate backdrop */
+    backdrop-filter: blur(8px);
+    z-index: 9999;
 }
 
-#posts-grid p {
-  color: #444;
-  line-height: 1.4;
+.modal.active {
+    display: flex;
 }
 
-/* ============================================
-   STEP CONTAINER
-============================================ */
-.post-step {
-  display: none;
-  flex-direction: column;
-  gap: 16px;
-  min-height: calc(100vh - 80px);
+/* 3. Modal Box - Accessible & Large Text */
+.modal-content {
+    background: #ffffff;
+    width: 95%;
+    max-width: 500px; /* Slightly wider for better reading */
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: popIn 0.25s ease-out;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    font-family: system-ui, -apple-system, sans-serif;
 }
 
-.post-step.active {
-  display: flex;
+/* 4. Close Button */
+.modal .close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 28px;
+    cursor: pointer;
+    color: #64748b;
+    transition: color 0.2s ease;
 }
 
-/* ============================================
-   PROGRESS DOTS
-============================================ */
-.post-progress {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 20px;
+.modal .close:hover {
+    color: #0f172a;
 }
 
+/* 5. Inputs & Forms - High Visibility */
+.modal-content input, 
+.modal-content textarea, 
+.modal-content select {
+    width: 100%;
+    padding: 16px;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0;
+    font-size: 16px; /* Prevents iOS auto-zoom */
+    background: #f8fafc;
+    color: #1e293b;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.modal-content input:focus, 
+.modal-content textarea:focus, 
+.modal-content select:focus {
+    outline: none;
+    border-color: #2563eb; /* Professional Blue */
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+/* 6. Buttons - Neutral & Solid (No Gradients) */
+.modal-content button {
+    padding: 16px 0;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    background: #1e293b; /* Deep Navy */
+    color: #ffffff;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content button:hover {
+    background: #0f172a;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+}
+
+/* 7. Category Grids & Selection Buttons */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.category-grid button,
+.property-type button,
+.rent-frequency button {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    color: #475569;
+    padding: 14px;
+}
+
+/* Active State - Blue instead of Pink */
+.property-type button.active, 
+.rent-frequency button.active, 
+.category-grid button.active {
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+    color: #ffffff !important;
+}
+
+/* 8. Progress Indicators */
 .post-progress .dot {
-  width: 10px;
-  height: 10px;
-  background: #ccc;
-  border-radius: 50%;
+    width: 10px;
+    height: 10px;
+    background: #e2e8f0;
 }
 
 .post-progress .dot.active {
-  background: #111;
+    background: #2563eb;
 }
 
-/* ============================================
-   CATEGORY GRID
-============================================ */
-.category-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+/* 9. Switches (Toggles) */
+.slider {
+    background-color: #cbd5e1;
 }
 
-.category-grid button {
-  padding: 14px;
-  background: #f5f5f5;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  text-align: center;
-  font-size: 14px;
-  color: #111;
-  cursor: pointer;
-  transition: background 0.2s;
+input:checked + .slider {
+    background-color: #2563eb;
 }
 
-.category-grid button:hover {
-  background: #e9e9e9;
+/* 10. Business/Info Boxes */
+.business-benefits {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    padding: 16px;
+    border-radius: 10px;
 }
 
-.category-grid button.active {
-  background: #111;
-  color: #fff;
-  border-color: #111;
+.business-benefits h4 {
+    color: #0f172a;
+    margin-bottom: 8px;
 }
 
-/* ============================================
-   INPUTS
-============================================ */
-#posts-grid input,
-#posts-grid textarea,
-#posts-grid select {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 15px;
-  color: #111;
-  background: #fff;
-  box-sizing: border-box;
+/* 11. Toasts (Notifications) */
+.toast.success { background: #059669; }
+.toast.error { background: #dc2626; }
+
+/* 12. Responsive Adjustments */
+@media (max-width: 480px) {
+    .modal-content {
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        max-width: none;
+        padding: 24px;
+    }
 }
 
-#posts-grid textarea {
-  min-height: 120px;
-  resize: vertical;
+/* Animations */
+@keyframes popIn {
+    from { transform: scale(0.97); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #222;
-  margin-bottom: 4px;
-  display: block;
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* ============================================
-   BUTTONS
-============================================ */
-.post-next,
-.post-prev,
-#postSubmitBtn,
-#confirmPostBtn {
-  width: 100%;
-  padding: 14px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  margin-top: 10px;
+/* Utility */
+.ghost-btn {
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+    border: 1px solid #e2e8f0 !important;
 }
 
-.post-next,
-#postSubmitBtn,
-#confirmPostBtn {
-  background: #111;
-  color: #fff;
-}
-
-.post-next:disabled,
-#postSubmitBtn:disabled {
-  background: #999;
-  cursor: not-allowed;
-}
-
-.post-prev {
-  background: #e5e5e5;
-  color: #111;
-}
-
-/* ============================================
-   IMAGE PREVIEW GRID
-============================================ */
-#imagePreview {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.preview-thumb-wrapper {
-  position: relative;
-}
-
-.preview-thumb {
-  width: 100%;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 6px;
-}
-
-.delete-thumb {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  background: rgba(0,0,0,0.7);
-  color: #fff;
-  border: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-/* ============================================
-   PREVIEW MODAL
-============================================ */
-#postPreviewModal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.65);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 10000;
-}
-
-#postPreviewModal .preview-box {
-  background: #fff;
-  width: 90%;
-  max-width: 500px;
-  padding: 20px;
-  border-radius: 12px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.preview-images img {
-  width: 100%;
-  border-radius: 8px;
-  margin-bottom: 10px;
-}
-
-.preview-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  background: #111;
-  color: #fff;
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-/* ============================================
-   TOASTS
-============================================ */
-.toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #111;
-  color: #fff;
-  padding: 12px 18px;
-  border-radius: 6px;
-  font-size: 14px;
-  z-index: 99999;
-  opacity: 0.95;
-}
-
-.toast.error {
-  background: #c62828;
-}
-
-.toast.success {
-  background: #2e7d32;
+.modal-switch span {
+    color: #2563eb;
+    font-weight: 700;
 }
