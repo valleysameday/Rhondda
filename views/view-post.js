@@ -168,6 +168,35 @@ function closeLightbox() {
   document.body.style.overflow = "";
 }
 
+let startX = 0;
+let endX = 0;
+
+lightbox.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+}, { passive: true });
+
+lightbox.addEventListener("touchend", e => {
+  endX = e.changedTouches[0].clientX;
+  handleSwipe();
+});
+
+function handleSwipe() {
+  const diff = startX - endX;
+
+  if (Math.abs(diff) < 40) return; // dead zone
+
+  if (diff > 0) {
+    // swipe left → next
+    currentIndex = (currentIndex + 1) % galleryImages.length;
+  } else {
+    // swipe right → previous
+    currentIndex =
+      (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+  }
+
+  lightboxImg.src = galleryImages[currentIndex];
+}
+
 lightboxClose.addEventListener("click", closeLightbox);
 
 /* =====================================================
