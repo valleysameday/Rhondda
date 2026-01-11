@@ -120,7 +120,8 @@ export function initPostSubmit() {
         title: titleInput.value.trim(),
         description: descInput.value.trim(),
         createdAt: Date.now(),
-        contact: contactInput.value.trim(),
+        phone: contactInput.value.trim(),
+whatsappAllowed: true, // or from a checkbox
         location: locationInput.value.trim(),
         price: Number(priceInput.value) || null,
         area: areaInput?.value || null,
