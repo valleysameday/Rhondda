@@ -6,9 +6,9 @@
 import { getFirebase } from "/index/js/firebase/init.js";
 
 // Posting modules (you will create these)
-import { initPostFlow } from "/index/postingStuff/post-flow.js";
-import { initPostImages } from "/index/postingStuff/post-images.js";
-import { initPostSubmit } from "/index/postingStuff/post-submit.js";
+import { initPostFlow } from "../index/postingStuff/post-flow.js";
+import { initPostImages } from "../index/postingStuff/post-images.js";
+import { initPostSubmit } from "../index/postingStuff/post-submit.js";
 
 let auth, db, storage;
 
