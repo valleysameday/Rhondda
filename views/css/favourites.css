@@ -1,0 +1,67 @@
+.favourites-container {
+  padding: 20px;
+  font-family: system-ui, sans-serif;
+  color: #111827;
+}
+
+.fav-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.fav-empty {
+  text-align: center;
+  color: #6b7280;
+  margin-top: 40px;
+  font-size: 0.95rem;
+}
+
+.fav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.fav-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.fav-thumb {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #e5e7eb;
+}
+
+.fav-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.fav-info h4 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.fav-info p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.fav-unavailable {
+  color: #b91c1c;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
