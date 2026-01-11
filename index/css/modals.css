@@ -3,6 +3,7 @@
 /* 1. Global Reset & Eye-Care */
 :root {
     --bg-dark: #0f172a;
+    --slate-900: #0f172a;
     --slate-800: #1e293b;
     --slate-600: #475569;
     --slate-200: #e2e8f0;
@@ -12,61 +13,71 @@
     --glass-blur: blur(12px);
 }
 
-body.modal-open { overflow: hidden; }
+/* 2. Scroll Lock & Background Takeover */
+html.modal-open, 
+body.modal-open { 
+    overflow: hidden !important; 
+    height: 100vh;
+    width: 100vw;
+    position: fixed; /* Extra security against background scroll */
+}
+
 body.modal-open main { 
     filter: var(--glass-blur); 
-    opacity: 0.2; 
+    opacity: 0.15; 
     pointer-events: none; 
     transition: all 0.4s ease; 
 }
 
-/* 2. Shared Modal Backdrop */
+/* 3. Shared Modal Backdrop */
 .modal, .preview-modal {
     position: fixed;
     inset: 0;
     display: none;
     align-items: center;
     justify-content: center;
-    background: rgba(15, 23, 42, 0.85);
+    background: rgba(15, 23, 42, 0.9); /* Deep Navy backdrop */
     backdrop-filter: var(--glass-blur);
     z-index: 9999;
 }
 
 .modal.active, .preview-modal:not(.hidden) { display: flex; }
 
-/* 3. Content Containers (Takeover Style) */
+/* 4. Content Containers (Focus Mode) */
 .modal-content, .preview-content {
     background: #ffffff;
     width: 95%;
     max-width: 550px;
-    padding: 32px;
+    padding: 35px;
     border-radius: 20px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
     position: relative;
     max-height: 90vh;
-    overflow-y: auto;
+    overflow-y: auto; /* Internal scrolling only */
     display: flex;
     flex-direction: column;
     gap: 20px;
     font-family: "Inter", system-ui, -apple-system, sans-serif;
     animation: slideUp 0.3s ease-out;
+    scrollbar-width: thin;
+    scrollbar-color: var(--slate-200) transparent;
 }
 
-/* 4. Typography & Headings */
+/* 5. Typography & Headings */
 h2, h3 {
     color: var(--text-main);
     text-align: center;
     margin: 0;
 }
 h2 { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
-h3 { font-size: 1.1rem; font-weight: 700; margin-top: 10px; text-align: left; }
+h3 { font-size: 1.1rem; font-weight: 700; margin-top: 10px; text-align: left; border-bottom: 1px solid var(--slate-200); padding-bottom: 8px; }
 
-/* 5. Progress Dots */
+/* 6. Progress Dots */
 .post-progress {
     display: flex;
     justify-content: center;
     gap: 12px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 .post-progress .dot {
     width: 10px; height: 10px;
@@ -75,7 +86,7 @@ h3 { font-size: 1.1rem; font-weight: 700; margin-top: 10px; text-align: left; }
 }
 .post-progress .dot.active { background: var(--action-blue); transform: scale(1.2); }
 
-/* 6. Form Elements - High Contrast */
+/* 7. Form Elements - High Contrast Blue (No Pink) */
 input, textarea, select {
     width: 100%;
     padding: 16px;
@@ -93,20 +104,21 @@ input:focus, textarea:focus, select:focus {
     box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
-/* Labels and Toggles */
-label { font-weight: 600; font-size: 0.95rem; color: var(--slate-600); }
+label { font-weight: 600; font-size: 0.95rem; color: var(--slate-600); margin-top: 5px; }
+
 .toggle-row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     cursor: pointer;
-    padding: 12px;
+    padding: 14px;
     background: #f1f5f9;
-    border-radius: 10px;
+    border-radius: 12px;
+    font-weight: 500;
 }
-.toggle-row input { width: auto; }
+.toggle-row input { width: auto; height: 18px; width: 18px; cursor: pointer; }
 
-/* 7. Category & Feature Grids */
+/* 8. Category & Feature Grids */
 .category-grid, .feature-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -115,80 +127,90 @@ label { font-weight: 600; font-size: 0.95rem; color: var(--slate-600); }
 .category-grid button {
     background: #fff;
     border: 2px solid var(--slate-200);
-    padding: 20px 10px;
+    padding: 22px 10px;
     border-radius: 16px;
     font-weight: 700;
     color: var(--slate-800);
     cursor: pointer;
     transition: all 0.2s ease;
+    font-size: 0.95rem;
 }
 .category-grid button:hover { border-color: var(--action-blue); background: #f0f7ff; }
 .category-grid button.active { 
     background: var(--action-blue) !important; 
     color: #fff !important; 
     border-color: var(--action-blue); 
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
-/* Feature Items */
 .feature-item {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     font-size: 0.9rem;
-    padding: 8px;
+    padding: 10px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid var(--slate-200);
 }
 
-/* 8. Navigation & Action Buttons */
-.post-nav { display: flex; gap: 12px; margin-top: 15px; }
+/* 9. Navigation & Action Buttons */
+.post-nav { display: flex; gap: 15px; margin-top: 15px; }
 .primary-btn {
     background: var(--action-blue);
     color: #fff;
     border: none;
-    padding: 16px;
-    border-radius: 12px;
+    padding: 18px;
+    border-radius: 14px;
     font-weight: 700;
     cursor: pointer;
     flex: 2;
+    font-size: 16px;
 }
-.primary-btn:hover { background: var(--action-hover); transform: translateY(-1px); }
+.primary-btn:hover { background: var(--action-hover); transform: translateY(-2px); }
 .primary-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .ghost-btn {
     background: #f1f5f9;
     color: var(--slate-600);
     border: 1px solid var(--slate-200);
-    padding: 16px;
-    border-radius: 12px;
+    padding: 18px;
+    border-radius: 14px;
     font-weight: 600;
     cursor: pointer;
     flex: 1;
 }
 
-/* 9. Preview Modal Specifics */
+/* 10. Previews & Photos */
 .preview-body { padding: 10px 0; }
 .preview-close, .close {
     position: absolute;
     top: 20px;
     right: 20px;
-    background: none;
+    background: #f1f5f9;
     border: none;
-    font-size: 28px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     color: var(--slate-600);
 }
 
-/* 10. Photo Uploader Grid */
 .image-preview-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 12px;
     margin-top: 15px;
 }
 .image-preview-grid img {
     width: 100%;
     aspect-ratio: 1/1;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: 12px;
     border: 1px solid var(--slate-200);
 }
 
@@ -196,19 +218,20 @@ label { font-weight: 600; font-size: 0.95rem; color: var(--slate-600); }
 .post-step { display: none; }
 .post-step.active { display: flex; flex-direction: column; gap: 20px; }
 
-/* 11. Mobile Optimization */
+/* 11. Mobile Full Screen Optimization */
 @media (max-width: 500px) {
     .modal-content, .preview-content {
         width: 100vw;
         height: 100vh;
         max-height: 100vh;
         border-radius: 0;
-        padding: 40px 20px;
+        padding: 60px 24px 40px; /* Space for close button */
+        justify-content: flex-start;
     }
     .category-grid { grid-template-columns: 1fr 1fr; }
 }
 
 @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
 }
