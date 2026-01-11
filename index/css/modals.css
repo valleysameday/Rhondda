@@ -1,127 +1,172 @@
-/* --- 2026 FULL-SCREEN PROFESSIONAL & ACCESSIBLE THEME --- */
+/* --- 2026 FULL-SCREEN MULTI-STEP THEME (CLEAN & ACCESSIBLE) --- */
 
-/* 1. Deep Background Blur (Full Screen Takeover) */
-body.modal-open main {
-    filter: blur(12px); /* Deep blur for total content focus */
-    opacity: 0.2;       /* Significant dimming to avoid background distraction */
-    pointer-events: none;
-    transition: filter 0.4s ease;
+/* 1. Full Screen Takeover Logic */
+body.modal-open { overflow: hidden; }
+body.modal-open main { 
+    filter: blur(10px); 
+    opacity: .2; 
+    pointer-events: none; 
+    transition: all 0.4s ease; 
 }
 
-/* 2. Modal Overlay - Dark Slate Backdrop */
 .modal {
     position: fixed;
     inset: 0;
     display: none;
     align-items: center;
     justify-content: center;
-    background: rgba(15, 23, 42, 0.9); /* Deep Navy/Slate 2026 Standard */
-    backdrop-filter: blur(10px);
+    background: rgba(15, 23, 42, 0.9); /* Deep Slate 2026 Backdrop */
+    backdrop-filter: blur(8px);
     z-index: 9999;
 }
-
 .modal.active { display: flex; }
 
-/* 3. Modal Box - Clean, High Contrast, & Spacious */
+/* 2. Responsive Content Box */
 .modal-content {
     background: #ffffff;
     width: 95%;
-    max-width: 520px; /* Wider for easier line-length reading */
-    padding: 40px;    /* Extra breathing room for the eyes */
-    border-radius: 16px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    max-width: 520px;
+    padding: 35px;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
     position: relative;
-    animation: slideUp 0.3s ease-out;
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    /* Using 2026 recommended fonts for high legibility */
-    font-family: "Inter", "Atkinson Hyperlegible", system-ui, sans-serif;
+    gap: 20px;
+    font-family: "Inter", system-ui, sans-serif;
     color: #1e293b;
-    line-height: 1.6; /* Scientific standard for reading comfort */
+    max-height: 95vh;
+    overflow-y: auto;
 }
 
-/* 4. Large, Clear Inputs (No Pink) */
+/* 3. MULTI-STEP LOGIC (The "Takeover" Step View) */
+#posts-grid .post-step {
+    display: none; /* Hide inactive steps */
+    animation: slideUp 0.3s ease-out;
+}
+
+#posts-grid .post-step.active {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* 4. Progress Indicators (Step Dots) */
+.post-progress {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.post-progress .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.post-progress .dot.active {
+    background: #2563eb; /* Blue Active Step */
+    transform: scale(1.2);
+}
+
+/* 5. Typography & Forms (Eye-Friendly 2026) */
+h2 {
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+}
+
 .modal-content input, 
 .modal-content textarea, 
 .modal-content select {
     width: 100%;
-    padding: 18px;
+    padding: 16px;
     border-radius: 12px;
-    border: 2px solid #cbd5e1;
-    font-size: 17px; /* Increased for better clarity */
-    background: #f1f5f9;
-    color: #0f172a;
-    transition: all 0.2s ease;
-}
-
-/* Professional Blue Focus State */
-.modal-content input:focus, 
-.modal-content textarea:focus {
-    outline: none;
-    border-color: #2563eb; 
-    background: #ffffff;
-    box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.15);
-}
-
-/* 5. Buttons - Solid & Action-Oriented */
-.modal-content button {
-    padding: 18px;
-    border-radius: 12px;
+    border: 2px solid #e2e8f0;
     font-size: 16px;
-    font-weight: 700;
-    background: #1e293b; /* Strong Slate Navy */
-    color: #ffffff;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.modal-content button:hover {
-    background: #0f172a;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-}
-
-/* Active Category Highlights - High Visibility Blue */
-.category-grid button.active, 
-.property-type button.active {
-    background: #2563eb !important;
-    color: #ffffff !important;
-    border-color: #2563eb !important;
-}
-
-/* 6. Eye-Friendly Toggles & Sliders */
-input:checked + .slider {
-    background-color: #2563eb;
-}
-
-/* 7. Info Boxes - Muted Gray (Anti-Strain) */
-.business-benefits {
     background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    color: #475569;
-    padding: 20px;
-    border-radius: 12px;
-    font-size: 15px;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.business-benefits h4 { color: #1e293b; margin-bottom: 10px; }
+.modal-content input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
 
-/* 8. Full-Screen Mobile Optimization */
-@media (max-width: 600px) {
+/* 6. Action Buttons (No Pink/Gradients) */
+.post-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.primary-btn {
+    flex: 2;
+    background: #2563eb;
+    color: #fff;
+    font-weight: 700;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.ghost-btn {
+    flex: 1;
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    padding: 16px;
+    border-radius: 12px;
+}
+
+.primary-btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+.primary-btn:disabled { opacity: 0.5; pointer-events: none; }
+
+/* 7. Category Selection Grid */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.category-grid button {
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 20px 10px;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+}
+
+.category-grid button.active {
+    background: #eff6ff !important;
+    border-color: #2563eb !important;
+    color: #2563eb !important;
+}
+
+/* 8. Mobile Full-Screen Optimization */
+@media (max-width: 480px) {
     .modal-content {
-        width: 100%;
-        height: 100%;
-        max-width: none;
+        width: 100vw;
+        height: 100vh;
+        max-height: 100vh;
         border-radius: 0;
-        padding: 30px 20px;
-        justify-content: center;
+        padding: 40px 20px;
     }
 }
 
 /* Animations */
 @keyframes slideUp {
-    from { transform: translateY(30px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
 }
