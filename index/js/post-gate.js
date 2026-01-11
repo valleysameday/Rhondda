@@ -1,3 +1,4 @@
+console.log("POST-GATE: Loaded");
 // ===============================
 // POST GATE (MAIN CALLER)
 // index/js/post-gate.js
@@ -13,6 +14,7 @@ import { initPostSubmit } from "../postingStuff/post-submit.js";
 let auth, db, storage;
 
 export function initPostGate() {
+console.log("POST-GATE: initPostGate() running");
   getFirebase().then(fb => {
     auth = fb.auth;
     db = fb.db;
