@@ -57,19 +57,19 @@ export async function fetchFeedPosts({ lastDoc = null, limitCount = 50 } = {}) {
 
   const postsRef = collection(db, "posts");
   const q = lastDoc
-  ? query(
-      postsRef,
-      where("status", "==", "active"),
-      orderBy("createdAt", "desc"),
-      startAfter(lastDoc),
-      limit(limitCount)
-    )
-  : query(
-      postsRef,
-      where("status", "==", "active"),
-      orderBy("createdAt", "desc"),
-      limit(limitCount)
-    );
+    ? query(
+        postsRef,
+        where("status", "==", "active"),
+        orderBy("createdAt", "desc"),
+        startAfter(lastDoc),
+        limit(limitCount)
+      )
+    : query(
+        postsRef,
+        where("status", "==", "active"),
+        orderBy("createdAt", "desc"),
+        limit(limitCount)
+      );
 
   const snap = await getDocs(q);
 
@@ -100,7 +100,8 @@ export async function addPost(post) {
     ...post,
     status: "active",
     createdAt: Date.now(),
-    views: 0
+    views: 0,
+    stats: { contacts: 0, calls: 0, whatsapp: 0 }
   });
 }
 
@@ -115,38 +116,22 @@ export async function updatePost(postId, data) {
    RENEW & UNPUBLISH POSTS
 ============================================================ */
 
-// Reset timestamp + reactivate
 export async function renewPost(postId) {
-  console.log("🔄 renewPost()", postId);
-
   if (!db || !postId) return;
-
   await updateDoc(doc(db, "posts", postId), {
     createdAt: Date.now(),
     status: "active"
   });
-
-  console.log("✅ Post renewed");
 }
 
-// Mark as expired (auto-unpublish)
 export async function unpublishPost(postId) {
-  console.log("⛔ unpublishPost()", postId);
-
   if (!db || !postId) return;
-
   await updateDoc(doc(db, "posts", postId), {
     status: "expired"
   });
-
-  console.log("⚠️ Post marked expired");
 }
 
-
-
 export async function deletePost(post) {
-  console.log("🗑 deletePost()", post?.id);
-
   if (!db || !storage || !post?.id) return;
 
   const urls = [
@@ -157,21 +142,15 @@ export async function deletePost(post) {
   for (const url of urls) {
     try {
       const path = decodeURIComponent(url.split("/o/")[1].split("?")[0]);
-      console.log("🧹 deleting storage file:", path);
       await deleteObject(ref(storage, path));
-    } catch (err) {
-      console.warn("⚠️ Failed deleting image", err);
-    }
+    } catch {}
   }
 
-  await updateDoc(doc(db, "posts", post.id), { deleted: true }).catch(() =>
-    deleteDoc(doc(db, "posts", post.id))
-  );
+  await updateDoc(doc(db, "posts", post.id), { deleted: true })
+    .catch(() => deleteDoc(doc(db, "posts", post.id)));
 }
 
 export async function getSellerPosts(uid) {
-  console.log("📦 getSellerPosts()", uid);
-
   if (!db || !uid) return [];
 
   const postsRef = collection(db, "posts");
@@ -185,13 +164,10 @@ export async function getSellerPosts(uid) {
     if (!snaps.find(x => x.id === d.id)) snaps.push({ id: d.id, ...d.data() });
   });
 
-  console.log(`✅ ${snaps.length} seller posts found`);
   return snaps;
 }
 
 export async function toggleSavePost({ uid, postId }) {
-  console.log("⭐ toggleSavePost()", { uid, postId });
-
   const refUser = doc(db, "users", uid);
   const snap = await getDoc(refUser);
   if (!snap.exists()) return false;
@@ -200,8 +176,6 @@ export async function toggleSavePost({ uid, postId }) {
   saved[postId] ? delete saved[postId] : saved[postId] = true;
 
   await updateDoc(refUser, { savedPosts: saved });
-
-  console.log("✅ savedPosts updated");
   return !!saved[postId];
 }
 
@@ -210,24 +184,17 @@ export async function toggleSavePost({ uid, postId }) {
 ============================================================ */
 
 export async function getUser(uid) {
-  console.log("👤 getUser()", uid);
-
   if (!db || !uid) return null;
   const snap = await getDoc(doc(db, "users", uid));
-
   return snap.exists() ? { uid, ...snap.data() } : null;
 }
 
 export async function updateUser(uid, data) {
-  console.log("✏️ updateUser()", uid, data);
-
   if (!db || !uid || !data) return;
   await updateDoc(doc(db, "users", uid), data);
 }
 
 export async function toggleFollowSeller(userUid, sellerUid, actuallyToggle = true) {
-  console.log("➕ toggleFollowSeller()", { userUid, sellerUid });
-
   const sellerRef = doc(db, "users", sellerUid);
   const snap = await getDoc(sellerRef);
   if (!snap.exists()) return false;
@@ -244,32 +211,24 @@ export async function toggleFollowSeller(userUid, sellerUid, actuallyToggle = tr
 }
 
 /* ============================================================
-   LEADS / CONTACT COUNTERS
+   LEADS / CONTACT COUNTERS (CHEAP & SAFE)
 ============================================================ */
 
 const DEDUPE_MINUTES = 5;
 
 export async function trackContactClick({ postId, sellerUid, viewerUid, type }) {
-  console.log("📞 trackContactClick()", { postId, sellerUid, viewerUid, type });
-
   if (!db || !postId || !sellerUid || !viewerUid || !type) return;
 
-  const since = Timestamp.fromMillis(Date.now() - DEDUPE_MINUTES * 60 * 1000);
+  // Prevent seller clicking own ad
+  if (viewerUid === sellerUid) return;
 
-  const q = query(
-    collection(db, "leads"),
-    where("postId", "==", postId),
-    where("viewerUid", "==", viewerUid),
-    where("type", "==", type),
-    where("createdAt", ">", since)
-  );
+  // Cheap dedupe using localStorage
+  const key = `lead:${postId}:${viewerUid}:${type}`;
+  const last = Number(localStorage.getItem(key));
+  if (last && Date.now() - last < DEDUPE_MINUTES * 60 * 1000) return;
+  localStorage.setItem(key, Date.now());
 
-  const snap = await getDocs(q);
-  if (!snap.empty) {
-    console.log("⛔ Duplicate lead ignored");
-    return;
-  }
-
+  // Create lead
   await addDoc(collection(db, "leads"), {
     postId,
     sellerUid,
@@ -278,13 +237,14 @@ export async function trackContactClick({ postId, sellerUid, viewerUid, type }) 
     createdAt: serverTimestamp()
   });
 
+  // Increment stats
   await updateDoc(doc(db, "posts", postId), {
-    "stats.contacts": increment(1),
-    ...(type === "call" && { "stats.calls": increment(1) }),
-    ...(type === "whatsapp" && { "stats.whatsapp": increment(1) })
+    stats: {
+      contacts: increment(1),
+      ...(type === "call" && { calls: increment(1) }),
+      ...(type === "whatsapp" && { whatsapp: increment(1) })
+    }
   });
-
-  console.log("✅ Lead recorded");
 }
 
 /* ============================================================
@@ -292,8 +252,6 @@ export async function trackContactClick({ postId, sellerUid, viewerUid, type }) 
 ============================================================ */
 
 export async function uploadAvatar(uid, file, type = "user") {
-  console.log("🖼 uploadAvatar()", uid);
-
   if (!storage || !file || !uid) return null;
 
   const path = type === "user"
@@ -308,22 +266,15 @@ export async function uploadAvatar(uid, file, type = "user") {
     avatarUrl: url
   });
 
-  console.log("✅ Avatar uploaded");
   return url;
 }
 
 export async function uploadPostImage(file, uid) {
-  console.log("🖼 uploadPostImage()", uid);
-
   if (!storage || !file || !uid) return null;
 
   const refPath = ref(storage, `posts/${uid}/${Date.now()}-${file.name}`);
   await uploadBytes(refPath, file);
-
-  const url = await getDownloadURL(refPath);
-  console.log("✅ Post image uploaded");
-
-  return url;
+  return await getDownloadURL(refPath);
 }
 
 /* ============================================================
@@ -331,20 +282,18 @@ export async function uploadPostImage(file, uid) {
 ============================================================ */
 
 export function onUserConversations(userId, cb) {
-  console.log("💬 onUserConversations()", userId);
-
   if (!db || !userId) return () => {};
-  const q = query(
-    collection(db, "conversations"),
-    where("participants", "array-contains", userId),
-    orderBy("updatedAt", "desc")
+  return onSnapshot(
+    query(
+      collection(db, "conversations"),
+      where("participants", "array-contains", userId),
+      orderBy("updatedAt", "desc")
+    ),
+    cb
   );
-  return onSnapshot(q, cb);
 }
 
 export function onConversationMessages(convoId, cb) {
-  console.log("📨 onConversationMessages()", convoId);
-
   if (!db || !convoId) return () => {};
   return onSnapshot(
     query(collection(db, "conversations", convoId, "messages"), orderBy("createdAt")),
@@ -353,8 +302,6 @@ export function onConversationMessages(convoId, cb) {
 }
 
 export async function sendMessage(convoId, senderId, text) {
-  console.log("✉️ sendMessage()", { convoId, senderId });
-
   if (!db || !convoId || !senderId || !text) return;
 
   const now = Date.now();
@@ -371,8 +318,6 @@ export async function sendMessage(convoId, senderId, text) {
     { lastMessage: text, lastMessageSender: senderId, updatedAt: now },
     { merge: true }
   );
-
-  console.log("✅ Message sent");
 }
 
 /* ============================================================
@@ -380,7 +325,6 @@ export async function sendMessage(convoId, senderId, text) {
 ============================================================ */
 
 export async function fsGetAllServices() {
-  console.log("🛠 fsGetAllServices()");
   const snap = await getDocs(query(
     collection(db, "services"),
     where("isActive", "==", true),
@@ -390,8 +334,6 @@ export async function fsGetAllServices() {
 }
 
 export async function fsSearchServices(term) {
-  console.log("🔍 fsSearchServices()", term);
-
   if (!term) return [];
   const snap = await getDocs(query(
     collection(db, "services"),
@@ -409,8 +351,6 @@ export async function fsSearchServices(term) {
 }
 
 export async function fsFilterServices(category) {
-  console.log("🏷 fsFilterServices()", category);
-
   if (!category) return [];
   const snap = await getDocs(query(
     collection(db, "services"),
@@ -421,15 +361,11 @@ export async function fsFilterServices(category) {
 }
 
 export async function fsGetServiceById(serviceId) {
-  console.log("📄 fsGetServiceById()", serviceId);
-
   const snap = await getDoc(doc(db, "services", serviceId));
   return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 }
 
 export async function fsReportService(serviceId, reason) {
-  console.log("🚨 fsReportService()", serviceId, reason);
-
   await addDoc(collection(db, "serviceReports"), {
     serviceId,
     reason,
@@ -437,71 +373,47 @@ export async function fsReportService(serviceId, reason) {
     createdAt: serverTimestamp()
   });
 }
+
 export async function fsGetUserServices(uid) {
-  console.log("👔 fsGetUserServices()", uid);
-
   if (!db || !uid) return [];
-
   const q = query(
     collection(db, "services"),
     where("ownerUid", "==", uid),
     where("isActive", "==", true)
   );
-
   const snap = await getDocs(q);
-
-  console.log(`📦 ${snap.docs.length} services found for user`);
-
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
+
 export async function fsAddService(data) {
-  console.log("➕ fsAddService()", data);
-
   if (!db || !data) return null;
-
   const docRef = await addDoc(collection(db, "services"), {
     ...data,
     createdAt: Date.now(),
     isActive: true
   });
-
-  console.log("✅ Service created:", docRef.id);
   return docRef.id;
 }
+
 export async function fsUpdateService(serviceId, data) {
-  console.log("✏️ fsUpdateService()", serviceId, data);
-
   if (!db || !serviceId || !data) return false;
-
   await updateDoc(doc(db, "services", serviceId), data);
-
-  console.log("✅ Service updated");
   return true;
 }
+
 export async function fsDeleteService(serviceId) {
-  console.log("🗑 fsDeleteService()", serviceId);
-
   if (!db || !serviceId) return false;
-
   await updateDoc(doc(db, "services", serviceId), {
     isActive: false,
     deletedAt: Date.now()
   });
-
-  console.log("⚠️ Service marked inactive");
   return true;
 }
+
 export async function fsUploadServiceImage(serviceId, file, index = 0) {
-  console.log("🖼 fsUploadServiceImage()", { serviceId, index });
-
   if (!storage || !file || !serviceId) return null;
-
   const path = `services/${serviceId}/photo-${index}.jpg`;
   const refPath = ref(storage, path);
-
   await uploadBytes(refPath, file);
-  const url = await getDownloadURL(refPath);
-
-  console.log("✅ Uploaded:", url);
-  return url;
+  return await getDownloadURL(refPath);
 }
