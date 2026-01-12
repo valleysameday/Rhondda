@@ -57,7 +57,7 @@ export async function fetchFeedPosts({
   limitCount = 50,
   category = "all",
   subCategory = null
-} = {})
+} = {}) {
   console.log("📥 fetchFeedPosts()", { lastDoc, limitCount, category });
   const postsRef = collection(db, "posts");
   let q;
