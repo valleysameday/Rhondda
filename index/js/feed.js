@@ -25,7 +25,6 @@ function resetFeedState() {
   lastDoc = null;
   loadingMore = false;
   reachedEnd = false;
-  currentCategory = "all";
 }
 
 /* ============================================================
@@ -236,7 +235,9 @@ if (btn.dataset.category === "services") {
   loadView("view-services", { forceInit: true });
   return;
 }
-
+if (window.currentView === "view-services" && btn.dataset.category !== "services") {
+  loadView("home", { forceInit: true });
+}
     // Highlight active
     categoryBtns.forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
@@ -308,7 +309,6 @@ if (btn.dataset.category === "services") {
   showSkeletons();
 
   const posts = await fetchPosts(true);
-  currentCategory = "all";
 
   categoryBtns.forEach(b => b.classList.remove("active"));
   document.querySelector('.category-btn[data-category="all"]')?.classList.add("active");
