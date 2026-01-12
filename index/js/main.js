@@ -129,6 +129,8 @@ window.daysSince = function (timestamp) {
    SPA VIEW LOADER
 ===================================================== */
 export async function loadView(view, options = {}) {
+  // Push history state for native back button support
+history.pushState({ view }, "", "#" + view);
   window.currentViewOptions = options;
   if (view === "home") options.forceInit = true;
   if (window.currentView === view && !options.forceInit) return;
@@ -425,8 +427,21 @@ document.addEventListener("click", e => {
     });
   };
 
+// Handle phone back button
+window.onpopstate = (event) => {
+  const state = event.state;
 
-const postGate = await import('/index/js/post-gate.js');
+  // No state → default to home
+  if (!state || !state.view) {
+    loadView("home", { forceInit: true });
+    return;
+  }
+
+  loadView(state.view, { forceInit: true });
+};
+
+  
+  const postGate = await import('/index/js/post-gate.js');
 postGate.initPostGate();
   
   document.readyState === "loading"
