@@ -1,140 +1,34 @@
-// ========================== main.js ==========================
-
-import { getFirebase } from '/index/js/firebase/init.js';
-import { initUIRouter } from '/index/js/ui-router.js';
-import { openLoginModal } from '/index/js/auth/loginModal.js';
-import { openSignupModal } from '/index/js/auth/signupModal.js';
-import { openForgotModal } from '/index/js/auth/forgotModal.js';
-
+import { getFirebase } from "/index/js/firebase/init.js";
+import { openLoginModal } from "/index/js/auth/loginModal.js";
+import { openSignupModal } from "/index/js/auth/signupModal.js";
+import { openForgotModal } from "/index/js/auth/forgotModal.js";
 import { initViewServices } from "/views/view-services.js";
 import { initViewService } from "/views/view-service.js";
 
+let auth, db, storage, settingsModule = null;
+
+// Registry for special views
 const viewRegistry = {
   "view-services": initViewServices,
-  "view-service": initViewService,
-  // …existing views
+  "view-service": initViewService
 };
 
-window.openManageMyBusinessPopup = function(services) {
-  const popup = document.getElementById("manageBusinessPopup");
-  const grid = document.getElementById("manageBusinessGrid");
-  const closeBtn = document.getElementById("closeManagePopup");
-
-  grid.innerHTML = "";
-
-  // Render existing listings
-  services.forEach(s => {
-    const card = document.createElement("div");
-    card.className = "manage-card";
-
-    card.innerHTML = `
-      <img src="${s.logoUrl || '/assets/default-logo.png'}">
-      <h4>${s.name || s.businessName}</h4>
-      <p>${s.category}</p>
-
-      <button class="btn-edit">Edit</button>
-      <button class="btn-delete">Delete</button>
-    `;
-
-    // Edit
-    card.querySelector(".btn-edit").addEventListener("click", () => {
-      loadView("business-onboarding", { forceInit: true, editService: s });
-      popup.classList.add("hidden");
-    });
-
-    // Delete
-    card.querySelector(".btn-delete").addEventListener("click", async () => {
-      if (!confirm("Delete this listing?")) return;
-
-      await settingsModule.fsDeleteService(s.id);
-      alert("Listing deleted");
-      popup.classList.add("hidden");
-    });
-
-    grid.appendChild(card);
-  });
-
-  // Add New Listing Card
-  const addCard = document.createElement("div");
-  addCard.className = "manage-card add-card";
-
-  const userHasTwo = services.length >= 2;
-
-  addCard.innerHTML = userHasTwo
-    ? `
-      <span>🔒</span>
-      <p>Upgrade to add more listings</p>
-    `
-    : `
-      <span>+</span>
-      <p>Add New Business</p>
-    `;
-
-  if (!userHasTwo) {
-    addCard.addEventListener("click", () => {
-      loadView("business-onboarding", { forceInit: true });
-      popup.classList.add("hidden");
-    });
-  } else {
-    addCard.classList.add("locked");
+// ------------------------------------------------------
+// SPA VIEW LOADER (HASH-BASED, NO PUSHSTATE)
+// ------------------------------------------------------
+export async function loadView(view, options = {}) {
+  // Update hash WITHOUT triggering popstate
+  if (location.hash !== "#" + view) {
+    location.hash = view;
   }
 
-  grid.appendChild(addCard);
-
-  // Show popup
-  popup.classList.remove("hidden");
-
-  closeBtn.addEventListener("click", () => popup.classList.add("hidden"));
-};
-// Expose modals globally
-window.openLoginModal = openLoginModal;
-window.openSignupModal = openSignupModal;
-window.openForgotModal = openForgotModal;
-
-let auth, db, storage;
-let settingsModule = null;
-
-/* =====================================================
-   GLOBAL TIME FORMATTER
-===================================================== */
-window.timeAgo = function (timestamp) {
-  if (!timestamp) return "";
-
-  const diff = Date.now() - timestamp;
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-
-  if (seconds < 60) return "Just now";
-  if (minutes === 1) return "1 minute ago";
-  if (minutes < 60) return `${minutes} minutes ago`;
-  if (hours === 1) return "1 hour ago";
-  if (hours < 24) return `${hours} hours ago`;
-  if (days === 1) return "Yesterday";
-  return `${days} days ago`;
-};
-
-/* =====================================================
-   DAYS SINCE (for expiry logic)
-===================================================== */
-window.daysSince = function (timestamp) {
-  if (!timestamp) return 999; // treat missing timestamps as expired
-
-  const diff = Date.now() - timestamp;
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
-};
-
-/* =====================================================
-   SPA VIEW LOADER
-===================================================== */
-export async function loadView(view, options = {}) {
-  // Push history state for native back button support
-history.pushState({ view }, "", "#" + view);
   window.currentViewOptions = options;
-  if (view === "home") options.forceInit = true;
-  if (window.currentView === view && !options.forceInit) return;
 
+  // Force re-init for home
+  if (view === "home") options.forceInit = true;
+
+  // Prevent duplicate loads
+  if (window.currentView === view && !options.forceInit) return;
   window.currentView = view;
 
   const app = document.getElementById("app");
@@ -143,6 +37,7 @@ history.pushState({ view }, "", "#" + view);
   // Hide all views
   app.querySelectorAll(".view").forEach(v => (v.hidden = true));
 
+  // Create or select view container
   let target = document.getElementById(`view-${view}`);
   if (!target) {
     target = document.createElement("div");
@@ -152,8 +47,10 @@ history.pushState({ view }, "", "#" + view);
     app.appendChild(target);
   }
 
+  // Force reload if needed
   if (options.forceInit) delete target.dataset.loaded;
 
+  // Load HTML + JS for the view
   if (!target.dataset.loaded) {
     target.innerHTML = await fetch(`/views/${view}.html`).then(r => r.text());
     target.dataset.loaded = "true";
@@ -161,22 +58,22 @@ history.pushState({ view }, "", "#" + view);
     try {
       const mod = await import(`/views/${view}.js`);
       mod.init?.({ auth, db, storage });
-
-
     } catch (err) {
       console.error("❌ View JS error:", err);
     }
   }
 
+  // Show the view
   target.hidden = false;
-document.querySelectorAll(".sub-tabs").forEach(el =>
-  el.classList.add("hidden")
-);
-  /* ===============================
-     ACCOUNT HEADER VISIBILITY LOGIC
-  =============================== */
+
+  // Hide sub-tabs globally
+  document.querySelectorAll(".sub-tabs").forEach(el =>
+    el.classList.add("hidden")
+  );
+
+  // Header visibility logic
   const accountHeader = document.getElementById("accountHeader");
-  const categoryBars = document.querySelectorAll(".main-tabs, .rctx-search");
+  const mainTabs = document.querySelectorAll(".main-tabs, .rctx-search");
 
   const accountViews = [
     "my-ads",
@@ -189,10 +86,10 @@ document.querySelectorAll(".sub-tabs").forEach(el =>
 
   if (accountViews.includes(view)) {
     accountHeader?.classList.remove("hidden");
-    categoryBars.forEach(el => el.classList.add("hidden"));
+    mainTabs.forEach(el => el.classList.add("hidden"));
   } else {
     accountHeader?.classList.add("hidden");
-    categoryBars.forEach(el => el.classList.remove("hidden"));
+    mainTabs.forEach(el => el.classList.remove("hidden"));
   }
 
   // Highlight active account tab
@@ -201,18 +98,26 @@ document.querySelectorAll(".sub-tabs").forEach(el =>
   });
 }
 
-/* =====================================================
-   SIDEBAR MENU RENDERER
-===================================================== */
+// ------------------------------------------------------
+// HASH-BASED ROUTER (REPLACES POPSTATE COMPLETELY)
+// ------------------------------------------------------
+window.addEventListener("hashchange", () => {
+  const view = location.hash.replace("#", "") || "home";
+  loadView(view, { forceInit: true });
+});
+
+// ------------------------------------------------------
+// SIDE MENU RENDERING
+// ------------------------------------------------------
 function renderSideMenu() {
   const menu = document.getElementById("menuOptions");
   if (!menu) return;
 
   menu.innerHTML = "";
 
-  const isLoggedIn = !!auth.currentUser;
+  const loggedIn = !!auth.currentUser;
 
-  const options = isLoggedIn
+  const items = loggedIn
     ? [
         { label: "Home", action: () => loadView("home") },
         { label: "Post an Ad", action: () => document.getElementById("post-ad-btn")?.click() },
@@ -234,215 +139,107 @@ function renderSideMenu() {
         { label: "Login", action: () => openLoginModal() }
       ];
 
-  options.forEach(opt => {
-    const item = document.createElement("div");
-    item.className = "menu-item";
-    item.innerHTML = `
-      <span>${opt.label}</span>
+  items.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "menu-item";
+    div.innerHTML = `
+      <span>${item.label}</span>
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
       </svg>
     `;
-
-    item.addEventListener("click", () => {
+    div.addEventListener("click", () => {
       document.getElementById("sideMenu")?.classList.add("hidden");
-      opt.action();
+      item.action();
     });
-
-    menu.appendChild(item);
+    menu.appendChild(div);
   });
 }
 
-/* =====================================================
-   LIST MY BUSINESS HANDLER
-===================================================== */
+// ------------------------------------------------------
+// BUSINESS HANDLER
+// ------------------------------------------------------
 async function handleListMyBusiness() {
   const user = auth.currentUser;
-
   if (!user) {
     openLoginModal();
     return;
   }
 
   const services = await settingsModule.fsGetUserServices(user.uid);
-
-  if (!services.length) {
-    loadView("business-onboarding", { forceInit: true });
-  } else {
+  if (services.length) {
     openManageMyBusinessPopup(services);
+  } else {
+    loadView("business-onboarding", { forceInit: true });
   }
 }
-/* =====================================================
-   APP INITIALIZATION
-===================================================== */
-getFirebase().then(async fb => {
 
+// ------------------------------------------------------
+// APP INITIALISATION
+// ------------------------------------------------------
+getFirebase().then(async fb => {
   auth = fb.auth;
   db = fb.db;
   storage = fb.storage;
 
-  window.firebaseAuth = auth;
-  window.firebaseDb = db;
-  window.firebaseStorage = storage;
-
   settingsModule = await import("/index/js/firebase/settings.js");
   settingsModule.initFirebase({ auth, db, storage });
-  const fsLoadUserProfile = settingsModule.getUser;
+
+  // Auth state
+  const getUser = settingsModule.getUser;
 
   window.currentUser = null;
   window.currentUserData = null;
   window.authReady = false;
 
-  /* =====================================================
-     AUTH LISTENER
-  ===================================================== */
   auth.onAuthStateChanged(async user => {
     window.currentUser = user || null;
     window.currentUserData = null;
     window.authReady = false;
 
-    const statusDot = document.getElementById("accountStatusDot");
-    if (statusDot) {
-      statusDot.style.background = user ? "green" : "red";
-      statusDot.classList.toggle("logged-out", !user);
+    const dot = document.getElementById("accountStatusDot");
+    if (dot) {
+      dot.style.background = user ? "green" : "red";
+      dot.classList.toggle("logged-out", !user);
     }
 
-    const loginBtn = document.getElementById("auth-logged-out");
-    const inboxBtn = document.getElementById("auth-messages");
+    const loggedOut = document.getElementById("auth-logged-out");
+    const messages = document.getElementById("auth-messages");
 
     if (!user) {
-      loginBtn?.classList.remove("hidden");
-      inboxBtn?.classList.add("hidden");
+      loggedOut?.classList.remove("hidden");
+      messages?.classList.add("hidden");
       window.authReady = true;
       return;
     }
 
-    loginBtn?.classList.add("hidden");
-    inboxBtn?.classList.remove("hidden");
+    loggedOut?.classList.add("hidden");
+    messages?.classList.remove("hidden");
 
     try {
-      window.currentUserData = await fsLoadUserProfile(user.uid);
-
+      window.currentUserData = await getUser(user.uid);
       const adminBtn = document.getElementById("openAdminDashboard");
       if (adminBtn) {
         adminBtn.style.display = window.currentUserData?.isAdmin
           ? "inline-block"
           : "none";
       }
-
-    } catch (e) {
-      console.warn("❌ User lookup failed:", e);
+    } catch (err) {
+      console.warn("❌ User lookup failed:", err);
     }
 
     window.authReady = true;
   });
 
-  /* =====================================================
-     START APP
-  ===================================================== */
+  // Initial load
   const start = () => {
-  //  initUIRouter();
-    loadView("home");
-
-    // LOGIN BUTTON
-    document.addEventListener("click", e => {
-      if (e.target.closest("#auth-logged-out")) openLoginModal(auth, db);
-    });
-    
-    
-    // LOGO → HOME
-    document.addEventListener("click", e => {
-      if (e.target.closest(".rctx-logo")) {
-        loadView("home", { forceInit: true });
-        window.scrollTo(0, 0);
-      }
-    });
-// ACCOUNT TABS → LOAD VIEW
-document.addEventListener("click", e => {
-  const btn = e.target.closest(".account-tabs button");
-  if (!btn) return;
-
-  const view = btn.dataset.view;
-  loadView(view);
-  window.scrollTo(0, 0);
-});
-    // INBOX → CHAT LIST
-    document.addEventListener("click", e => {
-      if (e.target.closest("#auth-messages")) {
-        const chatView = document.getElementById("view-chat-list");
-        if (chatView) delete chatView.dataset.loaded;
-        loadView("chat-list", { forceInit: true });
-        window.scrollTo(0, 0);
-      }
-    });
-
-    // VEHICLES SUBCATEGORY
-    const subVehicles = document.getElementById("sub-vehicles");
-    document.addEventListener("click", e => {
-      const isVehicles = e.target.closest("#cat-vehicles");
-      const isCategory = e.target.closest(".rctx-tabs");
-
-      if (isVehicles) subVehicles?.classList.remove("hidden");
-      else if (isCategory) subVehicles?.classList.add("hidden");
-    });
-
-    // POST AD BUTTON
-    document.addEventListener("click", e => {
-      if (!e.target.closest("#post-ad-btn")) return;
-
-      if (!auth.currentUser) {
-        openLoginModal();
-        return;
-      }
-
-    document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
-
-      const postModal = document.getElementById("posts-grid");
-      postModal.style.display = "flex";
-
-      const steps = document.querySelectorAll("#posts-grid .post-step");
-      const dots = document.querySelectorAll("#posts-grid .dot");
-
-      steps.forEach(s => s.classList.remove("active"));
-      dots.forEach(d => d.classList.remove("active"));
-
-      steps[0]?.classList.add("active");
-      dots[0]?.classList.add("active");
-    });
-
-    // MENU BUTTON → SIDEBAR
-    document.addEventListener("click", e => {
-      if (e.target.closest("[title='Menu']")) {
-        renderSideMenu();
-        document.getElementById("sideMenu")?.classList.remove("hidden");
-      }
-
-      if (e.target.closest(".close-menu")) {
-        document.getElementById("sideMenu")?.classList.add("hidden");
-      }
-    });
+    const initialView = location.hash.replace("#", "") || "home";
+    loadView(initialView, { forceInit: true });
   };
 
-// Handle phone back button
-window.onpopstate = (event) => {
-  const state = event.state;
-
-  // No state → default to home
-  if (!state || !state.view) {
-    loadView("home", { forceInit: true });
-    return;
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start);
+  } else {
+    start();
   }
-
-  loadView(state.view, { forceInit: true });
-};
-
-  
-  const postGate = await import('/index/js/post-gate.js');
-postGate.initPostGate();
-  
-  document.readyState === "loading"
-    ? document.addEventListener("DOMContentLoaded", start)
-    : start();
-
-  await import('/index/js/post-gate.js');
 });
