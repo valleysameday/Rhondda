@@ -123,6 +123,23 @@ export async function addPost(post) {
   });
 } 
 /* ============================================================
+   GET SINGLE POST
+============================================================ */
+export async function getPost(postId) {
+  console.log("📄 getPost()", postId);
+
+  if (!db || !postId) return null;
+
+  const snap = await getDoc(doc(db, "posts", postId));
+
+  if (!snap.exists()) {
+    console.warn("⚠️ Post not found", postId);
+    return null;
+  }
+
+  return { id: snap.id, ...snap.data() };
+}
+/* ============================================================
    RENEW & UNPUBLISH POSTS
 ============================================================ */
 
