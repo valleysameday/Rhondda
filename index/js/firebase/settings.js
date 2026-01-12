@@ -59,6 +59,20 @@ export async function fetchFeedPosts({
 } = {}) {
   console.log("📥 fetchFeedPosts()", { lastDoc, limitCount, category });
 
+
+ /* ============================================================
+   ADD POST (RESTORED)
+============================================================ */
+export async function addPost(post) {
+  return await addDoc(collection(db, "posts"), {
+    ...post,
+    status: "active",
+    createdAt: Date.now(),
+    views: 0,
+    stats: { contacts: 0, calls: 0, whatsapp: 0 }
+  });
+} 
+  
   const postsRef = collection(db, "posts");
   let q;
 
