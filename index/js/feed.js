@@ -92,7 +92,11 @@ export async function initFeed(_, options = {}) {
   async function fetchPosts(initial = false) {
     if (reachedEnd) return [];
 
-    const result = await fsFetchFeedPosts({ lastDoc, initial });
+    const result = await fsFetchFeedPosts({
+  lastDoc,
+  initial,
+  category: currentCategory
+});
 
     if (!result.posts.length) {
       reachedEnd = true;
@@ -149,9 +153,7 @@ if (ENABLE_SPONSORED_AD && initial) {
       document.getElementById("feedEndMessage")?.remove();
     }
 
-    const filtered =
-      category === "all" ? posts : posts.filter(p => p.category === category);
-
+    const filtered = posts;
     if (!filtered.length && !options.append) {
       postsContainer.innerHTML = `<p class="empty-feed">No posts yet</p>`;
       return;
