@@ -63,7 +63,7 @@ body.modal-open main {
 .modal-content textarea:focus,
 .modal-content select:focus {
     outline: none;
-    border-color: ##380c0c;
+    border-color: #380c0c;
     box-shadow: 0 0 0 3px rgba(255,126,179,0.15);
 }
 
@@ -116,7 +116,7 @@ body.modal-open main {
     text-align: center;
 }
 .modal-switch span {
-    color: ##67a5c7;
+    color: #67a5c7;
     cursor: pointer;
     font-weight: 600;
 }
