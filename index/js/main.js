@@ -130,7 +130,10 @@ window.daysSince = function (timestamp) {
 ===================================================== */
 export async function loadView(view, options = {}) {
   // Push history state for native back button 
-  location.hash = view;
+  // Only update hash if it actually changed
+if (location.hash !== "#" + view) {
+    location.hash = view;
+}
   window.currentViewOptions = options;
   if (view === "home") options.forceInit = true;
   if (window.currentView === view && !options.forceInit) return;
