@@ -162,11 +162,7 @@ history.pushState({ view }, "", "#" + view);
       const mod = await import(`/views/${view}.js`);
       mod.init?.({ auth, db, storage });
 
-      // 🔥 IMPORTANT: Home feed must be manually initialised
-      if (view === "home") {
-        const { initFeed } = await import("/index/js/feed.js");
-        initFeed({ db });
-      }
+
     } catch (err) {
       console.error("❌ View JS error:", err);
     }
