@@ -13,13 +13,14 @@ import { loadView } from "/index/js/main.js";
 let lastDoc = null;
 let loadingMore = false;
 let reachedEnd = false;
-let currentCategory = "all";
+let currentCategory = "all";       // main category: all, free, jobs, property, vehicles, etc.
+let currentSubCategory = null;     // sub-category: cars, vans, property-rent, etc.
 let scrollBound = false;
 
 const savedPosts = new Set();
 
 /* ============================================================
-   STATE RESET (🔥 FIX)
+   STATE RESET
 ============================================================ */
 function resetFeedState() {
   lastDoc = null;
@@ -33,13 +34,14 @@ function resetFeedState() {
 export async function initFeed(_, options = {}) {
   console.log("🏠 Home view init");
 
-  // 🔥 CRITICAL FIX
   resetFeedState();
 
   const postsContainer = document.getElementById("feed");
-  const categoryBtns = document.querySelectorAll(".category-btn");
-
   if (!postsContainer) return console.warn("Feed container not found");
+
+  const mainCategoryBtns = document.querySelectorAll(".main-tabs .category-btn");
+  const subVehicleBtns   = document.querySelectorAll("#sub-vehicles .category-btn");
+  const subPropertyBtns  = document.querySelectorAll("#sub-property .category-btn");
 
   /* ============================================================
      SKELETON LOADING
@@ -86,16 +88,17 @@ export async function initFeed(_, options = {}) {
   }
 
   /* ============================================================
-     FETCH POSTS
+     FETCH POSTS (CATEGORY + SUB‑CATEGORY AWARE)
   ============================================================ */
   async function fetchPosts(initial = false) {
     if (reachedEnd) return [];
 
     const result = await fsFetchFeedPosts({
-  lastDoc,
-  initial,
-  category: currentCategory
-});
+      lastDoc,
+      initial,
+      category: currentCategory,
+      subCategory: currentSubCategory || null   // ← requires settings.js to accept this
+    });
 
     if (!result.posts.length) {
       reachedEnd = true;
@@ -104,30 +107,29 @@ export async function initFeed(_, options = {}) {
 
     lastDoc = result.lastDoc;
 
- /// ← AD LOGIC...///
-    const ENABLE_SPONSORED_AD = false; // ← flip to true to activate
-
-if (ENABLE_SPONSORED_AD && initial) {
-  result.posts.push({
-    id: "featured-biz",
-    title: "Rhondda Pro Cleaning Services",
-    teaser: "Professional home & end-of-tenancy cleaning. Trusted local business.",
-    category: "business",
-    categoryLabel: "Sponsored",
-    area: "Rhondda Valleys",
-    image: "/images/business-cleaning.jpg",
-    type: "featured",
-    isBusiness: true,
-    cta: "Get a Quote",
-    createdAt: Date.now()
-  });
-}
+    // Optional sponsored ad injection
+    const ENABLE_SPONSORED_AD = false;
+    if (ENABLE_SPONSORED_AD && initial) {
+      result.posts.push({
+        id: "featured-biz",
+        title: "Rhondda Pro Cleaning Services",
+        teaser: "Professional home & end-of-tenancy cleaning. Trusted local business.",
+        category: "business",
+        categoryLabel: "Sponsored",
+        area: "Rhondda Valleys",
+        image: "/images/business-cleaning.jpg",
+        type: "featured",
+        isBusiness: true,
+        cta: "Get a Quote",
+        createdAt: Date.now()
+      });
+    }
 
     return result.posts;
   }
 
   /* ============================================================
-     META BUILDER
+     META BUILDER (currently unused but kept for future)
   ============================================================ */
   function buildMeta(p) {
     let html = "";
@@ -145,20 +147,19 @@ if (ENABLE_SPONSORED_AD && initial) {
   /* ============================================================
      RENDER POSTS
   ============================================================ */
-  function renderPosts(posts, category = "all", options = {}) {
+  function renderPosts(posts, options = {}) {
     if (!options.append) {
       postsContainer.innerHTML = "";
       hideBottomLoader();
       document.getElementById("feedEndMessage")?.remove();
     }
 
-    const filtered = posts;
-    if (!filtered.length && !options.append) {
+    if (!posts.length && !options.append) {
       postsContainer.innerHTML = `<p class="empty-feed">No posts yet</p>`;
       return;
     }
 
-    filtered.forEach(post => {
+    posts.forEach(post => {
       const image =
         post.image ||
         post.imageUrl ||
@@ -170,33 +171,36 @@ if (ENABLE_SPONSORED_AD && initial) {
       card.className = `feed-card ${post.type || ""}`;
 
       card.innerHTML = `
-  <div class="feed-image">
-    <img src="${image}" alt="${post.title}">
-  </div>
+        <div class="feed-image">
+          <img src="${image}" alt="${post.title}">
+        </div>
 
-  <div class="feed-content">
+        <div class="feed-content">
 
-    <div class="price-heart-row">
-      <span class="post-price">£${post.price || ""}</span>
-      <button class="save-heart ${savedPosts.has(post.id) ? "saved" : ""}" data-id="${post.id}">
-        ${savedPosts.has(post.id) ? "♥" : "♡"}
-      </button>
-    </div>
+          <div class="price-heart-row">
+            <span class="post-price">£${post.price || ""}</span>
+            <button class="save-heart ${savedPosts.has(post.id) ? "saved" : ""}" data-id="${post.id}">
+              ${savedPosts.has(post.id) ? "♥" : "♡"}
+            </button>
+          </div>
 
-    <h3 class="feed-title">${post.title}</h3>
+          <h3 class="feed-title">${post.title}</h3>
 
-    <div class="feed-area">
-      ${post.area ? `📍 ${post.area}` : "📍 Rhondda"} 
-    </div>
+          <div class="feed-area">
+            ${post.area ? `📍 ${post.area}` : "📍 Rhondda"} 
+          </div>
 
-  </div>
-`;
+        </div>
+      `;
+
       card.addEventListener("click", e => {
-        if (e.target.closest(" .save-heart")) return;
+        if (e.target.closest(".save-heart")) return;
 
         sessionStorage.setItem("feedScroll", window.scrollY);
         sessionStorage.setItem("feedCategory", currentCategory);
+        sessionStorage.setItem("feedSubCategory", currentSubCategory || "");
         sessionStorage.setItem("viewPostId", post.id);
+
         loadView("view-post", { forceInit: true });
       });
 
@@ -225,67 +229,128 @@ if (ENABLE_SPONSORED_AD && initial) {
     saved ? savedPosts.add(postId) : savedPosts.delete(postId);
   });
 
-/* ============================================================
-   CATEGORY FILTERS
-============================================================ */
-categoryBtns.forEach(btn => {
-  btn.addEventListener("click", async () => {
-    // SERVICES CATEGORY → LOAD SERVICES DIRECTORY VIEW
-if (btn.dataset.category === "services") {
-  loadView("view-services", { forceInit: true });
-  return;
-}
-if (window.currentView === "view-services" && btn.dataset.category !== "services") {
-  loadView("home", { forceInit: true });
-}
-    // Highlight active
-    categoryBtns.forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
+  /* ============================================================
+     CATEGORY FILTERS (MAIN TABS)
+  ============================================================ */
+  mainCategoryBtns.forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const cat = btn.dataset.category;
 
-    // ============================
-    // SHOW/HIDE SUB‑CATEGORY BARS
-    // ============================
+      // SERVICES CATEGORY → LOAD SERVICES DIRECTORY VIEW
+      if (cat === "services") {
+        loadView("view-services", { forceInit: true });
+        return;
+      }
 
-    // Vehicles
-    if (btn.dataset.category === "vehicles") {
-      document.getElementById("sub-vehicles")?.classList.remove("hidden");
-    } else {
-      document.getElementById("sub-vehicles")?.classList.add("hidden");
-    }
+      // Highlight active main tab
+      mainCategoryBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
 
-    // Property
-    if (btn.dataset.category === "property") {
-      document.getElementById("sub-property")?.classList.remove("hidden");
-    } else {
-      document.getElementById("sub-property")?.classList.add("hidden");
-    }
+      // Show/hide sub‑category bars
+      if (cat === "vehicles") {
+        document.getElementById("sub-vehicles")?.classList.remove("hidden");
+      } else {
+        document.getElementById("sub-vehicles")?.classList.add("hidden");
+      }
 
-    // ============================
-    // LOAD POSTS
-    // ============================
-    currentCategory = btn.dataset.category;
-    resetFeedState();
+      if (cat === "property") {
+        document.getElementById("sub-property")?.classList.remove("hidden");
+      } else {
+        document.getElementById("sub-property")?.classList.add("hidden");
+      }
 
-    showSkeletons();
-    const posts = await fetchPosts(true);
-    renderPosts(posts, currentCategory);
+      // Update state
+      currentCategory = cat;
+      currentSubCategory = null; // reset sub when changing main
+
+      // Reset sub‑tab active states
+      if (cat === "vehicles") {
+        subVehicleBtns.forEach(b => b.classList.remove("active"));
+        document
+          .querySelector("#sub-vehicles .category-btn[data-category='cars']")
+          ?.classList.add("active"); // default highlight
+      }
+
+      if (cat === "property") {
+        subPropertyBtns.forEach(b => b.classList.remove("active"));
+        document
+          .querySelector("#sub-property .category-btn[data-category='property-sale']")
+          ?.classList.add("active"); // default highlight
+      }
+
+      // Load posts
+      resetFeedState();
+      showSkeletons();
+      const posts = await fetchPosts(true);
+      renderPosts(posts);
+    });
   });
-});
 
   /* ============================================================
-     INFINITE SCROLL (BOUND ONCE 🔥)
+     SUB‑CATEGORY FILTERS (VEHICLES)
+  ============================================================ */
+  subVehicleBtns.forEach(btn => {
+    btn.addEventListener("click", async () => {
+      // Ensure main tab stays on "vehicles"
+      currentCategory = "vehicles";
+      currentSubCategory = btn.dataset.category; // cars, vans, motorbikes, parts, othervehicles
+
+      // Highlight sub‑tabs
+      subVehicleBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      // Highlight main vehicles tab
+      document
+        .querySelector(".main-tabs .category-btn[data-category='vehicles']")
+        ?.classList.add("active");
+
+      // Load posts
+      resetFeedState();
+      showSkeletons();
+      const posts = await fetchPosts(true);
+      renderPosts(posts);
+    });
+  });
+
+  /* ============================================================
+     SUB‑CATEGORY FILTERS (PROPERTY)
+  ============================================================ */
+  subPropertyBtns.forEach(btn => {
+    btn.addEventListener("click", async () => {
+      // Ensure main tab stays on "property"
+      currentCategory = "property";
+      currentSubCategory = btn.dataset.category; // property-sale, property-rent
+
+      // Highlight sub‑tabs
+      subPropertyBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      // Highlight main property tab
+      document
+        .querySelector(".main-tabs .category-btn[data-category='property']")
+        ?.classList.add("active");
+
+      // Load posts
+      resetFeedState();
+      showSkeletons();
+      const posts = await fetchPosts(true);
+      renderPosts(posts);
+    });
+  });
+
+  /* ============================================================
+     INFINITE SCROLL (BOUND ONCE)
   ============================================================ */
   if (!scrollBound) {
+    scrollBound = true;
+
     window.addEventListener("scroll", async () => {
       if (loadingMore || reachedEnd) return;
 
-    if (!scrollBound) {
-  setTimeout(() => {
-    window.addEventListener("scroll", handleScroll);
-  }, 300);
+      const nearBottom =
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
 
-  scrollBound = true;
-    } {
+      if (nearBottom) {
         loadingMore = true;
         showBottomLoader();
 
@@ -293,14 +358,12 @@ if (window.currentView === "view-services" && btn.dataset.category !== "services
         hideBottomLoader();
 
         morePosts.length
-          ? renderPosts(morePosts, currentCategory, { append: true })
+          ? renderPosts(morePosts, { append: true })
           : showEndMessage();
 
         loadingMore = false;
       }
     });
-
-    scrollBound = true;
   }
 
   /* ============================================================
@@ -308,12 +371,22 @@ if (window.currentView === "view-services" && btn.dataset.category !== "services
   ============================================================ */
   showSkeletons();
 
+  // Default to "all" on first load
+  currentCategory = "all";
+  currentSubCategory = null;
+
   const posts = await fetchPosts(true);
 
-  categoryBtns.forEach(b => b.classList.remove("active"));
-  document.querySelector('.category-btn[data-category="all"]')?.classList.add("active");
+  mainCategoryBtns.forEach(b => b.classList.remove("active"));
+  document
+    .querySelector('.main-tabs .category-btn[data-category="all"]')
+    ?.classList.add("active");
 
-  renderPosts(posts, "all");
+  // Hide sub bars initially
+  document.getElementById("sub-vehicles")?.classList.add("hidden");
+  document.getElementById("sub-property")?.classList.add("hidden");
+
+  renderPosts(posts);
 
   window.loadGreeting?.();
   window.loadWeather?.();
