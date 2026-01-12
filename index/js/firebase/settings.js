@@ -49,75 +49,67 @@ export function initFirebase({ auth: a, db: d, storage: s }) {
 }
 
 /* ============================================================
-   POSTS
+   POSTS (WITH CATEGORY FILTERING)
 ============================================================ */
 
-export async function fetchFeedPosts({ lastDoc = null, limitCount = 50 } = {}) {
-  console.log("📥 fetchFeedPosts()", { lastDoc, limitCount });
+export async function fetchFeedPosts({
+  lastDoc = null,
+  limitCount = 50,
+  category = "all"
+} = {}) {
+  console.log("📥 fetchFeedPosts()", { lastDoc, limitCount, category });
 
   const postsRef = collection(db, "posts");
-  const q = lastDoc
-    ? query(
-        postsRef,
-        where("status", "==", "active"),
-        orderBy("createdAt", "desc"),
-        startAfter(lastDoc),
-        limit(limitCount)
-      )
-    : query(
-        postsRef,
-        where("status", "==", "active"),
-        orderBy("createdAt", "desc"),
-        limit(limitCount)
-      );
+  let q;
 
+  // ============================
+  // CATEGORY-AWARE QUERY
+  // ============================
+  if (category === "all") {
+    q = lastDoc
+      ? query(
+          postsRef,
+          where("status", "==", "active"),
+          orderBy("createdAt", "desc"),
+          startAfter(lastDoc),
+          limit(limitCount)
+        )
+      : query(
+          postsRef,
+          where("status", "==", "active"),
+          orderBy("createdAt", "desc"),
+          limit(limitCount)
+        );
+  } else {
+    q = lastDoc
+      ? query(
+          postsRef,
+          where("status", "==", "active"),
+          where("category", "==", category),
+          orderBy("createdAt", "desc"),
+          startAfter(lastDoc),
+          limit(limitCount)
+        )
+      : query(
+          postsRef,
+          where("status", "==", "active"),
+          where("category", "==", category),
+          orderBy("createdAt", "desc"),
+          limit(limitCount)
+        );
+  }
+
+  // ============================
+  // FETCH
+  // ============================
   const snap = await getDocs(q);
 
-  console.log(`✅ ${snap.docs.length} posts loaded`);
+  console.log(`✅ ${snap.docs.length} posts loaded for category: ${category}`);
 
   return {
     posts: snap.docs.map(d => ({ id: d.id, ...d.data() })),
     lastDoc: snap.docs[snap.docs.length - 1] || null
   };
-}
-
-export async function getPost(postId) {
-  console.log("📄 getPost()", postId);
-
-  if (!db || !postId) return null;
-  const snap = await getDoc(doc(db, "posts", postId));
-
-  if (!snap.exists()) {
-    console.warn("⚠️ Post not found", postId);
-    return null;
-  }
-
-  return { id: snap.id, ...snap.data() };
-}
-
-export async function addPost(post) {
-  return await addDoc(collection(db, "posts"), {
-    ...post,
-    status: "active",
-    createdAt: Date.now(),
-    views: 0,
-    stats: { contacts: 0, calls: 0, whatsapp: 0 }
-  });
-}
-
-export async function getUserFavourites(uid) {
-  const snap = await getDoc(doc(db, "users", uid));
-  if (!snap.exists()) return [];
-
-  const saved = snap.data().savedPosts || {};
-  return Object.keys(saved);
-}
-
-export async function updatePost(postId, data) {
-  console.log("✏️ updatePost()", postId, data);
-
-  if (!db || !postId || !data) return;
-  await updateDoc(doc(db, "posts", postId), data);
 }
 
 /* ============================================================
@@ -424,4 +416,4 @@ export async function fsUploadServiceImage(serviceId, file, index = 0) {
   const refPath = ref(storage, path);
   await uploadBytes(refPath, file);
   return await getDownloadURL(refPath);
-}
+    }
