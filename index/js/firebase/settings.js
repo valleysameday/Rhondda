@@ -61,42 +61,61 @@ export async function fetchFeedPosts({
   const postsRef = collection(db, "posts");
   let q;
 
-  // ============================
-  // CATEGORY-AWARE QUERY
-  // ============================
-  if (category === "all") {
-    q = lastDoc
-      ? query(
-          postsRef,
-          where("status", "==", "active"),
-          orderBy("createdAt", "desc"),
-          startAfter(lastDoc),
-          limit(limitCount)
-        )
-      : query(
-          postsRef,
-          where("status", "==", "active"),
-          orderBy("createdAt", "desc"),
-          limit(limitCount)
-        );
-  } else {
-    q = lastDoc
-      ? query(
-          postsRef,
-          where("status", "==", "active"),
-          where("category", "==", category),
-          orderBy("createdAt", "desc"),
-          startAfter(lastDoc),
-          limit(limitCount)
-        )
-      : query(
-          postsRef,
-          where("status", "==", "active"),
-          where("category", "==", category),
-          orderBy("createdAt", "desc"),
-          limit(limitCount)
-        );
-  }
+// CATEGORY + SUBCATEGORY LOGIC
+if (category === "all") {
+  q = lastDoc
+    ? query(
+        postsRef,
+        where("status", "==", "active"),
+        orderBy("createdAt", "desc"),
+        startAfter(lastDoc),
+        limit(limitCount)
+      )
+    : query(
+        postsRef,
+        where("status", "==", "active"),
+        orderBy("createdAt", "desc"),
+        limit(limitCount)
+      );
+} else if (subCategory) {
+  // MAIN CATEGORY + SUBCATEGORY
+  q = lastDoc
+    ? query(
+        postsRef,
+        where("status", "==", "active"),
+        where("category", "==", category),
+        where("subCategory", "==", subCategory),
+        orderBy("createdAt", "desc"),
+        startAfter(lastDoc),
+        limit(limitCount)
+      )
+    : query(
+        postsRef,
+        where("status", "==", "active"),
+        where("category", "==", category),
+        where("subCategory", "==", subCategory),
+        orderBy("createdAt", "desc"),
+        limit(limitCount)
+      );
+} else {
+  // MAIN CATEGORY ONLY
+  q = lastDoc
+    ? query(
+        postsRef,
+        where("status", "==", "active"),
+        where("category", "==", category),
+        orderBy("createdAt", "desc"),
+        startAfter(lastDoc),
+        limit(limitCount)
+      )
+    : query(
+        postsRef,
+        where("status", "==", "active"),
+        where("category", "==", category),
+        orderBy("createdAt", "desc"),
+        limit(limitCount)
+      );
+}
 
   // ============================
   // FETCH
