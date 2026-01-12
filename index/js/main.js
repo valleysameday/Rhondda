@@ -345,7 +345,7 @@ getFirebase().then(async fb => {
      START APP
   ===================================================== */
   const start = () => {
-    initUIRouter();
+  //  initUIRouter();
     loadView("home");
 
     // LOGIN BUTTON
