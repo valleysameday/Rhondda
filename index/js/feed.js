@@ -235,7 +235,11 @@ export async function initFeed(_, options = {}) {
   mainCategoryBtns.forEach(btn => {
     btn.addEventListener("click", async () => {
       const cat = btn.dataset.category;
-
+// If leaving services view → return to feed
+if (window.currentView === "view-services" && cat !== "services") {
+  loadView("home", { forceInit: true });
+  return;
+}
       // SERVICES CATEGORY → LOAD SERVICES DIRECTORY VIEW
       if (cat === "services") {
         loadView("view-services", { forceInit: true });
