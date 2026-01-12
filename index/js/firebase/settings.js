@@ -55,8 +55,9 @@ export function initFirebase({ auth: a, db: d, storage: s }) {
 export async function fetchFeedPosts({
   lastDoc = null,
   limitCount = 50,
-  category = "all"
-} = {}) {
+  category = "all",
+  subCategory = null
+} = {})
   console.log("📥 fetchFeedPosts()", { lastDoc, limitCount, category });
   const postsRef = collection(db, "posts");
   let q;
