@@ -57,7 +57,7 @@ export async function init({ auth }) {
 
   if (!sellerUid) {
     sellerNameEl.textContent = "Seller unavailable";
-    followBtn.style.display = "block"; // always visible
+    followBtn.style.display = "block";
     followBtn.onclick = () => showToast("Sign in to follow sellers");
     return;
   }
@@ -177,17 +177,32 @@ async function renderSeller(user, currentUser) {
   sellerPostingSinceEl.textContent =
     joinedDate ? `Member since ${joinedDate.getFullYear()}` : "";
 
-  /* -------- CONTACT -------- */
-  const phone = currentPost?.phone || user.phone || null;
+  /* -------- CONTACT BUTTONS (fixed) -------- */
+  let phone = null;
 
-  if (phone) {
-    const clean = phone.replace(/\s+/g, "");
-    callBtn.onclick = () => (window.location.href = `tel:${clean}`);
-    whatsappBtn.onclick = () =>
-      window.open(`https://wa.me/${clean}`, "_blank");
+  // Prefer post phone number ALWAYS
+  if (currentPost?.phone) {
+    phone = currentPost.phone;
+  } else if (user.phone) {
+    phone = user.phone;
+  }
+
+  if (!phone) {
+    callBtn.style.display = "none";
+    whatsappBtn.style.display = "none";
   } else {
-    callBtn.disabled = true;
-    whatsappBtn.disabled = true;
+    const clean = phone.replace(/\s+/g, "");
+
+    callBtn.style.display = "block";
+    callBtn.onclick = () => (window.location.href = `tel:${clean}`);
+
+    if (currentPost.whatsappAllowed) {
+      whatsappBtn.style.display = "block";
+      whatsappBtn.onclick = () =>
+        window.open(`https://wa.me/${clean}`, "_blank");
+    } else {
+      whatsappBtn.style.display = "none";
+    }
   }
 
   /* -------- FOLLOW BUTTON ALWAYS VISIBLE -------- */
