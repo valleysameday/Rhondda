@@ -1,12 +1,6 @@
 // ========================== view-post.js ==========================
 
-import {
-  getPost,
-  getUser,
-  followUser,
-  unfollowUser,
-  isFollowing
-} from "/index/js/firebase/settings.js";
+import { getPost, getUser, toggleFollowSeller } from "/index/js/firebase/settings.js";
 
 /* ---------------- DOM REFS ---------------- */
 let titleEl, priceEl, descEl, timeEl;
@@ -22,11 +16,11 @@ let postId = null;
 let sellerUid = null;
 let following = false;
 
-/* ---------------- INIT ---------------- */
+/* ===================================================== */
 export async function init({ auth }) {
   console.log("📄 View post init");
 
-  /* -------- RESET STATE -------- */
+  // ---------------- RESET STATE ----------------
   galleryImages = [];
   currentIndex = 0;
   following = false;
@@ -34,22 +28,23 @@ export async function init({ auth }) {
   sellerUid = null;
 
   if (!postId) {
-    showToast("No post selected");
+    console.warn("❌ No postId found");
     return;
   }
 
-  /* -------- REBIND DOM -------- */
+  // ---------------- REBIND DOM ----------------
   bindDOM();
 
-  /* -------- LOAD POST -------- */
+  // ---------------- LOAD POST ----------------
   const post = await getPost(postId);
   if (!post) {
     descEl.textContent = "This post is no longer available.";
     return;
   }
+
   renderPost(post);
 
-  /* -------- LOAD SELLER -------- */
+  // ---------------- LOAD SELLER ----------------
   sellerUid = post.uid;
   if (sellerUid) {
     const seller = await getUser(sellerUid);
@@ -81,24 +76,9 @@ function bindDOM() {
   lightboxImg = document.getElementById("lightboxImage");
   lightboxClose = document.getElementById("lightboxClose");
 
-  // Close lightbox
-  lightboxClose?.addEventListener("click", () => {
-    lightbox.classList.remove("show");
-    document.body.style.overflow = "";
-  });
-
-  // Lightbox swipe
-  let startX = 0;
-  lightbox?.addEventListener("touchstart", e => startX = e.touches[0].clientX, { passive: true });
-  lightbox?.addEventListener("touchend", e => handleSwipe(e.changedTouches[0].clientX));
-}
-
-function handleSwipe(endX) {
-  const diff = currentIndex - endX;
-  if (Math.abs(diff) < 40) return;
-  if (diff > 0) currentIndex = (currentIndex + 1) % galleryImages.length;
-  else currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
-  lightboxImg.src = galleryImages[currentIndex];
+  // Clear previous listeners
+  mainImage.onclick = null;
+  lightboxClose?.addEventListener("click", () => lightbox.classList.remove("show"));
 }
 
 /* ===================================================== */
@@ -129,6 +109,7 @@ function updateMainImage() {
 
 function renderThumbnails() {
   if (!thumbnailsWrap) return;
+
   thumbnailsWrap.innerHTML = "";
 
   galleryImages.forEach((src, i) => {
@@ -150,7 +131,6 @@ function openLightbox(index) {
   if (!lightbox || !lightboxImg) return;
   lightboxImg.src = galleryImages[index];
   lightbox.classList.add("show");
-  document.body.style.overflow = "hidden";
 }
 
 /* ===================================================== */
@@ -168,75 +148,55 @@ async function renderSeller(user, currentUser) {
   sellerLastActiveEl.textContent =
     user.lastActive?.toDate?.().toLocaleDateString() || "";
 
-  /* ---- Contact ---- */
+  // ---------------- CONTACT ----------------
   if (user.phone) {
     const phone = user.phone.replace(/\s+/g, "");
-    callBtn.onclick = () => {
-      showToast(`Calling ${phone}`);
-      window.location.href = `tel:${phone}`;
-    };
-    whatsappBtn.onclick = () => {
-      showToast(`Opening WhatsApp chat`);
-      window.open(`https://wa.me/${phone}`, "_blank");
-    };
+    callBtn.onclick = () => (window.location.href = `tel:${phone}`);
+    whatsappBtn.onclick = () => window.open(`https://wa.me/${phone}`, "_blank");
   } else {
     callBtn.disabled = true;
     whatsappBtn.disabled = true;
   }
 
-  /* ---- Follow ---- */
+  // ---------------- FOLLOW ----------------
   if (!currentUser || currentUser.uid === user.uid) {
     followBtn.style.display = "none";
     return;
   }
 
-  following = await isFollowing(currentUser.uid, user.uid);
+  following = await checkFollowing(currentUser.uid, user.uid);
   updateFollowBtn();
 
   followBtn.onclick = async () => {
-    try {
-      if (following) await unfollowUser(currentUser.uid, user.uid);
-      else await followUser(currentUser.uid, user.uid);
-      following = !following;
-      updateFollowBtn();
-      showToast(following ? "Now following" : "Unfollowed");
-    } catch (err) {
-      console.error(err);
-      showToast("Action failed");
-    }
+    following = await toggleFollowSeller(currentUser.uid, user.uid);
+    updateFollowBtn();
+    showToast(following ? "You are now following this seller" : "You unfollowed this seller");
   };
 }
 
+/* ===================================================== */
+/* ---------------- FOLLOW HELPERS ---------------- */
 function updateFollowBtn() {
   followBtn.textContent = following ? "Following" : "Follow";
   followBtn.classList.toggle("active", following);
 }
 
+async function checkFollowing(userUid, sellerUid) {
+  if (!userUid || !sellerUid) return false;
+  const snap = await getUser(sellerUid);
+  if (!snap) return false;
+  const followers = snap.followers || {};
+  return !!followers[userUid];
+}
+
 /* ===================================================== */
 /* ---------------- TOAST ---------------- */
-export function showToast(msg, duration = 2000) {
-  const el = document.createElement("div");
-  el.textContent = msg;
-  el.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.85);
-    color: #fff;
-    padding: 12px 18px;
-    border-radius: 8px;
-    font-size: 14px;
-    z-index: 999999;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    max-width: 90%;
-    text-align: center;
-  `;
-  document.body.appendChild(el);
-  requestAnimationFrame(() => (el.style.opacity = "1"));
-  setTimeout(() => {
-    el.style.opacity = "0";
-    setTimeout(() => el.remove(), 300);
-  }, duration);
+function showToast(msg, duration = 2000) {
+  let toast = document.createElement("div");
+  toast.className = "toast-message";
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.classList.add("show"), 50);
+  setTimeout(() => toast.classList.remove("show"), duration);
+  setTimeout(() => toast.remove(), duration + 300);
 }
