@@ -20,22 +20,18 @@ const viewRegistry = {
 ===================================================== */
 window.openLoginModal = () => {
   history.pushState({ type: "modal", modal: "login" }, "", "/login");
-  openLoginModalInternal();
+  openLoginModal();
 };
 
 window.openSignupModal = () => {
   history.pushState({ type: "modal", modal: "signup" }, "", "/signup");
-  openSignupModalInternal();
+  openSignupModal();
 };
 
 window.openForgotModal = () => {
   history.pushState({ type: "modal", modal: "forgot" }, "", "/forgot");
-  openForgotModalInternal();
+  openForgotModal();
 };
-
-function openLoginModalInternal() { openLoginModal(); }
-function openSignupModalInternal() { openSignupModal(); }
-function openForgotModalInternal() { openForgotModal(); }
 
 function closeAllModals() {
   document.body.classList.remove("modal-open");
@@ -109,10 +105,6 @@ window.addEventListener("popstate", (event) => {
   if (state.type === "view") {
     loadView(state.view, { forceInit: true, skipHistory: true });
   }
-
-  if (state.type === "modal") {
-    // modals already closed by default
-  }
 });
 
 /* =====================================================
@@ -139,7 +131,7 @@ function renderSideMenu() {
       ]
     : [
         { label: "Home", action: () => loadView("home") },
-        { label: "Login", action: () => openLoginModalInternal() },
+        { label: "Login", action: () => openLoginModal() },
         { label: "Help & Contact", action: () => loadView("help") }
       ];
 
@@ -156,57 +148,44 @@ function renderSideMenu() {
 }
 
 /* =====================================================
-   GLOBAL CATEGORY HANDLING (GUMTREE-STYLE)
+   GLOBAL CATEGORY HANDLING
 ===================================================== */
 function initGlobalCategories() {
   const mainCategoryBtns = document.querySelectorAll(".main-tabs .category-btn");
   const subVehicleBtns   = document.querySelectorAll("#sub-vehicles .category-btn");
   const subPropertyBtns  = document.querySelectorAll("#sub-property .category-btn");
 
-  // Main categories (All, Free, Jobs, Property, Vehicles, etc.)
   mainCategoryBtns.forEach(btn => {
     btn.addEventListener("click", () => {
       const cat = btn.dataset.category;
       if (!cat) return;
 
-      // Save selection
       sessionStorage.setItem("feedCategory", cat);
       sessionStorage.setItem("feedSubCategory", "");
 
-      // Services → separate view
       if (cat === "services") {
         loadView("view-services", { forceInit: true });
         return;
       }
 
-      // All other categories → home feed
       loadView("home", { forceInit: true });
     });
   });
 
-  // Subcategories under Vehicles
   subVehicleBtns.forEach(btn => {
     btn.addEventListener("click", () => {
       const sub = btn.dataset.category;
-      if (!sub) return;
-
       sessionStorage.setItem("feedCategory", "vehicles");
       sessionStorage.setItem("feedSubCategory", sub);
-
-      // Always go to feed for subcategories
       loadView("home", { forceInit: true });
     });
   });
 
-  // Subcategories under Property
   subPropertyBtns.forEach(btn => {
     btn.addEventListener("click", () => {
       const sub = btn.dataset.category;
-      if (!sub) return;
-
       sessionStorage.setItem("feedCategory", "property");
       sessionStorage.setItem("feedSubCategory", sub);
-
       loadView("home", { forceInit: true });
     });
   });
@@ -226,36 +205,46 @@ getFirebase().then(async fb => {
   auth.onAuthStateChanged(() => renderSideMenu());
 
   const start = () => {
-    // Global categories become live once, across all views
     initGlobalCategories();
 
     loadView("home", { skipHistory: true });
 
-    document.addEventListener("click", e => {
+    /* ----------------------------------------------
+       DIRECT, SAFE EVENT LISTENERS (NO GLOBAL CATCH)
+    ---------------------------------------------- */
 
-      // Post modal
-      if (e.target.closest("#post-ad-btn")) {
-        if (!auth.currentUser) {
-          openLoginModalInternal();
-          return;
-        }
+    // Logo → Home
+    document.querySelector(".rctx-logo")?.addEventListener("click", () => {
+      loadView("home");
+    });
 
-        history.pushState({ type: "modal", modal: "post" }, "", "/post");
-        const postModal = document.getElementById("posts-grid");
-        postModal.style.display = "flex";
-        document.body.classList.add("modal-open");
+    // Login button
+    document.getElementById("auth-logged-out")?.addEventListener("click", () => {
+      openLoginModal();
+    });
+
+    // Post Ad button
+    document.getElementById("post-ad-btn")?.addEventListener("click", () => {
+      if (!auth.currentUser) {
+        openLoginModal();
+        return;
       }
 
-      // Open menu
-      if (e.target.closest("[title='Menu']")) {
-        renderSideMenu();
-        document.getElementById("sideMenu")?.classList.remove("hidden");
-      }
+      history.pushState({ type: "modal", modal: "post" }, "", "/post");
+      const postModal = document.getElementById("posts-grid");
+      postModal.style.display = "flex";
+      document.body.classList.add("modal-open");
+    });
 
-      // Close menu
-      if (e.target.closest(".close-menu")) {
-        document.getElementById("sideMenu")?.classList.add("hidden");
-      }
+    // Menu open
+    document.querySelector("[title='Menu']")?.addEventListener("click", () => {
+      renderSideMenu();
+      document.getElementById("sideMenu")?.classList.remove("hidden");
+    });
+
+    // Menu close
+    document.querySelector(".close-menu")?.addEventListener("click", () => {
+      document.getElementById("sideMenu")?.classList.add("hidden");
     });
   };
 
