@@ -9,7 +9,10 @@
     <img id="mainImage" class="gallery-main" />
     <div id="galleryCount" class="gallery-count"></div>
   </div>
-<div id="postTime" class="post-time"></div>
+
+  <!-- Posted time -->
+  <div id="postTime" class="post-time"></div>
+
   <!-- ========================= -->
   <!-- POST CONTENT -->
   <!-- ========================= -->
@@ -17,56 +20,61 @@
   <div class="post-price" id="postPrice"></div>
   <p id="postDescription"></p>
 
-<div class="enquiry-box">
-  <div class="enquiry-title">Pop seller a message</div>
-
-  <textarea id="quickMessage" class="quick-message">
-Hi, is this still available? Thanks!
-  </textarea>
-
-  <button id="sendQuickMessageBtn" class="action-btn primary">
-    Send
-  </button>
-</div>
-
   <!-- ========================= -->
-  <!-- CONTACT BUTTONS
-       (shown only if seller has phone / WhatsApp)
-  ========================= -->
-  <div class="post-actions">
-    <a id="callSellerBtn" class="action-btn" href="#" style="display:none;">📞 Call</a>
-    <a id="whatsappSellerBtn" class="action-btn" href="#" target="_blank" style="display:none;">💚 WhatsApp</a>
+  <!-- ENQUIRY BOX -->
+  <!-- ========================= -->
+  <div class="enquiry-box">
+    <div class="enquiry-title">Pop seller a message</div>
+
+    <textarea id="quickMessage" class="quick-message">Hi, is this still available? Thanks!</textarea>
+
+    <button id="sendQuickMessageBtn" class="action-btn primary">
+      Send
+    </button>
   </div>
 
-<!-- ========================= -->
-<!-- SELLER INFO + FOLLOW -->
-<!-- ========================= -->
-<div class="seller-info-bar">
-  <div class="seller-meta">
-    <div id="sellerName" class="seller-name"></div>
-    <div class="seller-stats">
-      <span id="sellerPostingSince"></span>
-      •
-      <span id="sellerLastActive"></span>
+  <!-- ========================= -->
+  <!-- CONTACT + SHARE BUTTONS -->
+  <!-- ========================= -->
+  <div class="post-actions" id="postActions">
+    <a id="callSellerBtn" class="action-btn primary" href="#" style="display:none;">📞 Call</a>
+    <a id="whatsappSellerBtn" class="action-btn secondary" href="#" target="_blank" style="display:none;">💚 WhatsApp</a>
+    <button id="sharePostBtn" class="action-btn icon-btn" type="button">
+      🔗 Share
+    </button>
+  </div>
+
+  <!-- ========================= -->
+  <!-- SELLER INFO + FOLLOW -->
+  <!-- ========================= -->
+  <div class="seller-info-bar">
+    <div class="seller-meta">
+      <div id="sellerName" class="seller-name"></div>
+      <div class="seller-stats">
+        <span id="sellerPostingSince"></span>
+        <span>•</span>
+        <span id="sellerLastActive"></span>
+      </div>
+    </div>
+
+    <button id="followSellerBtn" class="follow-btn-small">Follow</button>
+  </div>
+
+  <!-- ========================= -->
+  <!-- LIGHTBOX -->
+  <!-- ========================= -->
+  <div id="lightbox" class="lightbox">
+    <span id="lightboxClose" class="lightbox-close">×</span>
+
+    <div class="lightbox-inner">
+      <img id="lightboxImage" class="lightbox-img" />
+    </div>
+
+    <div id="lightboxBottom">
+      <img src="/images/imageAdd.jpg" alt="Advertisement" />
     </div>
   </div>
 
-  <button id="followSellerBtn" class="follow-btn-small">Follow</button>
-</div>
-
-<!-- ========================= -->
-<!-- LIGHTBOX -->
-<!-- ========================= -->
-<div id="lightbox" class="lightbox">
-  <span id="lightboxClose" class="lightbox-close">×</span>
-
-  <div class="lightbox-inner">
-    <img id="lightboxImage" class="lightbox-img" />
-  </div>
-
-  <div id="lightboxBottom">
-    <img src="/images/imageAdd.jpg" alt="Advertisement" />
-  </div>
 </div>
 
 <script type="module" src="/views/view-post.js"></script>
