@@ -44,6 +44,61 @@ export async function initFeed(_, options = {}) {
   const subPropertyBtns  = document.querySelectorAll("#sub-property .category-btn");
 
   /* ============================================================
+     RESTORE CATEGORY STATE FROM SESSION
+  ============================================================ */
+  const storedMain = sessionStorage.getItem("feedCategory") || "all";
+  const storedSub  = sessionStorage.getItem("feedSubCategory") || "";
+
+  currentCategory = storedMain;
+  currentSubCategory = storedSub || null;
+
+  // Highlight main tab
+  mainCategoryBtns.forEach(b => b.classList.remove("active"));
+  document
+    .querySelector(`.main-tabs .category-btn[data-category="${currentCategory}"]`)
+    ?.classList.add("active");
+
+  // Show/hide sub-bars based on main category
+  const subVehiclesEl = document.getElementById("sub-vehicles");
+  const subPropertyEl = document.getElementById("sub-property");
+
+  if (currentCategory === "vehicles") {
+    subVehiclesEl?.classList.remove("hidden");
+  } else {
+    subVehiclesEl?.classList.add("hidden");
+  }
+
+  if (currentCategory === "property") {
+    subPropertyEl?.classList.remove("hidden");
+  } else {
+    subPropertyEl?.classList.add("hidden");
+  }
+
+  // Highlight sub-tabs for vehicles
+  if (currentCategory === "vehicles" && subVehicleBtns.length) {
+    subVehicleBtns.forEach(b => b.classList.remove("active"));
+
+    const activeSub = currentSubCategory || "cars";
+    document
+      .querySelector(`#sub-vehicles .category-btn[data-category="${activeSub}"]`)
+      ?.classList.add("active");
+
+    currentSubCategory = activeSub;
+  }
+
+  // Highlight sub-tabs for property
+  if (currentCategory === "property" && subPropertyBtns.length) {
+    subPropertyBtns.forEach(b => b.classList.remove("active"));
+
+    const activeSub = currentSubCategory || "property-sale";
+    document
+      .querySelector(`#sub-property .category-btn[data-category="${activeSub}"]`)
+      ?.classList.add("active");
+
+    currentSubCategory = activeSub;
+  }
+
+  /* ============================================================
      SKELETON LOADING
   ============================================================ */
   function showSkeletons(count = 6) {
@@ -97,7 +152,7 @@ export async function initFeed(_, options = {}) {
       lastDoc,
       initial,
       category: currentCategory,
-      subCategory: currentSubCategory || null   // ← requires settings.js to accept this
+      subCategory: currentSubCategory || null
     });
 
     if (!result.posts.length) {
@@ -129,7 +184,7 @@ export async function initFeed(_, options = {}) {
   }
 
   /* ============================================================
-     META BUILDER (currently unused but kept for future)
+     META BUILDER (kept for future)
   ============================================================ */
   function buildMeta(p) {
     let html = "";
@@ -230,119 +285,6 @@ export async function initFeed(_, options = {}) {
   });
 
   /* ============================================================
-     CATEGORY FILTERS (MAIN TABS)
-  ============================================================ */
-  mainCategoryBtns.forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const cat = btn.dataset.category;
-// If leaving services view → return to feed
-if (window.currentView === "view-services" && cat !== "services") {
-  loadView("home", { forceInit: true });
-  return;
-}
-      // SERVICES CATEGORY → LOAD SERVICES DIRECTORY VIEW
-      if (cat === "services") {
-        loadView("view-services", { forceInit: true });
-        return;
-      }
-
-      // Highlight active main tab
-      mainCategoryBtns.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-
-      // Show/hide sub‑category bars
-      if (cat === "vehicles") {
-        document.getElementById("sub-vehicles")?.classList.remove("hidden");
-      } else {
-        document.getElementById("sub-vehicles")?.classList.add("hidden");
-      }
-
-      if (cat === "property") {
-        document.getElementById("sub-property")?.classList.remove("hidden");
-      } else {
-        document.getElementById("sub-property")?.classList.add("hidden");
-      }
-
-      // Update state
-      currentCategory = cat;
-      currentSubCategory = null; // reset sub when changing main
-
-      // Reset sub‑tab active states
-      if (cat === "vehicles") {
-        subVehicleBtns.forEach(b => b.classList.remove("active"));
-        document
-          .querySelector("#sub-vehicles .category-btn[data-category='cars']")
-          ?.classList.add("active"); // default highlight
-      }
-
-      if (cat === "property") {
-        subPropertyBtns.forEach(b => b.classList.remove("active"));
-        document
-          .querySelector("#sub-property .category-btn[data-category='property-sale']")
-          ?.classList.add("active"); // default highlight
-      }
-
-      // Load posts
-      resetFeedState();
-      showSkeletons();
-      const posts = await fetchPosts(true);
-      renderPosts(posts);
-    });
-  });
-
-  /* ============================================================
-     SUB‑CATEGORY FILTERS (VEHICLES)
-  ============================================================ */
-  subVehicleBtns.forEach(btn => {
-    btn.addEventListener("click", async () => {
-      // Ensure main tab stays on "vehicles"
-      currentCategory = "vehicles";
-      currentSubCategory = btn.dataset.category; // cars, vans, motorbikes, parts, othervehicles
-
-      // Highlight sub‑tabs
-      subVehicleBtns.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-
-      // Highlight main vehicles tab
-      document
-        .querySelector(".main-tabs .category-btn[data-category='vehicles']")
-        ?.classList.add("active");
-
-      // Load posts
-      resetFeedState();
-      showSkeletons();
-      const posts = await fetchPosts(true);
-      renderPosts(posts);
-    });
-  });
-
-  /* ============================================================
-     SUB‑CATEGORY FILTERS (PROPERTY)
-  ============================================================ */
-  subPropertyBtns.forEach(btn => {
-    btn.addEventListener("click", async () => {
-      // Ensure main tab stays on "property"
-      currentCategory = "property";
-      currentSubCategory = btn.dataset.category; // property-sale, property-rent
-
-      // Highlight sub‑tabs
-      subPropertyBtns.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-
-      // Highlight main property tab
-      document
-        .querySelector(".main-tabs .category-btn[data-category='property']")
-        ?.classList.add("active");
-
-      // Load posts
-      resetFeedState();
-      showSkeletons();
-      const posts = await fetchPosts(true);
-      renderPosts(posts);
-    });
-  });
-
-  /* ============================================================
      INFINITE SCROLL (BOUND ONCE)
   ============================================================ */
   if (!scrollBound) {
@@ -375,21 +317,7 @@ if (window.currentView === "view-services" && cat !== "services") {
   ============================================================ */
   showSkeletons();
 
-  // Default to "all" on first load
-  currentCategory = "all";
-  currentSubCategory = null;
-
   const posts = await fetchPosts(true);
-
-  mainCategoryBtns.forEach(b => b.classList.remove("active"));
-  document
-    .querySelector('.main-tabs .category-btn[data-category="all"]')
-    ?.classList.add("active");
-
-  // Hide sub bars initially
-  document.getElementById("sub-vehicles")?.classList.add("hidden");
-  document.getElementById("sub-property")?.classList.add("hidden");
-
   renderPosts(posts);
 
   window.loadGreeting?.();
