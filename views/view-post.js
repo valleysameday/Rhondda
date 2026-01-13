@@ -8,9 +8,9 @@ import {
 
 /* ---------------- DOM REFS ---------------- */
 let titleEl, priceEl, descEl;
-let mainImage, galleryCount, thumbnailsWrap;
-let callBtn, whatsappBtn, followBtn;
-let sellerNameEl, sellerPostingSinceEl;
+let mainImage, galleryCount;
+let callBtn, whatsappBtn, followBtn, shareBtn, postActions;
+let sellerNameEl, sellerPostingSinceEl, sellerLastActiveEl, postTimeEl;
 let lightbox, lightboxImg, lightboxClose;
 
 /* ---------------- STATE ---------------- */
@@ -64,6 +64,9 @@ export async function init({ auth }) {
 
   const seller = await getUser(sellerUid);
   await renderSeller(seller, auth?.currentUser);
+
+  /* -------- SHARE BUTTON -------- */
+  shareBtn.onclick = () => handleShare(post);
 }
 
 /* ===================================================== */
@@ -75,14 +78,17 @@ function bindDOM() {
 
   mainImage = document.getElementById("mainImage");
   galleryCount = document.getElementById("galleryCount");
-  thumbnailsWrap = document.getElementById("postThumbnails");
 
   callBtn = document.getElementById("callSellerBtn");
   whatsappBtn = document.getElementById("whatsappSellerBtn");
   followBtn = document.getElementById("followSellerBtn");
+  shareBtn = document.getElementById("sharePostBtn");
+  postActions = document.getElementById("postActions");
 
   sellerNameEl = document.getElementById("sellerName");
   sellerPostingSinceEl = document.getElementById("sellerPostingSince");
+  sellerLastActiveEl = document.getElementById("sellerLastActive");
+  postTimeEl = document.getElementById("postTime");
 
   lightbox = document.getElementById("lightbox");
   lightboxImg = document.getElementById("lightboxImage");
@@ -90,7 +96,7 @@ function bindDOM() {
 
   mainImage.onclick = null;
   lightboxClose?.addEventListener("click", () =>
-    lightbox.classList.remove("show")
+    lightbox.classList.remove("active")
   );
 }
 
@@ -101,6 +107,20 @@ function renderPost(post) {
   priceEl.textContent = post.price ? `£${post.price}` : "";
   descEl.textContent = post.description || "";
 
+  // Time since posted
+  if (post.createdAt) {
+    const created =
+      typeof post.createdAt === "number"
+        ? new Date(post.createdAt)
+        : post.createdAt.toDate
+        ? post.createdAt.toDate()
+        : null;
+
+    postTimeEl.textContent = created ? timeAgo(created) : "";
+  } else {
+    postTimeEl.textContent = "";
+  }
+
   galleryImages =
     Array.isArray(post.images) && post.images.length
       ? post.images
@@ -108,13 +128,41 @@ function renderPost(post) {
 
   currentIndex = 0;
   updateMainImage();
-  renderThumbnails();
+}
+
+/* ===================================================== */
+/* ---------------- TIME AGO HELPER ---------------- */
+function timeAgo(date) {
+  const now = new Date();
+  const diffMs = now - date;
+
+  const seconds = Math.floor(diffMs / 1000);
+  if (seconds < 60) return "Just now";
+
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return minutes === 1 ? "1 minute ago" : `${minutes} minutes ago`;
+
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
+
+  const days = Math.floor(hours / 24);
+  if (days < 7) return days === 1 ? "1 day ago" : `${days} days ago`;
+
+  const weeks = Math.floor(days / 7);
+  if (weeks < 4) return weeks === 1 ? "1 week ago" : `${weeks} weeks ago`;
+
+  const months = Math.floor(days / 30);
+  if (months < 12) return months === 1 ? "1 month ago" : `${months} months ago`;
+
+  const years = Math.floor(days / 365);
+  return years === 1 ? "1 year ago" : `${years} years ago`;
 }
 
 /* ===================================================== */
 /* ---------------- GALLERY ---------------- */
 function updateMainImage() {
-  mainImage.src = galleryImages[currentIndex];
+  const src = galleryImages[currentIndex];
+  mainImage.src = src;
 
   galleryCount.textContent =
     galleryImages.length > 1
@@ -124,30 +172,10 @@ function updateMainImage() {
   mainImage.onclick = () => openLightbox(currentIndex);
 }
 
-function renderThumbnails() {
-  if (!thumbnailsWrap) return;
-
-  thumbnailsWrap.innerHTML = "";
-
-  galleryImages.forEach((src, i) => {
-    const img = document.createElement("img");
-    img.src = src;
-    img.className = i === currentIndex ? "active" : "";
-    img.onclick = () => {
-      currentIndex = i;
-      updateMainImage();
-      renderThumbnails();
-    };
-    thumbnailsWrap.appendChild(img);
-  });
-}
-
-/* ===================================================== */
-/* ---------------- LIGHTBOX ---------------- */
 function openLightbox(index) {
   if (!lightbox || !lightboxImg) return;
   lightboxImg.src = galleryImages[index];
-  lightbox.classList.add("show");
+  lightbox.classList.add("active");
 }
 
 /* ===================================================== */
@@ -157,13 +185,15 @@ async function renderSeller(user, currentUser) {
     sellerNameEl.textContent = "Seller unavailable";
     followBtn.style.display = "block";
     followBtn.onclick = () => showToast("Sign in to follow sellers");
+    sellerPostingSinceEl.textContent = "";
+    sellerLastActiveEl.textContent = "";
     return;
   }
 
   sellerNameEl.textContent =
     user.displayName || user.name || "Seller";
 
-  /* -------- CREATED AT (fix NaN) -------- */
+  /* -------- MEMBER SINCE (CREATED AT) -------- */
   let joinedDate = null;
 
   if (user.createdAt) {
@@ -177,15 +207,29 @@ async function renderSeller(user, currentUser) {
   sellerPostingSinceEl.textContent =
     joinedDate ? `Member since ${joinedDate.getFullYear()}` : "";
 
-  /* -------- CONTACT BUTTONS (fixed) -------- */
+  /* -------- LAST ACTIVE (if you ever store it) -------- */
+  if (user.lastActive) {
+    const last =
+      typeof user.lastActive === "number"
+        ? new Date(user.lastActive)
+        : user.lastActive.toDate
+        ? user.lastActive.toDate()
+        : null;
+    sellerLastActiveEl.textContent = last ? `Active ${timeAgo(last)}` : "";
+  } else {
+    sellerLastActiveEl.textContent = "";
+  }
+
+  /* -------- CONTACT BUTTONS -------- */
   let phone = null;
 
-  // Prefer post phone number ALWAYS
   if (currentPost?.phone) {
     phone = currentPost.phone;
   } else if (user.phone) {
     phone = user.phone;
   }
+
+  let anyContactVisible = false;
 
   if (!phone) {
     callBtn.style.display = "none";
@@ -193,22 +237,29 @@ async function renderSeller(user, currentUser) {
   } else {
     const clean = phone.replace(/\s+/g, "");
 
-    callBtn.style.display = "block";
+    callBtn.style.display = "inline-flex";
     callBtn.onclick = () => (window.location.href = `tel:${clean}`);
+    anyContactVisible = true;
 
     if (currentPost.whatsappAllowed) {
-      whatsappBtn.style.display = "block";
+      whatsappBtn.style.display = "inline-flex";
       whatsappBtn.onclick = () =>
         window.open(`https://wa.me/${clean}`, "_blank");
+      anyContactVisible = true;
     } else {
       whatsappBtn.style.display = "none";
     }
   }
 
+  // Show actions row if any contact or share exists (share always exists)
+  postActions.style.display = anyContactVisible ? "flex" : "flex";
+
   /* -------- FOLLOW BUTTON ALWAYS VISIBLE -------- */
   followBtn.style.display = "block";
 
   if (!currentUser) {
+    followBtn.classList.remove("active");
+    followBtn.textContent = "Follow";
     followBtn.onclick = () => showToast("Sign in to follow sellers");
     return;
   }
@@ -239,6 +290,31 @@ function updateFollowBtn() {
 }
 
 /* ===================================================== */
+/* ---------------- SHARE HANDLER ---------------- */
+function handleShare(post) {
+  const shareUrl = `${window.location.origin}/view-post?post=${postId}`;
+  const shareTitle = post.title || "Check out this ad";
+  const shareText = `${shareTitle} on RCT-X`;
+
+  if (navigator.share) {
+    navigator
+      .share({
+        title: shareTitle,
+        text: shareText,
+        url: shareUrl
+      })
+      .catch(() => {
+        // user cancelled; ignore
+      });
+  } else {
+    navigator.clipboard
+      .writeText(shareUrl)
+      .then(() => showToast("Link copied to clipboard"))
+      .catch(() => showToast("Could not copy link"));
+  }
+}
+
+/* ===================================================== */
 /* ---------------- TOAST ---------------- */
 function showToast(msg, duration = 2000) {
   const toast = document.createElement("div");
@@ -246,7 +322,7 @@ function showToast(msg, duration = 2000) {
   toast.textContent = msg;
   document.body.appendChild(toast);
 
-  setTimeout(() => toast.classList.add("show"), 50);
+  setTimeout(() => toast.classList.add("show"), 30);
   setTimeout(() => toast.classList.remove("show"), duration);
-  setTimeout(() => toast.remove(), duration + 300);
+  setTimeout(() => toast.remove(), duration + 260);
 }
