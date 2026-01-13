@@ -7,10 +7,10 @@ import {
 } from "/index/js/firebase/settings.js";
 
 /* ---------------- DOM REFS ---------------- */
-let titleEl, priceEl, descEl, timeEl;
+let titleEl, priceEl, descEl;
 let mainImage, galleryCount, thumbnailsWrap;
 let callBtn, whatsappBtn, followBtn;
-let sellerNameEl, sellerPostingSinceEl, sellerLastActiveEl;
+let sellerNameEl, sellerPostingSinceEl;
 let lightbox, lightboxImg, lightboxClose;
 
 /* ---------------- STATE ---------------- */
@@ -30,20 +30,20 @@ export async function init({ auth }) {
   currentIndex = 0;
   following = false;
   currentPost = null;
+  sellerUid = null;
 
   postId = sessionStorage.getItem("viewPostId");
-  sellerUid = null;
 
   if (!postId) {
     console.warn("❌ No postId found");
     return;
   }
 
-  /* -------- BIND DOM -------- */
   bindDOM();
 
   /* -------- LOAD POST -------- */
   const post = await getPost(postId);
+
   if (!post) {
     descEl.textContent = "This post is no longer available.";
     return;
@@ -53,12 +53,16 @@ export async function init({ auth }) {
   renderPost(post);
 
   /* -------- LOAD SELLER -------- */
-  sellerUid = post.userId; // ✅ FIXED (was post.uid)
+  sellerUid = post.userId || post.sellerId || null;
 
-  if (sellerUid) {
-    const seller = await getUser(sellerUid);
-    renderSeller(seller, auth?.currentUser);
+  if (!sellerUid) {
+    sellerNameEl.textContent = "Seller unavailable";
+    followBtn.style.display = "none";
+    return;
   }
+
+  const seller = await getUser(sellerUid);
+  await renderSeller(seller, auth?.currentUser);
 }
 
 /* ===================================================== */
@@ -67,7 +71,6 @@ function bindDOM() {
   titleEl = document.getElementById("postTitle");
   priceEl = document.getElementById("postPrice");
   descEl = document.getElementById("postDescription");
-  timeEl = document.getElementById("postTime");
 
   mainImage = document.getElementById("mainImage");
   galleryCount = document.getElementById("galleryCount");
@@ -79,7 +82,6 @@ function bindDOM() {
 
   sellerNameEl = document.getElementById("sellerName");
   sellerPostingSinceEl = document.getElementById("sellerPostingSince");
-  sellerLastActiveEl = document.getElementById("sellerLastActive");
 
   lightbox = document.getElementById("lightbox");
   lightboxImg = document.getElementById("lightboxImage");
@@ -98,14 +100,10 @@ function renderPost(post) {
   priceEl.textContent = post.price ? `£${post.price}` : "";
   descEl.textContent = post.description || "";
 
-  // ✅ FIX timestamp (number-safe)
-  timeEl.textContent = post.createdAt
-    ? new Date(post.createdAt).toLocaleString()
-    : "";
-
-  galleryImages = post.images?.length
-    ? post.images
-    : ["/assets/default-thumb.jpg"];
+  galleryImages =
+    Array.isArray(post.images) && post.images.length
+      ? post.images
+      : ["/assets/default-thumb.jpg"];
 
   currentIndex = 0;
   updateMainImage();
@@ -116,6 +114,7 @@ function renderPost(post) {
 /* ---------------- GALLERY ---------------- */
 function updateMainImage() {
   mainImage.src = galleryImages[currentIndex];
+
   galleryCount.textContent =
     galleryImages.length > 1
       ? `${currentIndex + 1}/${galleryImages.length}`
@@ -163,16 +162,11 @@ async function renderSeller(user, currentUser) {
     user.displayName || user.name || "Seller";
 
   sellerPostingSinceEl.textContent = user.createdAt
-    ? new Date(user.createdAt).getFullYear()
+    ? `Member since ${new Date(user.createdAt).getFullYear()}`
     : "";
 
-  sellerLastActiveEl.textContent = user.lastActive
-    ? new Date(user.lastActive).toLocaleDateString()
-    : "";
-
-  /* -------- CONTACT (post OR user phone) -------- */
-  const phone =
-    currentPost?.phone || user.phone || null;
+  /* -------- CONTACT -------- */
+  const phone = currentPost?.phone || user.phone || null;
 
   if (phone) {
     const clean = phone.replace(/\s+/g, "");
@@ -190,7 +184,7 @@ async function renderSeller(user, currentUser) {
     return;
   }
 
-  following = !!user.followers?.[currentUser.uid];
+  following = Boolean(user.followers?.[currentUser.uid]);
   updateFollowBtn();
 
   followBtn.onclick = async () => {
@@ -199,6 +193,7 @@ async function renderSeller(user, currentUser) {
       sellerUid
     );
     updateFollowBtn();
+
     showToast(
       following
         ? "You are now following this seller"
@@ -225,4 +220,4 @@ function showToast(msg, duration = 2000) {
   setTimeout(() => toast.classList.add("show"), 50);
   setTimeout(() => toast.classList.remove("show"), duration);
   setTimeout(() => toast.remove(), duration + 300);
-}
+        }
