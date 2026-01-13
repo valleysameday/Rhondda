@@ -57,7 +57,8 @@ export async function init({ auth }) {
 
   if (!sellerUid) {
     sellerNameEl.textContent = "Seller unavailable";
-    followBtn.style.display = "none";
+    followBtn.style.display = "block"; // always visible
+    followBtn.onclick = () => showToast("Sign in to follow sellers");
     return;
   }
 
@@ -154,16 +155,27 @@ function openLightbox(index) {
 async function renderSeller(user, currentUser) {
   if (!user) {
     sellerNameEl.textContent = "Seller unavailable";
-    followBtn.style.display = "none";
+    followBtn.style.display = "block";
+    followBtn.onclick = () => showToast("Sign in to follow sellers");
     return;
   }
 
   sellerNameEl.textContent =
     user.displayName || user.name || "Seller";
 
-  sellerPostingSinceEl.textContent = user.createdAt
-    ? `Member since ${new Date(user.createdAt).getFullYear()}`
-    : "";
+  /* -------- CREATED AT (fix NaN) -------- */
+  let joinedDate = null;
+
+  if (user.createdAt) {
+    if (typeof user.createdAt === "number") {
+      joinedDate = new Date(user.createdAt);
+    } else if (user.createdAt.toDate) {
+      joinedDate = user.createdAt.toDate();
+    }
+  }
+
+  sellerPostingSinceEl.textContent =
+    joinedDate ? `Member since ${joinedDate.getFullYear()}` : "";
 
   /* -------- CONTACT -------- */
   const phone = currentPost?.phone || user.phone || null;
@@ -178,9 +190,11 @@ async function renderSeller(user, currentUser) {
     whatsappBtn.disabled = true;
   }
 
-  /* -------- FOLLOW -------- */
-  if (!currentUser || currentUser.uid === sellerUid) {
-    followBtn.style.display = "none";
+  /* -------- FOLLOW BUTTON ALWAYS VISIBLE -------- */
+  followBtn.style.display = "block";
+
+  if (!currentUser) {
+    followBtn.onclick = () => showToast("Sign in to follow sellers");
     return;
   }
 
@@ -220,4 +234,4 @@ function showToast(msg, duration = 2000) {
   setTimeout(() => toast.classList.add("show"), 50);
   setTimeout(() => toast.classList.remove("show"), duration);
   setTimeout(() => toast.remove(), duration + 300);
-        }
+}
