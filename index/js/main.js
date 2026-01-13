@@ -1,20 +1,18 @@
-// ========================== main.js (SPA FIXED) ==========================
+// ========================== main.js (SPA) ==========================
 
-import { getFirebase } from '/index/js/firebase/init.js';
-
-import { openLoginModal } from '/index/js/auth/loginModal.js';
-import { openSignupModal } from '/index/js/auth/signupModal.js';
-import { openForgotModal } from '/index/js/auth/forgotModal.js';
-
-import { initViewServices } from "/views/view-services.js";
-import { initViewService } from "/views/view-service.js";
+import { getFirebase } from "/index/js/firebase/init.js";
+import { openLoginModal } from "/index/js/auth/loginModal.js";
+import { openSignupModal } from "/index/js/auth/signupModal.js";
+import { openForgotModal } from "/index/js/auth/forgotModal.js";
 
 /* =====================================================
    VIEW REGISTRY
 ===================================================== */
 const viewRegistry = {
-  "view-services": initViewServices,
-  "view-service": initViewService,
+  "view-services": "/views/view-services.js",
+  "view-service": "/views/view-service.js",
+  "home": "/views/home.js",
+  "view-post": "/views/view-post.js"
 };
 
 /* =====================================================
@@ -35,15 +33,9 @@ window.openForgotModal = () => {
   openForgotModalInternal();
 };
 
-function openLoginModalInternal() {
-  openLoginModal();
-}
-function openSignupModalInternal() {
-  openSignupModal();
-}
-function openForgotModalInternal() {
-  openForgotModal();
-}
+function openLoginModalInternal() { openLoginModal(); }
+function openSignupModalInternal() { openSignupModal(); }
+function openForgotModalInternal() { openForgotModal(); }
 
 function closeAllModals() {
   document.body.classList.remove("modal-open");
@@ -60,7 +52,7 @@ let auth, db, storage;
 let settingsModule = null;
 
 /* =====================================================
-   SPA VIEW LOADER (FIXED)
+   SPA VIEW LOADER
 ===================================================== */
 export async function loadView(view, options = {}) {
   if (window.currentView === view && !options.forceInit) return;
@@ -103,11 +95,10 @@ export async function loadView(view, options = {}) {
 }
 
 /* =====================================================
-   BACK BUTTON HANDLER (CRITICAL)
+   BACK BUTTON HANDLER
 ===================================================== */
 window.addEventListener("popstate", (event) => {
   const state = event.state;
-
   closeAllModals();
 
   if (!state) {
@@ -120,7 +111,7 @@ window.addEventListener("popstate", (event) => {
   }
 
   if (state.type === "modal") {
-    // modal already closed by default
+    // modals already closed by default
   }
 });
 
@@ -181,6 +172,8 @@ getFirebase().then(async fb => {
     loadView("home", { skipHistory: true });
 
     document.addEventListener("click", e => {
+
+      // Post modal
       if (e.target.closest("#post-ad-btn")) {
         if (!auth.currentUser) {
           openLoginModalInternal();
@@ -193,11 +186,13 @@ getFirebase().then(async fb => {
         document.body.classList.add("modal-open");
       }
 
+      // Open menu
       if (e.target.closest("[title='Menu']")) {
         renderSideMenu();
         document.getElementById("sideMenu")?.classList.remove("hidden");
       }
 
+      // Close menu
       if (e.target.closest(".close-menu")) {
         document.getElementById("sideMenu")?.classList.add("hidden");
       }
