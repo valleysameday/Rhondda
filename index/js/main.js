@@ -156,6 +156,63 @@ function renderSideMenu() {
 }
 
 /* =====================================================
+   GLOBAL CATEGORY HANDLING (GUMTREE-STYLE)
+===================================================== */
+function initGlobalCategories() {
+  const mainCategoryBtns = document.querySelectorAll(".main-tabs .category-btn");
+  const subVehicleBtns   = document.querySelectorAll("#sub-vehicles .category-btn");
+  const subPropertyBtns  = document.querySelectorAll("#sub-property .category-btn");
+
+  // Main categories (All, Free, Jobs, Property, Vehicles, etc.)
+  mainCategoryBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const cat = btn.dataset.category;
+      if (!cat) return;
+
+      // Save selection
+      sessionStorage.setItem("feedCategory", cat);
+      sessionStorage.setItem("feedSubCategory", "");
+
+      // Services → separate view
+      if (cat === "services") {
+        loadView("view-services", { forceInit: true });
+        return;
+      }
+
+      // All other categories → home feed
+      loadView("home", { forceInit: true });
+    });
+  });
+
+  // Subcategories under Vehicles
+  subVehicleBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const sub = btn.dataset.category;
+      if (!sub) return;
+
+      sessionStorage.setItem("feedCategory", "vehicles");
+      sessionStorage.setItem("feedSubCategory", sub);
+
+      // Always go to feed for subcategories
+      loadView("home", { forceInit: true });
+    });
+  });
+
+  // Subcategories under Property
+  subPropertyBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const sub = btn.dataset.category;
+      if (!sub) return;
+
+      sessionStorage.setItem("feedCategory", "property");
+      sessionStorage.setItem("feedSubCategory", sub);
+
+      loadView("home", { forceInit: true });
+    });
+  });
+}
+
+/* =====================================================
    APP INITIALISATION
 ===================================================== */
 getFirebase().then(async fb => {
@@ -169,6 +226,9 @@ getFirebase().then(async fb => {
   auth.onAuthStateChanged(() => renderSideMenu());
 
   const start = () => {
+    // Global categories become live once, across all views
+    initGlobalCategories();
+
     loadView("home", { skipHistory: true });
 
     document.addEventListener("click", e => {
