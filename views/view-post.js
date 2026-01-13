@@ -1,6 +1,10 @@
 // ========================== view-post.js ==========================
 
-import { getPost, getUser, toggleFollowSeller } from "/index/js/firebase/settings.js";
+import {
+  getPost,
+  getUser,
+  toggleFollowSeller
+} from "/index/js/firebase/settings.js";
 
 /* ---------------- DOM REFS ---------------- */
 let titleEl, priceEl, descEl, timeEl;
@@ -15,15 +19,18 @@ let currentIndex = 0;
 let postId = null;
 let sellerUid = null;
 let following = false;
+let currentPost = null;
 
 /* ===================================================== */
 export async function init({ auth }) {
   console.log("📄 View post init");
 
-  // ---------------- RESET STATE ----------------
+  /* -------- RESET STATE -------- */
   galleryImages = [];
   currentIndex = 0;
   following = false;
+  currentPost = null;
+
   postId = sessionStorage.getItem("viewPostId");
   sellerUid = null;
 
@@ -32,20 +39,22 @@ export async function init({ auth }) {
     return;
   }
 
-  // ---------------- REBIND DOM ----------------
+  /* -------- BIND DOM -------- */
   bindDOM();
 
-  // ---------------- LOAD POST ----------------
+  /* -------- LOAD POST -------- */
   const post = await getPost(postId);
   if (!post) {
     descEl.textContent = "This post is no longer available.";
     return;
   }
 
+  currentPost = post;
   renderPost(post);
 
-  // ---------------- LOAD SELLER ----------------
-  sellerUid = post.uid;
+  /* -------- LOAD SELLER -------- */
+  sellerUid = post.userId; // ✅ FIXED (was post.uid)
+
   if (sellerUid) {
     const seller = await getUser(sellerUid);
     renderSeller(seller, auth?.currentUser);
@@ -76,9 +85,10 @@ function bindDOM() {
   lightboxImg = document.getElementById("lightboxImage");
   lightboxClose = document.getElementById("lightboxClose");
 
-  // Clear previous listeners
   mainImage.onclick = null;
-  lightboxClose?.addEventListener("click", () => lightbox.classList.remove("show"));
+  lightboxClose?.addEventListener("click", () =>
+    lightbox.classList.remove("show")
+  );
 }
 
 /* ===================================================== */
@@ -87,10 +97,15 @@ function renderPost(post) {
   titleEl.textContent = post.title || "";
   priceEl.textContent = post.price ? `£${post.price}` : "";
   descEl.textContent = post.description || "";
-  timeEl.textContent = post.createdAt?.toDate?.().toLocaleString() || "";
 
-  galleryImages = post.images || [];
-  if (!galleryImages.length) galleryImages = ["/assets/default-thumb.jpg"];
+  // ✅ FIX timestamp (number-safe)
+  timeEl.textContent = post.createdAt
+    ? new Date(post.createdAt).toLocaleString()
+    : "";
+
+  galleryImages = post.images?.length
+    ? post.images
+    : ["/assets/default-thumb.jpg"];
 
   currentIndex = 0;
   updateMainImage();
@@ -102,7 +117,9 @@ function renderPost(post) {
 function updateMainImage() {
   mainImage.src = galleryImages[currentIndex];
   galleryCount.textContent =
-    galleryImages.length > 1 ? `${currentIndex + 1}/${galleryImages.length}` : "";
+    galleryImages.length > 1
+      ? `${currentIndex + 1}/${galleryImages.length}`
+      : "";
 
   mainImage.onclick = () => openLightbox(currentIndex);
 }
@@ -142,60 +159,69 @@ async function renderSeller(user, currentUser) {
     return;
   }
 
-  sellerNameEl.textContent = user.displayName || "Seller";
-  sellerPostingSinceEl.textContent =
-    user.createdAt?.toDate?.().getFullYear() || "";
-  sellerLastActiveEl.textContent =
-    user.lastActive?.toDate?.().toLocaleDateString() || "";
+  sellerNameEl.textContent =
+    user.displayName || user.name || "Seller";
 
-  // ---------------- CONTACT ----------------
-  if (user.phone) {
-    const phone = user.phone.replace(/\s+/g, "");
-    callBtn.onclick = () => (window.location.href = `tel:${phone}`);
-    whatsappBtn.onclick = () => window.open(`https://wa.me/${phone}`, "_blank");
+  sellerPostingSinceEl.textContent = user.createdAt
+    ? new Date(user.createdAt).getFullYear()
+    : "";
+
+  sellerLastActiveEl.textContent = user.lastActive
+    ? new Date(user.lastActive).toLocaleDateString()
+    : "";
+
+  /* -------- CONTACT (post OR user phone) -------- */
+  const phone =
+    currentPost?.phone || user.phone || null;
+
+  if (phone) {
+    const clean = phone.replace(/\s+/g, "");
+    callBtn.onclick = () => (window.location.href = `tel:${clean}`);
+    whatsappBtn.onclick = () =>
+      window.open(`https://wa.me/${clean}`, "_blank");
   } else {
     callBtn.disabled = true;
     whatsappBtn.disabled = true;
   }
 
-  // ---------------- FOLLOW ----------------
-  if (!currentUser || currentUser.uid === user.uid) {
+  /* -------- FOLLOW -------- */
+  if (!currentUser || currentUser.uid === sellerUid) {
     followBtn.style.display = "none";
     return;
   }
 
-  following = await checkFollowing(currentUser.uid, user.uid);
+  following = !!user.followers?.[currentUser.uid];
   updateFollowBtn();
 
   followBtn.onclick = async () => {
-    following = await toggleFollowSeller(currentUser.uid, user.uid);
+    following = await toggleFollowSeller(
+      currentUser.uid,
+      sellerUid
+    );
     updateFollowBtn();
-    showToast(following ? "You are now following this seller" : "You unfollowed this seller");
+    showToast(
+      following
+        ? "You are now following this seller"
+        : "You unfollowed this seller"
+    );
   };
 }
 
 /* ===================================================== */
-/* ---------------- FOLLOW HELPERS ---------------- */
+/* ---------------- FOLLOW UI ---------------- */
 function updateFollowBtn() {
   followBtn.textContent = following ? "Following" : "Follow";
   followBtn.classList.toggle("active", following);
 }
 
-async function checkFollowing(userUid, sellerUid) {
-  if (!userUid || !sellerUid) return false;
-  const snap = await getUser(sellerUid);
-  if (!snap) return false;
-  const followers = snap.followers || {};
-  return !!followers[userUid];
-}
-
 /* ===================================================== */
 /* ---------------- TOAST ---------------- */
 function showToast(msg, duration = 2000) {
-  let toast = document.createElement("div");
+  const toast = document.createElement("div");
   toast.className = "toast-message";
   toast.textContent = msg;
   document.body.appendChild(toast);
+
   setTimeout(() => toast.classList.add("show"), 50);
   setTimeout(() => toast.classList.remove("show"), duration);
   setTimeout(() => toast.remove(), duration + 300);
